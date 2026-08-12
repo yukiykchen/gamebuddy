@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Runmate Pet</title>
+    <link rel="stylesheet" href="./pet.css" />
+  </head>
+  <body>
+    <main class="pet-stage" id="pet-stage">
+      <button class="pet-button" id="pet-button" aria-label="打开 Runmate 建议面板">
+        <span class="speech" id="speech">等你出牌</span>
+        <span class="pet-glow"></span>
+        <span class="pet-body">
+          <span class="pet-ear left"></span><span class="pet-ear right"></span>
+          <span class="pet-face"><span class="eye left"></span><span class="eye right"></span><span class="pet-mouth"></span></span>
+          <span class="pet-scarf"></span><span class="pet-foot left"></span><span class="pet-foot right"></span>
+        </span>
+        <span class="pet-shadow"></span>
+        <span class="pet-status"><span class="status-dot"></span><span id="pet-status-label">模拟数据</span></span>
+      </button>
+      <button class="pet-menu" id="pet-menu" aria-label="显示或隐藏 Runmate 面板">···</button>
+    </main>
+    <script src="./pet.js"></script>
+  </body>
+</html>

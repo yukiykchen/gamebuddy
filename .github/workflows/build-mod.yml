@@ -1,0 +1,43 @@
+name: Build STS2 Mod
+
+on:
+  workflow_dispatch:
+    inputs:
+      sts2_dir:
+        description: "Absolute STS2 install directory on the self-hosted runner"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  mod:
+    # This runner must have Godot .NET 4.5.1, .NET 9 and a local STS2 install.
+    # A hosted runner cannot build against the game's private sts2.dll.
+    runs-on: [self-hosted, windows, sts2]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Build and install Mod
+        shell: pwsh
+        run: >-
+          dotnet build .\mod\RunmateBridge\RunmateBridge.csproj
+          -c Release
+          -p:Sts2Dir="${{ inputs.sts2_dir }}"
+          -p:CopyModAfterBuild=true
+
+      - name: Upload Mod artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: runmate-sts2-mod
+          path: |
+            mod/RunmateBridge/bin/Release/net9.0/RunmateBridge.dll
+            mod/RunmateBridge/bin/Release/net9.0/RunmateBridge.json
+          if-no-files-found: error

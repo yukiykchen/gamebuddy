@@ -1,0 +1,11 @@
+[
+  {
+    "schema": "runmate.state.v1",
+    "timestamp": 1723370000000,
+    "source": "recorded-smoke",
+    "run": { "act": 2, "floor": 18, "room": "combat", "character": "ironclad" },
+    "player": { "hp": 43, "maxHp": 67, "block": 12, "energy": 3, "maxEnergy": 3, "gold": 184, "cards": [], "relics": [], "potions": [] },
+    "combat": { "turn": 7, "hand": [], "drawPile": [], "discardPile": [], "exhaustPile": [], "enemies": [] },
+    "map": { "visited": [] }
+  }
+]

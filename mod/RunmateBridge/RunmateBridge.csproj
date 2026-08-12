@@ -1,0 +1,42 @@
+<Project Sdk="Godot.NET.Sdk/4.5.1">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>true</ImplicitUsings>
+    <LangVersion>12.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyName>RunmateBridge</AssemblyName>
+
+    <Sts2Dir Condition="'$(Sts2Dir)' == '' and '$(STS2_DIR)' != ''">$(STS2_DIR)</Sts2Dir>
+    <Sts2DataDir Condition="'$(Sts2DataDir)' == '' and '$(Sts2Dir)' != ''">$(Sts2Dir)\data_sts2_windows_x86_64</Sts2DataDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="sts2" Condition="'$(Sts2DataDir)' != ''">
+      <HintPath>$(Sts2DataDir)\sts2.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="0Harmony" Condition="'$(Sts2DataDir)' != ''">
+      <HintPath>$(Sts2DataDir)\0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <None Include="RunmateBridge.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <Target Name="ValidateSts2References" BeforeTargets="Compile">
+    <Error Condition="'$(Sts2DataDir)' == ''" Text="Set Sts2Dir or STS2_DIR to the local Slay the Spire 2 installation before building the Mod." />
+    <Error Condition="!Exists('$(Sts2DataDir)\sts2.dll')" Text="STS2 assembly not found at $(Sts2DataDir)\sts2.dll" />
+    <Error Condition="!Exists('$(Sts2DataDir)\0Harmony.dll')" Text="Harmony assembly not found at $(Sts2DataDir)\0Harmony.dll" />
+  </Target>
+
+  <Target Name="CopyModAfterBuild" AfterTargets="Build" Condition="'$(CopyModAfterBuild)' == 'true'">
+    <PropertyGroup>
+      <ModDirectory>$(Sts2Dir)\mods\RunmateBridge</ModDirectory>
+    </PropertyGroup>
+    <MakeDir Directories="$(ModDirectory)" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ModDirectory)" />
+    <Copy SourceFiles="RunmateBridge.json" DestinationFolder="$(ModDirectory)" />
+  </Target>
+</Project>

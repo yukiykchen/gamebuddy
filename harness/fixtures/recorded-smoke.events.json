@@ -1,0 +1,14 @@
+[
+  {
+    "type": "event",
+    "name": "combat.started",
+    "timestamp": 1723370000000,
+    "data": {}
+  },
+  {
+    "type": "event",
+    "name": "turn.started",
+    "timestamp": 1723370000001,
+    "data": { "turn": 7 }
+  }
+]

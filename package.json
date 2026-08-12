@@ -1,0 +1,65 @@
+{
+  "name": "sts2-companion",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A real-time AI companion for Slay the Spire 2",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "demo": "node harness/run-demo.js",
+    "dist:win": "electron-builder --win nsis --x64",
+    "test:syntax": "node --check main.js && node --check preload.js && node --check src/renderer.js && node --check src/pet.js && node --check harness/protocol.js && node --check harness/observation-store.js && node --check harness/replay-bridge.js && node --check harness/run-demo.js && node --check harness/record-bridge.js && node --check harness/inspect-bridge.js && node --check harness/validate-protocol.js && node --check harness/validate-all.js && node --check harness/validate-events.js && node --check harness/validate-observation.js && node --check harness/validate-replay.js && node --check harness/validate-mod.js && node --check harness/smoke-replay.js",
+    "harness:validate-observation": "node harness/validate-observation.js",
+    "harness:validate-protocol": "node harness/validate-protocol.js",
+    "harness:validate-all": "node harness/validate-all.js",
+    "harness:validate": "node harness/validate-replay.js",
+    "harness:validate-mod": "node harness/validate-mod.js",
+    "harness:replay": "node harness/replay-bridge.js",
+    "harness:record": "node harness/record-bridge.js",
+    "harness:inspect": "node harness/inspect-bridge.js",
+    "harness:smoke": "node harness/smoke-replay.js",
+    "harness:smoke:lifecycle": "node harness/smoke-replay.js --fixture harness/fixtures/lifecycle.json --events combat.started,turn.started,combat.ended,map.opened"
+  },
+  "dependencies": {
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "electron": "^37.2.6",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.runmate.sts2",
+    "productName": "Runmate",
+    "asar": true,
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*",
+      "harness/protocol.js",
+      "harness/observation-store.js",
+      "README.md",
+      "docs/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "artifactName": "Runmate-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Runmate"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+node_modules/
+dist/
+release/
+.DS_Store
+*.log
+.env
+.env.*
+!.env.example
+hatch-runs/

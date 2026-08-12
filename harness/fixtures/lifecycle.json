@@ -1,0 +1,29 @@
+[
+  {
+    "schema": "runmate.state.v1",
+    "timestamp": 1723370000000,
+    "source": "replay-lifecycle",
+    "run": { "act": 1, "floor": 4, "room": "combat", "character": "ironclad" },
+    "player": { "hp": 68, "maxHp": 80, "block": 5, "energy": 3, "maxEnergy": 3, "gold": 99, "cards": [], "relics": [], "potions": [] },
+    "combat": { "turn": 1, "hand": [], "drawPile": [], "discardPile": [], "exhaustPile": [], "enemies": [{ "name": "小史莱姆", "hp": 20, "maxHp": 20, "block": 0, "intent": "AttackIntent", "damage": 8, "alive": true }] },
+    "map": { "visited": [] }
+  },
+  {
+    "schema": "runmate.state.v1",
+    "timestamp": 1723370001000,
+    "source": "replay-lifecycle",
+    "run": { "act": 1, "floor": 4, "room": "combat", "character": "ironclad" },
+    "player": { "hp": 68, "maxHp": 80, "block": 0, "energy": 3, "maxEnergy": 3, "gold": 99, "cards": [], "relics": [], "potions": [] },
+    "combat": { "turn": 2, "hand": [], "drawPile": [], "discardPile": [], "exhaustPile": [], "enemies": [{ "name": "小史莱姆", "hp": 0, "maxHp": 20, "block": 0, "intent": "none", "damage": 0, "alive": false }] },
+    "map": { "visited": [] }
+  },
+  {
+    "schema": "runmate.state.v1",
+    "timestamp": 1723370002000,
+    "source": "replay-lifecycle",
+    "run": { "act": 1, "floor": 5, "room": "map", "character": "ironclad" },
+    "player": { "hp": 68, "maxHp": 80, "block": 0, "energy": 3, "maxEnergy": 3, "gold": 109, "cards": [], "relics": [], "potions": [] },
+    "combat": null,
+    "map": { "visited": ["0,0", "1,0"] }
+  }
+]

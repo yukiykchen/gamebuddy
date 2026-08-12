@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Runmate · 杀戮尖塔 2 AI 搭子</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="titlebar">
+        <div class="brand-lockup">
+          <div class="brand-mark">R</div>
+          <div>
+            <div class="brand-name">RUNMATE</div>
+            <div class="brand-subtitle">SLAY THE SPIRE 2 / AI COMPANION</div>
+          </div>
+        </div>
+        <div class="titlebar-center"><span class="live-dot"></span>实时辅助模式</div>
+        <div class="titlebar-actions">
+          <button class="icon-button window-control" id="minimize-button" aria-label="最小化窗口">−</button>
+          <button class="icon-button window-control close-control" id="close-button" aria-label="关闭窗口">×</button>
+        </div>
+      </header>
+
+      <div class="workspace">
+        <aside class="sidebar">
+          <div class="connection-card">
+            <div class="connection-header">
+              <span class="status-indicator"></span>
+              <span id="bridge-name">模拟数据</span>
+              <span class="connection-live" id="bridge-state">DEMO</span>
+            </div>
+            <div class="connection-detail" id="bridge-detail">等待本地 Mod Bridge · 127.0.0.1:27182</div>
+            <div class="connection-footer"><span>延迟 38 ms</span><span id="last-sync">刚刚同步</span></div>
+          </div>
+
+          <div class="sidebar-section-label">决策工作台</div>
+          <nav class="primary-nav" aria-label="决策工作台">
+            <button class="nav-item active" data-mode="combat"><span class="nav-index">01</span><span>战斗决策</span><span class="nav-chevron">›</span></button>
+            <button class="nav-item" data-mode="draft"><span class="nav-index">02</span><span>选牌建议</span><span class="nav-chevron">›</span></button>
+            <button class="nav-item" data-mode="route"><span class="nav-index">03</span><span>路线规划</span><span class="nav-chevron">›</span></button>
+          </nav>
+
+          <div class="sidebar-section-label run-label">本局概览</div>
+          <div class="run-summary">
+            <div class="run-character"><span class="character-badge">铁</span><div><strong id="run-character-name">铁甲战士</strong><span id="run-location">尖塔 · 第 2 层</span></div></div>
+            <div class="run-progress"><div class="progress-meta"><span>本局进度</span><strong id="run-progress-label">18 / 52</strong></div><div class="progress-track"><span id="run-progress-bar"></span></div></div>
+            <div class="run-stats"><div><span>卡组</span><strong id="deck-count">28</strong></div><div><span>遗物</span><strong id="relic-count">7</strong></div><div><span>金币</span><strong id="gold-count">184</strong></div></div>
+          </div>
+
+          <div class="sidebar-spacer"></div>
+          <div class="model-card"><div class="model-heading"><span class="pulse-line"></span><span>决策引擎</span></div><strong>Runmate Core</strong><span>战斗推演 · 路线评分 · 版本 0.1</span></div>
+          <div class="sidebar-bottom"><button class="text-button">设置</button><button class="text-button">反馈问题</button></div>
+        </aside>
+
+        <main class="main-content">
+          <section class="page-heading">
+            <div><div class="eyebrow" id="page-eyebrow">COMBAT / TURN 07</div><h1 id="page-title">现在该怎么打？</h1><p id="page-description">我会根据当前手牌、敌人意图和未来回合，给出可执行的最优顺序。</p></div>
+            <div class="heading-actions"><button class="secondary-button" id="refresh-button"><span class="refresh-glyph">↻</span>刷新数据</button><button class="quiet-toggle" id="pause-button"><span class="toggle-dot"></span><span id="pause-label">建议中</span></button></div>
+          </section>
+
+          <div id="view-container"></div>
+        </main>
+      </div>
+      <div class="toast" id="toast" role="status"></div>
+    </div>
+    <script src="./renderer.js"></script>
+  </body>
+</html>

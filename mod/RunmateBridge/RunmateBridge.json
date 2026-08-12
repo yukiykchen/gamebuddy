@@ -1,0 +1,11 @@
+{
+  "id": "runmate_bridge",
+  "name": "Runmate Bridge",
+  "author": "Runmate",
+  "description": "Exports read-only Slay the Spire 2 run state to the local Runmate desktop companion.",
+  "version": "0.1.0",
+  "has_pck": false,
+  "has_dll": true,
+  "dependencies": [],
+  "affects_gameplay": false
+}
