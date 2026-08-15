@@ -1,6 +1,6 @@
 [
   {
-    "schema": "runmate.state.v1",
+    "schema": "gamebuddy.state.v1",
     "timestamp": 1723370000000,
     "source": "replay-bridge",
     "run": { "act": 2, "floor": 18, "room": "combat", "character": "ironclad" },
@@ -29,7 +29,7 @@
     "map": { "visited": [] }
   },
   {
-    "schema": "runmate.state.v1",
+    "schema": "gamebuddy.state.v1",
     "timestamp": 1723370001200,
     "source": "replay-bridge",
     "run": { "act": 2, "floor": 18, "room": "combat", "character": "ironclad" },
@@ -57,7 +57,7 @@
     "map": { "visited": [] }
   },
   {
-    "schema": "runmate.state.v1",
+    "schema": "gamebuddy.state.v1",
     "timestamp": 1723370002400,
     "source": "replay-bridge",
     "run": { "act": 2, "floor": 18, "room": "combat", "character": "ironclad" },

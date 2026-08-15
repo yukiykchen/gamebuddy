@@ -1,14 +1,14 @@
-# Runmate 数据契约
+# GameBuddy 数据契约
 
-Runmate 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责把当前可观测状态和事件通过本地 WebSocket 推送给桌面应用，桌面应用负责展示、缓存和调用决策引擎。
+GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责把当前可观测状态和事件通过本地 WebSocket 推送给桌面应用，桌面应用负责展示、缓存和调用决策引擎。
 
 ## 当前状态消息
 
-真实 Mod 的当前采集范围见 [mod/RunmateBridge/README.md](../mod/RunmateBridge/README.md)。由于 STS2 的内部程序集会随游戏更新变化，协议字段是稳定边界，Mod 内部类名不是稳定边界。
+真实 Mod 的当前采集范围见 [mod/GameBuddyBridge/README.md](../mod/GameBuddyBridge/README.md)。由于 STS2 的内部程序集会随游戏更新变化，协议字段是稳定边界，Mod 内部类名不是稳定边界。
 
 ```json
 {
-  "schema": "runmate.state.v1",
+  "schema": "gamebuddy.state.v1",
   "timestamp": 1723370000000,
   "source": "sts2-mod-bridge",
   "run": {
@@ -84,20 +84,21 @@ Runmate 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责�
 - `LIVE`：最近 5 秒内收到合法状态
 - `STALE`：连接仍在，但超过 5 秒没有新状态
 - `ERROR`：消息未通过协议校验
-- `DEMO`：没有真实 Bridge，当前使用模拟/回放数据
+- `DEMO`：明确启动了 Replay Bridge，当前是回放数据
+- `WAIT`：没有真实 Bridge，桌面端正在等待游戏 Mod
 
 ## Agent 观察对象
 
-桌面主进程和未来 Agent 使用 `runmate.observation.v1` 作为观察边界：
+桌面主进程和未来 Agent 使用 `gamebuddy.observation.v1` 作为观察边界：
 
 ```json
 {
-  "schema": "runmate.observation.v1",
+  "schema": "gamebuddy.observation.v1",
   "sequence": 12,
   "receivedAt": 1723370000000,
   "ageMs": 38,
   "fresh": true,
-  "state": { "schema": "runmate.state.v1" },
+  "state": { "schema": "gamebuddy.state.v1" },
   "recentEvents": []
 }
 ```

@@ -3,8 +3,8 @@ const path = require('node:path');
 const { WebSocketServer } = require('ws');
 const { validateState } = require('./protocol');
 
-const port = Number(process.env.RUNMATE_BRIDGE_PORT || 27182);
-const intervalMs = Number(process.env.RUNMATE_REPLAY_INTERVAL || 1400);
+const port = Number(process.env.GAMEBUDDY_BRIDGE_PORT || 27182);
+const intervalMs = Number(process.env.GAMEBUDDY_REPLAY_INTERVAL || 1400);
 const fixturePath = process.argv[2] || path.join(__dirname, 'fixtures', 'combat-run.json');
 const snapshots = JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
 for (const [index, snapshot] of snapshots.entries()) {
@@ -56,7 +56,7 @@ function nextSnapshot() {
 }
 
 server.on('listening', () => {
-  console.log(`Runmate Replay Bridge listening on ws://127.0.0.1:${port}`);
+  console.log(`GameBuddy Replay Bridge listening on ws://127.0.0.1:${port}`);
   console.log(`Fixture: ${fixturePath}`);
   timer = setInterval(nextSnapshot, intervalMs);
 });

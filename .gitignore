@@ -1,4 +1,6 @@
 node_modules/
+.tools/
+.godot/
 dist/
 release/
 .DS_Store

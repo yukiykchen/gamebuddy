@@ -1,20 +1,15 @@
 const state = {
   mode: 'combat',
   paused: false,
-  source: 'demo',
-  syncedAt: Date.now(),
-  run: { act: 2, floor: 18, totalFloor: 52, room: 'combat', character: 'ironclad' },
-  selectedCard: '打击',
-  player: { hp: 43, maxHp: 67, block: 12, energy: 2, maxEnergy: 3, gold: 184, cards: Array(28), relics: Array(7), potions: [] },
-  combat: { turn: 7, drawPile: Array(14), discardPile: Array(9), exhaustPile: [] },
-  enemy: { name: '蛇花', subtitle: '意图：强力攻击', hp: 78, maxHp: 96, damage: 18 },
-  hand: [
-    { name: '打击', cost: 1, type: '攻击' },
-    { name: '防御', cost: 1, type: '技能', skill: true },
-    { name: '痛击', cost: 2, type: '攻击' },
-    { name: '恶魔形态', cost: 3, type: '能力', skill: true },
-    { name: '铁斩波', cost: 1, type: '攻击' }
-  ]
+  source: 'waiting',
+  syncedAt: 0,
+  run: { act: 0, floor: 0, totalFloor: 0, room: null, character: '' },
+  selectedCard: '',
+  player: { hp: 0, maxHp: 0, block: 0, energy: 0, maxEnergy: 0, gold: 0, cards: [], relics: [], potions: [] },
+  combat: null,
+  enemy: null,
+  hand: [],
+  map: { visited: [] }
 };
 
 const viewContainer = document.querySelector('#view-container');
@@ -28,49 +23,57 @@ function showToast(message) {
   toastTimer = setTimeout(() => toast.classList.remove('show'), 2300);
 }
 
-function hpPercent(unit) { return Math.max(0, Math.min(100, Math.round((unit.hp / unit.maxHp) * 100))); }
+function hpPercent(unit) { return unit?.maxHp > 0 ? Math.max(0, Math.min(100, Math.round((unit.hp / unit.maxHp) * 100))) : 0; }
+
+function characterName(character) {
+  const names = { ironclad: '铁甲战士', silent: '静默猎手', defect: '故障机器人', regent: '统御者', necrobinder: '死灵法师' };
+  return names[String(character || '').toLowerCase()] || character || '等待游戏';
+}
 
 function combatView() {
-  const enemyIntent = state.enemy.damage > 0 ? `攻击 ${state.enemy.damage}` : state.enemy.subtitle || '意图未知';
-  const recommendation = state.selectedCard === '防御'
-    ? { title: '先打出', card: '防御', reason: '敌方本回合将造成 18 点伤害。保留 1 点能量给防御，可以让本回合的生命风险降到最低。', sequence: [['防御', '获得 5 格挡'], ['打击', '造成 6 伤害'], ['结束回合', '保留 1 点能量']] }
-    : { title: '先打出', card: '打击', reason: '先用低成本攻击压低蛇花的生命，再用剩余能量补防御。这个顺序比先防御多保留约 6 点有效伤害。', sequence: [['打击', '造成 6 伤害'], ['防御', '获得 5 格挡'], ['结束回合', '预计承受 1 点伤害']] };
+  const hasCombat = Boolean(state.combat);
+  const enemy = state.enemy;
+  const enemyIntent = enemy?.damage > 0 ? `攻击 ${enemy.damage}` : enemy?.subtitle || '意图未知';
+  const liveRecommendation = hasCombat && enemy
+    ? { title: '等待决策引擎', card: '', reason: `已收到 ${enemy.name} 的真实生命、格挡和行动意图；决策引擎接入后会基于当前手牌计算出牌顺序。`, sequence: [] }
+    : { title: '等待游戏状态', card: '', reason: '启动《杀戮尖塔 2》并进入一局游戏后，这里会根据真实手牌和敌人意图生成建议。', sequence: [] };
+  const hand = hasCombat ? state.hand : [];
   return `
     <div class="view-grid">
       <section class="panel battle-panel">
-        <div class="panel-heading"><span class="panel-title">战斗状态</span><span class="panel-meta">楼层 ${state.run.floor} · 回合 ${String(state.combat.turn).padStart(2, '0')}</span></div>
+        <div class="panel-heading"><span class="panel-title">战斗状态</span><span class="panel-meta">${hasCombat ? `楼层 ${state.run.floor} · 回合 ${String(state.combat.turn).padStart(2, '0')}` : '当前不在战斗中'}</span></div>
         <div class="combat-top">
           <div class="unit-card">
-            <div class="unit-label"><span class="mini-status"></span>我方</div><div class="unit-name">铁甲战士</div><div class="unit-subtitle">力量 3 · 易伤 1</div>
+            <div class="unit-label"><span class="mini-status"></span>我方</div><div class="unit-name">${characterName(state.run.character)}</div><div class="unit-subtitle">${hasCombat ? '实时战斗数据' : '等待真实游戏数据'}</div>
             <div class="vitals"><div class="vital ${state.player.hp < 30 ? 'danger' : ''}"><strong>${state.player.hp}</strong><span>生命 / ${state.player.maxHp}</span></div><div class="vital"><strong>${state.player.block}</strong><span>格挡</span></div></div>
             <div class="unit-meter"><span style="width:${hpPercent(state.player)}%"></span></div>
           </div>
           <div class="unit-card enemy-card">
-            <div class="unit-label enemy-label"><span class="mini-status"></span>敌方</div><div class="unit-name">${state.enemy.name}</div><div class="unit-subtitle">${state.enemy.subtitle}</div>
-            <div class="vitals"><div class="vital danger"><strong>${state.enemy.hp}</strong><span>生命 / ${state.enemy.maxHp}</span></div></div>
-            <div class="unit-meter"><span style="width:${hpPercent(state.enemy)}%"></span></div><div class="intent"><strong>${enemyIntent}</strong>　${state.enemy.damage > 0 ? '未减伤前的预估伤害' : '敌方下一步行动'}</div>
+            <div class="unit-label enemy-label"><span class="mini-status"></span>敌方</div><div class="unit-name">${enemy?.name || '暂无敌人'}</div><div class="unit-subtitle">${enemy?.subtitle || '进入战斗后显示'}</div>
+            <div class="vitals"><div class="vital danger"><strong>${enemy?.hp ?? '--'}</strong><span>${enemy ? `生命 / ${enemy.maxHp}` : '生命'}</span></div></div>
+            <div class="unit-meter"><span style="width:${enemy ? hpPercent(enemy) : 0}%"></span></div><div class="intent"><strong>${enemy ? enemyIntent : '等待战斗数据'}</strong>　${enemy ? (enemy.damage > 0 ? '未减伤前的预估伤害' : '敌方下一步行动') : '本区域暂无敌人'}</div>
           </div>
         </div>
-        <div class="energy-row"><div class="energy">${state.player.energy}<small>/ ${state.player.maxEnergy || 3} 能量</small></div><div class="turn-status">${state.paused ? '建议已暂停 · 数据仍在同步' : '等待你的操作'}</div><div class="panel-meta">抽牌堆 ${state.combat.drawPile.length}　弃牌堆 ${state.combat.discardPile.length}</div></div>
-        <div class="hand-area"><div class="hand-label"><span>当前手牌 · 5 张</span><span>点击卡牌查看推演</span></div><div class="hand">${state.hand.map(card => `<button class="card-tile ${card.skill ? 'skill' : ''} ${state.selectedCard === card.name ? 'recommended' : ''}" data-card="${card.name}"><span class="card-cost">${card.cost}</span><span class="card-name">${card.name}</span><span class="card-type">${card.type}</span></button>`).join('')}</div></div>
+        <div class="energy-row"><div class="energy">${hasCombat ? state.player.energy : '--'}<small>/ ${hasCombat ? state.player.maxEnergy : '--'} 能量</small></div><div class="turn-status">${state.paused ? '建议已暂停 · 数据仍在同步' : hasCombat ? '等待你的操作' : '等待进入战斗'}</div><div class="panel-meta">抽牌堆 ${hasCombat ? state.combat.drawPile.length : '--'}　弃牌堆 ${hasCombat ? state.combat.discardPile.length : '--'}</div></div>
+        <div class="hand-area"><div class="hand-label"><span>当前手牌 · ${hand.length} 张</span><span>${hand.length ? '点击卡牌查看推演' : '等待真实手牌数据'}</span></div><div class="hand">${hand.length ? hand.map(card => `<button class="card-tile ${card.skill ? 'skill' : ''} ${state.selectedCard === card.name ? 'recommended' : ''}" data-card="${card.name}"><span class="card-cost">${card.cost ?? 'X'}</span><span class="card-name">${card.name}</span><span class="card-type">${card.type}</span></button>`).join('') : '<div class="data-empty">进入战斗后，真实手牌会显示在这里。</div>'}</div></div>
       </section>
       <div class="side-stack">
         <section class="panel recommendation-panel">
-          <div class="panel-heading"><span class="panel-title">本回合建议</span><span class="confidence">置信度 84%</span></div>
-          <div class="recommendation-body"><div class="recommendation-kicker">最小化本回合风险</div><div class="recommendation-title">${recommendation.title} <em>${recommendation.card}</em></div><p class="recommendation-reason">${recommendation.reason}</p><div class="sequence"><div class="sequence-label">建议顺序</div><div class="sequence-list">${recommendation.sequence.map((item, index) => `<div class="sequence-item"><span class="sequence-number">${index + 1}</span><strong>${item[0]}</strong><span>${item[1]}</span></div>`).join('')}</div></div><div class="decision-footer"><button class="primary-button" id="confirm-action">采纳这条建议</button><button class="outline-button" id="more-actions">看其他方案</button></div></div>
+          <div class="panel-heading"><span class="panel-title">本回合建议</span><span class="confidence">等待分析</span></div>
+          <div class="recommendation-body"><div class="recommendation-kicker">${hasCombat && enemy ? '最小化本回合风险' : '实时数据接入'}</div><div class="recommendation-title">${liveRecommendation.title} <em>${liveRecommendation.card}</em></div><p class="recommendation-reason">${liveRecommendation.reason}</p><div class="sequence">${liveRecommendation.sequence.length ? `<div class="sequence-label">建议顺序</div><div class="sequence-list">${liveRecommendation.sequence.map((item, index) => `<div class="sequence-item"><span class="sequence-number">${index + 1}</span><strong>${item[0]}</strong><span>${item[1]}</span></div>`).join('')}</div>` : ''}</div><div class="decision-footer">${hasCombat && enemy ? '<button class="primary-button" id="confirm-action">采纳这条建议</button><button class="outline-button" id="more-actions">看其他方案</button>' : ''}</div></div>
         </section>
-        <section class="panel why-panel"><div class="panel-heading"><span class="panel-title">为什么这样打</span><span class="panel-meta">实时推演</span></div><div class="why-body"><div class="score-row"><div class="score-number">8.4</div><div class="score-copy"><strong>局面评分</strong><span>预计存活率较高</span></div></div><div class="score-track"><span></span></div><ul class="why-list"><li>蛇花下回合可能进入防御姿态，当前不必急于投入全部伤害。</li><li>保留 1 点能量，可应对下一张牌的费用波动。</li></ul></div></section>
+        <section class="panel why-panel"><div class="panel-heading"><span class="panel-title">为什么这样打</span><span class="panel-meta">实时推演</span></div><div class="why-body">${hasCombat && enemy ? '<div class="data-empty">决策引擎将在真实战斗数据接入后生成解释。</div>' : '<div class="data-empty">等待真实战斗数据。</div>'}</div></section>
       </div>
     </div>`;
 }
 
 function draftView() {
-  return `<div class="draft-layout"><section class="panel draft-offer"><div class="draft-kicker">REWARD / CARD REWARD</div><h2 class="draft-title">这三张牌，哪一张值得加入卡组？</h2><div class="draft-cards"><article class="draft-card top-pick"><span class="pick-tag">推荐加入</span><div class="card-cost">1</div><div class="card-name">剑柄打击</div><div class="card-type">攻击 · 罕见</div><p>当前卡组缺少低费过牌，能让力量体系更快启动。</p></article><article class="draft-card"><div class="card-cost">2</div><div class="card-name">祭品</div><div class="card-type">技能 · 罕见</div><p>爆发很高，但会消耗生命。只有在后续有恢复点时优先级才会上升。</p></article><article class="draft-card"><div class="card-cost">2</div><div class="card-name">震荡波</div><div class="card-type">技能 · 罕见</div><p>控制价值不错，但与当前卡组的防御密度重复，暂不建议稀释卡组。</p></article></div><div class="decision-footer"><button class="primary-button" id="draft-confirm">选择剑柄打击</button><button class="outline-button" id="draft-skip">跳过奖励</button></div></section><section class="panel draft-side"><div class="panel-heading"><span class="panel-title">卡组画像</span><span class="panel-meta">当前 28 张</span></div><div class="deck-stat"><span>力量体系</span><strong>成型中 · 72%</strong></div><div class="deck-stat"><span>平均费用</span><strong>1.46</strong></div><div class="deck-stat"><span>攻击 / 技能 / 能力</span><strong>13 / 12 / 3</strong></div><div class="deck-stat"><span>下一张精英前景</span><strong style="color:var(--mint)">可挑战</strong></div><div class="why-body"><ul class="why-list"><li>卡组已经有足够的单体攻击，不需要继续补高费伤害。</li><li>过牌是当前最缺的功能，优先选能减少空过回合的牌。</li></ul></div></section></div>`;
+  return `<div class="draft-layout"><section class="panel draft-offer"><div class="draft-kicker">REWARD / CARD REWARD</div><h2 class="draft-title">等待真实卡牌奖励</h2><div class="data-empty large-empty">进入奖励界面后，Mod 会把游戏提供的卡牌传给这里，再生成选牌建议。</div></section><section class="panel draft-side"><div class="panel-heading"><span class="panel-title">当前卡组</span><span class="panel-meta">${state.player.cards.length ? `${state.player.cards.length} 张` : '等待数据'}</span></div><div class="deck-stat"><span>卡牌</span><strong>${state.player.cards.length || '--'}</strong></div><div class="deck-stat"><span>遗物</span><strong>${state.player.relics.length || '--'}</strong></div><div class="deck-stat"><span>药水</span><strong>${state.player.potions.length || '--'}</strong></div></section></div>`;
 }
 
 function routeView() {
-  const nodes = [['战', ''], ['？', ''], ['营', 'rest'], ['精', 'elite'], ['？', ''], ['营', 'rest'], ['BOSS', 'boss']];
-  return `<div class="route-layout"><section class="panel map-panel"><div class="panel-heading"><span class="panel-title">第二层地图</span><span class="panel-meta">当前位于第 18 个房间</span></div><div class="map-rail">${nodes.map((node, index) => `<button class="map-node ${node[1]} ${index === 0 ? 'current' : ''}" data-node="${index}">${node[0]}</button>`).join('')}</div><div class="map-legend"><span class="legend-current">当前位置</span><span class="legend-elite">精英</span><span class="legend-rest">休息处</span></div></section><section class="panel route-advice"><div class="eyebrow">ROUTE SCORE / NEXT 4 ROOMS</div><h2>向右走更适合这套牌</h2><p>下一处休息点前有一次普通战斗，能把卡组推演需要的生命成本控制在安全线内。</p><div class="route-choice"><strong>推荐路线 · 生存优先</strong><span>普通战斗 → 问号 → 休息处 → 精英</span></div><div class="score-row" style="margin-top:24px"><div class="score-number">76</div><div class="score-copy"><strong>路线收益分</strong><span>包含遗物与升级价值</span></div></div><div class="score-track"><span style="width:76%;background:var(--amber)"></span></div><ul class="why-list"><li>你当前生命 64%，可以承受一次普通战斗。</li><li>休息处后挑战精英，预计战斗前生命恢复至 79%。</li><li>避开左侧连续两场战斗的高波动路线。</li></ul></section></div>`;
+  const visited = state.map?.visited?.length || 0;
+  return `<div class="route-layout"><section class="panel map-panel"><div class="panel-heading"><span class="panel-title">当前地图</span><span class="panel-meta">${state.run.currentCoord || '等待地图数据'}</span></div><div class="data-empty large-empty">${visited ? `已从游戏收到 ${visited} 个已访问节点。完整路线评分会在地图结构接入后显示。` : '打开地图后，Mod 会把真实节点和访问记录同步到这里。'}</div></section><section class="panel route-advice"><div class="eyebrow">MAP / LIVE STATE</div><h2>${state.run.currentNode || '等待地图状态'}</h2><p>${state.run.room ? `当前房间：${state.run.room}` : '启动游戏并打开地图后，这里会显示真实位置。'}</p><div class="route-choice"><strong>已访问节点</strong><span>${visited || '--'}</span></div><div class="score-row" style="margin-top:24px"><div class="score-number">--</div><div class="score-copy"><strong>路线评分</strong><span>等待完整地图数据</span></div></div></section></div>`;
 }
 
 function render() {
@@ -90,24 +93,22 @@ function render() {
 }
 
 function updateRunSummary() {
-  const character = state.run.character || 'ironclad';
-  const characterNames = { ironclad: '铁甲战士', silent: '静默猎手', defect: '故障机器人', regent: '统御者', necrobinder: '死灵法师' };
-  const name = characterNames[character.toLowerCase()] || character;
+  const character = state.run.character || '';
+  const name = characterName(character);
+  document.querySelector('#character-badge').textContent = name === '等待游戏' ? '?' : name.slice(0, 1);
   document.querySelector('#run-character-name').textContent = name;
-  document.querySelector('#run-location').textContent = `尖塔 · 第 ${state.run.act || 1} 层 · 房间 ${state.run.floor || 0}`;
-  document.querySelector('#run-progress-label').textContent = `${state.run.floor || 0} / ${state.run.totalFloor || 52}`;
-  document.querySelector('#run-progress-bar').style.width = `${Math.min(100, ((state.run.floor || 0) / Math.max(1, state.run.totalFloor || 52)) * 100)}%`;
-  document.querySelector('#deck-count').textContent = state.player.cards?.length || 0;
-  document.querySelector('#relic-count').textContent = state.player.relics?.length || 0;
-  document.querySelector('#gold-count').textContent = state.player.gold ?? 0;
+  document.querySelector('#run-location').textContent = state.run.act ? `尖塔 · 第 ${state.run.act} 层 · 房间 ${state.run.floor || 0}` : '启动《杀戮尖塔 2》后显示';
+  document.querySelector('#run-progress-label').textContent = state.run.act ? `${state.run.floor || 0} / ${state.run.totalFloor || '--'}` : '-- / --';
+  document.querySelector('#run-progress-bar').style.width = state.run.act ? `${Math.min(100, ((state.run.floor || 0) / Math.max(1, state.run.totalFloor || 52)) * 100)}%` : '0%';
+  document.querySelector('#deck-count').textContent = state.player.cards?.length || '--';
+  document.querySelector('#relic-count').textContent = state.player.relics?.length || '--';
+  document.querySelector('#gold-count').textContent = state.run.act ? (state.player.gold ?? 0) : '--';
 }
 
 function bindViewActions() {
   document.querySelectorAll('[data-card]').forEach(button => button.addEventListener('click', () => { state.selectedCard = button.dataset.card; render(); showToast(`已切换到「${button.dataset.card}」的行动推演`); }));
-  document.querySelector('#confirm-action')?.addEventListener('click', () => { state.player.energy = Math.max(0, state.player.energy - 1); state.enemy.hp = Math.max(0, state.enemy.hp - 6); state.player.block += 5; state.syncedAt = Date.now(); render(); showToast('已记录：打出打击，后续建议已更新'); });
-  document.querySelector('#more-actions')?.addEventListener('click', () => showToast('另一方案：先防御，预计少受 5 点伤害，但本回合少造成 6 点伤害'));
-  document.querySelector('#draft-confirm')?.addEventListener('click', () => showToast('已加入卡组：剑柄打击 · 卡组现在 29 张'));
-  document.querySelector('#draft-skip')?.addEventListener('click', () => showToast('已跳过奖励，保留卡组纯度'));
+  document.querySelector('#confirm-action')?.addEventListener('click', () => showToast('建议已记录，GameBuddy 不会自动操作游戏'));
+  document.querySelector('#more-actions')?.addEventListener('click', () => showToast('其他方案将在决策引擎接入后显示'));
   document.querySelectorAll('[data-node]').forEach(button => button.addEventListener('click', () => showToast(`已查看第 ${Number(button.dataset.node) + 1} 个节点的路线风险`)));
 }
 
@@ -118,17 +119,31 @@ document.querySelector('#refresh-button').addEventListener('click', () => { stat
 document.querySelector('#pause-button').addEventListener('click', () => { state.paused = !state.paused; document.querySelector('#pause-button').classList.toggle('paused', state.paused); document.querySelector('#pause-label').textContent = state.paused ? '已暂停' : '建议中'; render(); });
 
 function setBridgeStatus(status) {
-  const phase = typeof status === 'object' ? status.status : status ? 'connected' : 'demo';
-  const connected = phase === 'live';
+  const phase = typeof status === 'object' ? status.status : status ? 'connected' : 'waiting';
+  const replay = phase === 'live' && typeof status === 'object' && status.mode === 'replay';
+  const connected = phase === 'live' && !replay;
   const invalid = phase === 'invalid';
   const stale = phase === 'stale';
-  state.source = connected ? 'bridge' : 'demo';
+  const wasLive = state.source === 'bridge' || state.source === 'demo';
+  state.source = replay || phase === 'demo' ? 'demo' : connected ? 'bridge' : 'waiting';
+  if (wasLive && phase !== 'live' && phase !== 'stale') {
+    state.run = { act: 0, floor: 0, totalFloor: 0, room: null, character: '' };
+    state.player = { hp: 0, maxHp: 0, block: 0, energy: 0, maxEnergy: 0, gold: 0, cards: [], relics: [], potions: [] };
+    state.combat = null;
+    state.enemy = null;
+    state.hand = [];
+    state.selectedCard = '';
+    state.syncedAt = 0;
+    render();
+  }
   document.querySelector('.status-indicator').style.background = connected ? 'var(--mint)' : invalid || stale ? 'var(--red)' : 'var(--amber)';
-  document.querySelector('#bridge-name').textContent = connected ? '游戏数据' : invalid ? '数据异常' : stale ? '数据停滞' : phase === 'connecting' ? '正在连接' : phase === 'connected' ? '数据桥已连接' : '模拟数据';
-  document.querySelector('#bridge-state').textContent = connected ? 'LIVE' : invalid ? 'ERROR' : stale ? 'STALE' : phase === 'connecting' || phase === 'connected' ? 'WAIT' : 'DEMO';
+  document.querySelector('#bridge-name').textContent = replay || phase === 'demo' ? '回放数据' : connected ? '游戏数据' : invalid ? '数据异常' : stale ? '数据停滞' : phase === 'connecting' ? '正在连接' : phase === 'connected' ? '数据桥已连接' : '等待游戏';
+  document.querySelector('#bridge-state').textContent = replay || phase === 'demo' ? 'DEMO' : connected ? 'LIVE' : invalid ? 'ERROR' : stale ? 'STALE' : 'WAIT';
   document.querySelector('#bridge-state').style.color = connected ? 'var(--mint)' : invalid || stale ? 'var(--red)' : 'var(--amber)';
   document.querySelector('#bridge-detail').textContent = connected
     ? '本地 Mod Bridge · 0.4.2'
+    : replay
+      ? 'Replay Bridge · 127.0.0.1:27182'
     : invalid
       ? `消息未通过校验 · ${status.detail || '未知错误'}`
       : stale
@@ -137,21 +152,24 @@ function setBridgeStatus(status) {
         ? '正在等待 127.0.0.1:27182'
         : phase === 'connected'
           ? '等待第一份游戏状态 · 127.0.0.1:27182'
-        : '等待本地 Mod Bridge · 127.0.0.1:27182';
+        : phase === 'demo'
+          ? 'Replay Bridge · 127.0.0.1:27182'
+          : '等待本地 Mod Bridge · 127.0.0.1:27182';
 }
 
 function applyBridgeState(next) {
   if (next.run) state.run = { ...state.run, ...next.run };
   if (next.player) state.player = { ...state.player, ...next.player };
-  const incomingCombat = next.combat || { turn: 0, hand: [], drawPile: [], discardPile: [], exhaustPile: [], enemies: [] };
-  state.combat = {
-    ...state.combat,
+  state.map = next.map || { visited: [] };
+  const incomingCombat = next.combat;
+  state.combat = incomingCombat ? {
     ...incomingCombat,
     drawPile: incomingCombat.drawPile || [],
     discardPile: incomingCombat.discardPile || [],
     exhaustPile: incomingCombat.exhaustPile || []
-  };
-  if (!next.combat) state.hand = [];
+  } : null;
+  state.enemy = null;
+  state.hand = [];
   if (next.combat?.enemies?.[0]) {
     const enemy = next.combat.enemies[0];
     state.enemy = {
@@ -167,6 +185,7 @@ function applyBridgeState(next) {
       skill: card.skill ?? /技能|skill/i.test(card.type || '')
     }));
   }
+  state.selectedCard = '';
   state.syncedAt = Date.now();
   if (state.mode === 'combat') render();
 }
@@ -178,9 +197,9 @@ setInterval(() => {
 }, 1000);
 
 render();
-setBridgeStatus(false);
-window.runmateBridge?.onState(applyBridgeState);
-window.runmateBridge?.onEvent(event => {
+setBridgeStatus({ status: 'waiting' });
+window.gamebuddyBridge?.onState(applyBridgeState);
+window.gamebuddyBridge?.onEvent(event => {
   if (event.name === 'card.reward.opened') {
     state.mode = 'draft';
     render();
@@ -192,7 +211,7 @@ window.runmateBridge?.onEvent(event => {
     showToast('地图已打开，路线建议已准备');
   }
 });
-window.runmateBridge?.onStatus(status => {
+window.gamebuddyBridge?.onStatus(status => {
   setBridgeStatus(status);
   if (status.status === 'connected') showToast('已连接《杀戮尖塔 2》实时数据');
 });

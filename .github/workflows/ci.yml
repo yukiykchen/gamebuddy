@@ -1,4 +1,4 @@
-name: Validate Runmate
+name: Validate GameBuddy
 
 on:
   pull_request:

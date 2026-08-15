@@ -1,7 +1,7 @@
 const WebSocket = require('ws');
 const { validateState } = require('./protocol');
 
-const sourceUrl = process.env.RUNMATE_SOURCE_URL || 'ws://127.0.0.1:27182';
+const sourceUrl = process.env.GAMEBUDDY_SOURCE_URL || 'ws://127.0.0.1:27182';
 const once = process.argv.includes('--once');
 const durationArg = process.argv.find(value => value.startsWith('--duration='));
 const durationMs = durationArg ? Number(durationArg.slice('--duration='.length)) : 0;
@@ -13,7 +13,7 @@ let stateCount = 0;
 let eventCount = 0;
 
 function line(message) {
-  process.stdout.write(`[Runmate Inspect] ${message}\n`);
+  process.stdout.write(`[GameBuddy Inspect] ${message}\n`);
 }
 
 function finish(code = 0) {

@@ -3,10 +3,10 @@ const path = require('node:path');
 const WebSocket = require('ws');
 const { validateMessage, validateState, stateSignature } = require('./protocol');
 
-const sourceUrl = process.env.RUNMATE_SOURCE_URL || 'ws://127.0.0.1:27182';
-const outputPath = process.env.RUNMATE_RECORD_OUTPUT || path.join(__dirname, 'fixtures', 'recorded-run.json');
-const eventOutputPath = process.env.RUNMATE_RECORD_EVENTS_OUTPUT || outputPath.replace(/\.json$/i, '.events.json');
-const maxMs = Number(process.env.RUNMATE_RECORD_MS || 0);
+const sourceUrl = process.env.GAMEBUDDY_SOURCE_URL || 'ws://127.0.0.1:27182';
+const outputPath = process.env.GAMEBUDDY_RECORD_OUTPUT || path.join(__dirname, 'fixtures', 'recorded-run.json');
+const eventOutputPath = process.env.GAMEBUDDY_RECORD_EVENTS_OUTPUT || outputPath.replace(/\.json$/i, '.events.json');
+const maxMs = Number(process.env.GAMEBUDDY_RECORD_MS || 0);
 const snapshots = [];
 const events = [];
 let socket;
@@ -42,7 +42,7 @@ function connect() {
   if (finished) return;
   socket = new WebSocket(sourceUrl);
   socket.once('open', () => {
-    console.log(`Recording Runmate state from ${sourceUrl}`);
+    console.log(`Recording GameBuddy state from ${sourceUrl}`);
     socket.send(JSON.stringify({ type: 'request_snapshot' }));
   });
   socket.on('message', raw => {

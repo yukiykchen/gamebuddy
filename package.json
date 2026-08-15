@@ -1,5 +1,5 @@
 {
-  "name": "sts2-companion",
+  "name": "gamebuddy",
   "version": "0.1.0",
   "private": true,
   "description": "A real-time AI companion for Slay the Spire 2",
@@ -8,6 +8,7 @@
     "start": "electron .",
     "dev": "electron .",
     "demo": "node harness/run-demo.js",
+    "mod:build": "powershell -ExecutionPolicy Bypass -File .\\mod\\GameBuddyBridge\\build.ps1",
     "dist:win": "electron-builder --win nsis --x64",
     "test:syntax": "node --check main.js && node --check preload.js && node --check src/renderer.js && node --check src/pet.js && node --check harness/protocol.js && node --check harness/observation-store.js && node --check harness/replay-bridge.js && node --check harness/run-demo.js && node --check harness/record-bridge.js && node --check harness/inspect-bridge.js && node --check harness/validate-protocol.js && node --check harness/validate-all.js && node --check harness/validate-events.js && node --check harness/validate-observation.js && node --check harness/validate-replay.js && node --check harness/validate-mod.js && node --check harness/smoke-replay.js",
     "harness:validate-observation": "node harness/validate-observation.js",
@@ -29,8 +30,8 @@
     "electron-builder": "^26.0.12"
   },
   "build": {
-    "appId": "com.runmate.sts2",
-    "productName": "Runmate",
+    "appId": "com.gamebuddy.sts2",
+    "productName": "GameBuddy",
     "asar": true,
     "files": [
       "main.js",
@@ -52,14 +53,14 @@
           "arch": ["x64"]
         }
       ],
-      "artifactName": "Runmate-Setup-${version}.${ext}"
+      "artifactName": "GameBuddy-Setup-${version}.${ext}"
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Runmate"
+      "shortcutName": "GameBuddy"
     }
   }
 }

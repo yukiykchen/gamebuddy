@@ -5,11 +5,11 @@ const root = path.join(__dirname, '..');
 const port = 27182;
 const bridge = spawn(process.execPath, [path.join(__dirname, 'replay-bridge.js')], {
   cwd: root,
-  env: { ...process.env, RUNMATE_BRIDGE_PORT: String(port) },
+  env: { ...process.env, GAMEBUDDY_BRIDGE_PORT: String(port) },
   stdio: 'inherit'
 });
 
-const log = message => process.stderr.write(`[Runmate Demo] ${message}\n`);
+const log = message => process.stderr.write(`[GameBuddy Demo] ${message}\n`);
 
 let app;
 let stopping = false;
@@ -38,7 +38,7 @@ bridge.once('spawn', () => {
   log(`Starting Electron with bridge ${port}`);
   app = spawn(electronBinary, ['.'], {
     cwd: root,
-    env: { ...process.env, RUNMATE_BRIDGE_URL: `ws://127.0.0.1:${port}` },
+    env: { ...process.env, GAMEBUDDY_BRIDGE_URL: `ws://127.0.0.1:${port}`, GAMEBUDDY_BRIDGE_MODE: 'replay' },
     stdio: 'inherit'
   });
   app.once('error', error => {

@@ -2,7 +2,7 @@ const assert = require('node:assert/strict');
 const { createObservationStore } = require('./observation-store');
 
 const state = {
-  schema: 'runmate.state.v1',
+  schema: 'gamebuddy.state.v1',
   timestamp: 1,
   source: 'observation-test',
   run: { act: 1, floor: 1, room: 'combat', character: 'ironclad' },
@@ -18,7 +18,7 @@ assert.equal(store.ingest({ type: 'event', name: 'turn.started', timestamp: 3, d
 assert.equal(store.getObservation(5101).fresh, true);
 assert.equal(store.getObservation(5102).fresh, false);
 assert.equal(store.getObservation(5102).recentEvents.length, 1);
-assert.equal(store.getObservation(5102).schema, 'runmate.observation.v1');
+assert.equal(store.getObservation(5102).schema, 'gamebuddy.observation.v1');
 assert.equal(store.ingest({ type: 'unknown' }, 103).accepted, false);
 
 console.log('Observation store cases passed: 6');

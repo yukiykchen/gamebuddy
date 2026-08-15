@@ -2,7 +2,7 @@ const assert = require('node:assert/strict');
 const { validateMessage, validateState } = require('./protocol');
 
 const validState = {
-  schema: 'runmate.state.v1',
+  schema: 'gamebuddy.state.v1',
   timestamp: Date.now(),
   source: 'protocol-test',
   run: { act: 1, floor: 1, room: 'combat', character: 'ironclad' },

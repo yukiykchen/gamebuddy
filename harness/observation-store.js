@@ -32,7 +32,7 @@ function createObservationStore({ historyLimit = 100, staleAfterMs = 5000 } = {}
 
   function getObservation(now = Date.now()) {
     return {
-      schema: 'runmate.observation.v1',
+      schema: 'gamebuddy.observation.v1',
       sequence,
       receivedAt,
       ageMs: receivedAt ? Math.max(0, now - receivedAt) : null,

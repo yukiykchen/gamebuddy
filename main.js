@@ -3,16 +3,20 @@ const path = require('node:path');
 const WebSocket = require('ws');
 const { createObservationStore } = require('./harness/observation-store');
 
-const BRIDGE_URL = process.env.RUNMATE_BRIDGE_URL || 'ws://127.0.0.1:27182';
+const BRIDGE_URL = process.env.GAMEBUDDY_BRIDGE_URL || 'ws://127.0.0.1:27182';
+const BRIDGE_MODE = process.env.GAMEBUDDY_BRIDGE_MODE === 'replay' ? 'replay' : 'game';
 let mainWindow;
 let petWindow;
 let tray;
 let bridgeSocket;
 let bridgeReconnectTimer;
 let isQuitting = false;
+let petHiddenByUser = false;
+let petTopmostTimer;
+let petDragState;
 const observationStore = createObservationStore({ staleAfterMs: 5000 });
 let bridgeHealthTimer;
-let lastBridgeStatus = { status: 'demo', detail: '等待本地 Mod Bridge', url: BRIDGE_URL };
+let lastBridgeStatus = { status: 'waiting', detail: '等待本地 Mod Bridge', url: BRIDGE_URL, mode: BRIDGE_MODE };
 
 function broadcast(channel, payload) {
   for (const window of [mainWindow, petWindow]) {
@@ -21,8 +25,14 @@ function broadcast(channel, payload) {
 }
 
 function broadcastBridgeStatus(status, detail = '') {
-  lastBridgeStatus = { status, detail, url: BRIDGE_URL };
+  lastBridgeStatus = { status, detail, url: BRIDGE_URL, mode: BRIDGE_MODE };
   broadcast('bridge-status', lastBridgeStatus);
+}
+
+function keepPetVisible() {
+  if (petHiddenByUser || !petWindow || petWindow.isDestroyed()) return;
+  petWindow.setAlwaysOnTop(true, 'screen-saver');
+  petWindow.showInactive();
 }
 
 function connectBridge() {
@@ -60,7 +70,7 @@ function connectBridge() {
     if (disconnected) return;
     disconnected = true;
     if (bridgeSocket === socket) bridgeSocket = null;
-    broadcastBridgeStatus('demo', '等待本地 Mod Bridge');
+    broadcastBridgeStatus('waiting', '等待本地 Mod Bridge');
     clearTimeout(bridgeReconnectTimer);
     bridgeReconnectTimer = setTimeout(connectBridge, 2500);
   };
@@ -75,7 +85,7 @@ function createMainWindow() {
     minWidth: 1120,
     minHeight: 720,
     backgroundColor: '#111315',
-    title: 'Runmate · 杀戮尖塔 2 AI 搭子',
+    title: 'GameBuddy · 杀戮尖塔 2 AI 搭子',
     frame: false,
     autoHideMenuBar: true,
     titleBarStyle: 'hidden',
@@ -127,7 +137,7 @@ function createPetWindow() {
 
   const { workArea } = screen.getPrimaryDisplay();
   petWindow.setPosition(workArea.x + workArea.width - 238, workArea.y + workArea.height - 270);
-  petWindow.setAlwaysOnTop(true, 'floating');
+  petWindow.setAlwaysOnTop(true, 'screen-saver');
   petWindow.loadFile(path.join(__dirname, 'src', 'pet.html'));
   petWindow.webContents.on('did-finish-load', () => {
     petWindow.webContents.send('bridge-status', lastBridgeStatus);
@@ -140,10 +150,14 @@ function createPetWindow() {
 
 function createTray() {
   tray = new Tray(nativeImage.createEmpty());
-  tray.setToolTip('Runmate · 杀戮尖塔 2 AI 搭子');
+  tray.setToolTip('GameBuddy · 杀戮尖塔 2 AI 搭子');
   tray.setContextMenu(Menu.buildFromTemplate([
-    { label: '打开 Runmate', click: () => mainWindow?.show() },
-    { label: '显示 / 隐藏桌面宠物', click: () => petWindow?.isVisible() ? petWindow.hide() : petWindow?.showInactive() },
+    { label: '打开 GameBuddy', click: () => mainWindow?.show() },
+    { label: '显示 / 隐藏桌面宠物', click: () => {
+      petHiddenByUser = petWindow?.isVisible() === true;
+      if (petHiddenByUser) petWindow.hide();
+      else { petHiddenByUser = false; keepPetVisible(); }
+    } },
     { type: 'separator' },
     { label: '退出', click: () => { isQuitting = true; app.quit(); } }
   ]));
@@ -158,9 +172,28 @@ ipcMain.on('window-close', event => {
   BrowserWindow.fromWebContents(event.sender)?.hide();
 });
 
-ipcMain.on('open-main-window', () => mainWindow?.show());
-ipcMain.on('toggle-pet', () => petWindow?.isVisible() ? petWindow.hide() : petWindow?.showInactive());
+ipcMain.on('open-main-window', () => {
+  mainWindow?.show();
+  keepPetVisible();
+});
+ipcMain.on('toggle-pet', () => {
+  petHiddenByUser = petWindow?.isVisible() === true;
+  if (petHiddenByUser) petWindow.hide();
+  else { petHiddenByUser = false; keepPetVisible(); }
+});
 ipcMain.on('pet-pass-through', (_event, enabled) => petWindow?.setIgnoreMouseEvents(Boolean(enabled), { forward: true }));
+ipcMain.on('pet-drag-start', (_event, point) => {
+  if (!petWindow || petWindow.isDestroyed() || !point) return;
+  const [x, y] = petWindow.getPosition();
+  petDragState = { startX: Number(point.x), startY: Number(point.y), windowX: x, windowY: y };
+});
+ipcMain.on('pet-drag-move', (_event, point) => {
+  if (!petDragState || !petWindow || petWindow.isDestroyed() || !point) return;
+  const x = petDragState.windowX + Number(point.x) - petDragState.startX;
+  const y = petDragState.windowY + Number(point.y) - petDragState.startY;
+  petWindow.setPosition(Math.round(x), Math.round(y), false);
+});
+ipcMain.on('pet-drag-end', () => { petDragState = undefined; });
 ipcMain.handle('get-observation', () => observationStore.getObservation());
 
 app.whenReady().then(() => {
@@ -168,6 +201,7 @@ app.whenReady().then(() => {
   createPetWindow();
   createTray();
   connectBridge();
+  petTopmostTimer = setInterval(keepPetVisible, 1000);
   bridgeHealthTimer = setInterval(() => {
     if (lastBridgeStatus.status === 'live' && !observationStore.getObservation().fresh) {
       broadcastBridgeStatus('stale', '已连接，但超过 5 秒没有新的游戏状态');
@@ -179,7 +213,7 @@ app.whenReady().then(() => {
   });
 });
 
-app.on('before-quit', () => { isQuitting = true; clearTimeout(bridgeReconnectTimer); clearInterval(bridgeHealthTimer); bridgeSocket?.close(); });
+app.on('before-quit', () => { isQuitting = true; clearTimeout(bridgeReconnectTimer); clearInterval(bridgeHealthTimer); clearInterval(petTopmostTimer); bridgeSocket?.close(); });
 app.on('window-all-closed', () => {
   if (isQuitting && process.platform !== 'darwin') app.quit();
 });

@@ -1,4 +1,4 @@
-const SUPPORTED_SCHEMA = 'runmate.state.v1';
+const SUPPORTED_SCHEMA = 'gamebuddy.state.v1';
 const SUPPORTED_EVENTS = new Set(['combat.started', 'turn.started', 'combat.ended', 'map.opened', 'card.played', 'card.reward.opened']);
 
 function validateState(state) {

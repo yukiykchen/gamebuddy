@@ -11,23 +11,24 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Logging;
+using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.MonsterMoves.Intents;
 using MegaCrit.Sts2.Core.Nodes.Screens.Map;
 using MegaCrit.Sts2.Core.Runs;
 
-namespace RunmateBridge.Scripts;
+namespace GameBuddyBridge.Scripts;
 
-public static class RunmateExporter
+public static class GameBuddyExporter
 {
     private const int Port = 27182;
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 
     private static readonly object Gate = new();
-    private static RunmateWebSocketServer? _server;
+    private static GameBuddyWebSocketServer? _server;
+    private static string _modDirectory = string.Empty;
     private static string _lastSignature = string.Empty;
     private static bool _wasInCombat;
     private static int _lastTurn = -1;
@@ -42,10 +43,17 @@ public static class RunmateExporter
                 return;
             }
 
-            _server = new RunmateWebSocketServer(Port);
+            _modDirectory = modDirectory;
+            _server = new GameBuddyWebSocketServer(Port);
             _server.Start();
-            Log.Info($"[RunmateBridge] WebSocket server listening on 127.0.0.1:{Port}");
+            GameBuddyDiagnostics.Write(modDirectory, $"WebSocket listening on 127.0.0.1:{Port}");
+            Log.Info($"[GameBuddyBridge] WebSocket server listening on 127.0.0.1:{Port}");
         }
+    }
+
+    public static void ReportCollectorReady()
+    {
+        GameBuddyDiagnostics.Write(_modDirectory, "collector attached and processing");
     }
 
     public static void CaptureAndPublish()
@@ -65,7 +73,7 @@ public static class RunmateExporter
             }
 
             var snapshot = BuildSnapshot(runState, player);
-            var json = JsonSerializer.Serialize(new BridgeMessage<RunmateState>("state", snapshot), JsonOptions);
+            var json = JsonSerializer.Serialize(new BridgeMessage<GameBuddyState>("state", snapshot), JsonOptions);
             var signature = JsonSerializer.Serialize(snapshot with { Timestamp = 0 }, JsonOptions);
             if (!string.Equals(signature, _lastSignature, StringComparison.Ordinal))
             {
@@ -77,11 +85,11 @@ public static class RunmateExporter
         }
         catch (Exception ex)
         {
-            Log.Warn($"[RunmateBridge] state capture failed: {ex.Message}");
+            Log.Warn($"[GameBuddyBridge] state capture failed: {ex.Message}");
         }
     }
 
-    private static void PublishTransitions(RunmateState snapshot)
+    private static void PublishTransitions(GameBuddyState snapshot)
     {
         var inCombat = snapshot.Combat is not null;
         var mapVisible = NMapScreen.Instance?.IsVisibleInTree() == true;
@@ -105,7 +113,7 @@ public static class RunmateExporter
         _server?.BroadcastEvent(message);
     }
 
-    private static RunmateState BuildSnapshot(RunState runState, Player player)
+    private static GameBuddyState BuildSnapshot(RunState runState, Player player)
     {
         var combat = player.PlayerCombatState;
         var combatState = CombatManager.Instance.IsInProgress && combat is not null
@@ -120,8 +128,8 @@ public static class RunmateExporter
 
         var currentPoint = runState.CurrentMapPoint;
         var coord = runState.CurrentMapCoord;
-        return new RunmateState(
-            "runmate.state.v1",
+        return new GameBuddyState(
+            "gamebuddy.state.v1",
             DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
             "sts2-mod-bridge",
             new RunSnapshot(
@@ -150,7 +158,7 @@ public static class RunmateExporter
     {
         return cards.Select(card => new CardSnapshot(
             card.Id.Entry,
-            card.Title.GetFormattedText(),
+            card.Title,
             card.Type.ToString(),
             card.EnergyCost.CostsX ? null : card.EnergyCost.GetAmountToSpend(),
             card.IsUpgraded)).ToList();
@@ -181,7 +189,7 @@ public static class RunmateExporter
 public sealed record BridgeMessage<T>(string Type, T Data);
 public sealed record BridgeEvent(string Type, string Name, long Timestamp, object? Data);
 
-public sealed record RunmateState(string Schema, long Timestamp, string Source, RunSnapshot Run, PlayerSnapshot Player, CombatSnapshot? Combat, MapSnapshot Map);
+public sealed record GameBuddyState(string Schema, long Timestamp, string Source, RunSnapshot Run, PlayerSnapshot Player, CombatSnapshot? Combat, MapSnapshot Map);
 public sealed record RunSnapshot(int Act, int Floor, string? Room, string Character, int TotalFloor, string? CurrentNode, string? CurrentCoord);
 public sealed record PlayerSnapshot(int Hp, int MaxHp, int Block, int Gold, int Energy, int MaxEnergy, List<CardSnapshot> Cards, List<string> Relics, List<string> Potions);
 public sealed record CombatSnapshot(int Turn, List<CardSnapshot> Hand, List<CardSnapshot> DrawPile, List<CardSnapshot> DiscardPile, List<CardSnapshot> ExhaustPile, List<EnemySnapshot> Enemies);
@@ -189,7 +197,7 @@ public sealed record EnemySnapshot(string Name, int Hp, int MaxHp, int Block, st
 public sealed record CardSnapshot(string Id, string Name, string Type, int? Cost, bool Upgraded);
 public sealed record MapSnapshot(List<string> Visited);
 
-internal sealed class RunmateWebSocketServer
+internal sealed class GameBuddyWebSocketServer
 {
     private readonly TcpListener _listener;
     private readonly List<TcpClient> _clients = new();
@@ -198,7 +206,7 @@ internal sealed class RunmateWebSocketServer
     private CancellationTokenSource _cts = new();
     private byte[]? _lastStateFrame;
 
-    public RunmateWebSocketServer(int port)
+    public GameBuddyWebSocketServer(int port)
     {
         _listener = new TcpListener(IPAddress.Loopback, port);
     }
@@ -238,7 +246,7 @@ internal sealed class RunmateWebSocketServer
                 _ = HandleClientAsync(client, cancellationToken);
             }
             catch (OperationCanceledException) { return; }
-            catch (Exception ex) { Log.Warn($"[RunmateBridge] accept failed: {ex.Message}"); }
+            catch (Exception ex) { Log.Warn($"[GameBuddyBridge] accept failed: {ex.Message}"); }
         }
     }
 
@@ -273,7 +281,7 @@ internal sealed class RunmateWebSocketServer
         }
         catch (Exception ex) when (ex is IOException or SocketException or OperationCanceledException)
         {
-            Log.Debug($"[RunmateBridge] client disconnected: {ex.Message}");
+            Log.Debug($"[GameBuddyBridge] client disconnected: {ex.Message}");
         }
         finally
         {
