@@ -23,6 +23,13 @@ npm run demo
 
 这个命令只使用 Replay Bridge，不读取真实游戏；真实 Mod 接入后仍然使用同一个桌面端入口。直接执行 `npm start` 时，没有真实 Bridge 就只显示等待状态，不再用虚拟对局填充界面。
 
+### 桌面宠物操作
+
+- 左键单击宠物：打开 GameBuddy 主面板。
+- 按住宠物拖动：移动宠物位置。
+- 右键单击宠物：打开原生菜单，可打开主面板或关闭桌面宠物。
+- 关闭桌面宠物不会退出 GameBuddy；可从系统托盘的“显示 / 隐藏桌面宠物”重新显示。
+
 ## 接入真实游戏
 
 需要 Windows、Steam 版《杀戮尖塔 2》、Godot .NET 4.5.1 和 .NET 9 SDK。先构建并自动复制只读 Mod：
@@ -34,6 +41,33 @@ npm run mod:build -- -Sts2Dir "C:\Program Files (x86)\Steam\steamapps\common\Sla
 ```
 
 启动游戏并进入一局后，再执行 `npm start`。桌面端会连接 `ws://127.0.0.1:27182`，状态从 `WAIT` 变为 `LIVE`。可以先用 `npm run harness:inspect -- --once` 验证 Mod 是否真的发出了合法状态。
+
+### Windows 实际安装流程
+
+1. 在 Windows 上构建 Mod，并指定 STS2 安装目录：
+
+   ```powershell
+   dotnet build .\mod\GameBuddyBridge\GameBuddyBridge.csproj -c Release `
+     -p:Sts2Dir="E:\SteamLibrary\steamapps\common\Slay the Spire 2" `
+     -p:CopyModAfterBuild=true
+   ```
+
+2. 确认以下文件位于游戏目录：
+
+   ```text
+   <STS2>\mods\GameBuddyBridge\GameBuddyBridge.json
+   <STS2>\mods\GameBuddyBridge\gamebuddy_bridge.dll
+   ```
+
+3. 完整退出并重新启动游戏，在 Mod 设置中启用 `GameBuddy Bridge`。游戏只会在启动时加载 Mod。
+4. 进入一局游戏后启动 GameBuddy：`npm start`。
+5. 用以下命令确认真实快照：
+
+   ```powershell
+   npm run harness:inspect -- --once
+   ```
+
+   输出中的 `source=sts2-mod-bridge` 和 `LIVE` 表示数据来自真实游戏；没有启动游戏时不会自动填充虚拟对局。
 
 ## 本地 Harness 回放
 

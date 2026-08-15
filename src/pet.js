@@ -69,6 +69,9 @@ function finishPetPointer(event) {
 
 petButton.addEventListener('pointerup', finishPetPointer);
 petButton.addEventListener('pointercancel', finishPetPointer);
-document.querySelector('#pet-menu').addEventListener('click', event => { event.stopPropagation(); window.windowControls?.togglePet(); });
+petButton.addEventListener('contextmenu', event => {
+  event.preventDefault();
+  window.windowControls?.showPetMenu({ x: event.clientX, y: event.clientY });
+});
 window.gamebuddyBridge?.onStatus(setStatus);
 window.gamebuddyBridge?.onState(setState);

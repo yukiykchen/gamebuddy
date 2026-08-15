@@ -5,6 +5,7 @@ contextBridge.exposeInMainWorld('windowControls', {
   close: () => ipcRenderer.send('window-close'),
   openMain: () => ipcRenderer.send('open-main-window'),
   togglePet: () => ipcRenderer.send('toggle-pet'),
+  showPetMenu: point => ipcRenderer.send('pet-context-menu', point),
   setPetPassThrough: enabled => ipcRenderer.send('pet-pass-through', enabled),
   startPetDrag: point => ipcRenderer.send('pet-drag-start', point),
   movePet: point => ipcRenderer.send('pet-drag-move', point),

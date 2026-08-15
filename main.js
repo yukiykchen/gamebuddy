@@ -35,6 +35,25 @@ function keepPetVisible() {
   petWindow.showInactive();
 }
 
+function hidePet() {
+  petHiddenByUser = true;
+  petWindow?.hide();
+}
+
+function showPetContextMenu(point) {
+  if (!petWindow || petWindow.isDestroyed()) return;
+  const menu = Menu.buildFromTemplate([
+    { label: '打开 GameBuddy', click: () => { mainWindow?.show(); keepPetVisible(); } },
+    { type: 'separator' },
+    { label: '关闭桌面宠物', click: hidePet }
+  ]);
+  menu.popup({
+    window: petWindow,
+    x: Math.max(0, Math.round(Number(point?.x) || 0)),
+    y: Math.max(0, Math.round(Number(point?.y) || 0))
+  });
+}
+
 function connectBridge() {
   if (bridgeSocket) return;
   broadcastBridgeStatus('connecting');
@@ -155,7 +174,7 @@ function createTray() {
     { label: '打开 GameBuddy', click: () => mainWindow?.show() },
     { label: '显示 / 隐藏桌面宠物', click: () => {
       petHiddenByUser = petWindow?.isVisible() === true;
-      if (petHiddenByUser) petWindow.hide();
+      if (petHiddenByUser) hidePet();
       else { petHiddenByUser = false; keepPetVisible(); }
     } },
     { type: 'separator' },
@@ -178,10 +197,11 @@ ipcMain.on('open-main-window', () => {
 });
 ipcMain.on('toggle-pet', () => {
   petHiddenByUser = petWindow?.isVisible() === true;
-  if (petHiddenByUser) petWindow.hide();
+  if (petHiddenByUser) hidePet();
   else { petHiddenByUser = false; keepPetVisible(); }
 });
 ipcMain.on('pet-pass-through', (_event, enabled) => petWindow?.setIgnoreMouseEvents(Boolean(enabled), { forward: true }));
+ipcMain.on('pet-context-menu', (_event, point) => showPetContextMenu(point));
 ipcMain.on('pet-drag-start', (_event, point) => {
   if (!petWindow || petWindow.isDestroyed() || !point) return;
   const [x, y] = petWindow.getPosition();
