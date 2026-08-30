@@ -1,5 +1,4 @@
 using Godot;
-using Godot.Bridge;
 using MegaCrit.Sts2.Core.Logging;
 using MegaCrit.Sts2.Core.Modding;
 
@@ -16,10 +15,14 @@ public class Entry
         {
             GameBuddyExporter.Initialize(modDirectory);
 
-            var root = ((SceneTree)Engine.GetMainLoop()).Root;
-            var collector = new GameBuddyCollectorNode();
-            root.CallDeferred(Node.MethodName.AddChild, collector);
-            GameBuddyDiagnostics.Write(modDirectory, "collector queued for deferred attachment; bridge ready");
+            if (Engine.GetMainLoop() is not SceneTree tree)
+            {
+                GameBuddyDiagnostics.Write(modDirectory, "main loop is not a SceneTree; collector not attached");
+                return;
+            }
+
+            GameBuddyCollectorNode.Attach(tree);
+            GameBuddyDiagnostics.Write(modDirectory, "collector attached via ProcessFrame; bridge ready");
             Log.Info($"[GameBuddyBridge] initialized. Directory={modDirectory}");
         }
         catch (Exception ex)

@@ -13,6 +13,7 @@ using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Logging;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.MonsterMoves.Intents;
+using MegaCrit.Sts2.Core.Map;
 using MegaCrit.Sts2.Core.Nodes.Screens.Map;
 using MegaCrit.Sts2.Core.Runs;
 
@@ -33,6 +34,7 @@ public static class GameBuddyExporter
     private static bool _wasInCombat;
     private static int _lastTurn = -1;
     private static bool _wasMapVisible;
+    private static bool _wasAtRest;
 
     public static void Initialize(string modDirectory)
     {
@@ -44,10 +46,19 @@ public static class GameBuddyExporter
             }
 
             _modDirectory = modDirectory;
-            _server = new GameBuddyWebSocketServer(Port);
-            _server.Start();
-            GameBuddyDiagnostics.Write(modDirectory, $"WebSocket listening on 127.0.0.1:{Port}");
-            Log.Info($"[GameBuddyBridge] WebSocket server listening on 127.0.0.1:{Port}");
+            try
+            {
+                _server = new GameBuddyWebSocketServer(Port);
+                _server.Start();
+                GameBuddyDiagnostics.Write(modDirectory, $"WebSocket listening on 127.0.0.1:{Port}");
+                Log.Info($"[GameBuddyBridge] WebSocket server listening on 127.0.0.1:{Port}");
+            }
+            catch (Exception ex)
+            {
+                _server = null;
+                GameBuddyDiagnostics.Write(modDirectory, $"WebSocket failed to start: {ex}");
+                Log.Warn($"[GameBuddyBridge] WebSocket failed to start: {ex.Message}");
+            }
         }
     }
 
@@ -103,8 +114,14 @@ public static class GameBuddyExporter
         }
         if (mapVisible && !_wasMapVisible) PublishEvent("map.opened");
 
+        var atRest = !inCombat
+            && string.Equals(snapshot.Run.CurrentNode, "RestSite", StringComparison.OrdinalIgnoreCase)
+            && !mapVisible;
+        if (atRest && !_wasAtRest) PublishEvent("rest.opened");
+
         _wasInCombat = inCombat;
         _wasMapVisible = mapVisible;
+        _wasAtRest = atRest;
     }
 
     private static void PublishEvent(string name, object? data = null)
@@ -151,8 +168,152 @@ public static class GameBuddyExporter
                 player.Relics.Select(relic => relic.Title.GetFormattedText()).ToList(),
                 player.Potions.Select(potion => potion.Title.GetFormattedText()).ToList()),
             combatState,
-            new MapSnapshot(runState.VisitedMapCoords.Select(value => $"{value.row},{value.col}").ToList()));
+            BuildMapSnapshot(runState));
     }
+
+    private static MapSnapshot BuildMapSnapshot(RunState runState)
+    {
+        var visited = runState.VisitedMapCoords.Select(CoordId).ToList();
+        var current = runState.CurrentMapCoord is { } currentCoord ? CoordId(currentCoord) : null;
+        try
+        {
+            var map = runState.Map;
+            if (map is null)
+            {
+                return EmptyMap(visited, current);
+            }
+
+            var nodes = new List<MapNodeSnapshot>();
+            foreach (var point in map.GetAllMapPoints())
+            {
+                var children = new List<string>();
+                if (point.Children is not null)
+                {
+                    foreach (var child in point.Children)
+                    {
+                        children.Add(CoordId(child.coord));
+                    }
+                }
+
+                nodes.Add(new MapNodeSnapshot(
+                    CoordId(point.coord),
+                    point.coord.row,
+                    point.coord.col,
+                    MapTypeName(point.PointType),
+                    children));
+            }
+
+            var byId = new Dictionary<string, MapNodeSnapshot>(StringComparer.Ordinal);
+            foreach (var node in nodes)
+            {
+                byId[node.Id] = node;
+            }
+
+            var start = map.StartingMapPoint is { } startPoint ? CoordId(startPoint.coord) : null;
+            var boss = map.BossMapPoint is { } bossPoint ? CoordId(bossPoint.coord) : null;
+            var secondBoss = map.SecondBossMapPoint is { } secondBossPoint ? CoordId(secondBossPoint.coord) : null;
+            var origin = current is not null && byId.ContainsKey(current) ? current : start;
+            var routes = EnumerateRoutes(byId, origin, boss, 256, out var truncated);
+            return new MapSnapshot(
+                visited,
+                current,
+                start,
+                boss,
+                secondBoss,
+                map.GetRowCount(),
+                map.GetColumnCount(),
+                nodes,
+                routes,
+                truncated);
+        }
+        catch (Exception ex)
+        {
+            Log.Warn($"[GameBuddyBridge] map capture failed: {ex.Message}");
+            return EmptyMap(visited, current);
+        }
+    }
+
+    private static MapSnapshot EmptyMap(List<string> visited, string? current)
+    {
+        return new MapSnapshot(visited, current, null, null, null, 0, 0, new List<MapNodeSnapshot>(), new List<List<string>>(), false);
+    }
+
+    private static List<List<string>> EnumerateRoutes(
+        Dictionary<string, MapNodeSnapshot> byId,
+        string? originId,
+        string? bossId,
+        int maxRoutes,
+        out bool truncated)
+    {
+        var truncatedFlag = false;
+        var routes = new List<List<string>>();
+        if (originId is null || !byId.ContainsKey(originId))
+        {
+            truncated = false;
+            return routes;
+        }
+
+        var path = new List<string>();
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+
+        void Walk(string id)
+        {
+            if (truncatedFlag)
+            {
+                return;
+            }
+
+            if (!seen.Add(id))
+            {
+                return;
+            }
+
+            path.Add(id);
+            var node = byId[id];
+            var next = new List<string>();
+            foreach (var child in node.Children)
+            {
+                if (byId.ContainsKey(child) && !seen.Contains(child))
+                {
+                    next.Add(child);
+                }
+            }
+
+            if ((bossId is not null && id == bossId) || next.Count == 0)
+            {
+                if (routes.Count >= maxRoutes)
+                {
+                    truncatedFlag = true;
+                }
+                else
+                {
+                    routes.Add(path.ToList());
+                }
+            }
+            else
+            {
+                foreach (var child in next)
+                {
+                    Walk(child);
+                    if (truncatedFlag)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            path.RemoveAt(path.Count - 1);
+            seen.Remove(id);
+        }
+
+        Walk(originId);
+        truncated = truncatedFlag;
+        return routes;
+    }
+
+    private static string CoordId(MapCoord coord) => $"{coord.row},{coord.col}";
+
+    private static string MapTypeName(MapPointType type) => type.ToString();
 
     private static List<CardSnapshot> MapCards(IEnumerable<CardModel> cards)
     {
@@ -195,7 +356,18 @@ public sealed record PlayerSnapshot(int Hp, int MaxHp, int Block, int Gold, int 
 public sealed record CombatSnapshot(int Turn, List<CardSnapshot> Hand, List<CardSnapshot> DrawPile, List<CardSnapshot> DiscardPile, List<CardSnapshot> ExhaustPile, List<EnemySnapshot> Enemies);
 public sealed record EnemySnapshot(string Name, int Hp, int MaxHp, int Block, string? Intent, int Damage, bool Alive);
 public sealed record CardSnapshot(string Id, string Name, string Type, int? Cost, bool Upgraded);
-public sealed record MapSnapshot(List<string> Visited);
+public sealed record MapSnapshot(
+    List<string> Visited,
+    string? Current,
+    string? Start,
+    string? Boss,
+    string? SecondBoss,
+    int Rows,
+    int Cols,
+    List<MapNodeSnapshot> Nodes,
+    List<List<string>> Routes,
+    bool RoutesTruncated);
+public sealed record MapNodeSnapshot(string Id, int Row, int Col, string Type, List<string> Children);
 
 internal sealed class GameBuddyWebSocketServer
 {

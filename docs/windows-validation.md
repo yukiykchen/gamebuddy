@@ -35,7 +35,8 @@ mods\GameBuddyBridge\GameBuddyBridge.json
 7. 进入战斗，确认生命、能量、手牌、敌人生命和攻击意图更新。
 8. 打出一张牌，确认状态变化后桌面端刷新。
 9. 结束战斗或打开地图，确认 `combat.ended` / `map.opened` 事件带来对应 UI 变化。
-10. 关闭游戏，确认 GameBuddy 回到等待状态并自动重连。
+10. 在地图页确认出现「下一步」路线建议（无 API Key 时为规则打分；配置 LLM 后可看到「模型」来源）。
+11. 关闭游戏，确认 GameBuddy 回到等待状态并自动重连。
 
 ## 记录结果
 

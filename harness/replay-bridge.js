@@ -41,7 +41,19 @@ function emitTransitions(socket, snapshot) {
     sendEvent(socket, 'turn.started', { turn: snapshot.combat.turn });
   }
   if (snapshot.run?.room === 'map' && previousSnapshot?.run?.room !== 'map') sendEvent(socket, 'map.opened');
+  const restNow = isRestSnapshot(snapshot);
+  const restBefore = isRestSnapshot(previousSnapshot);
+  if (restNow && !restBefore) sendEvent(socket, 'rest.opened');
   previousSnapshots.set(socket, snapshot);
+}
+
+function isRestSnapshot(snapshot) {
+  if (!snapshot || snapshot.combat) return false;
+  const room = String(snapshot.run?.room || '');
+  const node = String(snapshot.run?.currentNode || '');
+  if (/rest|camp/i.test(room)) return true;
+  if (/map/i.test(room)) return false;
+  return /rest/i.test(node);
 }
 
 function sendSnapshotAndTransitions(socket, snapshot) {

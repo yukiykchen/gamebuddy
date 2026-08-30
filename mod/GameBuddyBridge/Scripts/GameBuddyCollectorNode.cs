@@ -2,18 +2,24 @@ using Godot;
 
 namespace GameBuddyBridge.Scripts;
 
-public sealed partial class GameBuddyCollectorNode : Node
+internal static class GameBuddyCollectorNode
 {
-    private double _elapsed;
-    private bool _reportedReady;
+    private static SceneTree? _tree;
+    private static ulong _lastTicks;
+    private static bool _reportedReady;
 
-    public GameBuddyCollectorNode()
+    public static void Attach(SceneTree tree)
     {
-        Name = "GameBuddyCollector";
-        ProcessMode = ProcessModeEnum.Always;
+        if (_tree is not null)
+        {
+            return;
+        }
+
+        _tree = tree;
+        tree.ProcessFrame += OnProcessFrame;
     }
 
-    public override void _Process(double delta)
+    private static void OnProcessFrame()
     {
         if (!_reportedReady)
         {
@@ -21,13 +27,13 @@ public sealed partial class GameBuddyCollectorNode : Node
             GameBuddyExporter.ReportCollectorReady();
         }
 
-        _elapsed += delta;
-        if (_elapsed < 0.20)
+        var now = Time.GetTicksMsec();
+        if (now - _lastTicks < 200)
         {
             return;
         }
 
-        _elapsed = 0;
+        _lastTicks = now;
         GameBuddyExporter.CaptureAndPublish();
     }
 }

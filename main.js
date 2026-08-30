@@ -2,6 +2,8 @@ const { app, BrowserWindow, Tray, Menu, nativeImage, ipcMain, screen } = require
 const path = require('node:path');
 const WebSocket = require('ws');
 const { createObservationStore } = require('./harness/observation-store');
+const { createOrchestrator } = require('./agent/orchestrator');
+const { createOpenAiClient, readLlmConfig } = require('./agent/llm/openai');
 
 const BRIDGE_URL = process.env.GAMEBUDDY_BRIDGE_URL || 'ws://127.0.0.1:27182';
 const BRIDGE_MODE = process.env.GAMEBUDDY_BRIDGE_MODE === 'replay' ? 'replay' : 'game';
@@ -15,6 +17,16 @@ let petHiddenByUser = false;
 let petTopmostTimer;
 let petDragState;
 const observationStore = createObservationStore({ staleAfterMs: 5000 });
+const llmConfig = readLlmConfig();
+if (llmConfig.enabled) {
+  console.log(`GameBuddy LLM: ${llmConfig.model} · ${llmConfig.wireApi} · ${llmConfig.source}${llmConfig.providerName ? `/${llmConfig.providerName}` : ''}`);
+} else {
+  console.log('GameBuddy LLM: rules only');
+}
+const orchestrator = createOrchestrator({
+  llm: createOpenAiClient(llmConfig),
+  onRecommendation: recommendation => broadcast('bridge-recommendation', recommendation)
+});
 let bridgeHealthTimer;
 let lastBridgeStatus = { status: 'waiting', detail: '等待本地 Mod Bridge', url: BRIDGE_URL, mode: BRIDGE_MODE };
 
@@ -79,7 +91,13 @@ function connectBridge() {
         if (result.accepted) broadcast('bridge-state', result.state);
       }
       if (result.kind === 'event' && result.accepted) broadcast('bridge-event', result.event);
-      if (result.accepted) broadcast('bridge-observation', observationStore.getObservation());
+      if (result.accepted) {
+        const observation = observationStore.getObservation();
+        broadcast('bridge-observation', observation);
+        void orchestrator.consider(observation, {
+          force: result.kind === 'event' && (result.event?.name === 'map.opened' || result.event?.name === 'rest.opened')
+        });
+      }
     } catch (error) {
       broadcastBridgeStatus('invalid', error.message);
     }
@@ -121,6 +139,8 @@ function createMainWindow() {
     const state = observationStore.getState();
     if (state) mainWindow.webContents.send('bridge-state', state);
     mainWindow.webContents.send('bridge-observation', observationStore.getObservation());
+    const recommendation = orchestrator.getRecommendation();
+    if (recommendation) mainWindow.webContents.send('bridge-recommendation', recommendation);
   });
   mainWindow.on('close', event => {
     if (!isQuitting) {
@@ -163,6 +183,8 @@ function createPetWindow() {
     const state = observationStore.getState();
     if (state) petWindow.webContents.send('bridge-state', state);
     petWindow.webContents.send('bridge-observation', observationStore.getObservation());
+    const recommendation = orchestrator.getRecommendation();
+    if (recommendation) petWindow.webContents.send('bridge-recommendation', recommendation);
   });
   petWindow.once('ready-to-show', () => petWindow.showInactive());
 }

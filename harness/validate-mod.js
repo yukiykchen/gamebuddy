@@ -22,7 +22,7 @@ if (manifest.id !== 'gamebuddy_bridge' || manifest.has_dll !== true || manifest.
 }
 
 const exporter = fs.readFileSync(path.join(root, 'Scripts', 'GameBuddyExporter.cs'), 'utf8');
-for (const marker of ['127.0.0.1', '27182', 'gamebuddy.state.v1', 'DebugOnlyGetState', 'LocalContext.GetMe', 'AttackIntent', 'BroadcastState', 'BroadcastEvent', 'GameBuddyWebSocketServer']) {
+for (const marker of ['127.0.0.1', '27182', 'gamebuddy.state.v1', 'DebugOnlyGetState', 'LocalContext.GetMe', 'AttackIntent', 'BroadcastState', 'BroadcastEvent', 'GameBuddyWebSocketServer', 'GetAllMapPoints', 'MapPointType', 'rest.opened']) {
   if (!exporter.includes(marker)) throw new Error(`Mod exporter is missing marker: ${marker}`);
 }
 

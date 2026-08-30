@@ -33,11 +33,22 @@ function setState(next) {
   const intent = String(enemy?.intent || '').toLowerCase();
   if (intent.includes('attack') || Number(enemy?.damage) > 0) {
     say(`小心，预计 ${enemy.damage || 0} 伤害`, 'alert');
-  } else if (next.combat?.hand?.length) {
-    say('手牌更新了，看看怎么打', 'thinking');
+  } else if (/rest|camp/i.test(String(next.run?.room || '')) || /rest/i.test(String(next.run?.currentNode || ''))) {
+    say('休息处，想想回血还是升级', 'thinking');
+  } else if (next.run?.room === 'map') {
+    say('地图开了，看看走哪条');
   } else {
     say('我在看着这局');
   }
+}
+
+function setRecommendation(recommendation) {
+  if (recommendation?.task === 'rest_site' && recommendation.primary?.label) {
+    say(`休息处建议${recommendation.primary.label}`, 'thinking');
+    return;
+  }
+  if (recommendation?.task !== 'map_route' || !recommendation.primary?.label) return;
+  say(`下一路点建议走${recommendation.primary.label}`, 'thinking');
 }
 
 const petButton = document.querySelector('#pet-button');
@@ -75,3 +86,4 @@ petButton.addEventListener('contextmenu', event => {
 });
 window.gamebuddyBridge?.onStatus(setStatus);
 window.gamebuddyBridge?.onState(setState);
+window.gamebuddyBridge?.onRecommendation(setRecommendation);

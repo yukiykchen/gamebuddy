@@ -2,7 +2,7 @@
 
 GameBuddy 是面向《杀戮尖塔 2》的 Windows AI 桌面搭子原型，目标是在游戏运行时提供：
 
-- 战斗中的出牌顺序和风险解释
+- 战斗中的出牌顺序和风险解释（暂缓）
 - 卡牌奖励中的选牌建议
 - 地图节点和路线选择
 
@@ -130,12 +130,29 @@ STS2 Mod Bridge / Replay Bridge
         -> localhost WebSocket
         -> Electron main process bridge
         -> main panel + floating pet
-        -> future agent loop
+        -> agent loop
 ```
 
-主进程只负责连接、校验边界和广播状态。未来的决策 Agent 应放在独立的 `agent/` 模块中，通过状态快照和事件输入工作，避免把游戏读取、桌面展示和策略推理耦合在一起。
+主进程只负责连接、校验边界和广播状态。决策 Agent 在独立的 `agent/` 模块中，通过观察对象工作，避免把游戏读取、桌面展示和策略推理耦合在一起。
 
-当前主进程已经通过 [harness/observation-store.js](./harness/observation-store.js) 整理最新状态、事件历史和 freshness。后续 Agent 可以直接消费 `gamebuddy.observation.v1`，先判断状态是否新鲜，再进行推理。
+当前主进程已经通过 [harness/observation-store.js](./harness/observation-store.js) 整理最新状态、事件历史和 freshness。[agent/](./agent/) 消费这份观察对象，先做路线建议 `map_route`，进入休息处后再给 `rest_site`：回血还是升级哪一张牌。规则给可达路线和火堆选择打分；有密钥时再用模型解释。战斗出牌暂缓。
+
+本地 `.env`（已 gitignore）会提供模型接口。启动时自动读取，默认：
+
+- Base URL：`https://ai.gs88.shop`
+- Model：`gpt-5.5`
+- API：Codex `responses`
+- Reasoning：`xhigh`
+
+项目内 Codex CLI：
+
+```bash
+npm run codex
+```
+
+它使用 `.codex-cli/` 和同一套 `.env` 密钥，不会改掉 ChatGPT 桌面版那份 `~/.codex` 本地代理配置。
+
+没有 API Key 时只用规则，桌面端仍然能给出下一步路点。
 
 ## Mod 构建边界
 

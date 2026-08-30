@@ -166,6 +166,7 @@ h1 { margin: 9px 0 7px; color: var(--cream); font: 500 30px Georgia, "Songti SC"
 .log-entry time { color: #616a6d; }
 .log-entry strong { color: #c5ccc6; font-weight: 500; }
 .draft-layout, .route-layout { display: grid; gap: 20px; }
+.rest-layout .recommendation-reason { margin: 0 0 18px; }
 .draft-layout { grid-template-columns: 1.45fr .9fr; }
 .draft-offer { padding: 23px; }
 .draft-kicker { color: var(--amber); font-size: 10px; letter-spacing: 1.5px; }
@@ -182,7 +183,7 @@ h1 { margin: 9px 0 7px; color: var(--cream); font: 500 30px Georgia, "Songti SC"
 .route-layout { grid-template-columns: 1.55fr .8fr; }
 .map-panel { padding-bottom: 22px; }
 .map-panel .panel-heading { margin-bottom: 17px; }
-.map-rail { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0; align-items: center; padding: 22px 24px 30px; background: #181b1d; }
+.map-rail { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0; align-items: center; padding: 8px 24px; background: #181b1d; }
 .map-node { position: relative; display: grid; place-items: center; height: 42px; margin: 0 auto; width: 42px; border: 1px solid #565e5e; color: #97a09c; background: #222729; font-size: 13px; z-index: 1; }
 .map-node::before { content: ""; position: absolute; top: 20px; right: 41px; width: 54px; height: 1px; background: #3b4645; z-index: -1; }
 .map-node:first-child::before { display: none; }
@@ -190,14 +191,18 @@ h1 { margin: 9px 0 7px; color: var(--cream); font: 500 30px Georgia, "Songti SC"
 .map-node.elite { border-color: #9b645b; color: var(--red); }
 .map-node.rest { border-color: #a28b57; color: var(--amber); }
 .map-node.boss { width: 47px; height: 47px; border-color: var(--amber); color: var(--amber); }
+.map-node.on-route { border-color: #6a8f82; }
+.map-node.recommended { border-color: var(--amber); color: var(--amber); box-shadow: 0 0 0 4px rgba(228,166,77,.12); }
+.map-node.current.recommended { border-color: var(--mint); color: var(--mint); }
 .map-legend { display: flex; gap: 17px; padding: 0 24px; color: #7d8787; font-size: 10px; }
 .map-legend span::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 5px; background: #697272; }
-.map-legend .legend-elite::before { background: var(--red); }.map-legend .legend-rest::before { background: var(--amber); }.map-legend .legend-current::before { background: var(--mint); }
+.map-legend .legend-elite::before { background: var(--red); }.map-legend .legend-rest::before { background: var(--amber); }.map-legend .legend-current::before { background: var(--mint); }.map-legend .legend-recommended::before { background: var(--amber); }
 .route-advice { padding: 19px; }
 .route-advice h2 { margin: 0; color: var(--cream); font: 500 20px Georgia, serif; }
 .route-advice p { color: #919b99; font-size: 11px; line-height: 1.7; }
-.route-choice { margin-top: 18px; padding: 13px; border-left: 2px solid var(--mint); background: #202a27; }
-.route-choice strong, .route-choice span { display: block; }.route-choice strong { color: var(--mint); font-size: 12px; }.route-choice span { margin-top: 5px; color: #98a5a1; font-size: 10px; }
+.route-choice { margin-top: 18px; padding: 13px; border-left: 2px solid #3b4a46; background: #202a27; }
+.route-choice.recommended { border-left-color: var(--amber); background: #2a261c; }
+.route-choice strong, .route-choice span { display: block; }.route-choice strong { color: var(--mint); font-size: 12px; }.route-choice.recommended strong { color: var(--amber); }.route-choice span { margin-top: 5px; color: #98a5a1; font-size: 10px; }
 .toast { position: fixed; right: 28px; bottom: 24px; padding: 11px 15px; border: 1px solid #466257; background: #1d2925; color: var(--mint); font-size: 11px; opacity: 0; transform: translateY(8px); transition: opacity .2s ease, transform .2s ease; pointer-events: none; }
 .toast.show { opacity: 1; transform: translateY(0); }
 @media (max-width: 1200px) { .main-content { padding-left: 32px; padding-right: 32px; }.view-grid { grid-template-columns: minmax(470px, 1.4fr) minmax(270px, .8fr); } }
