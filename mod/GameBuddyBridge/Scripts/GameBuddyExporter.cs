@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
@@ -212,8 +213,30 @@ public static class GameBuddyExporter
             var start = map.StartingMapPoint is { } startPoint ? CoordId(startPoint.coord) : null;
             var boss = map.BossMapPoint is { } bossPoint ? CoordId(bossPoint.coord) : null;
             var secondBoss = map.SecondBossMapPoint is { } secondBossPoint ? CoordId(secondBossPoint.coord) : null;
-            var origin = current is not null && byId.ContainsKey(current) ? current : start;
-            var routes = EnumerateRoutes(byId, origin, boss, 256, out var truncated);
+            var originCandidates = ResolveOriginIds(byId, current, start);
+            var routes = new List<List<string>>();
+            var truncated = false;
+            foreach (var origin in originCandidates)
+            {
+                var found = EnumerateRoutes(byId, origin, boss, 256 - routes.Count, out var originTruncated);
+                routes.AddRange(found);
+                if (originTruncated)
+                {
+                    truncated = true;
+                    break;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(boss))
+            {
+                var toBoss = routes.Where(route => route.Contains(boss)).ToList();
+                if (toBoss.Count > 0) routes = toBoss;
+            }
+
+            if (routes.Count == 0 && originCandidates.Count > 0)
+            {
+                routes = originCandidates.Select(id => new List<string> { id }).ToList();
+            }
             return new MapSnapshot(
                 visited,
                 current,
@@ -236,6 +259,48 @@ public static class GameBuddyExporter
     private static MapSnapshot EmptyMap(List<string> visited, string? current)
     {
         return new MapSnapshot(visited, current, null, null, null, 0, 0, new List<MapNodeSnapshot>(), new List<List<string>>(), false);
+    }
+
+    private static List<string> ResolveOriginIds(
+        Dictionary<string, MapNodeSnapshot> byId,
+        string? current,
+        string? start)
+    {
+        if (current is not null && byId.TryGetValue(current, out var currentNode))
+        {
+            var hasChild = currentNode.Children.Any(byId.ContainsKey);
+            if (hasChild || (currentNode.Type != "Boss" && currentNode.Type != "Ancient"))
+            {
+                return new List<string> { current };
+            }
+        }
+
+        if (start is not null && byId.ContainsKey(start))
+        {
+            return new List<string> { start };
+        }
+
+        var incoming = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var node in byId.Values)
+        {
+            foreach (var child in node.Children)
+            {
+                incoming.Add(child);
+            }
+        }
+
+        var roots = byId.Values
+            .Where(node => !incoming.Contains(node.Id) && node.Type != "Boss" && node.Type != "Ancient")
+            .OrderBy(node => node.Row)
+            .ThenBy(node => node.Col)
+            .Select(node => node.Id)
+            .ToList();
+        if (roots.Count > 0) return roots;
+
+        var choosable = byId.Values.Where(node => node.Type != "Boss" && node.Type != "Ancient").ToList();
+        if (choosable.Count == 0) return new List<string>();
+        var minRow = choosable.Min(node => node.Row);
+        return choosable.Where(node => node.Row == minRow).Select(node => node.Id).ToList();
     }
 
     private static List<List<string>> EnumerateRoutes(

@@ -104,28 +104,128 @@ function restAfterEliteBonus(upcoming, ctx) {
   return ctx.hpRatio < 0.55 ? 8 : 4;
 }
 
-function nextStep(route, current) {
+function nodeChildren(node) {
+  return Array.isArray(node?.children) ? node.children.filter(id => typeof id === 'string' && id) : [];
+}
+
+function isChoiceNode(node) {
+  return Boolean(node && node.type !== 'Boss' && node.type !== 'Ancient');
+}
+
+function resolveMapOrigins(map) {
+  const nodes = Array.isArray(map?.nodes) ? map.nodes : [];
+  const byId = new Map(nodes.map(node => [node.id, node]));
+  const current = map?.current;
+  if (current && byId.has(current)) {
+    const node = byId.get(current);
+    if (nodeChildren(node).some(id => byId.has(id)) || isChoiceNode(node)) return [current];
+  }
+  if (map?.start && byId.has(map.start)) return [map.start];
+  const incoming = new Set();
+  for (const node of nodes) {
+    for (const child of nodeChildren(node)) incoming.add(child);
+  }
+  const roots = nodes
+    .filter(node => !incoming.has(node.id) && isChoiceNode(node))
+    .sort((a, b) => a.row - b.row || a.col - b.col)
+    .map(node => node.id);
+  if (roots.length) return roots;
+  const choosable = nodes.filter(isChoiceNode);
+  if (!choosable.length) return [];
+  const minRow = Math.min(...choosable.map(node => Number(node.row) || 0));
+  return choosable.filter(node => node.row === minRow).map(node => node.id);
+}
+
+function walkMapRoutes(byId, originId, bossId, maxRoutes) {
+  const routes = [];
+  let truncated = false;
+  const path = [];
+  const seen = new Set();
+
+  function walk(id) {
+    if (truncated || seen.has(id)) return;
+    seen.add(id);
+    path.push(id);
+    const next = [];
+    for (const child of nodeChildren(byId.get(id))) {
+      if (byId.has(child) && !seen.has(child)) next.push(child);
+    }
+    if ((bossId && id === bossId) || next.length === 0) {
+      if (routes.length >= maxRoutes) truncated = true;
+      else routes.push(path.slice());
+    } else {
+      for (const child of next) {
+        walk(child);
+        if (truncated) break;
+      }
+    }
+    path.pop();
+    seen.delete(id);
+  }
+
+  if (byId.has(originId)) walk(originId);
+  return { routes, truncated };
+}
+
+function ensureMapRoutes(map, maxRoutes = 256) {
+  if (!map || typeof map !== 'object') return { visited: [], nodes: [], routes: [] };
+  if (Array.isArray(map.routes) && map.routes.length) return map;
+  const nodes = Array.isArray(map.nodes) ? map.nodes : [];
+  if (!nodes.length) return map;
+  const byId = new Map(nodes.map(node => [node.id, node]));
+  const origins = resolveMapOrigins(map);
+  const collected = [];
+  let truncated = false;
+  for (const origin of origins) {
+    const remaining = maxRoutes - collected.length;
+    if (remaining <= 0) {
+      truncated = true;
+      break;
+    }
+    const found = walkMapRoutes(byId, origin, map.boss || null, remaining);
+    collected.push(...found.routes);
+    if (found.truncated) truncated = true;
+  }
+  const toBoss = map.boss ? collected.filter(route => route.includes(map.boss)) : [];
+  let routes = toBoss.length ? toBoss : collected.filter(route => route.length > 1);
+  if (!routes.length) routes = origins.map(id => [id]);
+  return {
+    ...map,
+    routes,
+    routesTruncated: truncated || Boolean(map.routesTruncated)
+  };
+}
+
+function nextStep(route, current, visited) {
   if (!Array.isArray(route) || !route.length) return null;
   const index = current ? route.indexOf(current) : -1;
   if (index >= 0) return route[index + 1] || route[index];
-  return route[0];
+  const seen = new Set(Array.isArray(visited) ? visited : []);
+  return route.find(id => !seen.has(id)) || route[0];
 }
 
 function rankRoutes(state) {
-  const map = state?.map || {};
+  const map = ensureMapRoutes(state?.map || {});
   const routes = Array.isArray(map.routes) ? map.routes : [];
   const nodes = Array.isArray(map.nodes) ? map.nodes : [];
   const nodesById = new Map(nodes.map(node => [node.id, node]));
   const current = map.current || null;
+  const visited = Array.isArray(map.visited) ? map.visited : [];
   const ctx = buildScoreContext(state);
 
   return routes.map((route, index) => {
+    const targetId = nextStep(route, current, visited);
     let score = 0;
     const upcoming = [];
+    let counting = !targetId;
     for (let i = 0; i < route.length; i += 1) {
-      const node = nodesById.get(route[i]);
+      const id = route[i];
+      if (!counting) {
+        if (id === targetId) counting = true;
+        else continue;
+      }
+      const node = nodesById.get(id);
       if (!node) continue;
-      if (i === 0 && route[i] === current) continue;
       const parts = scoreParts(node.type, ctx);
       const nodeScore = parts.payoff + parts.risk;
       score += nodeScore;
@@ -139,7 +239,6 @@ function rankRoutes(state) {
     }
     score += restAfterEliteBonus(upcoming, ctx);
     if (ctx.hpRatio < 0.45) score += Math.max(0, 8 - route.length);
-    const targetId = nextStep(route, current);
     const target = nodesById.get(targetId);
     return {
       index,
@@ -244,7 +343,7 @@ function promptPayload(state, ranked) {
 }
 
 async function recommendRoute(state, { llm, now = Date.now() } = {}) {
-  const ranked = rankRoutes(state);
+  const ranked = rankRoutes({ ...state, map: ensureMapRoutes(state?.map || {}) });
   if (!ranked.length || !ranked[0].targetId) return null;
 
   let chosen = ranked[0];
@@ -294,6 +393,8 @@ module.exports = {
   buildScoreContext,
   scoreParts,
   scoreNode,
+  ensureMapRoutes,
+  resolveMapOrigins,
   rankRoutes,
   recommendRoute,
   routeSignature

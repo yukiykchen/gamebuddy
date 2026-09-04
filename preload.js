@@ -18,5 +18,6 @@ contextBridge.exposeInMainWorld('gamebuddyBridge', {
   onStatus: callback => ipcRenderer.on('bridge-status', (_event, status) => callback(status)),
   onObservation: callback => ipcRenderer.on('bridge-observation', (_event, observation) => callback(observation)),
   onRecommendation: callback => ipcRenderer.on('bridge-recommendation', (_event, recommendation) => callback(recommendation)),
-  getObservation: () => ipcRenderer.invoke('get-observation')
+  getObservation: () => ipcRenderer.invoke('get-observation'),
+  refreshRecommendation: () => ipcRenderer.invoke('refresh-recommendation')
 });

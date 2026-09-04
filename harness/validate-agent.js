@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { createObservationStore } = require('./observation-store');
 const { validateRecommendation } = require('../agent/recommendation');
-const { rankRoutes, recommendRoute, scoreNode, scoreParts, buildScoreContext } = require('../agent/tasks/route');
+const { rankRoutes, recommendRoute, scoreNode, scoreParts, buildScoreContext, ensureMapRoutes } = require('../agent/tasks/route');
 const { isRestSite, recommendRest, rankSmithCards } = require('../agent/tasks/rest');
 const { parseJsonObject, createOpenAiClient, readLlmConfig, extractResponseText } = require('../agent/llm/openai');
 const { loadCodexLlmConfig } = require('../agent/llm/codex-config');
@@ -197,6 +197,31 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   });
   assert.equal(empty, first);
 
+  const offGraphMap = {
+    ...mapState.map,
+    current: '-1,0',
+    start: null,
+    routes: []
+  };
+  const synthesized = ensureMapRoutes(offGraphMap);
+  assert.ok(synthesized.routes.length > 0);
+  assert.ok(synthesized.routes.some(route => route.includes('3,0')));
+
+  const offGraphState = { ...mapState, map: offGraphMap };
+  const synthesizedRec = await recommendRoute(offGraphState, { now: 4 });
+  assert.equal(synthesizedRec.task, 'map_route');
+  assert.equal(synthesizedRec.primary.action, 'TAKE_ROUTE');
+  assert.ok(synthesizedRec.primary.targetId);
+
+  const staleOrch = createOrchestrator({ llm: { enabled: false }, now: () => 5 });
+  const staleRec = await staleOrch.consider({
+    schema: 'gamebuddy.observation.v1',
+    fresh: false,
+    state: offGraphState
+  });
+  assert.equal(staleRec.task, 'map_route');
+  assert.ok(staleRec.primary.targetId);
+
   const healRec = await recommendRest(restState(24), { now: 10 });
   assert.equal(validateRecommendation(healRec).ok, true);
   assert.equal(healRec.task, 'rest_site');
@@ -225,7 +250,7 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   });
   assert.equal(viaEvent.task, 'rest_site');
 
-  console.log('Agent route cases passed: 19');
+  console.log('Agent route cases passed: 23');
 }).catch(error => {
   console.error(error);
   process.exit(1);

@@ -36,7 +36,13 @@ function createObservationStore({ historyLimit = 100, staleAfterMs = 5000 } = {}
       sequence,
       receivedAt,
       ageMs: receivedAt ? Math.max(0, now - receivedAt) : null,
-      fresh: Boolean(state && receivedAt && now - receivedAt <= staleAfterMs),
+      fresh: Boolean(state && receivedAt && (
+        now - receivedAt <= staleAfterMs
+        || (!state.combat && (
+          (Array.isArray(state.map?.nodes) && state.map.nodes.length > 0)
+          || (Array.isArray(state.map?.routes) && state.map.routes.length > 0)
+        ))
+      )),
       state: state || null,
       recentEvents: events.slice()
     };

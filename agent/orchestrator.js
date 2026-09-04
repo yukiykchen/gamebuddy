@@ -1,7 +1,12 @@
 const { validateRecommendation } = require('./recommendation');
-const { recommendRoute, routeSignature } = require('./tasks/route');
+const { recommendRoute, routeSignature, ensureMapRoutes } = require('./tasks/route');
 const { isRestSite, recommendRest, restSignature } = require('./tasks/rest');
 const { createOpenAiClient, readLlmConfig } = require('./llm/openai');
+
+function hasRoutableMap(state) {
+  const map = ensureMapRoutes(state?.map || {});
+  return Array.isArray(map.routes) && map.routes.length > 0;
+}
 
 function selectTask(observation) {
   const state = observation?.state;
@@ -15,8 +20,7 @@ function selectTask(observation) {
     }
     if (isRestSite(state)) return 'rest_site';
   }
-  const routes = state.map?.routes;
-  if (Array.isArray(routes) && routes.length) return 'map_route';
+  if (hasRoutableMap(state)) return 'map_route';
   return null;
 }
 
@@ -39,7 +43,7 @@ function createOrchestrator({
   async function consider(observation, { force = false } = {}) {
     const task = selectTask(observation);
     if (!task) return lastRecommendation;
-    if (!observation?.fresh && !force) return lastRecommendation;
+    if (!observation?.fresh && !force && lastRecommendation) return lastRecommendation;
 
     const signature = `${task}:${signatureFor(task, observation.state)}`;
     if (!force && signature === lastSignature && lastRecommendation) return lastRecommendation;

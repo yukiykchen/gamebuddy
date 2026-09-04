@@ -4,6 +4,7 @@ const WebSocket = require('ws');
 const { createObservationStore } = require('./harness/observation-store');
 const { createOrchestrator } = require('./agent/orchestrator');
 const { createOpenAiClient, readLlmConfig } = require('./agent/llm/openai');
+const { ensureMapRoutes } = require('./agent/tasks/route');
 
 const BRIDGE_URL = process.env.GAMEBUDDY_BRIDGE_URL || 'ws://127.0.0.1:27182';
 const BRIDGE_MODE = process.env.GAMEBUDDY_BRIDGE_MODE === 'replay' ? 'replay' : 'game';
@@ -27,6 +28,22 @@ const orchestrator = createOrchestrator({
   llm: createOpenAiClient(llmConfig),
   onRecommendation: recommendation => broadcast('bridge-recommendation', recommendation)
 });
+
+function withRoutableState(state) {
+  if (!state?.map) return state;
+  const map = ensureMapRoutes(state.map);
+  if (map === state.map) return state;
+  return { ...state, map };
+}
+
+function observationForAgent(observation) {
+  if (!observation?.state) return observation;
+  return { ...observation, state: withRoutableState(observation.state) };
+}
+
+function considerObservation(observation, options) {
+  return orchestrator.consider(observationForAgent(observation), options);
+}
 let bridgeHealthTimer;
 let lastBridgeStatus = { status: 'waiting', detail: '等待本地 Mod Bridge', url: BRIDGE_URL, mode: BRIDGE_MODE };
 
@@ -88,14 +105,15 @@ function connectBridge() {
       }
       if (result.kind === 'state') {
         broadcastBridgeStatus('live');
-        if (result.accepted) broadcast('bridge-state', result.state);
+        if (result.accepted) broadcast('bridge-state', withRoutableState(result.state));
       }
       if (result.kind === 'event' && result.accepted) broadcast('bridge-event', result.event);
-      if (result.accepted) {
+      if (result.accepted || (result.kind === 'duplicate' && !orchestrator.getRecommendation())) {
         const observation = observationStore.getObservation();
-        broadcast('bridge-observation', observation);
-        void orchestrator.consider(observation, {
-          force: result.kind === 'event' && (result.event?.name === 'map.opened' || result.event?.name === 'rest.opened')
+        if (result.accepted) broadcast('bridge-observation', observation);
+        void considerObservation(observation, {
+          force: result.kind === 'duplicate'
+            || (result.kind === 'event' && (result.event?.name === 'map.opened' || result.event?.name === 'rest.opened'))
         });
       }
     } catch (error) {
@@ -137,10 +155,11 @@ function createMainWindow() {
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.webContents.send('bridge-status', lastBridgeStatus);
     const state = observationStore.getState();
-    if (state) mainWindow.webContents.send('bridge-state', state);
+    if (state) mainWindow.webContents.send('bridge-state', withRoutableState(state));
     mainWindow.webContents.send('bridge-observation', observationStore.getObservation());
     const recommendation = orchestrator.getRecommendation();
     if (recommendation) mainWindow.webContents.send('bridge-recommendation', recommendation);
+    else void considerObservation(observationStore.getObservation(), { force: true });
   });
   mainWindow.on('close', event => {
     if (!isQuitting) {
@@ -181,7 +200,7 @@ function createPetWindow() {
   petWindow.webContents.on('did-finish-load', () => {
     petWindow.webContents.send('bridge-status', lastBridgeStatus);
     const state = observationStore.getState();
-    if (state) petWindow.webContents.send('bridge-state', state);
+    if (state) petWindow.webContents.send('bridge-state', withRoutableState(state));
     petWindow.webContents.send('bridge-observation', observationStore.getObservation());
     const recommendation = orchestrator.getRecommendation();
     if (recommendation) petWindow.webContents.send('bridge-recommendation', recommendation);
@@ -237,6 +256,16 @@ ipcMain.on('pet-drag-move', (_event, point) => {
 });
 ipcMain.on('pet-drag-end', () => { petDragState = undefined; });
 ipcMain.handle('get-observation', () => observationStore.getObservation());
+ipcMain.handle('refresh-recommendation', async () => {
+  if (bridgeSocket?.readyState === WebSocket.OPEN) {
+    bridgeSocket.send(JSON.stringify({ type: 'request_snapshot' }));
+  }
+  const observation = observationStore.getObservation();
+  if (observation?.state) broadcast('bridge-state', withRoutableState(observation.state));
+  const recommendation = await considerObservation(observation, { force: true });
+  if (recommendation) broadcast('bridge-recommendation', recommendation);
+  return { ok: Boolean(recommendation), recommendation };
+});
 
 app.whenReady().then(() => {
   createMainWindow();

@@ -204,7 +204,7 @@ function render() {
     draft: ['REWARD / CARD REWARD', '这张牌值得拿吗？', '把卡组当前缺口、未来路线和战斗表现放在一起判断。'],
     route: showingRest()
       ? ['REST / CAMPFIRE', '回血还是升级？', '根据生命缺口、后续精英和未升级的牌，给出休息处选择。']
-      : ['MAP / ACT 02', '下一步往哪里走？', '把战斗风险、卡组成长和遗物收益，压缩成一条可执行的路线。']
+      : ['MAP / ACT ' + String(state.run.act || 1).padStart(2, '0'), '下一步往哪里走？', '把战斗风险、卡组成长和遗物收益，压缩成一条可执行的路线。']
   }[state.mode];
   document.querySelector('#page-eyebrow').textContent = copy[0];
   document.querySelector('#page-title').textContent = copy[1];
@@ -241,7 +241,16 @@ function bindViewActions() {
 document.querySelectorAll('.nav-item').forEach(button => button.addEventListener('click', () => { state.mode = button.dataset.mode; render(); }));
 document.querySelector('#minimize-button').addEventListener('click', () => window.windowControls?.minimize());
 document.querySelector('#close-button').addEventListener('click', () => window.windowControls?.close());
-document.querySelector('#refresh-button').addEventListener('click', () => { state.syncedAt = Date.now(); document.querySelector('#last-sync').textContent = '刚刚同步'; showToast('已从游戏数据桥刷新当前局面'); });
+document.querySelector('#refresh-button').addEventListener('click', async () => {
+  state.syncedAt = Date.now();
+  document.querySelector('#last-sync').textContent = '刚刚同步';
+  try {
+    const result = await window.gamebuddyBridge?.refreshRecommendation?.();
+    showToast(result?.ok ? '已根据当前地图给出路线建议' : '已刷新，但还没有可走的下一步');
+  } catch {
+    showToast('已从游戏数据桥刷新当前局面');
+  }
+});
 document.querySelector('#pause-button').addEventListener('click', () => { state.paused = !state.paused; document.querySelector('#pause-button').classList.toggle('paused', state.paused); document.querySelector('#pause-label').textContent = state.paused ? '已暂停' : '建议中'; render(); });
 
 function setBridgeStatus(status) {

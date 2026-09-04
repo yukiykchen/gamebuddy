@@ -1,5 +1,6 @@
 const { SCHEMA } = require('../recommendation');
 const { smithScore, smithReason, isStrike, isDefend } = require('../knowledge/smith');
+const { ensureMapRoutes } = require('./route');
 
 function hpRatio(player) {
   const maxHp = Number(player?.maxHp) || 0;
@@ -17,10 +18,11 @@ function isRestSite(state) {
 }
 
 function upcomingThreats(state) {
-  const nodes = Array.isArray(state?.map?.nodes) ? state.map.nodes : [];
+  const map = ensureMapRoutes(state?.map || {});
+  const nodes = Array.isArray(map.nodes) ? map.nodes : [];
   const nodesById = new Map(nodes.map(node => [node.id, node]));
-  const current = state?.map?.current;
-  const routes = Array.isArray(state?.map?.routes) ? state.map.routes : [];
+  const current = map.current;
+  const routes = Array.isArray(map.routes) ? map.routes : [];
   let eliteSoon = false;
   let bossSoon = false;
   for (const route of routes) {
