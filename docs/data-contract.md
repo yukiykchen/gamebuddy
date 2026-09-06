@@ -131,7 +131,7 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
 
 ## Agent 建议
 
-主进程里的 `agent/` 消费 `gamebuddy.observation.v1`，产出 `gamebuddy.recommendation.v1`。当前实现路线任务 `map_route` 和休息处任务 `rest_site`；战斗出牌 `combat_play` 暂缓。没有配置 LLM 时用规则打分：每个节点拆成**收益**和**风险**。精英按遗物缺口和生命评估；火堆同时计算回血和未升级牌的敲升级价值；商店按金币、卡组厚度和打击/防御数量计算删牌与购物。同一条路上精英后面有火堆时会加协同分。进入休息处后会单独建议 **回血还是升级哪一张牌**。有 OpenAI 兼容接口时再让模型在前 5 条里解释和改选。
+主进程里的 `agent/` 消费 `gamebuddy.observation.v1`，产出 `gamebuddy.recommendation.v1`。当前实现路线任务 `map_route` 和休息处任务 `rest_site`；战斗出牌 `combat_play` 暂缓。路线推荐采用简单、可解释的规则：优先选择可达路线上的**精英数量**，再比较**火堆数量**，完全相同时才用生命、金币和卡组等上下文分数处理平局。路线任务固定由规则引擎决定，不交给 LLM 改选。进入休息处后会单独建议 **回血还是升级哪一张牌**；事件则由独立的 `event_choice` 任务处理。
 
 ```json
 {
@@ -153,7 +153,7 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
 
 `fresh=false` 时不发新建议。应用只展示建议，不会替玩家点地图。
 
-LLM 默认读取本机 Codex CLI 配置（`~/.codex/config.toml`、`~/.codex/auth.json`）。环境变量 `GAMEBUDDY_LLM_BASE_URL`、`GAMEBUDDY_LLM_API_KEY`、`GAMEBUDDY_LLM_MODEL`、`GAMEBUDDY_LLM_WIRE_API` 可以覆盖。`wire_api = "responses"` 时请求 `/v1/responses`。
+LLM 只读取项目 `.env` 中的环境变量：`GAMEBUDDY_LLM_BASE_URL`、`GAMEBUDDY_LLM_API_KEY`、`GAMEBUDDY_LLM_MODEL`、`GAMEBUDDY_LLM_WIRE_API` 和 `GAMEBUDDY_LLM_REASONING_EFFORT`。`GAMEBUDDY_LLM_WIRE_API=responses` 时请求 `/v1/responses`。
 
 ## 接入边界
 

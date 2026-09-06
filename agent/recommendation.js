@@ -26,6 +26,11 @@ function validateRecommendation(recommendation) {
       return { ok: false, reason: 'rest_site SMITH needs cardName' };
     }
   }
+  if (recommendation.task === 'event_choice') {
+    if (primary.action !== 'CHOOSE_EVENT') return { ok: false, reason: 'event_choice action must be CHOOSE_EVENT' };
+    if (!Number.isInteger(primary.optionIndex) || primary.optionIndex < 0) return { ok: false, reason: 'event_choice needs optionIndex' };
+    if (typeof primary.label !== 'string' || !primary.label.trim()) return { ok: false, reason: 'event_choice needs label' };
+  }
   if (recommendation.alternatives !== undefined) {
     if (!Array.isArray(recommendation.alternatives)) return { ok: false, reason: 'alternatives must be an array' };
   }

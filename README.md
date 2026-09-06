@@ -117,6 +117,8 @@ Electron 启动后可以在三个决策工作台之间切换。启动时会尝�
 
 接入层约定见 [docs/data-contract.md](./docs/data-contract.md)。第一阶段建议先实现：
 
+事件选择规则库的实施规划见 [docs/event-choice-todo.md](./docs/event-choice-todo.md)。
+
 1. STS2 Mod Bridge：导出完整状态快照和关键事件。当前初版采集器位于 [mod/GameBuddyBridge](./mod/GameBuddyBridge)。
 2. 桌面端状态适配器：校验 schema、断线重连、保留最近快照。
 3. 决策引擎：先做规则 + 搜索，再逐步接入模型，保证建议可解释、可回放。
@@ -137,20 +139,12 @@ STS2 Mod Bridge / Replay Bridge
 
 当前主进程已经通过 [harness/observation-store.js](./harness/observation-store.js) 整理最新状态、事件历史和 freshness。[agent/](./agent/) 消费这份观察对象，先做路线建议 `map_route`，进入休息处后再给 `rest_site`：回血还是升级哪一张牌。规则给可达路线和火堆选择打分；有密钥时再用模型解释。战斗出牌暂缓。
 
-本地 `.env`（已 gitignore）会提供模型接口。启动时自动读取，默认：
+本地 `.env`（已 gitignore）会提供 Kimi 模型接口。启动时自动读取，默认：
 
 - Base URL：`https://ai.gs88.shop`
-- Model：`gpt-5.5`
-- API：Codex `responses`
-- Reasoning：`xhigh`
-
-项目内 Codex CLI：
-
-```bash
-npm run codex
-```
-
-它使用 `.codex-cli/` 和同一套 `.env` 密钥，不会改掉 ChatGPT 桌面版那份 `~/.codex` 本地代理配置。
+- Model：`kimi-k2.5`
+- API：Kimi OpenAI 兼容 `chat`
+- Reasoning：`high`
 
 没有 API Key 时只用规则，桌面端仍然能给出下一步路点。
 

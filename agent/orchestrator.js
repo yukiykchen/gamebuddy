@@ -1,6 +1,7 @@
 const { validateRecommendation } = require('./recommendation');
 const { recommendRoute, routeSignature, ensureMapRoutes } = require('./tasks/route');
 const { isRestSite, recommendRest, restSignature } = require('./tasks/rest');
+const { recommendEvent, eventSignature } = require('./tasks/event');
 const { createOpenAiClient, readLlmConfig } = require('./llm/openai');
 
 function hasRoutableMap(state) {
@@ -11,6 +12,7 @@ function hasRoutableMap(state) {
 function selectTask(observation) {
   const state = observation?.state;
   if (!state) return null;
+  if (Array.isArray(state.event?.options) && state.event.options.length > 0) return 'event_choice';
   if (!state.combat) {
     const recent = observation.recentEvents || [];
     for (let i = recent.length - 1; i >= 0; i -= 1) {
@@ -27,12 +29,14 @@ function selectTask(observation) {
 function signatureFor(task, state) {
   if (task === 'rest_site') return restSignature(state);
   if (task === 'map_route') return routeSignature(state);
+  if (task === 'event_choice') return eventSignature(state);
   return '';
 }
 
 function createOrchestrator({
   llm,
   onRecommendation,
+  onAgentStatus,
   now = () => Date.now()
 } = {}) {
   const client = llm || createOpenAiClient(readLlmConfig());
@@ -49,8 +53,11 @@ function createOrchestrator({
     if (!force && signature === lastSignature && lastRecommendation) return lastRecommendation;
 
     const current = ++generation;
+    onAgentStatus?.({ status: 'thinking', task, timestamp: now() });
     try {
-      const recommendation = task === 'rest_site'
+      const recommendation = task === 'event_choice'
+        ? await recommendEvent(observation.state, { llm: client, now: now() })
+        : task === 'rest_site'
         ? await recommendRest(observation.state, { llm: client, now: now() })
         : await recommendRoute(observation.state, { llm: client, now: now() });
       if (current !== generation) return lastRecommendation;
@@ -59,10 +66,12 @@ function createOrchestrator({
       lastSignature = signature;
       lastRecommendation = recommendation;
       onRecommendation?.(recommendation);
+      onAgentStatus?.({ status: 'ready', task, timestamp: now() });
       return recommendation;
     } catch (error) {
       if (current === generation) {
         console.error('GameBuddy agent failed:', error.message);
+        onAgentStatus?.({ status: 'error', task, detail: error.message, timestamp: now() });
       }
       return lastRecommendation;
     }

@@ -204,6 +204,19 @@ function nextStep(route, current, visited) {
   return route.find(id => !seen.has(id)) || route[0];
 }
 
+function targetPositionLabel(map, targetId) {
+  const nodes = Array.isArray(map?.nodes) ? map.nodes : [];
+  const target = nodes.find(node => node?.id === targetId);
+  if (!target) return '';
+  const sameRow = nodes
+    .filter(node => Number(node?.row) === Number(target.row))
+    .sort((a, b) => (Number(a.col) || 0) - (Number(b.col) || 0));
+  const position = sameRow.findIndex(node => node.id === targetId);
+  if (sameRow.length === 3) return ['左侧', '中间', '右侧'][position] || '';
+  if (sameRow.length === 2) return ['左侧', '右侧'][position] || '';
+  return sameRow.length > 1 ? `从左第${position + 1}个` : '';
+}
+
 function rankRoutes(state) {
   const map = ensureMapRoutes(state?.map || {});
   const routes = Array.isArray(map.routes) ? map.routes : [];
@@ -240,23 +253,37 @@ function rankRoutes(state) {
     score += restAfterEliteBonus(upcoming, ctx);
     if (ctx.hpRatio < 0.45) score += Math.max(0, 8 - route.length);
     const target = nodesById.get(targetId);
+    const eliteCount = upcoming.filter(node => node.type === 'Elite').length;
+    const restSiteCount = upcoming.filter(node => node.type === 'RestSite').length;
     return {
       index,
       route,
       score,
       upcoming,
+      eliteCount,
+      restSiteCount,
       targetId: targetId || route[route.length - 1] || '',
       targetType: target?.type || '',
+      targetPosition: targetPositionLabel(map, targetId),
       label: mapTypeLabel(target?.type)
     };
-  }).sort((a, b) => b.score - a.score || a.index - b.index);
+  }).sort((a, b) =>
+    b.eliteCount - a.eliteCount
+    || b.restSiteCount - a.restSiteCount
+    || b.score - a.score
+    || a.index - b.index
+  );
 }
 
 function explainRoute(ranked, state) {
   const ctx = buildScoreContext(state);
   const types = new Set(ranked.upcoming.map(node => node.type));
-  const nextLabel = ranked.label || '下一节点';
+  const nextLabel = `${ranked.targetPosition || ''}${ranked.label || '下一节点'}`;
   const clauses = [];
+
+  clauses.push(`这条路线后续有 ${ranked.eliteCount} 个精英和 ${ranked.restSiteCount} 个火堆`);
+  const followUp = ranked.upcoming.slice(1, 4).map(node => mapTypeLabel(node.type));
+  if (followUp.length) clauses.push(`通过后续是 ${followUp.join(' → ')}`);
 
   if (ranked.targetType === 'Elite' || types.has('Elite')) {
     if (ctx.hpRatio < 0.45) clauses.push('精英有遗物和更好的卡牌奖励，但当前生命偏危险');
@@ -272,9 +299,6 @@ function explainRoute(ranked, state) {
     else clauses.push('商店收益一般，金币不太够删牌或购物');
   }
   if (ranked.targetType === 'Treasure') clauses.push('宝箱几乎总是正收益');
-  if (!clauses.length) {
-    return `下一步走${nextLabel}。综合遗物、升级、删牌和生命风险，这条路更划算。`;
-  }
   return `下一步走${nextLabel}。${clauses.join('；')}。`;
 }
 
@@ -291,6 +315,7 @@ function toAlternative(item) {
     action: 'TAKE_ROUTE',
     targetId: item.targetId,
     label: item.label,
+    targetPosition: item.targetPosition,
     route: item.route,
     score: item.score
   };
@@ -308,6 +333,7 @@ function buildRecommendation(chosen, ranked, { source, reason, now }) {
       action: 'TAKE_ROUTE',
       targetId: chosen.targetId,
       label: chosen.label,
+      targetPosition: chosen.targetPosition,
       route: chosen.route,
       routeIndex: chosen.index,
       score: chosen.score
@@ -346,27 +372,11 @@ async function recommendRoute(state, { llm, now = Date.now() } = {}) {
   const ranked = rankRoutes({ ...state, map: ensureMapRoutes(state?.map || {}) });
   if (!ranked.length || !ranked[0].targetId) return null;
 
-  let chosen = ranked[0];
-  let source = 'rules';
-  let reason = explainRoute(chosen, state);
-
-  if (llm?.enabled && typeof llm.completeRoute === 'function') {
-    try {
-      const pick = await llm.completeRoute(promptPayload(state, ranked));
-      const index = Number(pick?.index);
-      if (Number.isInteger(index) && ranked[index]) {
-        chosen = ranked[index];
-        source = 'llm';
-        if (typeof pick.reason === 'string' && pick.reason.trim()) reason = pick.reason.trim();
-        else reason = explainRoute(chosen, state);
-      }
-    } catch {
-      source = 'rules';
-      reason = explainRoute(chosen, state);
-    }
-  }
-
-  return buildRecommendation(chosen, ranked, { source, reason, now });
+  return buildRecommendation(ranked[0], ranked, {
+    source: 'rules',
+    reason: explainRoute(ranked[0], state),
+    now
+  });
 }
 
 function routeSignature(state) {
@@ -396,6 +406,7 @@ module.exports = {
   ensureMapRoutes,
   resolveMapOrigins,
   rankRoutes,
+  targetPositionLabel,
   recommendRoute,
   routeSignature
 };
