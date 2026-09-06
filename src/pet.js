@@ -34,8 +34,19 @@ function setState(next) {
   }
 }
 
-document.querySelector('#pet-button').addEventListener('click', () => window.windowControls?.openMain());
-document.querySelector('#pet-menu').addEventListener('click', event => { event.stopPropagation(); window.windowControls?.togglePet(); });
+let clickTimer = null;
+
+document.querySelector('#pet-button').addEventListener('click', () => {
+  // Distinguish click (open panel) from drag start.
+  if (clickTimer) return;
+  clickTimer = setTimeout(() => { clickTimer = null; }, 260);
+});
+
+document.querySelector('#pet-button').addEventListener('dblclick', () => {
+  clearTimeout(clickTimer);
+  clickTimer = null;
+  window.windowControls?.openMain();
+});
 window.runmateBridge?.onStatus(setStatus);
 window.runmateBridge?.onState(setState);
 window.runmateBridge?.onObservation(observation => observation?.decision && setState({ decision: observation.decision }));

@@ -57,6 +57,8 @@ function connectBridge() {
       const message = JSON.parse(raw.toString());
       const result = observationStore.ingest(message);
       if (result.kind === 'invalid') {
+        console.error('[Runmate DEBUG] invalid state reason:', result.reason);
+        console.error('[Runmate DEBUG] raw message:', JSON.stringify(message, null, 2).slice(0, 4000));
         broadcastBridgeStatus('invalid', result.reason);
         return;
       }
