@@ -8,3 +8,5 @@ release/
 !.env.example
 hatch-runs/
 runs/
+
+mod/RunmateBridge/.godot/
