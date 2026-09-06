@@ -67,6 +67,7 @@ function connectBridge() {
           const observation = currentObservation();
           recordDecision({ runId: agentRunId, observation, decision: observation.decision });
           broadcast('bridge-state', result.state);
+          sendHighlightRoute(observation.decision);
         }
       }
       if (result.kind === 'event' && result.accepted) broadcast('bridge-event', result.event);
@@ -86,6 +87,14 @@ function connectBridge() {
   };
   socket.on('error', disconnect);
   socket.on('close', disconnect);
+}
+
+function sendHighlightRoute(decision) {
+  if (!bridgeSocket || bridgeSocket.readyState !== WebSocket.OPEN) return;
+  if (decision?.agent !== 'route' || decision?.status !== 'ready') return;
+  const coords = decision.payload?.routeCoords;
+  if (!Array.isArray(coords) || !coords.length) return;
+  bridgeSocket.send(JSON.stringify({ type: 'highlight_map_nodes', coords }));
 }
 
 function createMainWindow() {

@@ -385,6 +385,111 @@ internal sealed class RunmateWebSocketServer
         }
     }
 
+    private static void HandleHighlightMapNodes(string json)
+    {
+        try
+        {
+            var doc = System.Text.Json.JsonDocument.Parse(json);
+            var coords = doc.RootElement.GetProperty("coords").EnumerateArray()
+                .Select(v => v.GetString())
+                .Where(v => !string.IsNullOrEmpty(v))
+                .Select(v =>
+                {
+                    var parts = v!.Split(',');
+                    return (row: int.Parse(parts[0]), col: int.Parse(parts[1]));
+                })
+                .ToHashSet();
+            HighlightMapCoords(coords);
+        }
+        catch (Exception ex)
+        {
+            Log.Warn($"[RunmateBridge] highlight failed: {ex.Message}");
+        }
+    }
+
+    private static void HighlightMapCoords(HashSet<(int row, int col)> coords)
+    {
+        if (!coords.Any()) return;
+        var screen = FindMapScreen();
+        if (screen is null) return;
+        // The NMapScreen stores map point nodes in a private dictionary keyed by MapCoord.
+        // We reflect over all instance fields to find one whose key type matches MapCoord.
+        var fields = screen.GetType().GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+        foreach (var field in fields)
+        {
+            var fieldType = field.FieldType;
+            if (!fieldType.IsGenericType || fieldType.GetGenericTypeDefinition() != typeof(System.Collections.Generic.Dictionary<,>)) continue;
+            var args = fieldType.GetGenericArguments();
+            if (args[0] != typeof(MapCoord)) continue;
+            var dict = field.GetValue(screen);
+            if (dict is null) continue;
+            var keysProp = fieldType.GetProperty("Keys");
+            var indexer = fieldType.GetProperty("Item");
+            if (keysProp?.GetValue(dict) is not System.Collections.IEnumerable keys || indexer is null) continue;
+            foreach (var key in keys)
+            {
+                var rowField = key.GetType().GetField("row");
+                var rowProperty = key.GetType().GetProperty("row");
+                var colField = key.GetType().GetField("col");
+                var colProperty = key.GetType().GetProperty("col");
+                var rowObj = rowField?.GetValue(key) ?? rowProperty?.GetValue(key);
+                var colObj = colField?.GetValue(key) ?? colProperty?.GetValue(key);
+                if (rowObj is null || colObj is null) continue;
+                var row = Convert.ToInt32(rowObj);
+                var col = Convert.ToInt32(colObj);
+                if (!coords.Contains((row, col))) continue;
+                var point = indexer.GetValue(dict, new object[] { key });
+                if (point is null) continue;
+                TryHighlightPoint(point);
+            }
+            return;
+        }
+        Log.Info("[RunmateBridge] no map point dictionary field found on NMapScreen");
+    }
+
+    private static void TryHighlightPoint(object point)
+    {
+        // Prefer the game's own highlight mechanism, then fall back to the State property.
+        try
+        {
+            var screen = FindMapScreen();
+            if (screen is not null)
+            {
+                var highlightMethod = screen.GetType().GetMethod("HighlightPointType", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                // HighlightPointType highlights by type, not coord, so only use it when we cannot set State.
+            }
+        }
+        catch { }
+        try
+        {
+            var stateProp = point.GetType().GetProperty("State");
+            if (stateProp is null || !stateProp.CanWrite) return;
+            var enumType = stateProp.PropertyType;
+            if (!enumType.IsEnum) return;
+            var names = System.Enum.GetNames(enumType);
+            var preferred = new[] { "Highlighted", "Travelable", "Selectable", "Recommended", "Available" };
+            foreach (var name in preferred)
+            {
+                if (!names.Contains(name, StringComparer.OrdinalIgnoreCase)) continue;
+                var value = System.Enum.Parse(enumType, name);
+                stateProp.SetValue(point, value);
+                return;
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Warn($"[RunmateBridge] point highlight failed: {ex.Message}");
+        }
+    }
+
+    private static NMapScreen? FindMapScreen()
+    {
+        var tree = Engine.GetMainLoop() as SceneTree;
+        var root = tree?.Root;
+        if (root is null) return null;
+        return root.FindChildren("*", nameof(NMapScreen), true, false).OfType<NMapScreen>().FirstOrDefault();
+    }
+
     private async Task HandleClientAsync(TcpClient client, CancellationToken cancellationToken)
     {
         try
@@ -411,6 +516,10 @@ internal sealed class RunmateWebSocketServer
                 if (message.Contains("request_snapshot", StringComparison.Ordinal))
                 {
                     if (_lastStateFrame is not null) await SendAsync(client, _lastStateFrame, cancellationToken);
+                }
+                else if (message.Contains("highlight_map_nodes", StringComparison.Ordinal))
+                {
+                    HandleHighlightMapNodes(message);
                 }
             }
         }

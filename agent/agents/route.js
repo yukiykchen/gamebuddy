@@ -7,26 +7,30 @@ function decide(state) {
   const run = state.run || {};
   const actNumber = numberOr(run.act, 1);
   const act = codex.acts?.find?.(row => row.id === actNumber) || null;
-  const options = (state.map?.nodes || state.map?.choices || state.map?.options || []).filter(Boolean);
-  if (!Array.isArray(options) || !options.length) {
+  const rawNodes = (state.map?.nodes || state.map?.choices || state.map?.options || []).filter(Boolean);
+  const currentCoord = parseCoord(state.run?.currentCoord || state.map?.currentCoord);
+  if (!Array.isArray(rawNodes) || !rawNodes.length) {
     return ['route', unavailable('route', state, '当前快照没有可选择的地图节点。')];
   }
   const hpRatio = numberOr(state.player.hp, 1) / Math.max(1, numberOr(state.player.maxHp, 1));
   const deckSize = (state.player.cards || []).length;
-  const reviewed = options.map((option, index) => {
+  const reviewed = rawNodes.map((option, index) => {
     const room = normalizeRoom(option);
     const score = routeScore(room, { hpRatio, deckSize, actNumber, option });
     return { index, room, score, reason: explainRoute(room, score, hpRatio, deckSize) };
   });
   const best = reviewed.sort((a, b) => b.score - a.score)[0];
+  const routeCoords = buildRouteCoords(rawNodes, best.index, currentCoord);
   const decision = createDecision('route', state);
   decision.title = `建议进入「${roomName(best.room)}」`;
   decision.summary = best.reason;
-  decision.confidence = 0.45 + Math.min(0.3, options.length / 12);
+  decision.confidence = 0.45 + Math.min(0.3, rawNodes.length / 12);
   decision.payload = {
     action: 'map-node',
     choiceIndex: best.index,
-    options: reviewed
+    options: reviewed,
+    routeCoords,
+    currentCoord
   };
   decision.evidence = [
     { kind: 'state', detail: `HP ${Math.round(hpRatio * 100)}%，卡组 ${deckSize} 张，Act ${actNumber}` },
@@ -47,6 +51,56 @@ function normalizeRoom(option) {
   if (/treasure|chest|宝/.test(value)) return 'chest';
   if (/boss|首领|boss/.test(value)) return 'boss';
   return 'unknown';
+}
+
+function parseCoord(value) {
+  if (!value) return null;
+  if (typeof value === 'string') {
+    const [row, col] = value.split(',').map(part => Number.parseInt(part, 10));
+    return Number.isFinite(row) && Number.isFinite(col) ? { row, col } : null;
+  }
+  if (typeof value === 'object' && Number.isFinite(value.row) && Number.isFinite(value.col)) {
+    return { row: value.row, col: value.col };
+  }
+  return null;
+}
+
+function buildRouteCoords(nodes, chosenIndex, currentCoord) {
+  const coords = [];
+  if (currentCoord) coords.push(`${currentCoord.row},${currentCoord.col}`);
+  const chosen = nodes[chosenIndex];
+  const coord = extractCoord(chosen, chosenIndex);
+  if (coord) coords.push(`${coord.row},${coord.col}`);
+  const nextNodes = nodes
+    .filter((_, index) => index !== chosenIndex)
+    .map((node, index) => ({ node, index }))
+    .filter(row => {
+      const nextCoord = extractCoord(row.node, row.index);
+      return nextCoord && (!coord || nextCoord.row >= coord.row);
+    })
+    .sort((a, b) => {
+      const ca = extractCoord(a.node, a.index);
+      const cb = extractCoord(b.node, b.index);
+      return (ca?.row ?? 0) - (cb?.row ?? 0);
+    })
+    .slice(0, 4)
+    .sort((a, b) => routeScore(normalizeRoom(a.node), { hpRatio: 0.6, deckSize: 20, actNumber: 1, option: a.node }) - routeScore(normalizeRoom(b.node), { hpRatio: 0.6, deckSize: 20, actNumber: 1, option: b.node }))
+    .map(row => extractCoord(row.node, row.index))
+    .filter(Boolean)
+    .map(coord => `${coord.row},${coord.col}`);
+  return [...coords, ...nextNodes];
+}
+
+function extractCoord(node, index) {
+  if (!node) return null;
+  if (typeof node === 'string') {
+    const parsed = parseCoord(node);
+    if (parsed) return parsed;
+    return null;
+  }
+  const coord = parseCoord(node.coord || node.coordinate || node.id || node.coordId);
+  if (coord) return coord;
+  return parseCoord(node.coordString) || null;
 }
 
 function routeScore(room, context) {

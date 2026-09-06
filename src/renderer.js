@@ -150,6 +150,86 @@ function optionsView(kind, heading) {
     </div>`;
 }
 
+function roomLabel(type) {
+  const value = String(type || '').toLowerCase();
+  if (/monster|combat|战|怪/.test(value)) return '战';
+  if (/elite|精/.test(value)) return '精';
+  if (/rest|campfire|休息|营/.test(value)) return '休';
+  if (/shop|商/.test(value)) return '商';
+  if (/event|unknown|问|？|\?/.test(value)) return '问';
+  if (/treasure|chest|宝/.test(value)) return '宝';
+  if (/boss|首领/.test(value)) return 'BOSS';
+  return '?';
+}
+
+function mapView() {
+  const state = gameState();
+  const decision = currentDecision();
+  const nodes = state?.map?.nodes || [];
+  const currentCoord = state?.run?.currentCoord || null;
+  const routeCoords = decision?.payload?.routeCoords || [];
+  const visited = new Set(state?.map?.visited || []);
+  const current = new Set(currentCoord ? [currentCoord] : []);
+  const route = new Set(routeCoords);
+  const rowsByRow = new Map();
+  nodes.forEach((node, index) => {
+    const coord = node?.coord || node?.coordinate || node?.id || `${index},${index}`;
+    const [rowRaw] = String(coord).split(',');
+    const row = Number.parseInt(rowRaw, 10);
+    if (!Number.isFinite(row)) return;
+    if (!rowsByRow.has(row)) rowsByRow.set(row, []);
+    rowsByRow.get(row).push({ node, coord, index });
+  });
+  const rows = [...rowsByRow.keys()].sort((a, b) => b - a);
+  const maxCols = Math.max(1, ...[...rowsByRow.values()].map(row => row.length));
+  const gridRows = rows.map(row => {
+    const rowNodes = rowsByRow.get(row);
+    const cells = Array.from({ length: maxCols }, (_, colIndex) => {
+      const rowNode = rowNodes[colIndex];
+      if (!rowNode) return '<div></div>';
+      const coord = rowNode.coord;
+      const isCurrent = current.has(coord);
+      const isRoute = route.has(coord);
+      const isVisited = visited.has(coord);
+      const cls = [
+        'map-node',
+        roomKey(rowNode.node?.type || rowNode.node?.room || rowNode.node?.pointType),
+        isCurrent ? 'current' : '',
+        isRoute && !isCurrent ? 'route' : '',
+        isVisited ? 'visited' : ''
+      ].filter(Boolean).join(' ');
+      const title = isRoute ? '推荐路线' : isCurrent ? '当前位置' : '';
+      return `<div class="${cls}" title="${title}">${roomLabel(rowNode.node?.type || rowNode.node?.room || rowNode.node?.pointType)}</div>`;
+    });
+    return `<div class="map-row">${cells.join('')}</div>`;
+  });
+  return `
+    <section class="panel map-panel">
+      <div class="panel-heading">
+        <span class="panel-title">当前地图</span>
+        <span class="panel-meta">从下往上 · 与游戏一致</span>
+      </div>
+      <div class="map-grid">${gridRows.join('')}</div>
+      <div class="map-legend">
+        <span class="legend-current">当前位置</span>
+        <span class="legend-route">推荐路线</span>
+        <span class="legend-elite">精英</span>
+        <span class="legend-rest">休息处</span>
+      </div>
+    </section>`;
+}
+
+function roomKey(type) {
+  const value = String(type || '').toLowerCase();
+  if (/monster|combat/.test(value)) return 'monster';
+  if (/elite/.test(value)) return 'elite';
+  if (/rest|campfire/.test(value)) return 'rest';
+  if (/shop/.test(value)) return 'shop';
+  if (/treasure|chest/.test(value)) return 'chest';
+  if (/boss/.test(value)) return 'boss';
+  return 'unknown';
+}
+
 const COPY = {
   combat: ['COMBAT', '当前回合怎么打？', '由战斗 agent 根据手牌、敌人和 Codex 数据推演。'],
   draft: ['REWARD', '这次奖励怎么选？', '由奖励 agent 对卡牌、遗物和药水做边际收益评估。'],
@@ -163,7 +243,9 @@ function render() {
   document.querySelector('#page-eyebrow').textContent = copy[0];
   document.querySelector('#page-title').textContent = copy[1];
   document.querySelector('#page-description').textContent = copy[2];
-  viewContainer.innerHTML = appState.mode === 'combat' ? combatView() : optionsView(appState.mode, COPY[appState.mode][1]);
+  viewContainer.innerHTML = appState.mode === 'combat' ? combatView()
+    : appState.mode === 'route' ? mapView() + decisionPanel(currentDecision(), currentDecision()?.payload?.options || [])
+    : optionsView(appState.mode, COPY[appState.mode][1]);
   updateRunSummary();
   document.querySelector('#pause-button').classList.toggle('paused', appState.paused);
   bindViewActions();

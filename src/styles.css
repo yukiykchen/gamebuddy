@@ -180,17 +180,23 @@ h1 { margin: 9px 0 7px; color: var(--cream); font: 500 30px Georgia, "Songti SC"
 .route-layout { grid-template-columns: 1.55fr .8fr; }
 .map-panel { padding-bottom: 22px; }
 .map-panel .panel-heading { margin-bottom: 17px; }
+.map-grid { display: grid; gap: 15px 0; padding: 8px 24px 26px; background: #181b1d; }
+.map-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(44px, 1fr)); justify-items: center; }
 .map-rail { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0; align-items: center; padding: 22px 24px 30px; background: #181b1d; }
 .map-node { position: relative; display: grid; place-items: center; height: 42px; margin: 0 auto; width: 42px; border: 1px solid #565e5e; color: #97a09c; background: #222729; font-size: 13px; z-index: 1; }
 .map-node::before { content: ""; position: absolute; top: 20px; right: 41px; width: 54px; height: 1px; background: #3b4645; z-index: -1; }
 .map-node:first-child::before { display: none; }
 .map-node.current { border-color: var(--mint); color: var(--mint); box-shadow: 0 0 0 4px rgba(120,198,168,.1); }
+.map-node.route { border-color: var(--amber); color: var(--amber); box-shadow: 0 0 0 4px rgba(239,183,100,.14); }
+.map-node.visited { opacity: .45; }
 .map-node.elite { border-color: #9b645b; color: var(--red); }
 .map-node.rest { border-color: #a28b57; color: var(--amber); }
 .map-node.boss { width: 47px; height: 47px; border-color: var(--amber); color: var(--amber); }
+.map-node.route.elite, .map-node.route.rest { border-color: var(--amber); box-shadow: 0 0 0 4px rgba(239,183,100,.14); }
 .map-legend { display: flex; gap: 17px; padding: 0 24px; color: #7d8787; font-size: 10px; }
 .map-legend span::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 5px; background: #697272; }
 .map-legend .legend-elite::before { background: var(--red); }.map-legend .legend-rest::before { background: var(--amber); }.map-legend .legend-current::before { background: var(--mint); }
+.map-legend .legend-route::before { background: var(--amber); }
 .route-advice { padding: 19px; }
 .route-advice h2 { margin: 0; color: var(--cream); font: 500 20px Georgia, serif; }
 .route-advice p { color: #919b99; font-size: 11px; line-height: 1.7; }
