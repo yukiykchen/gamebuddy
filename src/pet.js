@@ -26,12 +26,9 @@ function setStatus(status) {
 }
 
 function setState(next) {
-  const enemy = next.combat?.enemies?.[0];
-  const intent = String(enemy?.intent || '').toLowerCase();
-  if (intent.includes('attack') || Number(enemy?.damage) > 0) {
-    say(`小心，预计 ${enemy.damage || 0} 伤害`, 'alert');
-  } else if (next.combat?.hand?.length) {
-    say('手牌更新了，看看怎么打', 'thinking');
+  const decision = next.decision;
+  if (decision?.status === 'ready') {
+    say(decision.title, decision.agent === 'combat' ? 'alert' : 'thinking');
   } else {
     say('我在看着这局');
   }
@@ -41,3 +38,4 @@ document.querySelector('#pet-button').addEventListener('click', () => window.win
 document.querySelector('#pet-menu').addEventListener('click', event => { event.stopPropagation(); window.windowControls?.togglePet(); });
 window.runmateBridge?.onStatus(setStatus);
 window.runmateBridge?.onState(setState);
+window.runmateBridge?.onObservation(observation => observation?.decision && setState({ decision: observation.decision }));

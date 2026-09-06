@@ -1,12 +1,7 @@
 const {
-  lookupCard, lookupMonster, lookupRelic, monsterMoves, stripMarkup
+  lookupCard, lookupMonster, stripMarkup
 } = require('../codex-db');
 const { createDecision, unavailable, numberOr } = require('../contracts');
-
-const INTENT_DAMAGE = /attack|攻击|伤害/i;
-const INTENT_DEFENSE = /defend|格挡|防御/i;
-const INTENT_BUFF = /buff|增益/i;
-const INTENT_DEBUFF = /debuff|减益/i;
 
 function decide(state) {
   const player = state.player || {};
