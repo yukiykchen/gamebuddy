@@ -3,85 +3,334 @@
     "schema": "runmate.state.v1",
     "timestamp": 1723370000000,
     "source": "replay-bridge",
-    "run": { "act": 2, "floor": 18, "room": "combat", "character": "ironclad" },
-    "player": { "hp": 43, "maxHp": 67, "block": 12, "gold": 184, "energy": 3, "maxEnergy": 3, "cards": [], "relics": [], "potions": [] },
+    "run": {
+      "act": 2,
+      "floor": 18,
+      "room": "combat",
+      "character": "ironclad"
+    },
+    "player": {
+      "hp": 43,
+      "maxHp": 67,
+      "block": 12,
+      "gold": 184,
+      "energy": 3,
+      "maxEnergy": 3,
+      "cards": [],
+      "relics": [],
+      "potions": []
+    },
     "combat": {
       "turn": 7,
       "hand": [
-        { "id": "Strike_R", "name": "打击", "cost": 1, "type": "Attack", "upgraded": false },
-        { "id": "Defend_R", "name": "防御", "cost": 1, "type": "Skill", "upgraded": false },
-        { "id": "Bash", "name": "痛击", "cost": 2, "type": "Attack", "upgraded": false },
-        { "id": "DemonForm", "name": "恶魔形态", "cost": 3, "type": "Power", "upgraded": false },
-        { "id": "Cleave", "name": "铁斩波", "cost": 1, "type": "Attack", "upgraded": false }
+        {
+          "id": "STRIKE_IRONCLAD",
+          "name": "打击",
+          "cost": 1,
+          "type": "Attack",
+          "upgraded": false
+        },
+        {
+          "id": "DEFEND_IRONCLAD",
+          "name": "防御",
+          "cost": 1,
+          "type": "Skill",
+          "upgraded": false
+        },
+        {
+          "id": "BASH",
+          "name": "痛击",
+          "cost": 2,
+          "type": "Attack",
+          "upgraded": false
+        },
+        {
+          "id": "DEMON_FORM",
+          "name": "恶魔形态",
+          "cost": 3,
+          "type": "Power",
+          "upgraded": false
+        },
+        {
+          "id": "IRON_WAVE",
+          "name": "铁斩波",
+          "cost": 1,
+          "type": "Attack",
+          "upgraded": false
+        }
       ],
       "drawPile": [
-        { "id": "Strike_R", "name": "打击", "cost": 1, "type": "Attack", "upgraded": false },
-        { "id": "Defend_R", "name": "防御", "cost": 1, "type": "Skill", "upgraded": false },
-        { "id": "HeavyBlade", "name": "重击", "cost": 2, "type": "Attack", "upgraded": false }
+        {
+          "id": "STRIKE_IRONCLAD",
+          "name": "打击",
+          "cost": 1,
+          "type": "Attack",
+          "upgraded": false
+        },
+        {
+          "id": "DEFEND_IRONCLAD",
+          "name": "防御",
+          "cost": 1,
+          "type": "Skill",
+          "upgraded": false
+        },
+        {
+          "id": "BLUDGEON",
+          "name": "重击",
+          "cost": 2,
+          "type": "Attack",
+          "upgraded": false
+        }
       ],
       "discardPile": [
-        { "id": "TwinStrike", "name": "双持", "cost": 1, "type": "Attack", "upgraded": false },
-        { "id": "Offering", "name": "燃烧契约", "cost": 0, "type": "Skill", "upgraded": false }
+        {
+          "id": "TWIN_STRIKE",
+          "name": "双持",
+          "cost": 1,
+          "type": "Attack",
+          "upgraded": false
+        },
+        {
+          "id": "OFFERING",
+          "name": "燃烧契约",
+          "cost": 0,
+          "type": "Skill",
+          "upgraded": false
+        }
       ],
       "exhaustPile": [],
-      "enemies": [{ "name": "蛇花", "hp": 78, "maxHp": 96, "block": 0, "intent": "AttackIntent", "damage": 18, "alive": true }]
+      "enemies": [
+        {
+          "name": "蛇花",
+          "hp": 78,
+          "maxHp": 96,
+          "block": 0,
+          "intent": "AttackIntent",
+          "damage": 18,
+          "alive": true
+        }
+      ]
     },
-    "map": { "visited": [] }
+    "map": {
+      "visited": []
+    }
   },
   {
     "schema": "runmate.state.v1",
     "timestamp": 1723370001200,
     "source": "replay-bridge",
-    "run": { "act": 2, "floor": 18, "room": "combat", "character": "ironclad" },
-    "player": { "hp": 43, "maxHp": 67, "block": 17, "gold": 184, "energy": 1, "maxEnergy": 3, "cards": [], "relics": [], "potions": [] },
+    "run": {
+      "act": 2,
+      "floor": 18,
+      "room": "combat",
+      "character": "ironclad"
+    },
+    "player": {
+      "hp": 43,
+      "maxHp": 67,
+      "block": 17,
+      "gold": 184,
+      "energy": 1,
+      "maxEnergy": 3,
+      "cards": [],
+      "relics": [],
+      "potions": []
+    },
     "combat": {
       "turn": 7,
       "hand": [
-        { "id": "Defend_R", "name": "防御", "cost": 1, "type": "Skill", "upgraded": false },
-        { "id": "Bash", "name": "痛击", "cost": 2, "type": "Attack", "upgraded": false },
-        { "id": "DemonForm", "name": "恶魔形态", "cost": 3, "type": "Power", "upgraded": false },
-        { "id": "Cleave", "name": "铁斩波", "cost": 1, "type": "Attack", "upgraded": false }
+        {
+          "id": "DEFEND_IRONCLAD",
+          "name": "防御",
+          "cost": 1,
+          "type": "Skill",
+          "upgraded": false
+        },
+        {
+          "id": "BASH",
+          "name": "痛击",
+          "cost": 2,
+          "type": "Attack",
+          "upgraded": false
+        },
+        {
+          "id": "DEMON_FORM",
+          "name": "恶魔形态",
+          "cost": 3,
+          "type": "Power",
+          "upgraded": false
+        },
+        {
+          "id": "IRON_WAVE",
+          "name": "铁斩波",
+          "cost": 1,
+          "type": "Attack",
+          "upgraded": false
+        }
       ],
       "drawPile": [
-        { "id": "HeavyBlade", "name": "重击", "cost": 2, "type": "Attack", "upgraded": false },
-        { "id": "Defend_R", "name": "防御", "cost": 1, "type": "Skill", "upgraded": false }
+        {
+          "id": "BLUDGEON",
+          "name": "重击",
+          "cost": 2,
+          "type": "Attack",
+          "upgraded": false
+        },
+        {
+          "id": "DEFEND_IRONCLAD",
+          "name": "防御",
+          "cost": 1,
+          "type": "Skill",
+          "upgraded": false
+        }
       ],
       "discardPile": [
-        { "id": "TwinStrike", "name": "双持", "cost": 1, "type": "Attack", "upgraded": false },
-        { "id": "Offering", "name": "燃烧契约", "cost": 0, "type": "Skill", "upgraded": false },
-        { "id": "Strike_R", "name": "打击", "cost": 1, "type": "Attack", "upgraded": false }
+        {
+          "id": "TWIN_STRIKE",
+          "name": "双持",
+          "cost": 1,
+          "type": "Attack",
+          "upgraded": false
+        },
+        {
+          "id": "OFFERING",
+          "name": "燃烧契约",
+          "cost": 0,
+          "type": "Skill",
+          "upgraded": false
+        },
+        {
+          "id": "STRIKE_IRONCLAD",
+          "name": "打击",
+          "cost": 1,
+          "type": "Attack",
+          "upgraded": false
+        }
       ],
       "exhaustPile": [],
-      "enemies": [{ "name": "蛇花", "hp": 72, "maxHp": 96, "block": 0, "intent": "AttackIntent", "damage": 18, "alive": true }]
+      "enemies": [
+        {
+          "name": "蛇花",
+          "hp": 72,
+          "maxHp": 96,
+          "block": 0,
+          "intent": "AttackIntent",
+          "damage": 18,
+          "alive": true
+        }
+      ]
     },
-    "map": { "visited": [] }
+    "map": {
+      "visited": []
+    }
   },
   {
     "schema": "runmate.state.v1",
     "timestamp": 1723370002400,
     "source": "replay-bridge",
-    "run": { "act": 2, "floor": 18, "room": "combat", "character": "ironclad" },
-    "player": { "hp": 42, "maxHp": 67, "block": 0, "gold": 184, "energy": 3, "maxEnergy": 3, "cards": [], "relics": [], "potions": [] },
+    "run": {
+      "act": 2,
+      "floor": 18,
+      "room": "combat",
+      "character": "ironclad"
+    },
+    "player": {
+      "hp": 42,
+      "maxHp": 67,
+      "block": 0,
+      "gold": 184,
+      "energy": 3,
+      "maxEnergy": 3,
+      "cards": [],
+      "relics": [],
+      "potions": []
+    },
     "combat": {
       "turn": 8,
       "hand": [
-        { "id": "Strike_R", "name": "打击", "cost": 1, "type": "Attack", "upgraded": false },
-        { "id": "Defend_R", "name": "防御", "cost": 1, "type": "Skill", "upgraded": false },
-        { "id": "HeavyBlade", "name": "重击", "cost": 2, "type": "Attack", "upgraded": false },
-        { "id": "Cleave", "name": "铁斩波", "cost": 1, "type": "Attack", "upgraded": false }
+        {
+          "id": "STRIKE_IRONCLAD",
+          "name": "打击",
+          "cost": 1,
+          "type": "Attack",
+          "upgraded": false
+        },
+        {
+          "id": "DEFEND_IRONCLAD",
+          "name": "防御",
+          "cost": 1,
+          "type": "Skill",
+          "upgraded": false
+        },
+        {
+          "id": "BLUDGEON",
+          "name": "重击",
+          "cost": 2,
+          "type": "Attack",
+          "upgraded": false
+        },
+        {
+          "id": "IRON_WAVE",
+          "name": "铁斩波",
+          "cost": 1,
+          "type": "Attack",
+          "upgraded": false
+        }
       ],
       "drawPile": [
-        { "id": "Defend_R", "name": "防御", "cost": 1, "type": "Skill", "upgraded": false },
-        { "id": "Inflame", "name": "力量", "cost": 1, "type": "Power", "upgraded": false }
+        {
+          "id": "DEFEND_IRONCLAD",
+          "name": "防御",
+          "cost": 1,
+          "type": "Skill",
+          "upgraded": false
+        },
+        {
+          "id": "INFLAME",
+          "name": "力量",
+          "cost": 1,
+          "type": "Power",
+          "upgraded": false
+        }
       ],
       "discardPile": [
-        { "id": "TwinStrike", "name": "双持", "cost": 1, "type": "Attack", "upgraded": false },
-        { "id": "Offering", "name": "燃烧契约", "cost": 0, "type": "Skill", "upgraded": false },
-        { "id": "Bash", "name": "痛击", "cost": 2, "type": "Attack", "upgraded": false }
+        {
+          "id": "TWIN_STRIKE",
+          "name": "双持",
+          "cost": 1,
+          "type": "Attack",
+          "upgraded": false
+        },
+        {
+          "id": "OFFERING",
+          "name": "燃烧契约",
+          "cost": 0,
+          "type": "Skill",
+          "upgraded": false
+        },
+        {
+          "id": "BASH",
+          "name": "痛击",
+          "cost": 2,
+          "type": "Attack",
+          "upgraded": false
+        }
       ],
       "exhaustPile": [],
-      "enemies": [{ "name": "蛇花", "hp": 66, "maxHp": 96, "block": 8, "intent": "DefendIntent", "damage": 0, "alive": true }]
+      "enemies": [
+        {
+          "name": "蛇花",
+          "hp": 66,
+          "maxHp": 96,
+          "block": 8,
+          "intent": "DefendIntent",
+          "damage": 0,
+          "alive": true
+        }
+      ]
     },
-    "map": { "visited": [] }
+    "map": {
+      "visited": []
+    }
   }
 ]

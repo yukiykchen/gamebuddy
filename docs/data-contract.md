@@ -28,7 +28,7 @@ Runmate 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责�
     "energy": 2,
     "maxEnergy": 3,
     "cards": [
-      { "id": "Strike_R", "name": "打击", "type": "Attack", "cost": 1, "upgraded": false }
+      { "id": "STRIKE_IRONCLAD", "name": "打击", "type": "Attack", "cost": 1, "upgraded": false }
     ],
     "relics": [],
     "potions": []
@@ -36,7 +36,7 @@ Runmate 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责�
   "combat": {
     "turn": 7,
     "hand": [
-      { "id": "Strike_R", "name": "打击", "type": "Attack", "cost": 1, "upgraded": false }
+      { "id": "STRIKE_IRONCLAD", "name": "打击", "type": "Attack", "cost": 1, "upgraded": false }
     ],
     "drawPile": [],
     "discardPile": [],
