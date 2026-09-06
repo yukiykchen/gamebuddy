@@ -11,8 +11,14 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Logging;
+using MegaCrit.Sts2.Core.Map;
 using MegaCrit.Sts2.Core.MonsterMoves.Intents;
+using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Nodes.Screens;
 using MegaCrit.Sts2.Core.Nodes.Screens.Map;
+using MegaCrit.Sts2.Core.Nodes.Rewards;
+using MegaCrit.Sts2.Core.Rooms;
+using MegaCrit.Sts2.Core.Rewards;
 using MegaCrit.Sts2.Core.Runs;
 
 namespace RunmateBridge.Scripts;
@@ -120,6 +126,9 @@ public static class RunmateExporter
 
         var currentPoint = runState.CurrentMapPoint;
         var coord = runState.CurrentMapCoord;
+        var eventId = ExtractEventId(runState);
+        var rewards = ExtractVisibleRewards();
+        var mapNodes = ExtractTravelableMapNodes(runState, coord);
         return new RunmateState(
             "runmate.state.v1",
             DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
@@ -131,7 +140,8 @@ public static class RunmateExporter
                 player.Character.Id.Entry,
                 runState.TotalFloor,
                 currentPoint?.PointType.ToString(),
-                coord.HasValue ? $"{coord.Value.row},{coord.Value.col}" : null),
+                coord.HasValue ? $"{coord.Value.row},{coord.Value.col}" : null,
+                eventId),
             new PlayerSnapshot(
                 player.Creature.CurrentHp,
                 player.Creature.MaxHp,
@@ -140,17 +150,148 @@ public static class RunmateExporter
                 combat?.Energy ?? 0,
                 combat?.MaxEnergy ?? 0,
                 MapCards(player.Deck.Cards),
-                player.Relics.Select(relic => relic.Title.GetFormattedText()).ToList(),
-                player.Potions.Select(potion => potion.Title.GetFormattedText()).ToList()),
+                player.Relics.Select(relic => relic.Title?.ToString()).Where(v => v != null).Select(v => v!).ToList(),
+                player.Potions.Select(potion => potion.Title?.ToString()).Where(v => v != null).Select(v => v!).ToList()),
             combatState,
-            new MapSnapshot(runState.VisitedMapCoords.Select(value => $"{value.row},{value.col}").ToList()));
+            rewards,
+            new MapSnapshot(
+                runState.VisitedMapCoords.Select(value => $"{value.row},{value.col}").ToList(),
+                mapNodes));
+    }
+
+    private static string? ExtractEventId(RunState runState)
+    {
+        try
+        {
+            var room = runState.CurrentRoom;
+            if (room is not EventRoom eventRoom) return null;
+            return eventRoom.CanonicalEvent?.Id?.Entry;
+        }
+        catch { return null; }
+    }
+
+    private static T? FindScreen<T>() where T : Godot.GodotObject
+    {
+        var tree = Godot.Engine.GetMainLoop() as Godot.SceneTree;
+        var root = tree?.Root;
+        if (root is null) return null;
+        return root.FindChildren("*", nameof(T), true, false).OfType<T>().FirstOrDefault();
+    }
+
+    private static object? GetLinkedReward(NLinkedRewardSet setNode)
+    {
+        var method = setNode.GetType().GetMethod("GetReward", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        return method?.Invoke(setNode, null);
+    }
+
+    private static List<RewardSnapshot> ExtractVisibleRewards()
+    {
+        var list = new List<RewardSnapshot>();
+        try
+        {
+            var screen = FindScreen<NRewardsScreen>();
+            if (screen is null || !screen.IsVisibleInTree()) return list;
+            foreach (var setNode in screen.GetChildren().OfType<NLinkedRewardSet>())
+            {
+                var reward = GetLinkedReward(setNode);
+                if (reward is null) continue;
+                var typeName = reward.GetType().Name;
+                var kind = typeName.Replace("Reward", "").ToLowerInvariant();
+                string? id = null;
+                string? name = null;
+                switch (reward)
+                {
+                    case CardReward:
+                        kind = "card";
+                        (id, name) = DescribeCardReward(reward);
+                        break;
+                    case RelicReward:
+                        kind = "relic";
+                        (id, name) = DescribeRelicReward(reward);
+                        break;
+                }
+                list.Add(new RewardSnapshot(id, name, kind));
+            }
+        }
+        catch { }
+        return list;
+    }
+
+    private static (string? Id, string? Name) DescribeCardReward(object reward)
+    {
+        try
+        {
+            var prop = reward.GetType().GetProperty("Cards")
+                ?? reward.GetType().GetProperty("CardsList")
+                ?? reward.GetType().GetProperty("Options");
+            if (prop?.GetValue(reward) is not System.Collections.IEnumerable cards) return (null, null);
+            var ids = new List<string>();
+            foreach (var card in cards)
+            {
+                if (card is null) continue;
+                var idProp = card.GetType().GetProperty("Id");
+                var idValue = idProp?.GetValue(card);
+                var entry = idValue?.GetType().GetProperty("Entry")?.GetValue(idValue) as string;
+                if (!string.IsNullOrEmpty(entry)) ids.Add(entry);
+            }
+            if (ids.Count == 0) return (null, null);
+            return (ids[0], string.Join("|", ids));
+        }
+        catch { return (null, null); }
+    }
+
+    private static (string? Id, string? Name) DescribeRelicReward(object reward)
+    {
+        try
+        {
+            foreach (var fieldName in new[] { "_relic", "_predeterminedRelic", "_relicModel" })
+            {
+                var field = reward.GetType().GetField(fieldName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+                var relic = field?.GetValue(reward);
+                if (relic is null) continue;
+                var idProp = relic.GetType().GetProperty("Id");
+                var idValue = idProp?.GetValue(relic);
+                var entry = idValue?.GetType().GetProperty("Entry")?.GetValue(idValue) as string;
+                if (!string.IsNullOrEmpty(entry)) return (entry, entry);
+            }
+            return (null, null);
+        }
+        catch { return (null, null); }
+    }
+
+    private static List<MapNodeSnapshot> ExtractTravelableMapNodes(RunState runState, MapCoord? currentCoord)
+    {
+        var nodes = new List<MapNodeSnapshot>();
+        try
+        {
+            if (!currentCoord.HasValue) return nodes;
+            var currentPoint = runState.CurrentMapPoint;
+            if (currentPoint is null) return nodes;
+            var travelable = MapTravel.GetTravelablePointsFrom(runState, currentPoint);
+            if (travelable is null) return nodes;
+            foreach (var point in travelable)
+            {
+                var coordProp = point.GetType().GetProperty("Coord") ?? point.GetType().GetProperty("MapCoord");
+                var pointCoord = coordProp?.GetValue(point);
+                var row = pointCoord?.GetType().GetField("row")?.GetValue(pointCoord) ?? pointCoord?.GetType().GetProperty("row")?.GetValue(pointCoord);
+                var col = pointCoord?.GetType().GetField("col")?.GetValue(pointCoord) ?? pointCoord?.GetType().GetProperty("col")?.GetValue(pointCoord);
+                var roomTypeProp = point.GetType().GetProperty("RoomType");
+                var roomType = roomTypeProp?.GetValue(point) as System.Enum;
+                nodes.Add(new MapNodeSnapshot(
+                    $"{row},{col}",
+                    point.PointType.ToString(),
+                    roomType?.ToString()));
+            }
+        }
+        catch { }
+        return nodes;
     }
 
     private static List<CardSnapshot> MapCards(IEnumerable<CardModel> cards)
     {
         return cards.Select(card => new CardSnapshot(
             card.Id.Entry,
-            card.Title.GetFormattedText(),
+            card.Title,
             card.Type.ToString(),
             card.EnergyCost.CostsX ? null : card.EnergyCost.GetAmountToSpend(),
             card.IsUpgraded)).ToList();
@@ -181,13 +322,15 @@ public static class RunmateExporter
 public sealed record BridgeMessage<T>(string Type, T Data);
 public sealed record BridgeEvent(string Type, string Name, long Timestamp, object? Data);
 
-public sealed record RunmateState(string Schema, long Timestamp, string Source, RunSnapshot Run, PlayerSnapshot Player, CombatSnapshot? Combat, MapSnapshot Map);
-public sealed record RunSnapshot(int Act, int Floor, string? Room, string Character, int TotalFloor, string? CurrentNode, string? CurrentCoord);
+public sealed record RunmateState(string Schema, long Timestamp, string Source, RunSnapshot Run, PlayerSnapshot Player, CombatSnapshot? Combat, List<RewardSnapshot> Rewards, MapSnapshot Map);
+public sealed record RunSnapshot(int Act, int Floor, string? Room, string Character, int TotalFloor, string? CurrentNode, string? CurrentCoord, string? EventId);
 public sealed record PlayerSnapshot(int Hp, int MaxHp, int Block, int Gold, int Energy, int MaxEnergy, List<CardSnapshot> Cards, List<string> Relics, List<string> Potions);
 public sealed record CombatSnapshot(int Turn, List<CardSnapshot> Hand, List<CardSnapshot> DrawPile, List<CardSnapshot> DiscardPile, List<CardSnapshot> ExhaustPile, List<EnemySnapshot> Enemies);
 public sealed record EnemySnapshot(string Name, int Hp, int MaxHp, int Block, string? Intent, int Damage, bool Alive);
 public sealed record CardSnapshot(string Id, string Name, string Type, int? Cost, bool Upgraded);
-public sealed record MapSnapshot(List<string> Visited);
+public sealed record MapSnapshot(List<string> Visited, List<MapNodeSnapshot>? Nodes);
+public sealed record RewardSnapshot(string? Id, string? Name, string Kind);
+public sealed record MapNodeSnapshot(string Coord, string PointType, string? RoomType);
 
 internal sealed class RunmateWebSocketServer
 {
