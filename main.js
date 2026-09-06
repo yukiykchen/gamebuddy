@@ -2,6 +2,9 @@ const { app, BrowserWindow, Tray, Menu, nativeImage, ipcMain, screen } = require
 const path = require('node:path');
 const WebSocket = require('ws');
 const { createObservationStore } = require('./harness/observation-store');
+const { decide } = require('./agent/router');
+const { recordDecision } = require('./agent/recorder');
+const fs = require('node:fs');
 
 const BRIDGE_URL = process.env.RUNMATE_BRIDGE_URL || 'ws://127.0.0.1:27182';
 let mainWindow;
@@ -13,6 +16,18 @@ let isQuitting = false;
 const observationStore = createObservationStore({ staleAfterMs: 5000 });
 let bridgeHealthTimer;
 let lastBridgeStatus = { status: 'demo', detail: '等待本地 Mod Bridge', url: BRIDGE_URL };
+let agentRunId = null;
+
+function currentObservation(now = Date.now()) {
+  const observation = observationStore.getObservation(now);
+  return { ...observation, decision: decide(observation) };
+}
+
+function startAgentRun() {
+  const state = observationStore.getState();
+  agentRunId = String(state?.run?.seed || state?.run?.id || new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 14));
+  fs.mkdirSync(path.join(__dirname, 'runs', agentRunId), { recursive: true });
+}
 
 function broadcast(channel, payload) {
   for (const window of [mainWindow, petWindow]) {
@@ -47,10 +62,15 @@ function connectBridge() {
       }
       if (result.kind === 'state') {
         broadcastBridgeStatus('live');
-        if (result.accepted) broadcast('bridge-state', result.state);
+        if (result.accepted) {
+          if (!agentRunId) startAgentRun();
+          const observation = currentObservation();
+          recordDecision({ runId: agentRunId, observation, decision: observation.decision });
+          broadcast('bridge-state', result.state);
+        }
       }
       if (result.kind === 'event' && result.accepted) broadcast('bridge-event', result.event);
-      if (result.accepted) broadcast('bridge-observation', observationStore.getObservation());
+      if (result.accepted) broadcast('bridge-observation', currentObservation());
     } catch (error) {
       broadcastBridgeStatus('invalid', error.message);
     }
@@ -89,9 +109,10 @@ function createMainWindow() {
   mainWindow.loadFile(path.join(__dirname, 'src', 'index.html'));
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.webContents.send('bridge-status', lastBridgeStatus);
-    const state = observationStore.getState();
+    const observation = currentObservation();
+    const state = observation.state;
     if (state) mainWindow.webContents.send('bridge-state', state);
-    mainWindow.webContents.send('bridge-observation', observationStore.getObservation());
+    mainWindow.webContents.send('bridge-observation', observation);
   });
   mainWindow.on('close', event => {
     if (!isQuitting) {
@@ -131,9 +152,10 @@ function createPetWindow() {
   petWindow.loadFile(path.join(__dirname, 'src', 'pet.html'));
   petWindow.webContents.on('did-finish-load', () => {
     petWindow.webContents.send('bridge-status', lastBridgeStatus);
-    const state = observationStore.getState();
+    const observation = currentObservation();
+    const state = observation.state;
     if (state) petWindow.webContents.send('bridge-state', state);
-    petWindow.webContents.send('bridge-observation', observationStore.getObservation());
+    petWindow.webContents.send('bridge-observation', observation);
   });
   petWindow.once('ready-to-show', () => petWindow.showInactive());
 }
@@ -161,7 +183,10 @@ ipcMain.on('window-close', event => {
 ipcMain.on('open-main-window', () => mainWindow?.show());
 ipcMain.on('toggle-pet', () => petWindow?.isVisible() ? petWindow.hide() : petWindow?.showInactive());
 ipcMain.on('pet-pass-through', (_event, enabled) => petWindow?.setIgnoreMouseEvents(Boolean(enabled), { forward: true }));
-ipcMain.handle('get-observation', () => observationStore.getObservation());
+ipcMain.on('accept-decision', (_event, decision) => {
+  if (agentRunId && decision) recordDecision({ runId: agentRunId, observation: currentObservation(), decision, accepted: true });
+});
+ipcMain.handle('get-observation', () => currentObservation());
 
 app.whenReady().then(() => {
   createMainWindow();

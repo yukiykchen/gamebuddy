@@ -13,5 +13,6 @@ contextBridge.exposeInMainWorld('runmateBridge', {
   onEvent: callback => ipcRenderer.on('bridge-event', (_event, event) => callback(event)),
   onStatus: callback => ipcRenderer.on('bridge-status', (_event, status) => callback(status)),
   onObservation: callback => ipcRenderer.on('bridge-observation', (_event, observation) => callback(observation)),
-  getObservation: () => ipcRenderer.invoke('get-observation')
+  getObservation: () => ipcRenderer.invoke('get-observation'),
+  acceptDecision: decision => ipcRenderer.send('accept-decision', decision)
 });

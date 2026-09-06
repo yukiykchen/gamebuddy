@@ -31,6 +31,8 @@ function validateState(state) {
     if (!Array.isArray(state.combat.enemies)) return { ok: false, reason: 'combat.enemies must be an array' };
   }
   if (!state.map || typeof state.map !== 'object' || !Array.isArray(state.map.visited)) return { ok: false, reason: 'map.visited must be an array' };
+  if (state.rewards !== undefined && !Array.isArray(state.rewards)) return { ok: false, reason: 'rewards must be an array' };
+  if (state.run.eventId !== undefined && typeof state.run.eventId !== 'string') return { ok: false, reason: 'run.eventId must be a string' };
   for (const field of ['hp', 'maxHp', 'block', 'gold', 'energy', 'maxEnergy']) {
     if (!Number.isFinite(state.player[field])) return { ok: false, reason: `player.${field} is invalid` };
   }
@@ -42,7 +44,9 @@ function stateSignature(state) {
     run: state.run,
     player: state.player,
     combat: state.combat,
-    map: state.map
+    map: state.map,
+    rewards: state.rewards ?? null,
+    eventId: state.run?.eventId ?? null
   });
 }
 

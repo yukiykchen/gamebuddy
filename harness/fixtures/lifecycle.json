@@ -24,6 +24,13 @@
     "run": { "act": 1, "floor": 5, "room": "map", "character": "ironclad" },
     "player": { "hp": 68, "maxHp": 80, "block": 0, "energy": 3, "maxEnergy": 3, "gold": 109, "cards": [], "relics": [], "potions": [] },
     "combat": null,
-    "map": { "visited": ["0,0", "1,0"] }
+    "map": {
+      "visited": ["0,0", "1,0"],
+      "nodes": [
+        { "id": "5,1", "type": "monster" },
+        { "id": "5,2", "type": "rest" },
+        { "id": "5,3", "type": "shop" }
+      ]
+    }
   }
 ]
