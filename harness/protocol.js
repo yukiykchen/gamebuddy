@@ -3,7 +3,7 @@ const SUPPORTED_EVENTS = new Set(['combat.started', 'turn.started', 'combat.ende
 
 function validateState(state) {
   if (!state || typeof state !== 'object') return { ok: false, reason: 'state must be an object' };
-  for (const field of ['schema', 'timestamp', 'source', 'run', 'player', 'combat']) {
+  for (const field of ['schema', 'timestamp', 'source', 'run', 'player']) {
     if (!(field in state)) return { ok: false, reason: `missing ${field}` };
   }
   if (state.schema !== SUPPORTED_SCHEMA) return { ok: false, reason: `unsupported schema ${state.schema}` };
@@ -19,7 +19,7 @@ function validateState(state) {
   for (const field of ['cards', 'relics', 'potions']) {
     if (!Array.isArray(state.player[field])) return { ok: false, reason: `player.${field} must be an array` };
   }
-  if (state.combat !== null) {
+  if (state.combat !== null && state.combat !== undefined) {
     if (typeof state.combat !== 'object') return { ok: false, reason: 'combat must be an object or null' };
     for (const field of ['turn', 'hand', 'drawPile', 'discardPile', 'exhaustPile', 'enemies']) {
       if (!(field in state.combat)) return { ok: false, reason: `combat missing ${field}` };
