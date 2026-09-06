@@ -41,5 +41,16 @@ assert.equal(validateState({
     options: [{ index: 0, label: '拿起石剑', description: '获得石之剑。', locked: false }]
   }
 }).ok, true);
+assert.equal(validateState({
+  ...validState,
+  combat: null,
+  cardReward: {
+    options: [{ index: 0, id: 'Bash', name: '痛击', type: 'Attack', cost: 2, upgraded: false, description: '造成伤害。' }]
+  }
+}).ok, true);
+assert.equal(validateState({
+  ...validState,
+  cardReward: { options: [{ index: 0, id: 'Bash', name: '痛击', type: 'Attack', cost: '2' }] }
+}).ok, false);
 
-console.log('Protocol validation cases passed: 10');
+console.log('Protocol validation cases passed: 12');

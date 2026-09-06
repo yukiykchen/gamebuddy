@@ -11,6 +11,7 @@ const state = {
   hand: [],
   map: { visited: [] },
   event: null,
+  cardReward: null,
   recommendation: null,
   agentStatus: { status: 'idle', task: null }
 };
@@ -150,7 +151,23 @@ function restView() {
 }
 
 function draftView() {
-  return `<div class="draft-layout"><section class="panel draft-offer"><div class="draft-kicker">REWARD / CARD REWARD</div><h2 class="draft-title">等待真实卡牌奖励</h2><div class="data-empty large-empty">进入奖励界面后，Mod 会把游戏提供的卡牌传给这里，再生成选牌建议。</div></section><section class="panel draft-side"><div class="panel-heading"><span class="panel-title">当前卡组</span><span class="panel-meta">${state.player.cards.length ? `${state.player.cards.length} 张` : '等待数据'}</span></div><div class="deck-stat"><span>卡牌</span><strong>${state.player.cards.length || '--'}</strong></div><div class="deck-stat"><span>遗物</span><strong>${state.player.relics.length || '--'}</strong></div><div class="deck-stat"><span>药水</span><strong>${state.player.potions.length || '--'}</strong></div></section></div>`;
+  const reward = state.cardReward || { options: [] };
+  const options = Array.isArray(reward.options) ? reward.options : [];
+  const rec = state.recommendation?.task === 'card_reward' ? state.recommendation : null;
+  const thinking = state.agentStatus?.status === 'thinking' && state.agentStatus?.task === 'card_reward';
+  const sourceLabel = rec?.source === 'llm' ? 'KIMI AGENT' : '规则保底';
+  const optionCards = options.map((card, arrayIndex) => {
+    const index = Number.isInteger(card.index) ? card.index : arrayIndex;
+    const recommended = rec?.primary?.cardIndex === index;
+    const description = String(card.description || '牌面描述暂不可用。').replace(/\[\/?[^\]]+\]/g, '').trim();
+    return `<article class="draft-card ${recommended ? 'top-pick' : ''}"><span class="pick-tag">${recommended ? 'Agent 建议' : `第 ${index + 1} 张`}</span><div class="card-name">${escapeHtml(card.name)}</div><div class="card-meta">${escapeHtml(card.type)} · ${card.cost ?? 'X'} 费${card.upgraded ? ' · 已升级' : ''}</div><p>${escapeHtml(description)}</p></article>`;
+  }).join('');
+  const analysis = thinking
+    ? `<div class="agent-thinking"><span></span><div><strong>Agent 正在分析卡牌奖励</strong><p>正在比较每张牌的效果、费用、卡组缺口和后续战斗价值。</p></div></div>`
+    : rec
+      ? `<div class="event-reason"><div class="eyebrow">${sourceLabel}</div><h2>建议选第 ${Number(rec.primary.cardIndex) + 1} 张：${escapeHtml(rec.primary.cardName)}</h2><p>${escapeHtml(rec.reason)}</p></div>`
+      : `<div class="agent-thinking"><span></span><div><strong>等待 Agent 分析</strong><p>已读取候选卡牌，正在准备选牌建议。</p></div></div>`;
+  return `<div class="draft-layout"><section class="panel draft-offer"><div class="draft-kicker">REWARD / CARD REWARD</div><h2 class="draft-title">${rec ? `建议选择第 ${Number(rec.primary.cardIndex) + 1} 张` : '这三张牌怎么选？'}</h2>${analysis}<div class="draft-cards">${optionCards || '<div class="data-empty large-empty">正在读取真实卡牌奖励。</div>'}</div><div class="data-empty" style="margin-top:18px">GameBuddy 只给建议，不会替你点击选牌。</div></section><section class="panel draft-side"><div class="panel-heading"><span class="panel-title">当前卡组</span><span class="panel-meta">${state.player.cards.length ? `${state.player.cards.length} 张` : '等待数据'}</span></div><div class="deck-stat"><span>卡牌</span><strong>${state.player.cards.length || '--'}</strong></div><div class="deck-stat"><span>遗物</span><strong>${state.player.relics.length || '--'}</strong></div><div class="deck-stat"><span>药水</span><strong>${state.player.potions.length || '--'}</strong></div><div class="deck-stat"><span>候选牌</span><strong>${options.length || '--'}</strong></div><div class="data-empty" style="margin-top:18px">推荐会结合当前卡组、生命、遗物和牌面描述判断。</div></section></div>`;
 }
 
 const MAP_TYPE_LABELS = {
@@ -326,6 +343,7 @@ function applyBridgeState(next) {
   if (next.player) state.player = { ...state.player, ...next.player };
   state.map = next.map || { visited: [] };
   state.event = next.event || null;
+  state.cardReward = next.cardReward || null;
   const incomingCombat = next.combat;
   state.combat = incomingCombat ? {
     ...incomingCombat,
@@ -355,8 +373,11 @@ function applyBridgeState(next) {
   if (showingEvent()) {
     state.mode = 'event';
     if (state.recommendation?.task !== 'event_choice') state.recommendation = null;
+  } else if (state.cardReward?.options?.length) {
+    state.mode = 'draft';
+    if (state.recommendation?.task !== 'card_reward') state.recommendation = null;
   } else if (atRestSite(next.run, state.combat)) state.mode = 'route';
-  if (state.mode === 'combat' || state.mode === 'route' || state.mode === 'event') render();
+  if (state.mode === 'combat' || state.mode === 'route' || state.mode === 'event' || state.mode === 'draft') render();
 }
 
 setInterval(() => {
@@ -371,6 +392,7 @@ window.gamebuddyBridge?.onState(applyBridgeState);
 window.gamebuddyBridge?.onEvent(event => {
   if (event.name === 'card.reward.opened') {
     state.mode = 'draft';
+    state.recommendation = null;
     render();
     showToast('发现新的卡牌奖励');
   }
@@ -392,11 +414,12 @@ window.gamebuddyBridge?.onEvent(event => {
   }
 });
 window.gamebuddyBridge?.onRecommendation(recommendation => {
-  if (!recommendation || !['map_route', 'rest_site', 'event_choice'].includes(recommendation.task)) return;
+  if (!recommendation || !['map_route', 'rest_site', 'event_choice', 'card_reward'].includes(recommendation.task)) return;
   state.recommendation = recommendation;
   if (recommendation.task === 'rest_site') state.mode = 'route';
   if (recommendation.task === 'event_choice') state.mode = 'event';
-  if (state.mode === 'route' || state.mode === 'event') render();
+  if (recommendation.task === 'card_reward') state.mode = 'draft';
+  if (state.mode === 'route' || state.mode === 'event' || state.mode === 'draft') render();
 });
 window.gamebuddyBridge?.onAgentStatus(status => {
   state.agentStatus = status || { status: 'idle', task: null };
@@ -404,7 +427,11 @@ window.gamebuddyBridge?.onAgentStatus(status => {
     state.mode = 'event';
     state.recommendation = null;
   }
-  if (state.mode === 'event') render();
+  if (status?.status === 'thinking' && status.task === 'card_reward') {
+    state.mode = 'draft';
+    state.recommendation = null;
+  }
+  if (state.mode === 'event' || state.mode === 'draft') render();
 });
 window.gamebuddyBridge?.onStatus(status => {
   setBridgeStatus(status);

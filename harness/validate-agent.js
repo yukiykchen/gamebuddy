@@ -6,6 +6,7 @@ const { validateRecommendation } = require('../agent/recommendation');
 const { rankRoutes, recommendRoute, scoreNode, scoreParts, buildScoreContext, ensureMapRoutes } = require('../agent/tasks/route');
 const { isRestSite, recommendRest, rankSmithCards } = require('../agent/tasks/rest');
 const { recommendEvent } = require('../agent/tasks/event');
+const { recommendCardReward, rankCards } = require('../agent/tasks/card-reward');
 const { parseJsonObject, createOpenAiClient, readLlmConfig, extractResponseText } = require('../agent/llm/openai');
 const { createOrchestrator } = require('../agent/orchestrator');
 
@@ -158,6 +159,20 @@ const eventState = {
     ]
   }
 };
+const cardRewardState = {
+  ...mapState,
+  player: {
+    ...mapState.player,
+    cards: [...mapState.player.cards, { id: 'Defend_R', name: '防御', type: 'Skill', cost: 1, upgraded: false }]
+  },
+  cardReward: {
+    options: [
+      { index: 0, id: 'Strike_R', name: '打击', type: 'Attack', cost: 1, upgraded: false, description: '造成 6 点伤害。' },
+      { index: 1, id: 'PommelStrike', name: '剑柄打击', type: 'Attack', cost: 1, upgraded: false, description: '造成伤害。抽 1 张牌。' },
+      { index: 2, id: 'ShrugItOff', name: '耸肩无视', type: 'Skill', cost: 1, upgraded: false, description: '获得格挡。抽 1 张牌。' }
+    ]
+  }
+};
 const store = createObservationStore({ staleAfterMs: 5000 });
 store.ingest({ type: 'state', data: mapState }, 1723370002000);
 const observation = store.getObservation(1723370002100);
@@ -180,6 +195,20 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   });
   assert.equal(eventLlm.source, 'llm');
   assert.equal(eventLlm.primary.optionIndex, 1);
+
+  const rewardFallback = await recommendCardReward(cardRewardState, { now: 3 });
+  assert.equal(validateRecommendation(rewardFallback).ok, true);
+  assert.equal(rewardFallback.task, 'card_reward');
+  assert.equal(rewardFallback.primary.action, 'CHOOSE_CARD');
+  assert.equal(rewardFallback.primary.cardIndex, 2);
+  assert.match(rewardFallback.reason, /防御|牌|卡组/);
+  assert.equal(rankCards(cardRewardState)[0].card.name, '耸肩无视');
+  const rewardLlm = await recommendCardReward(cardRewardState, {
+    llm: { enabled: true, completeCardReward: async () => ({ index: 1, reason: '可以抽牌，提升卡组循环。' }) },
+    now: 4
+  });
+  assert.equal(rewardLlm.source, 'llm');
+  assert.equal(rewardLlm.primary.cardIndex, 1);
 
   const llm = {
     enabled: true,
@@ -255,6 +284,22 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   });
   const eventPick = await eventClient.completeEvent({ options: [{ index: 0 }, { index: 1 }] });
   assert.equal(eventPick.index, 1);
+  const rewardClient = createOpenAiClient({
+    enabled: true,
+    apiKey: 'sk-test',
+    baseURL: 'https://api.moonshot.cn/v1',
+    model: 'kimi-k2.5',
+    wireApi: 'chat'
+  }, {
+    fetchImpl: async (url, options) => {
+      assert.match(url, /chat\/completions$/);
+      const body = JSON.parse(options.body);
+      assert.match(body.messages[0].content, /选牌顾问/);
+      return { ok: true, json: async () => ({ choices: [{ message: { content: '{"index":2,"reason":"补足防御和抽牌"}' } }] }) };
+    }
+  });
+  const rewardPick = await rewardClient.completeCardReward({ candidates: cardRewardState.cardReward.options });
+  assert.equal(rewardPick.index, 2);
 
   let published;
   const orchestrator = createOrchestrator({
@@ -339,7 +384,18 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   assert.equal(eventRec.source, 'llm');
   assert.deepEqual(eventStatuses.map(status => status.status), ['thinking', 'ready']);
 
-  console.log('Agent route/event cases passed');
+  const rewardStatuses = [];
+  const rewardOrch = createOrchestrator({
+    llm: { enabled: false },
+    onAgentStatus: status => rewardStatuses.push(status),
+    now: () => 15
+  });
+  const rewardRec = await rewardOrch.consider({ schema: 'gamebuddy.observation.v1', fresh: true, state: cardRewardState });
+  assert.equal(rewardRec.task, 'card_reward');
+  assert.equal(rewardRec.primary.cardIndex, 2);
+  assert.deepEqual(rewardStatuses.map(status => status.status), ['thinking', 'ready']);
+
+  console.log('Agent route/event/card reward cases passed');
 }).catch(error => {
   console.error(error);
   process.exit(1);

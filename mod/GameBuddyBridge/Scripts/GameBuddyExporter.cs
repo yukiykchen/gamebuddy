@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Reflection;
 using Godot;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Context;
@@ -17,6 +18,8 @@ using MegaCrit.Sts2.Core.MonsterMoves.Intents;
 using MegaCrit.Sts2.Core.Map;
 using MegaCrit.Sts2.Core.Nodes.Screens.Map;
 using MegaCrit.Sts2.Core.Nodes.Rooms;
+using MegaCrit.Sts2.Core.Nodes.Screens.CardSelection;
+using MegaCrit.Sts2.Core.Nodes.Screens.Overlays;
 using MegaCrit.Sts2.Core.Runs;
 
 namespace GameBuddyBridge.Scripts;
@@ -38,6 +41,9 @@ public static class GameBuddyExporter
     private static bool _wasMapVisible;
     private static bool _wasAtRest;
     private static bool _wasEventVisible;
+    private static bool _wasCardRewardVisible;
+    private static readonly FieldInfo? CardRewardOptionsField = typeof(NCardRewardSelectionScreen)
+        .GetField("_options", BindingFlags.Instance | BindingFlags.NonPublic);
 
     public static void Initialize(string modDirectory)
     {
@@ -128,10 +134,17 @@ public static class GameBuddyExporter
             PublishEvent("event.opened", new { title = snapshot.Event!.Title });
         }
 
+        var cardRewardVisible = snapshot.CardReward is not null;
+        if (cardRewardVisible && !_wasCardRewardVisible)
+        {
+            PublishEvent("card.reward.opened", new { options = snapshot.CardReward!.Options });
+        }
+
         _wasInCombat = inCombat;
         _wasMapVisible = mapVisible;
         _wasAtRest = atRest;
         _wasEventVisible = eventVisible;
+        _wasCardRewardVisible = cardRewardVisible;
     }
 
     private static void PublishEvent(string name, object? data = null)
@@ -179,7 +192,62 @@ public static class GameBuddyExporter
                 player.Potions.Select(potion => potion.Title.GetFormattedText()).ToList()),
             combatState,
             BuildMapSnapshot(runState),
-            BuildEventSnapshot());
+            BuildEventSnapshot(),
+            BuildCardRewardSnapshot());
+    }
+
+    private static CardRewardSnapshot? BuildCardRewardSnapshot()
+    {
+        try
+        {
+            var overlayStack = NOverlayStack.Instance;
+            var screen = overlayStack?.Peek() as NCardRewardSelectionScreen
+                ?? overlayStack?.GetChildren()
+                    .OfType<NCardRewardSelectionScreen>()
+                    .LastOrDefault(candidate => candidate.IsVisibleInTree());
+            if (screen is null || !screen.IsVisibleInTree() || CardRewardOptionsField is null)
+            {
+                return null;
+            }
+
+            var results = CardRewardOptionsField.GetValue(screen) as IReadOnlyList<CardCreationResult>;
+            if (results is null || results.Count == 0)
+            {
+                return null;
+            }
+
+            var options = results
+                .Select((result, index) => MapCardRewardOption(result.Card, index))
+                .Where(option => option is not null)
+                .Select(option => option!)
+                .ToList();
+            return options.Count == 0 ? null : new CardRewardSnapshot(options);
+        }
+        catch (Exception ex)
+        {
+            Log.Warn($"[GameBuddyBridge] card reward capture failed: {ex.Message}");
+            return null;
+        }
+    }
+
+    private static CardRewardOptionSnapshot? MapCardRewardOption(CardModel card, int index)
+    {
+        try
+        {
+            return new CardRewardOptionSnapshot(
+                index,
+                card.Id.Entry,
+                card.Title,
+                card.Type.ToString(),
+                card.EnergyCost.CostsX ? null : card.EnergyCost.GetAmountToSpend(),
+                card.IsUpgraded,
+                card.GetDescriptionForPile(PileType.None));
+        }
+        catch (Exception ex)
+        {
+            Log.Warn($"[GameBuddyBridge] card reward option {index} capture failed: {ex.Message}");
+            return null;
+        }
     }
 
     private static EventSnapshot? BuildEventSnapshot()
@@ -462,7 +530,7 @@ public static class GameBuddyExporter
 public sealed record BridgeMessage<T>(string Type, T Data);
 public sealed record BridgeEvent(string Type, string Name, long Timestamp, object? Data);
 
-public sealed record GameBuddyState(string Schema, long Timestamp, string Source, RunSnapshot Run, PlayerSnapshot Player, CombatSnapshot? Combat, MapSnapshot Map, EventSnapshot? Event);
+public sealed record GameBuddyState(string Schema, long Timestamp, string Source, RunSnapshot Run, PlayerSnapshot Player, CombatSnapshot? Combat, MapSnapshot Map, EventSnapshot? Event, CardRewardSnapshot? CardReward);
 public sealed record RunSnapshot(int Act, int Floor, string? Room, string Character, int TotalFloor, string? CurrentNode, string? CurrentCoord);
 public sealed record PlayerSnapshot(int Hp, int MaxHp, int Block, int Gold, int Energy, int MaxEnergy, List<CardSnapshot> Cards, List<string> Relics, List<string> Potions);
 public sealed record CombatSnapshot(int Turn, List<CardSnapshot> Hand, List<CardSnapshot> DrawPile, List<CardSnapshot> DiscardPile, List<CardSnapshot> ExhaustPile, List<EnemySnapshot> Enemies);
@@ -482,6 +550,8 @@ public sealed record MapSnapshot(
 public sealed record MapNodeSnapshot(string Id, int Row, int Col, string Type, List<string> Children);
 public sealed record EventSnapshot(string Title, string Description, List<EventOptionSnapshot> Options);
 public sealed record EventOptionSnapshot(int Index, string Label, string Description, bool Locked);
+public sealed record CardRewardSnapshot(List<CardRewardOptionSnapshot> Options);
+public sealed record CardRewardOptionSnapshot(int Index, string Id, string Name, string Type, int? Cost, bool Upgraded, string Description);
 
 internal sealed class GameBuddyWebSocketServer
 {

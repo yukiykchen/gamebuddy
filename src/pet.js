@@ -33,6 +33,10 @@ function setState(next) {
     say('事件出现了，我来想想怎么选', 'thinking');
     return;
   }
+  if (Array.isArray(next.cardReward?.options) && next.cardReward.options.length) {
+    say('我在分析这几张牌', 'thinking');
+    return;
+  }
   const enemy = next.combat?.enemies?.[0];
   const intent = String(enemy?.intent || '').toLowerCase();
   if (intent.includes('attack') || Number(enemy?.damage) > 0) {
@@ -53,6 +57,10 @@ function setRecommendation(recommendation) {
   }
   if (recommendation?.task === 'rest_site' && recommendation.primary?.label) {
     say(`休息处建议${recommendation.primary.label}`, 'thinking');
+    return;
+  }
+  if (recommendation?.task === 'card_reward' && recommendation.primary?.cardName) {
+    say(`建议选第${Number(recommendation.primary.cardIndex) + 1}张${recommendation.primary.cardName}`, 'thinking');
     return;
   }
   if (recommendation?.task !== 'map_route' || !recommendation.primary?.label) return;
@@ -99,4 +107,5 @@ window.gamebuddyBridge?.onState(setState);
 window.gamebuddyBridge?.onRecommendation(setRecommendation);
 window.gamebuddyBridge?.onAgentStatus(status => {
   if (status?.status === 'thinking' && status.task === 'event_choice') say('我在分析事件选项', 'thinking');
+  if (status?.status === 'thinking' && status.task === 'card_reward') say('我在分析这几张牌', 'thinking');
 });

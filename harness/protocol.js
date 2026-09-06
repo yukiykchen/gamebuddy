@@ -57,6 +57,22 @@ function validateState(state) {
       }
     }
   }
+  if (state.cardReward !== undefined && state.cardReward !== null) {
+    if (typeof state.cardReward !== 'object' || !Array.isArray(state.cardReward.options)) {
+      return { ok: false, reason: 'cardReward.options must be an array' };
+    }
+    for (const card of state.cardReward.options) {
+      if (!card || typeof card !== 'object' || !Number.isInteger(card.index) || typeof card.id !== 'string' || typeof card.name !== 'string' || typeof card.type !== 'string') {
+        return { ok: false, reason: 'card reward option needs index, id, name and type' };
+      }
+      if (card.cost !== null && card.cost !== undefined && !Number.isFinite(card.cost)) {
+        return { ok: false, reason: 'card reward option cost is invalid' };
+      }
+      if (card.description !== undefined && typeof card.description !== 'string') {
+        return { ok: false, reason: 'card reward option description must be a string' };
+      }
+    }
+  }
   for (const field of ['hp', 'maxHp', 'block', 'gold', 'energy', 'maxEnergy']) {
     if (!Number.isFinite(state.player[field])) return { ok: false, reason: `player.${field} is invalid` };
   }
@@ -69,7 +85,8 @@ function stateSignature(state) {
     player: state.player,
     combat: state.combat,
     map: state.map,
-    event: state.event
+    event: state.event,
+    cardReward: state.cardReward
   });
 }
 

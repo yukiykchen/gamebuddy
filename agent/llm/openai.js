@@ -148,6 +148,10 @@ function createOpenAiClient(config = readLlmConfig(), { fetchImpl = globalThis.f
     completeEvent: payload => completeJson(
       '你是杀戮尖塔 2 的事件选择顾问。阅读事件背景和所有选项，结合当前生命、金币、遗物和卡组，选择长期收益更高且风险可接受的选项。只从给定选项里选，不要发明选项。用 JSON 回答：{"index":0,"reason":"两句中文解释"}。',
       payload
+    ),
+    completeCardReward: payload => completeJson(
+      '你是杀戮尖塔 2 的战斗后选牌顾问。阅读当前卡组和真实候选卡牌的牌面描述，选择最能补足卡组、提高后续通关率的一张。综合费用、类型、升级状态、抽牌、防御、输出、能力和当前生命；不要因为卡名相似而臆测没有提供的效果。只从给定候选里选，不要发明卡牌。用 JSON 回答：{"index":0,"reason":"两句中文解释"}。',
+      payload
     )
   };
 }

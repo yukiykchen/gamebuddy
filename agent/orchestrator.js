@@ -2,6 +2,7 @@ const { validateRecommendation } = require('./recommendation');
 const { recommendRoute, routeSignature, ensureMapRoutes } = require('./tasks/route');
 const { isRestSite, recommendRest, restSignature } = require('./tasks/rest');
 const { recommendEvent, eventSignature } = require('./tasks/event');
+const { recommendCardReward, cardRewardSignature } = require('./tasks/card-reward');
 const { createOpenAiClient, readLlmConfig } = require('./llm/openai');
 
 function hasRoutableMap(state) {
@@ -12,6 +13,7 @@ function hasRoutableMap(state) {
 function selectTask(observation) {
   const state = observation?.state;
   if (!state) return null;
+  if (Array.isArray(state.cardReward?.options) && state.cardReward.options.length > 0) return 'card_reward';
   if (Array.isArray(state.event?.options) && state.event.options.length > 0) return 'event_choice';
   if (!state.combat) {
     const recent = observation.recentEvents || [];
@@ -30,6 +32,7 @@ function signatureFor(task, state) {
   if (task === 'rest_site') return restSignature(state);
   if (task === 'map_route') return routeSignature(state);
   if (task === 'event_choice') return eventSignature(state);
+  if (task === 'card_reward') return cardRewardSignature(state);
   return '';
 }
 
@@ -57,6 +60,8 @@ function createOrchestrator({
     try {
       const recommendation = task === 'event_choice'
         ? await recommendEvent(observation.state, { llm: client, now: now() })
+        : task === 'card_reward'
+        ? await recommendCardReward(observation.state, { llm: client, now: now() })
         : task === 'rest_site'
         ? await recommendRest(observation.state, { llm: client, now: now() })
         : await recommendRoute(observation.state, { llm: client, now: now() });
