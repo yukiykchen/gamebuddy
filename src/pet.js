@@ -11,8 +11,11 @@ function say(message, mood = '') {
 }
 
 function setStatus(status) {
+  const replay = status.status === 'live' && status.mode === 'replay';
   statusDot.classList.remove('live', 'alert');
-  if (status.status === 'live') {
+  if (replay) {
+    statusLabel.textContent = '回放 DEMO';
+  } else if (status.status === 'live') {
     statusDot.classList.add('live');
     statusLabel.textContent = '游戏 LIVE';
   } else if (status.status === 'invalid' || status.status === 'stale') {
@@ -20,33 +23,67 @@ function setStatus(status) {
     statusLabel.textContent = status.status === 'stale' ? '数据停滞' : '数据异常';
     say(status.status === 'stale' ? '游戏状态停住了' : '数据格式需要检查', 'alert');
   } else {
-    statusLabel.textContent = status.status === 'connected' ? '等待游戏' : '模拟数据';
+    statusLabel.textContent = status.status === 'connected' ? '等待游戏' : status.status === 'demo' ? '回放数据' : '等待游戏';
     if (status.status === 'connecting') say('正在找游戏', 'thinking');
   }
 }
 
 function setState(next) {
-  const decision = next.decision;
-  if (decision?.status === 'ready') {
-    say(decision.title, decision.agent === 'combat' ? 'alert' : 'thinking');
+  const enemy = next.combat?.enemies?.find(item => item?.alive !== false) || next.combat?.enemies?.[0];
+  const intent = String(enemy?.intent || '').toLowerCase();
+  if (intent.includes('attack') || Number(enemy?.damage) > 0) {
+    say(`小心，预计 ${enemy.damage || 0} 伤害`, 'alert');
+  } else if (/rest|camp/i.test(String(next.run?.room || '')) || /rest/i.test(String(next.run?.currentNode || ''))) {
+    say('休息处，想想回血还是升级', 'thinking');
+  } else if (next.run?.room === 'map') {
+    say('地图开了，看看走哪条');
   } else {
     say('我在看着这局');
   }
 }
 
-let clickTimer = null;
+function setRecommendation(recommendation) {
+  if (recommendation?.task === 'rest_site' && recommendation.primary?.label) {
+    say(`休息处建议${recommendation.primary.label}`, 'thinking');
+    return;
+  }
+  if (recommendation?.task !== 'map_route' || !recommendation.primary?.label) return;
+  say(`下一路点建议走${recommendation.primary.label}`, 'thinking');
+}
 
-document.querySelector('#pet-button').addEventListener('click', () => {
-  // Distinguish click (open panel) from drag start.
-  if (clickTimer) return;
-  clickTimer = setTimeout(() => { clickTimer = null; }, 260);
+const petButton = document.querySelector('#pet-button');
+let dragState;
+
+petButton.addEventListener('pointerdown', event => {
+  if (event.button !== 0) return;
+  dragState = { pointerId: event.pointerId, screenX: event.screenX, screenY: event.screenY, moved: false };
+  petButton.setPointerCapture(event.pointerId);
+  window.windowControls?.startPetDrag({ x: event.screenX, y: event.screenY });
 });
 
-document.querySelector('#pet-button').addEventListener('dblclick', () => {
-  clearTimeout(clickTimer);
-  clickTimer = null;
-  window.windowControls?.openMain();
+petButton.addEventListener('pointermove', event => {
+  if (!dragState || event.pointerId !== dragState.pointerId) return;
+  const distance = Math.hypot(event.screenX - dragState.screenX, event.screenY - dragState.screenY);
+  if (!dragState.moved && distance < 4) return;
+  dragState.moved = true;
+  window.windowControls?.movePet({ x: event.screenX, y: event.screenY });
 });
-window.runmateBridge?.onStatus(setStatus);
-window.runmateBridge?.onState(setState);
-window.runmateBridge?.onObservation(observation => observation?.decision && setState({ decision: observation.decision }));
+
+function finishPetPointer(event) {
+  if (!dragState || event.pointerId !== dragState.pointerId) return;
+  const wasDragged = dragState.moved;
+  window.windowControls?.endPetDrag();
+  if (petButton.hasPointerCapture(event.pointerId)) petButton.releasePointerCapture(event.pointerId);
+  dragState = undefined;
+  if (!wasDragged) window.windowControls?.openMain();
+}
+
+petButton.addEventListener('pointerup', finishPetPointer);
+petButton.addEventListener('pointercancel', finishPetPointer);
+petButton.addEventListener('contextmenu', event => {
+  event.preventDefault();
+  window.windowControls?.showPetMenu({ x: event.clientX, y: event.clientY });
+});
+window.gamebuddyBridge?.onStatus(setStatus);
+window.gamebuddyBridge?.onState(setState);
+window.gamebuddyBridge?.onRecommendation(setRecommendation);

@@ -18,11 +18,20 @@ const checks = [
   ['fixture validation', [path.join(__dirname, 'validate-replay.js')]],
   ['recorded fixture', [path.join(__dirname, 'validate-replay.js'), path.join(__dirname, 'fixtures', 'recorded-smoke.json')]],
   ['lifecycle fixture', [path.join(__dirname, 'validate-replay.js'), path.join(__dirname, 'fixtures', 'lifecycle.json')]],
+  ['agent syntax', [path.join(__dirname, '..', 'agent', 'orchestrator.js')]],
+  ['recommendation syntax', [path.join(__dirname, '..', 'agent', 'recommendation.js')]],
+  ['route task syntax', [path.join(__dirname, '..', 'agent', 'tasks', 'route.js')]],
+  ['rest task syntax', [path.join(__dirname, '..', 'agent', 'tasks', 'rest.js')]],
+  ['smith syntax', [path.join(__dirname, '..', 'agent', 'knowledge', 'smith.js')]],
+  ['llm syntax', [path.join(__dirname, '..', 'agent', 'llm', 'openai.js')]],
+  ['codex config syntax', [path.join(__dirname, '..', 'agent', 'llm', 'codex-config.js')]],
+  ['load-env syntax', [path.join(__dirname, '..', 'agent', 'llm', 'load-env.js')]],
+  ['agent cases', [path.join(__dirname, 'validate-agent.js')]],
   ['Mod shape', [path.join(__dirname, 'validate-mod.js')]]
 ];
 
 for (const [name, args] of checks) {
-  const command = name.endsWith('syntax') || ['syntax', 'preload syntax', 'renderer syntax', 'pet syntax', 'protocol syntax', 'replay syntax', 'record syntax', 'inspect syntax'].includes(name)
+  const command = name.endsWith('syntax') || ['syntax', 'preload syntax', 'renderer syntax', 'pet syntax', 'protocol syntax', 'replay syntax', 'record syntax', 'inspect syntax', 'agent syntax', 'recommendation syntax', 'route task syntax', 'llm syntax'].includes(name)
     ? [process.execPath, '--check', ...args]
     : [process.execPath, ...args];
   const result = spawnSync(command[0], command.slice(1), { cwd: root, stdio: 'inherit' });

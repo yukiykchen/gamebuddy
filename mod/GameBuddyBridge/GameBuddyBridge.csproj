@@ -5,7 +5,7 @@
     <LangVersion>12.0</LangVersion>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <AssemblyName>RunmateBridge</AssemblyName>
+    <AssemblyName>gamebuddy_bridge</AssemblyName>
 
     <Sts2Dir Condition="'$(Sts2Dir)' == '' and '$(STS2_DIR)' != ''">$(STS2_DIR)</Sts2Dir>
     <Sts2DataDir Condition="'$(Sts2DataDir)' == '' and '$(Sts2Dir)' != ''">$(Sts2Dir)\data_sts2_windows_x86_64</Sts2DataDir>
@@ -20,7 +20,7 @@
       <HintPath>$(Sts2DataDir)\0Harmony.dll</HintPath>
       <Private>false</Private>
     </Reference>
-    <None Include="RunmateBridge.json">
+    <None Include="GameBuddyBridge.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -33,10 +33,10 @@
 
   <Target Name="CopyModAfterBuild" AfterTargets="Build" Condition="'$(CopyModAfterBuild)' == 'true'">
     <PropertyGroup>
-      <ModDirectory>$(Sts2Dir)\mods\RunmateBridge</ModDirectory>
+      <ModDirectory>$(Sts2Dir)\mods\GameBuddyBridge</ModDirectory>
     </PropertyGroup>
     <MakeDir Directories="$(ModDirectory)" />
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ModDirectory)" />
-    <Copy SourceFiles="RunmateBridge.json" DestinationFolder="$(ModDirectory)" />
+    <Copy SourceFiles="GameBuddyBridge.json" DestinationFolder="$(ModDirectory)" />
   </Target>
 </Project>

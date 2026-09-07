@@ -1,6 +1,6 @@
 [
   {
-    "schema": "runmate.state.v1",
+    "schema": "gamebuddy.state.v1",
     "timestamp": 1723370000000,
     "source": "replay-bridge",
     "run": {
@@ -116,7 +116,7 @@
     }
   },
   {
-    "schema": "runmate.state.v1",
+    "schema": "gamebuddy.state.v1",
     "timestamp": 1723370001200,
     "source": "replay-bridge",
     "run": {
@@ -225,7 +225,7 @@
     }
   },
   {
-    "schema": "runmate.state.v1",
+    "schema": "gamebuddy.state.v1",
     "timestamp": 1723370002400,
     "source": "replay-bridge",
     "run": {

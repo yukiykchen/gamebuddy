@@ -28,7 +28,7 @@ jobs:
       - name: Build and install Mod
         shell: pwsh
         run: >-
-          dotnet build .\mod\RunmateBridge\RunmateBridge.csproj
+          dotnet build .\mod\GameBuddyBridge\GameBuddyBridge.csproj
           -c Release
           -p:Sts2Dir="${{ inputs.sts2_dir }}"
           -p:CopyModAfterBuild=true
@@ -36,8 +36,8 @@ jobs:
       - name: Upload Mod artifact
         uses: actions/upload-artifact@v4
         with:
-          name: runmate-sts2-mod
+          name: gamebuddy-sts2-mod
           path: |
-            mod/RunmateBridge/bin/Release/net9.0/RunmateBridge.dll
-            mod/RunmateBridge/bin/Release/net9.0/RunmateBridge.json
+            mod/GameBuddyBridge/bin/Release/net9.0/gamebuddy_bridge.dll
+            mod/GameBuddyBridge/bin/Release/net9.0/GameBuddyBridge.json
           if-no-files-found: error

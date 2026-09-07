@@ -1,5 +1,5 @@
-const SUPPORTED_SCHEMA = 'runmate.state.v1';
-const SUPPORTED_EVENTS = new Set(['combat.started', 'turn.started', 'combat.ended', 'map.opened', 'card.played', 'card.reward.opened']);
+const SUPPORTED_SCHEMA = 'gamebuddy.state.v1';
+const SUPPORTED_EVENTS = new Set(['combat.started', 'turn.started', 'combat.ended', 'map.opened', 'rest.opened', 'card.played', 'card.reward.opened']);
 
 function validateState(state) {
   if (!state || typeof state !== 'object') return { ok: false, reason: 'state must be an object' };
@@ -31,8 +31,20 @@ function validateState(state) {
     if (!Array.isArray(state.combat.enemies)) return { ok: false, reason: 'combat.enemies must be an array' };
   }
   if (!state.map || typeof state.map !== 'object' || !Array.isArray(state.map.visited)) return { ok: false, reason: 'map.visited must be an array' };
-  if (state.rewards !== undefined && !Array.isArray(state.rewards)) return { ok: false, reason: 'rewards must be an array' };
-  if (state.run.eventId !== undefined && typeof state.run.eventId !== 'string') return { ok: false, reason: 'run.eventId must be a string' };
+  if (state.map.nodes !== undefined) {
+    if (!Array.isArray(state.map.nodes)) return { ok: false, reason: 'map.nodes must be an array' };
+    for (const node of state.map.nodes) {
+      if (!node || typeof node !== 'object') return { ok: false, reason: 'map.nodes entries must be objects' };
+      if (typeof node.id !== 'string' || typeof node.type !== 'string') return { ok: false, reason: 'map node needs id and type' };
+      if (!Array.isArray(node.children)) return { ok: false, reason: 'map node children must be an array' };
+    }
+  }
+  if (state.map.routes !== undefined) {
+    if (!Array.isArray(state.map.routes)) return { ok: false, reason: 'map.routes must be an array' };
+    for (const route of state.map.routes) {
+      if (!Array.isArray(route) || route.some(id => typeof id !== 'string')) return { ok: false, reason: 'map.routes entries must be id arrays' };
+    }
+  }
   for (const field of ['hp', 'maxHp', 'block', 'gold', 'energy', 'maxEnergy']) {
     if (!Number.isFinite(state.player[field])) return { ok: false, reason: `player.${field} is invalid` };
   }

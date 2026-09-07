@@ -2,20 +2,53 @@ const { app, BrowserWindow, Tray, Menu, nativeImage, ipcMain, screen } = require
 const path = require('node:path');
 const WebSocket = require('ws');
 const { createObservationStore } = require('./harness/observation-store');
+const { createOrchestrator } = require('./agent/orchestrator');
+const { createOpenAiClient, readLlmConfig } = require('./agent/llm/openai');
+const { ensureMapRoutes } = require('./agent/tasks/route');
 const { decide } = require('./agent/router');
 const { recordDecision } = require('./agent/recorder');
 const fs = require('node:fs');
 
-const BRIDGE_URL = process.env.RUNMATE_BRIDGE_URL || 'ws://127.0.0.1:27182';
+const BRIDGE_URL = process.env.GAMEBUDDY_BRIDGE_URL || 'ws://127.0.0.1:27182';
+const BRIDGE_MODE = process.env.GAMEBUDDY_BRIDGE_MODE === 'replay' ? 'replay' : 'game';
 let mainWindow;
 let petWindow;
 let tray;
 let bridgeSocket;
 let bridgeReconnectTimer;
 let isQuitting = false;
+let petHiddenByUser = false;
+let petTopmostTimer;
+let petDragState;
 const observationStore = createObservationStore({ staleAfterMs: 5000 });
+const llmConfig = readLlmConfig();
+if (llmConfig.enabled) {
+  console.log(`GameBuddy LLM: ${llmConfig.model} · ${llmConfig.wireApi} · ${llmConfig.source}${llmConfig.providerName ? `/${llmConfig.providerName}` : ''}`);
+} else {
+  console.log('GameBuddy LLM: rules only');
+}
+const orchestrator = createOrchestrator({
+  llm: createOpenAiClient(llmConfig),
+  onRecommendation: recommendation => broadcast('bridge-recommendation', recommendation)
+});
+
+function withRoutableState(state) {
+  if (!state?.map) return state;
+  const map = ensureMapRoutes(state.map);
+  if (map === state.map) return state;
+  return { ...state, map };
+}
+
+function observationForAgent(observation) {
+  if (!observation?.state) return observation;
+  return { ...observation, state: withRoutableState(observation.state) };
+}
+
+function considerObservation(observation, options) {
+  return orchestrator.consider(observationForAgent(observation), options);
+}
 let bridgeHealthTimer;
-let lastBridgeStatus = { status: 'demo', detail: '等待本地 Mod Bridge', url: BRIDGE_URL };
+let lastBridgeStatus = { status: 'waiting', detail: '等待本地 Mod Bridge', url: BRIDGE_URL, mode: BRIDGE_MODE };
 let agentRunId = null;
 
 function currentObservation(now = Date.now()) {
@@ -36,8 +69,33 @@ function broadcast(channel, payload) {
 }
 
 function broadcastBridgeStatus(status, detail = '') {
-  lastBridgeStatus = { status, detail, url: BRIDGE_URL };
+  lastBridgeStatus = { status, detail, url: BRIDGE_URL, mode: BRIDGE_MODE };
   broadcast('bridge-status', lastBridgeStatus);
+}
+
+function keepPetVisible() {
+  if (petHiddenByUser || !petWindow || petWindow.isDestroyed()) return;
+  petWindow.setAlwaysOnTop(true, 'screen-saver');
+  petWindow.showInactive();
+}
+
+function hidePet() {
+  petHiddenByUser = true;
+  petWindow?.hide();
+}
+
+function showPetContextMenu(point) {
+  if (!petWindow || petWindow.isDestroyed()) return;
+  const menu = Menu.buildFromTemplate([
+    { label: '打开 GameBuddy', click: () => { mainWindow?.show(); keepPetVisible(); } },
+    { type: 'separator' },
+    { label: '关闭桌面宠物', click: hidePet }
+  ]);
+  menu.popup({
+    window: petWindow,
+    x: Math.max(0, Math.round(Number(point?.x) || 0)),
+    y: Math.max(0, Math.round(Number(point?.y) || 0))
+  });
 }
 
 function connectBridge() {
@@ -67,13 +125,21 @@ function connectBridge() {
         if (result.accepted) {
           if (!agentRunId) startAgentRun();
           const observation = currentObservation();
-          recordDecision({ runId: agentRunId, observation, decision: observation.decision });
-          broadcast('bridge-state', result.state);
-          sendHighlightRoute(observation.decision);
+          const routableState = withRoutableState(observation.state);
+          recordDecision({ runId: agentRunId, observation: { ...observation, state: routableState }, decision: observation.decision });
+          broadcast('bridge-state', routableState);
+          sendHighlightRoute(observation.decision, routableState);
         }
       }
       if (result.kind === 'event' && result.accepted) broadcast('bridge-event', result.event);
-      if (result.accepted) broadcast('bridge-observation', currentObservation());
+      if (result.accepted || (result.kind === 'duplicate' && !orchestrator.getRecommendation())) {
+        const observation = observationStore.getObservation();
+        if (result.accepted) broadcast('bridge-observation', observation);
+        void considerObservation(observation, {
+          force: result.kind === 'duplicate'
+            || (result.kind === 'event' && (result.event?.name === 'map.opened' || result.event?.name === 'rest.opened'))
+        });
+      }
     } catch (error) {
       broadcastBridgeStatus('invalid', error.message);
     }
@@ -83,7 +149,7 @@ function connectBridge() {
     if (disconnected) return;
     disconnected = true;
     if (bridgeSocket === socket) bridgeSocket = null;
-    broadcastBridgeStatus('demo', '等待本地 Mod Bridge');
+    broadcastBridgeStatus('waiting', '等待本地 Mod Bridge');
     clearTimeout(bridgeReconnectTimer);
     bridgeReconnectTimer = setTimeout(connectBridge, 2500);
   };
@@ -91,10 +157,15 @@ function connectBridge() {
   socket.on('close', disconnect);
 }
 
-function sendHighlightRoute(decision) {
+function sendHighlightRoute(decision, routableState) {
   if (!bridgeSocket || bridgeSocket.readyState !== WebSocket.OPEN) return;
-  if (decision?.agent !== 'route' || decision?.status !== 'ready') return;
-  const coords = decision.payload?.routeCoords;
+  let coords = [];
+  if (decision?.agent === 'route' && decision?.status === 'ready') {
+    coords = Array.isArray(decision.payload?.routeCoords) ? decision.payload.routeCoords : [];
+  }
+  if (!coords.length && routableState?.map?.routes?.length) {
+    coords = routableState.map.routes[0];
+  }
   if (!Array.isArray(coords) || !coords.length) return;
   bridgeSocket.send(JSON.stringify({ type: 'highlight_map_nodes', coords }));
 }
@@ -106,7 +177,7 @@ function createMainWindow() {
     minWidth: 1120,
     minHeight: 720,
     backgroundColor: '#111315',
-    title: 'Runmate · 杀戮尖塔 2 AI 搭子',
+    title: 'GameBuddy · 杀戮尖塔 2 AI 搭子',
     frame: false,
     autoHideMenuBar: true,
     titleBarStyle: 'hidden',
@@ -122,8 +193,11 @@ function createMainWindow() {
     mainWindow.webContents.send('bridge-status', lastBridgeStatus);
     const observation = currentObservation();
     const state = observation.state;
-    if (state) mainWindow.webContents.send('bridge-state', state);
+    if (state) mainWindow.webContents.send('bridge-state', withRoutableState(state));
     mainWindow.webContents.send('bridge-observation', observation);
+    const recommendation = orchestrator.getRecommendation();
+    if (recommendation) mainWindow.webContents.send('bridge-recommendation', recommendation);
+    else void considerObservation(observation, { force: true });
   });
   mainWindow.on('close', event => {
     if (!isQuitting) {
@@ -159,24 +233,30 @@ function createPetWindow() {
 
   const { workArea } = screen.getPrimaryDisplay();
   petWindow.setPosition(workArea.x + workArea.width - 238, workArea.y + workArea.height - 270);
-  petWindow.setAlwaysOnTop(true, 'floating');
+  petWindow.setAlwaysOnTop(true, 'screen-saver');
   petWindow.loadFile(path.join(__dirname, 'src', 'pet.html'));
   petWindow.webContents.on('did-finish-load', () => {
     petWindow.webContents.send('bridge-status', lastBridgeStatus);
     const observation = currentObservation();
     const state = observation.state;
-    if (state) petWindow.webContents.send('bridge-state', state);
+    if (state) petWindow.webContents.send('bridge-state', withRoutableState(state));
     petWindow.webContents.send('bridge-observation', observation);
+    const recommendation = orchestrator.getRecommendation();
+    if (recommendation) petWindow.webContents.send('bridge-recommendation', recommendation);
   });
   petWindow.once('ready-to-show', () => petWindow.showInactive());
 }
 
 function createTray() {
   tray = new Tray(nativeImage.createEmpty());
-  tray.setToolTip('Runmate · 杀戮尖塔 2 AI 搭子');
+  tray.setToolTip('GameBuddy · 杀戮尖塔 2 AI 搭子');
   tray.setContextMenu(Menu.buildFromTemplate([
-    { label: '打开 Runmate', click: () => mainWindow?.show() },
-    { label: '显示 / 隐藏桌面宠物', click: () => petWindow?.isVisible() ? petWindow.hide() : petWindow?.showInactive() },
+    { label: '打开 GameBuddy', click: () => mainWindow?.show() },
+    { label: '显示 / 隐藏桌面宠物', click: () => {
+      petHiddenByUser = petWindow?.isVisible() === true;
+      if (petHiddenByUser) hidePet();
+      else { petHiddenByUser = false; keepPetVisible(); }
+    } },
     { type: 'separator' },
     { label: '退出', click: () => { isQuitting = true; app.quit(); } }
   ]));
@@ -191,19 +271,50 @@ ipcMain.on('window-close', event => {
   BrowserWindow.fromWebContents(event.sender)?.hide();
 });
 
-ipcMain.on('open-main-window', () => mainWindow?.show());
-ipcMain.on('toggle-pet', () => petWindow?.isVisible() ? petWindow.hide() : petWindow?.showInactive());
+ipcMain.on('open-main-window', () => {
+  mainWindow?.show();
+  keepPetVisible();
+});
+ipcMain.on('toggle-pet', () => {
+  petHiddenByUser = petWindow?.isVisible() === true;
+  if (petHiddenByUser) hidePet();
+  else { petHiddenByUser = false; keepPetVisible(); }
+});
 ipcMain.on('pet-pass-through', (_event, enabled) => petWindow?.setIgnoreMouseEvents(Boolean(enabled), { forward: true }));
+ipcMain.on('pet-context-menu', (_event, point) => showPetContextMenu(point));
+ipcMain.on('pet-drag-start', (_event, point) => {
+  if (!petWindow || petWindow.isDestroyed() || !point) return;
+  const [x, y] = petWindow.getPosition();
+  petDragState = { startX: Number(point.x), startY: Number(point.y), windowX: x, windowY: y };
+});
+ipcMain.on('pet-drag-move', (_event, point) => {
+  if (!petDragState || !petWindow || petWindow.isDestroyed() || !point) return;
+  const x = petDragState.windowX + Number(point.x) - petDragState.startX;
+  const y = petDragState.windowY + Number(point.y) - petDragState.startY;
+  petWindow.setPosition(Math.round(x), Math.round(y), false);
+});
+ipcMain.on('pet-drag-end', () => { petDragState = undefined; });
 ipcMain.on('accept-decision', (_event, decision) => {
   if (agentRunId && decision) recordDecision({ runId: agentRunId, observation: currentObservation(), decision, accepted: true });
 });
 ipcMain.handle('get-observation', () => currentObservation());
+ipcMain.handle('refresh-recommendation', async () => {
+  if (bridgeSocket?.readyState === WebSocket.OPEN) {
+    bridgeSocket.send(JSON.stringify({ type: 'request_snapshot' }));
+  }
+  const observation = observationStore.getObservation();
+  if (observation?.state) broadcast('bridge-state', withRoutableState(observation.state));
+  const recommendation = await considerObservation(observation, { force: true });
+  if (recommendation) broadcast('bridge-recommendation', recommendation);
+  return { ok: Boolean(recommendation), recommendation };
+});
 
 app.whenReady().then(() => {
   createMainWindow();
   createPetWindow();
   createTray();
   connectBridge();
+  petTopmostTimer = setInterval(keepPetVisible, 1000);
   bridgeHealthTimer = setInterval(() => {
     if (lastBridgeStatus.status === 'live' && !observationStore.getObservation().fresh) {
       broadcastBridgeStatus('stale', '已连接，但超过 5 秒没有新的游戏状态');
@@ -215,7 +326,7 @@ app.whenReady().then(() => {
   });
 });
 
-app.on('before-quit', () => { isQuitting = true; clearTimeout(bridgeReconnectTimer); clearInterval(bridgeHealthTimer); bridgeSocket?.close(); });
+app.on('before-quit', () => { isQuitting = true; clearTimeout(bridgeReconnectTimer); clearInterval(bridgeHealthTimer); clearInterval(petTopmostTimer); bridgeSocket?.close(); });
 app.on('window-all-closed', () => {
   if (isQuitting && process.platform !== 'darwin') app.quit();
 });

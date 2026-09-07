@@ -12,7 +12,7 @@ const expectedEvents = eventsIndex >= 0 ? (args[eventsIndex + 1] || '').split(',
 const bridgeArgs = [path.join(__dirname, 'replay-bridge.js')];
 if (fixturePath) bridgeArgs.push(fixturePath);
 const bridge = spawn(process.execPath, bridgeArgs, {
-  env: { ...process.env, RUNMATE_BRIDGE_PORT: String(port), RUNMATE_REPLAY_INTERVAL: '100' },
+  env: { ...process.env, GAMEBUDDY_BRIDGE_PORT: String(port), GAMEBUDDY_REPLAY_INTERVAL: '100' },
   stdio: ['ignore', 'pipe', 'pipe']
 });
 

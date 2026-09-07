@@ -32,8 +32,8 @@ jobs:
       - name: Upload installer
         uses: actions/upload-artifact@v4
         with:
-          name: runmate-windows
-          path: dist/Runmate-Setup-*.exe
+          name: gamebuddy-windows
+          path: dist/GameBuddy-Setup-*.exe
           if-no-files-found: error
 
       - name: Publish GitHub Release
@@ -41,4 +41,4 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
-          files: dist/Runmate-Setup-*.exe
+          files: dist/GameBuddy-Setup-*.exe

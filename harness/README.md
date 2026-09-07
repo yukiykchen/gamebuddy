@@ -1,6 +1,6 @@
-# Runmate Harness
+# GameBuddy Harness
 
-Harness 是 Runmate 的开发边界：桌面端只依赖 `runmate.state.v1` 和事件消息，不直接依赖某个游戏版本的内部类名。
+Harness 是 GameBuddy 的开发边界：桌面端只依赖 `gamebuddy.state.v1` 和事件消息，不直接依赖某个游戏版本的内部类名。
 
 ## 回放实时状态
 
@@ -45,17 +45,17 @@ npm run harness:validate-all
 
 ```js
 {
-  schema: 'runmate.observation.v1',
+  schema: 'gamebuddy.observation.v1',
   sequence: 12,
   receivedAt: 1723370000000,
   ageMs: 38,
   fresh: true,
-  state: { /* runmate.state.v1 */ },
-  recentEvents: [ /* runmate event messages */ ]
+  state: { /* gamebuddy.state.v1 */ },
+  recentEvents: [ /* gamebuddy event messages */ ]
 }
 ```
 
-桌面端主进程已经使用同一个 store 管理实时数据。Agent 后续可以复用这层，而不需要再次连接游戏或依赖 Electron 窗口。
+桌面端主进程已经使用同一个 store 管理实时数据。[agent/](../agent/) 消费这层观察对象，当前只输出路线建议，不给出牌顺序。
 
 Replay Bridge 会在 `127.0.0.1:27182` 以 WebSocket 推送固定局面的连续快照。桌面宠物和主面板会共用同一条主进程连接，看到状态更新后分别改变内容和动作。
 
@@ -64,15 +64,15 @@ Replay Bridge 会在 `127.0.0.1:27182` 以 WebSocket 推送固定局面的连续
 当 Windows 上的 STS2 Mod Bridge 已经运行时，可以把真实状态录制成以后可回放的 fixture：
 
 ```powershell
-$env:RUNMATE_RECORD_OUTPUT = "harness/fixtures/my-run.json"
-$env:RUNMATE_RECORD_MS = "60000"
+$env:GAMEBUDDY_RECORD_OUTPUT = "harness/fixtures/my-run.json"
+$env:GAMEBUDDY_RECORD_MS = "60000"
 npm run harness:record
 ```
 
-不设置 `RUNMATE_RECORD_MS` 时，按 `Ctrl+C` 结束录制。录制器会丢弃协议不合法的消息，只保存 `runmate.state.v1` 状态快照。录制完成后可以直接回放：
+不设置 `GAMEBUDDY_RECORD_MS` 时，按 `Ctrl+C` 结束录制。录制器会丢弃协议不合法的消息，只保存 `gamebuddy.state.v1` 状态快照。录制完成后可以直接回放：
 
 ```bash
-RUNMATE_REPLAY_INTERVAL=500 npm run harness:replay -- harness/fixtures/my-run.json
+GAMEBUDDY_REPLAY_INTERVAL=500 npm run harness:replay -- harness/fixtures/my-run.json
 ```
 
 这条路径是 Agent 开发的固定入口：先在真实游戏里录制，再离线开发决策循环和回归测试。
@@ -87,7 +87,7 @@ harness/fixtures/my-run.events.json
 也可以显式指定事件文件：
 
 ```powershell
-$env:RUNMATE_RECORD_EVENTS_OUTPUT = "harness/fixtures/my-run.events.json"
+$env:GAMEBUDDY_RECORD_EVENTS_OUTPUT = "harness/fixtures/my-run.events.json"
 ```
 
 ## 直接观测 Bridge
@@ -109,7 +109,7 @@ npm run harness:inspect -- --duration=30000
 Replay Bridge 会根据连续快照自动发出 `combat.started`、`turn.started`、`combat.ended` 和 `map.opened` 事件。可以用生命周期夹具验证：
 
 ```bash
-RUNMATE_REPLAY_INTERVAL=300 npm run harness:replay -- harness/fixtures/lifecycle.json
+GAMEBUDDY_REPLAY_INTERVAL=300 npm run harness:replay -- harness/fixtures/lifecycle.json
 ```
 
 CI 会用 `npm run harness:smoke:lifecycle` 验证这组快照实际产生四类生命周期事件。
@@ -119,7 +119,7 @@ CI 会用 `npm run harness:smoke:lifecycle` 验证这组快照实际产生四类
 未来的 STS2 Mod Bridge 只需要连接同一个地址并发送：
 
 ```json
-{ "type": "state", "data": { "schema": "runmate.state.v1", "...": "..." } }
+{ "type": "state", "data": { "schema": "gamebuddy.state.v1", "...": "..." } }
 ```
 
 事件可以发送：

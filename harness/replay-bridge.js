@@ -3,8 +3,8 @@ const path = require('node:path');
 const { WebSocketServer } = require('ws');
 const { validateState } = require('./protocol');
 
-const port = Number(process.env.RUNMATE_BRIDGE_PORT || 27182);
-const intervalMs = Number(process.env.RUNMATE_REPLAY_INTERVAL || 1400);
+const port = Number(process.env.GAMEBUDDY_BRIDGE_PORT || 27182);
+const intervalMs = Number(process.env.GAMEBUDDY_REPLAY_INTERVAL || 1400);
 const fixturePath = process.argv[2] || path.join(__dirname, 'fixtures', 'combat-run.json');
 const snapshots = JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
 for (const [index, snapshot] of snapshots.entries()) {
@@ -41,7 +41,19 @@ function emitTransitions(socket, snapshot) {
     sendEvent(socket, 'turn.started', { turn: snapshot.combat.turn });
   }
   if (snapshot.run?.room === 'map' && previousSnapshot?.run?.room !== 'map') sendEvent(socket, 'map.opened');
+  const restNow = isRestSnapshot(snapshot);
+  const restBefore = isRestSnapshot(previousSnapshot);
+  if (restNow && !restBefore) sendEvent(socket, 'rest.opened');
   previousSnapshots.set(socket, snapshot);
+}
+
+function isRestSnapshot(snapshot) {
+  if (!snapshot || snapshot.combat) return false;
+  const room = String(snapshot.run?.room || '');
+  const node = String(snapshot.run?.currentNode || '');
+  if (/rest|camp/i.test(room)) return true;
+  if (/map/i.test(room)) return false;
+  return /rest/i.test(node);
 }
 
 function sendSnapshotAndTransitions(socket, snapshot) {
@@ -56,7 +68,7 @@ function nextSnapshot() {
 }
 
 server.on('listening', () => {
-  console.log(`Runmate Replay Bridge listening on ws://127.0.0.1:${port}`);
+  console.log(`GameBuddy Replay Bridge listening on ws://127.0.0.1:${port}`);
   console.log(`Fixture: ${fixturePath}`);
   timer = setInterval(nextSnapshot, intervalMs);
 });
