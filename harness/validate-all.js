@@ -24,7 +24,6 @@ const checks = [
   ['rest task syntax', [path.join(__dirname, '..', 'agent', 'tasks', 'rest.js')]],
   ['smith syntax', [path.join(__dirname, '..', 'agent', 'knowledge', 'smith.js')]],
   ['llm syntax', [path.join(__dirname, '..', 'agent', 'llm', 'openai.js')]],
-  ['codex config syntax', [path.join(__dirname, '..', 'agent', 'llm', 'codex-config.js')]],
   ['load-env syntax', [path.join(__dirname, '..', 'agent', 'llm', 'load-env.js')]],
   ['agent cases', [path.join(__dirname, 'validate-agent.js')]],
   ['Mod shape', [path.join(__dirname, 'validate-mod.js')]]

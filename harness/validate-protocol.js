@@ -16,6 +16,7 @@ assert.equal(validateState({ ...validState, combat: null }).ok, true);
 assert.equal(validateMessage({ type: 'state', data: validState }).ok, true);
 assert.equal(validateMessage({ type: 'event', name: 'turn.started', timestamp: Date.now(), data: { turn: 1 } }).ok, true);
 assert.equal(validateMessage({ type: 'event', name: 'rest.opened', timestamp: Date.now() }).ok, true);
+assert.equal(validateMessage({ type: 'event', name: 'event.opened', timestamp: Date.now() }).ok, true);
 assert.equal(validateMessage({ type: 'event', name: 'made.up.event', timestamp: Date.now() }).ok, false);
 assert.equal(validateMessage({ type: 'state', data: { ...validState, player: { ...validState.player, energy: '3' } } }).ok, false);
 assert.equal(validateMessage({ type: 'unknown' }).ok, false);
@@ -31,5 +32,25 @@ assert.equal(validateState({
   ...validState,
   map: { visited: [], nodes: [{ id: '1,0' }] }
 }).ok, false);
+assert.equal(validateState({
+  ...validState,
+  combat: null,
+  event: {
+    title: '沉没雕像',
+    description: '钱可是个好东西……',
+    options: [{ index: 0, label: '拿起石剑', description: '获得石之剑。', locked: false }]
+  }
+}).ok, true);
+assert.equal(validateState({
+  ...validState,
+  combat: null,
+  cardReward: {
+    options: [{ index: 0, id: 'Bash', name: '痛击', type: 'Attack', cost: 2, upgraded: false, description: '造成伤害。' }]
+  }
+}).ok, true);
+assert.equal(validateState({
+  ...validState,
+  cardReward: { options: [{ index: 0, id: 'Bash', name: '痛击', type: 'Attack', cost: '2' }] }
+}).ok, false);
 
-console.log('Protocol validation cases passed: 10');
+console.log('Protocol validation cases passed: 12');

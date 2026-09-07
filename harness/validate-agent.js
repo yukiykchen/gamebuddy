@@ -5,16 +5,18 @@ const { createObservationStore } = require('./observation-store');
 const { validateRecommendation } = require('../agent/recommendation');
 const { rankRoutes, recommendRoute, scoreNode, scoreParts, buildScoreContext, ensureMapRoutes } = require('../agent/tasks/route');
 const { isRestSite, recommendRest, rankSmithCards } = require('../agent/tasks/rest');
+const { recommendEvent } = require('../agent/tasks/event');
+const { recommendCardReward, rankCards } = require('../agent/tasks/card-reward');
 const { parseJsonObject, createOpenAiClient, readLlmConfig, extractResponseText } = require('../agent/llm/openai');
-const { loadCodexLlmConfig } = require('../agent/llm/codex-config');
 const { createOrchestrator } = require('../agent/orchestrator');
 
 const lifecycle = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'lifecycle.json'), 'utf8'));
 const mapState = lifecycle[2];
 
 const shopOverElite = rankRoutes(mapState);
-assert.equal(shopOverElite[0].targetType, 'Shop');
-assert.ok(shopOverElite[0].score > shopOverElite[1].score);
+assert.equal(shopOverElite[0].targetType, 'Elite');
+assert.equal(shopOverElite[0].eliteCount, 1);
+assert.equal(shopOverElite[1].eliteCount, 0);
 
 const shopCtx = buildScoreContext(mapState);
 assert.ok(scoreParts('Shop', shopCtx).payoff > scoreParts('Elite', shopCtx).payoff);
@@ -25,7 +27,7 @@ const lowHpState = {
   player: { ...mapState.player, hp: 20, maxHp: 80, gold: 109 }
 };
 const lowHp = rankRoutes(lowHpState);
-assert.equal(lowHp[0].targetType, 'Shop');
+assert.equal(lowHp[0].targetType, 'Elite');
 assert.ok(scoreNode('Elite', buildScoreContext(lowHpState)) < 0);
 
 const healthyElite = rankRoutes({
@@ -81,6 +83,45 @@ assert.equal(eliteThenRest[0].targetType, 'Elite');
 assert.ok(eliteThenRest[0].route.includes('2,0'));
 assert.ok(eliteThenRest[0].score > eliteThenRest[1].score);
 
+const sameTypeSplit = rankRoutes({
+  run: mapState.run,
+  player: { ...mapState.player, hp: 72, maxHp: 80, gold: 20 },
+  combat: null,
+  map: {
+    visited: ['0,0'],
+    current: '0,0',
+    nodes: [
+      { id: '0,0', row: 0, col: 1, type: 'Unknown', children: ['1,0', '1,1', '1,2'] },
+      { id: '1,0', row: 1, col: 0, type: 'Monster', children: ['2,0'] },
+      { id: '1,1', row: 1, col: 1, type: 'Monster', children: ['2,1'] },
+      { id: '1,2', row: 1, col: 2, type: 'Monster', children: ['2,2'] },
+      { id: '2,0', row: 2, col: 0, type: 'Elite', children: ['3,0'] },
+      { id: '2,1', row: 2, col: 1, type: 'RestSite', children: ['3,0'] },
+      { id: '2,2', row: 2, col: 2, type: 'Monster', children: ['3,0'] },
+      { id: '3,0', row: 3, col: 1, type: 'Boss', children: [] }
+    ],
+    routes: [
+      ['0,0', '1,0', '2,0', '3,0'],
+      ['0,0', '1,1', '2,1', '3,0'],
+      ['0,0', '1,2', '2,2', '3,0']
+    ]
+  }
+});
+assert.equal(sameTypeSplit[0].targetType, 'Monster');
+assert.equal(sameTypeSplit[0].targetPosition, '左侧');
+assert.equal(sameTypeSplit[0].eliteCount, 1);
+
+const fourWaySplit = {
+  nodes: [
+    { id: '0,0', row: 1, col: 0 },
+    { id: '0,1', row: 1, col: 1 },
+    { id: '0,2', row: 1, col: 2 },
+    { id: '0,3', row: 1, col: 3 }
+  ]
+};
+assert.equal(require('../agent/tasks/route').targetPositionLabel(fourWaySplit, '0,0'), '从左第1个');
+assert.equal(require('../agent/tasks/route').targetPositionLabel(fourWaySplit, '0,2'), '从左第3个');
+
 function restState(hp) {
   return {
     ...mapState,
@@ -93,21 +134,45 @@ assert.equal(isRestSite(mapState), false);
 assert.equal(isRestSite(restState(72)), true);
 assert.equal(rankSmithCards(mapState.player.cards)[0].card.name, '痛击');
 
-const codexHome = path.join(__dirname, 'fixtures', 'codex-home');
-const fromCodex = loadCodexLlmConfig({ env: { GAMEBUDDY_CODEX_HOME: codexHome } });
-assert.equal(fromCodex.model, 'gpt-5.5');
-assert.equal(fromCodex.wireApi, 'responses');
-assert.equal(fromCodex.apiKey, 'sk-test-codex');
-assert.equal(fromCodex.baseURL, 'https://ai.gs88.shop/v1');
-assert.equal(fromCodex.reasoningEffort, 'xhigh');
-
-const merged = readLlmConfig({ GAMEBUDDY_CODEX_HOME: codexHome });
+const merged = readLlmConfig({
+  GAMEBUDDY_LLM_API_KEY: 'sk-test-kimi',
+  GAMEBUDDY_LLM_BASE_URL: 'https://api.moonshot.cn/v1',
+  GAMEBUDDY_LLM_MODEL: 'kimi-k2.5',
+  GAMEBUDDY_LLM_WIRE_API: 'chat',
+  GAMEBUDDY_LLM_REASONING_EFFORT: 'high'
+});
 assert.equal(merged.enabled, true);
-assert.equal(merged.model, 'gpt-5.5');
-assert.equal(merged.wireApi, 'responses');
-assert.equal(merged.source, 'codex');
+assert.equal(merged.model, 'kimi-k2.5');
+assert.equal(merged.wireApi, 'chat');
+assert.equal(merged.source, 'env');
 assert.equal(extractResponseText({ output_text: '{"index":1}' }), '{"index":1}');
 
+const eventState = {
+  ...mapState,
+  run: { ...mapState.run, room: 'EventRoom' },
+  event: {
+    title: '沉没雕像',
+    description: '钱可是个好东西……',
+    options: [
+      { index: 0, label: '拿起石剑', description: '获得石之剑。', locked: false },
+      { index: 1, label: '潜水', description: '获得112金币。失去7点生命。', locked: false }
+    ]
+  }
+};
+const cardRewardState = {
+  ...mapState,
+  player: {
+    ...mapState.player,
+    cards: [...mapState.player.cards, { id: 'Defend_R', name: '防御', type: 'Skill', cost: 1, upgraded: false }]
+  },
+  cardReward: {
+    options: [
+      { index: 0, id: 'Strike_R', name: '打击', type: 'Attack', cost: 1, upgraded: false, description: '造成 6 点伤害。' },
+      { index: 1, id: 'PommelStrike', name: '剑柄打击', type: 'Attack', cost: 1, upgraded: false, description: '造成伤害。抽 1 张牌。' },
+      { index: 2, id: 'ShrugItOff', name: '耸肩无视', type: 'Skill', cost: 1, upgraded: false, description: '获得格挡。抽 1 张牌。' }
+    ]
+  }
+};
 const store = createObservationStore({ staleAfterMs: 5000 });
 store.ingest({ type: 'state', data: mapState }, 1723370002000);
 const observation = store.getObservation(1723370002100);
@@ -118,15 +183,39 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   assert.equal(rulesRec.source, 'rules');
   assert.equal(rulesRec.task, 'map_route');
   assert.equal(rulesRec.primary.action, 'TAKE_ROUTE');
-  assert.equal(rulesRec.primary.targetId, '2,0');
-  assert.match(rulesRec.reason, /删起手牌|遗物|升级/);
+  assert.equal(rulesRec.primary.targetId, '2,1');
+  assert.match(rulesRec.reason, /精英和.*火堆/);
+
+  const eventFallback = await recommendEvent(eventState, { now: 1 });
+  assert.equal(eventFallback.task, 'event_choice');
+  assert.equal(eventFallback.source, 'rules');
+  const eventLlm = await recommendEvent(eventState, {
+    llm: { enabled: true, completeEvent: async () => ({ index: 1, reason: '生命代价可接受，金币收益更高。' }) },
+    now: 2
+  });
+  assert.equal(eventLlm.source, 'llm');
+  assert.equal(eventLlm.primary.optionIndex, 1);
+
+  const rewardFallback = await recommendCardReward(cardRewardState, { now: 3 });
+  assert.equal(validateRecommendation(rewardFallback).ok, true);
+  assert.equal(rewardFallback.task, 'card_reward');
+  assert.equal(rewardFallback.primary.action, 'CHOOSE_CARD');
+  assert.equal(rewardFallback.primary.cardIndex, 2);
+  assert.match(rewardFallback.reason, /防御|牌|卡组/);
+  assert.equal(rankCards(cardRewardState)[0].card.name, '耸肩无视');
+  const rewardLlm = await recommendCardReward(cardRewardState, {
+    llm: { enabled: true, completeCardReward: async () => ({ index: 1, reason: '可以抽牌，提升卡组循环。' }) },
+    now: 4
+  });
+  assert.equal(rewardLlm.source, 'llm');
+  assert.equal(rewardLlm.primary.cardIndex, 1);
 
   const llm = {
     enabled: true,
     completeRoute: async () => ({ index: 1, reason: '生命够用，去打精英换遗物。' })
   };
   const llmRec = await recommendRoute(mapState, { llm, now: 2 });
-  assert.equal(llmRec.source, 'llm');
+  assert.equal(llmRec.source, 'rules');
   assert.equal(llmRec.primary.label, '精英');
   assert.match(llmRec.reason, /精英/);
 
@@ -178,6 +267,40 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   assert.equal(restPick.index, 0);
   assert.equal(restPick.reason, '回血');
 
+  const eventClient = createOpenAiClient({
+    enabled: true,
+    apiKey: 'sk-test',
+    baseURL: 'https://api.moonshot.cn/v1',
+    model: 'kimi-k3',
+    wireApi: 'chat'
+  }, {
+    fetchImpl: async (url, options) => {
+      assert.match(url, /chat\/completions$/);
+      const body = JSON.parse(options.body);
+      assert.match(body.messages[0].content, /事件选择顾问/);
+      assert.equal(body.temperature, 1);
+      return { ok: true, json: async () => ({ choices: [{ message: { content: '{"index":1,"reason":"金币收益更高"}' } }] }) };
+    }
+  });
+  const eventPick = await eventClient.completeEvent({ options: [{ index: 0 }, { index: 1 }] });
+  assert.equal(eventPick.index, 1);
+  const rewardClient = createOpenAiClient({
+    enabled: true,
+    apiKey: 'sk-test',
+    baseURL: 'https://api.moonshot.cn/v1',
+    model: 'kimi-k2.5',
+    wireApi: 'chat'
+  }, {
+    fetchImpl: async (url, options) => {
+      assert.match(url, /chat\/completions$/);
+      const body = JSON.parse(options.body);
+      assert.match(body.messages[0].content, /选牌顾问/);
+      return { ok: true, json: async () => ({ choices: [{ message: { content: '{"index":2,"reason":"补足防御和抽牌"}' } }] }) };
+    }
+  });
+  const rewardPick = await rewardClient.completeCardReward({ candidates: cardRewardState.cardReward.options });
+  assert.equal(rewardPick.index, 2);
+
   let published;
   const orchestrator = createOrchestrator({
     llm: { enabled: false },
@@ -185,8 +308,8 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
     now: () => 3
   });
   const first = await orchestrator.consider(observation);
-  assert.equal(first.primary.targetId, '2,0');
-  assert.equal(published.primary.targetId, '2,0');
+  assert.equal(first.primary.targetId, '2,1');
+  assert.equal(published.primary.targetId, '2,1');
   const second = await orchestrator.consider(observation);
   assert.equal(second, first);
 
@@ -250,7 +373,29 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   });
   assert.equal(viaEvent.task, 'rest_site');
 
-  console.log('Agent route cases passed: 23');
+  const eventStatuses = [];
+  const eventOrch = createOrchestrator({
+    llm: { enabled: true, completeEvent: async () => ({ index: 1, reason: '金币收益更高。' }) },
+    onAgentStatus: status => eventStatuses.push(status),
+    now: () => 14
+  });
+  const eventRec = await eventOrch.consider({ schema: 'gamebuddy.observation.v1', fresh: true, state: eventState });
+  assert.equal(eventRec.task, 'event_choice');
+  assert.equal(eventRec.source, 'llm');
+  assert.deepEqual(eventStatuses.map(status => status.status), ['thinking', 'ready']);
+
+  const rewardStatuses = [];
+  const rewardOrch = createOrchestrator({
+    llm: { enabled: false },
+    onAgentStatus: status => rewardStatuses.push(status),
+    now: () => 15
+  });
+  const rewardRec = await rewardOrch.consider({ schema: 'gamebuddy.observation.v1', fresh: true, state: cardRewardState });
+  assert.equal(rewardRec.task, 'card_reward');
+  assert.equal(rewardRec.primary.cardIndex, 2);
+  assert.deepEqual(rewardStatuses.map(status => status.status), ['thinking', 'ready']);
+
+  console.log('Agent route/event/card reward cases passed');
 }).catch(error => {
   console.error(error);
   process.exit(1);

@@ -1,5 +1,5 @@
 const SUPPORTED_SCHEMA = 'gamebuddy.state.v1';
-const SUPPORTED_EVENTS = new Set(['combat.started', 'turn.started', 'combat.ended', 'map.opened', 'rest.opened', 'card.played', 'card.reward.opened']);
+const SUPPORTED_EVENTS = new Set(['combat.started', 'turn.started', 'combat.ended', 'map.opened', 'rest.opened', 'event.opened', 'card.played', 'card.reward.opened']);
 
 function validateState(state) {
   if (!state || typeof state !== 'object') return { ok: false, reason: 'state must be an object' };
@@ -45,6 +45,34 @@ function validateState(state) {
       if (!Array.isArray(route) || route.some(id => typeof id !== 'string')) return { ok: false, reason: 'map.routes entries must be id arrays' };
     }
   }
+  if (state.event !== undefined && state.event !== null) {
+    if (typeof state.event !== 'object') return { ok: false, reason: 'event must be an object or null' };
+    for (const field of ['title', 'description', 'options']) {
+      if (!(field in state.event)) return { ok: false, reason: `event missing ${field}` };
+    }
+    if (!Array.isArray(state.event.options)) return { ok: false, reason: 'event.options must be an array' };
+    for (const option of state.event.options) {
+      if (!option || typeof option !== 'object' || !Number.isInteger(option.index) || typeof option.label !== 'string') {
+        return { ok: false, reason: 'event option needs integer index and label' };
+      }
+    }
+  }
+  if (state.cardReward !== undefined && state.cardReward !== null) {
+    if (typeof state.cardReward !== 'object' || !Array.isArray(state.cardReward.options)) {
+      return { ok: false, reason: 'cardReward.options must be an array' };
+    }
+    for (const card of state.cardReward.options) {
+      if (!card || typeof card !== 'object' || !Number.isInteger(card.index) || typeof card.id !== 'string' || typeof card.name !== 'string' || typeof card.type !== 'string') {
+        return { ok: false, reason: 'card reward option needs index, id, name and type' };
+      }
+      if (card.cost !== null && card.cost !== undefined && !Number.isFinite(card.cost)) {
+        return { ok: false, reason: 'card reward option cost is invalid' };
+      }
+      if (card.description !== undefined && typeof card.description !== 'string') {
+        return { ok: false, reason: 'card reward option description must be a string' };
+      }
+    }
+  }
   for (const field of ['hp', 'maxHp', 'block', 'gold', 'energy', 'maxEnergy']) {
     if (!Number.isFinite(state.player[field])) return { ok: false, reason: `player.${field} is invalid` };
   }
@@ -57,6 +85,8 @@ function stateSignature(state) {
     player: state.player,
     combat: state.combat,
     map: state.map,
+    event: state.event,
+    cardReward: state.cardReward,
     rewards: state.rewards ?? null,
     eventId: state.run?.eventId ?? null
   });

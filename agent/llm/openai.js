@@ -1,22 +1,25 @@
-const { loadCodexLlmConfig, normalizeApiRoot } = require('./codex-config');
 const { loadProjectEnv } = require('./load-env');
 
 const DEFAULT_BASE_URL = 'https://ai.gs88.shop';
 const DEFAULT_MODEL = 'gpt-5.5';
 
-function readLlmConfig(env = process.env, options = {}) {
+function normalizeApiRoot(baseURL) {
+  const trimmed = String(baseURL || '').trim().replace(/\/+$/, '');
+  if (!trimmed) return '';
+  return /\/v\d+$/i.test(trimmed) ? trimmed : `${trimmed}/v1`;
+}
+
+function readLlmConfig(env = process.env) {
   if (env === process.env) loadProjectEnv(env);
-  const fromCodex = loadCodexLlmConfig({ env, ...options });
-  const apiKey = String(env.GAMEBUDDY_LLM_API_KEY || env.OPENAI_API_KEY || fromCodex.apiKey || '').trim();
-  const baseURL = normalizeApiRoot(env.GAMEBUDDY_LLM_BASE_URL || fromCodex.baseURL || DEFAULT_BASE_URL);
-  const model = String(env.GAMEBUDDY_LLM_MODEL || fromCodex.model || DEFAULT_MODEL).trim();
+  const apiKey = String(env.GAMEBUDDY_LLM_API_KEY || env.OPENAI_API_KEY || '').trim();
+  const baseURL = normalizeApiRoot(env.GAMEBUDDY_LLM_BASE_URL || DEFAULT_BASE_URL);
+  const model = String(env.GAMEBUDDY_LLM_MODEL || DEFAULT_MODEL).trim();
   const wireEnv = String(env.GAMEBUDDY_LLM_WIRE_API || '').trim().toLowerCase();
   let wireApi = 'responses';
   if (wireEnv === 'chat' || wireEnv === 'completions') wireApi = 'chat';
   else if (wireEnv === 'responses' || wireEnv === 'response') wireApi = 'responses';
-  else if (fromCodex.wireApi === 'chat') wireApi = 'chat';
-  const reasoningEffort = String(env.GAMEBUDDY_LLM_REASONING_EFFORT || fromCodex.reasoningEffort || 'xhigh').trim();
-  const source = env.GAMEBUDDY_LLM_API_KEY || env.GAMEBUDDY_LLM_BASE_URL || env.OPENAI_API_KEY ? 'env' : fromCodex.source || '';
+  const reasoningEffort = String(env.GAMEBUDDY_LLM_REASONING_EFFORT || 'xhigh').trim();
+  const source = apiKey ? 'env' : '';
   return {
     enabled: Boolean(apiKey),
     apiKey,
@@ -24,9 +27,9 @@ function readLlmConfig(env = process.env, options = {}) {
     model,
     wireApi,
     reasoningEffort,
-    store: fromCodex.store,
+    store: false,
     source: apiKey ? (source || 'env') : '',
-    providerName: fromCodex.providerName || ''
+    providerName: env.GAMEBUDDY_LLM_PROVIDER || ''
   };
 }
 
@@ -107,7 +110,7 @@ function createOpenAiClient(config = readLlmConfig(), { fetchImpl = globalThis.f
         if (error.status !== 404 && error.status !== 405) throw error;
         body = await request(`${config.baseURL}/chat/completions`, {
           model: config.model,
-          temperature: 0.2,
+          temperature: 1,
           messages: [
             { role: 'system', content: system },
             { role: 'user', content: user }
@@ -117,7 +120,7 @@ function createOpenAiClient(config = readLlmConfig(), { fetchImpl = globalThis.f
     } else {
       body = await request(`${config.baseURL}/chat/completions`, {
         model: config.model,
-        temperature: 0.2,
+        temperature: 1,
         messages: [
           { role: 'system', content: system },
           { role: 'user', content: user }
@@ -140,6 +143,14 @@ function createOpenAiClient(config = readLlmConfig(), { fetchImpl = globalThis.f
     ),
     completeRest: payload => completeJson(
       '你是杀戮尖塔 2 的休息处顾问。在回血和升级之间权衡：残血或后面有精英时优先回血；生命健康时升级核心牌，不要优先升打击和防御。只从给定候选里选一条。用 JSON 回答：{"index":0,"reason":"两句中文解释"}。',
+      payload
+    ),
+    completeEvent: payload => completeJson(
+      '你是杀戮尖塔 2 的事件选择顾问。阅读事件背景和所有选项，结合当前生命、金币、遗物和卡组，选择长期收益更高且风险可接受的选项。只从给定选项里选，不要发明选项。用 JSON 回答：{"index":0,"reason":"两句中文解释"}。',
+      payload
+    ),
+    completeCardReward: payload => completeJson(
+      '你是杀戮尖塔 2 的战斗后选牌顾问。阅读当前卡组和真实候选卡牌的牌面描述，选择最能补足卡组、提高后续通关率的一张。综合费用、类型、升级状态、抽牌、防御、输出、能力和当前生命；不要因为卡名相似而臆测没有提供的效果。只从给定候选里选，不要发明卡牌。用 JSON 回答：{"index":0,"reason":"两句中文解释"}。',
       payload
     )
   };

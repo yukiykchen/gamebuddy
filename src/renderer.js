@@ -10,7 +10,10 @@ const state = {
   enemy: null,
   hand: [],
   map: { visited: [] },
+  event: null,
+  cardReward: null,
   recommendation: null,
+  agentStatus: { status: 'idle', task: null },
   decision: null
 };
 
@@ -83,6 +86,28 @@ function showingRest() {
   return atRestSite();
 }
 
+function showingEvent() {
+  return Array.isArray(state.event?.options) && state.event.options.length > 0;
+}
+
+function eventView() {
+  const event = state.event || { title: '等待事件选项', description: '', options: [] };
+  const rec = state.recommendation?.task === 'event_choice' ? state.recommendation : null;
+  const thinking = state.agentStatus?.status === 'thinking' && state.agentStatus?.task === 'event_choice';
+  const sourceLabel = rec?.source === 'llm' ? 'KIMI AGENT' : '规则保底';
+  const options = (event.options || []).map((option, arrayIndex) => {
+    const optionIndex = Number(option.index ?? arrayIndex);
+    const recommended = rec?.primary?.optionIndex === optionIndex;
+    return `<article class="event-option ${recommended ? 'top-pick' : ''} ${option.locked ? 'locked' : ''}"><span class="pick-tag">${recommended ? 'Agent 建议' : option.locked ? '不可选' : `选项 ${String(optionIndex + 1).padStart(2, '0')}`}</span><h3>${escapeHtml(option.label)}</h3><p>${escapeHtml(option.description || '没有额外说明。')}</p></article>`;
+  }).join('');
+  const analysis = thinking
+    ? `<div class="agent-thinking"><span></span><div><strong>Agent 正在分析事件</strong><p>正在比较生命、金币、遗物、卡组与每个选项的代价和收益。</p></div></div>`
+    : rec
+      ? `<div class="event-reason"><div class="eyebrow">${sourceLabel}</div><h2>建议选择：${escapeHtml(rec.primary.label)}</h2><p>${escapeHtml(rec.reason)}</p></div>`
+      : `<div class="agent-thinking"><span></span><div><strong>等待 Agent 分析</strong><p>已收到事件选项，正在准备建议。</p></div></div>`;
+  return `<div class="event-layout"><section class="panel event-offer"><div class="draft-kicker">EVENT / LIVE CHOICE</div><h2 class="draft-title">${escapeHtml(event.title)}</h2><p class="event-description">${escapeHtml(event.description)}</p><div class="event-options">${options || '<div class="data-empty">正在读取事件选项。</div>'}</div></section><section class="panel event-side"><div class="panel-heading"><span class="panel-title">事件建议</span><span class="panel-meta">${thinking ? '分析中' : rec ? sourceLabel : '等待数据'}</span></div>${analysis}<div class="deck-stat"><span>生命</span><strong>${state.player.hp || 0} / ${state.player.maxHp || 0}</strong></div><div class="deck-stat"><span>金币</span><strong>${state.player.gold || 0}</strong></div><div class="deck-stat"><span>遗物</span><strong>${state.player.relics?.length || 0}</strong></div><div class="data-empty" style="margin-top:18px">GameBuddy 只给建议，不会替你点击事件选项。</div></section></div>`;
+}
+
 function atRestSite(run = state.run, combat = state.combat) {
   if (combat) return false;
   const room = String(run?.room || '');
@@ -127,7 +152,23 @@ function restView() {
 }
 
 function draftView() {
-  return `<div class="draft-layout"><section class="panel draft-offer"><div class="draft-kicker">REWARD / CARD REWARD</div><h2 class="draft-title">等待真实卡牌奖励</h2><div class="data-empty large-empty">进入奖励界面后，Mod 会把游戏提供的卡牌传给这里，再生成选牌建议。</div></section><section class="panel draft-side"><div class="panel-heading"><span class="panel-title">当前卡组</span><span class="panel-meta">${state.player.cards.length ? `${state.player.cards.length} 张` : '等待数据'}</span></div><div class="deck-stat"><span>卡牌</span><strong>${state.player.cards.length || '--'}</strong></div><div class="deck-stat"><span>遗物</span><strong>${state.player.relics.length || '--'}</strong></div><div class="deck-stat"><span>药水</span><strong>${state.player.potions.length || '--'}</strong></div></section></div>`;
+  const reward = state.cardReward || { options: [] };
+  const options = Array.isArray(reward.options) ? reward.options : [];
+  const rec = state.recommendation?.task === 'card_reward' ? state.recommendation : null;
+  const thinking = state.agentStatus?.status === 'thinking' && state.agentStatus?.task === 'card_reward';
+  const sourceLabel = rec?.source === 'llm' ? 'KIMI AGENT' : '规则保底';
+  const optionCards = options.map((card, arrayIndex) => {
+    const index = Number.isInteger(card.index) ? card.index : arrayIndex;
+    const recommended = rec?.primary?.cardIndex === index;
+    const description = String(card.description || '牌面描述暂不可用。').replace(/\[\/?[^\]]+\]/g, '').trim();
+    return `<article class="draft-card ${recommended ? 'top-pick' : ''}"><span class="pick-tag">${recommended ? 'Agent 建议' : `第 ${index + 1} 张`}</span><div class="card-name">${escapeHtml(card.name)}</div><div class="card-meta">${escapeHtml(card.type)} · ${card.cost ?? 'X'} 费${card.upgraded ? ' · 已升级' : ''}</div><p>${escapeHtml(description)}</p></article>`;
+  }).join('');
+  const analysis = thinking
+    ? `<div class="agent-thinking"><span></span><div><strong>Agent 正在分析卡牌奖励</strong><p>正在比较每张牌的效果、费用、卡组缺口和后续战斗价值。</p></div></div>`
+    : rec
+      ? `<div class="event-reason"><div class="eyebrow">${sourceLabel}</div><h2>建议选第 ${Number(rec.primary.cardIndex) + 1} 张：${escapeHtml(rec.primary.cardName)}</h2><p>${escapeHtml(rec.reason)}</p></div>`
+      : `<div class="agent-thinking"><span></span><div><strong>等待 Agent 分析</strong><p>已读取候选卡牌，正在准备选牌建议。</p></div></div>`;
+  return `<div class="draft-layout"><section class="panel draft-offer"><div class="draft-kicker">REWARD / CARD REWARD</div><h2 class="draft-title">${rec ? `建议选择第 ${Number(rec.primary.cardIndex) + 1} 张` : '这三张牌怎么选？'}</h2>${analysis}<div class="draft-cards">${optionCards || '<div class="data-empty large-empty">正在读取真实卡牌奖励。</div>'}</div><div class="data-empty" style="margin-top:18px">GameBuddy 只给建议，不会替你点击选牌。</div></section><section class="panel draft-side"><div class="panel-heading"><span class="panel-title">当前卡组</span><span class="panel-meta">${state.player.cards.length ? `${state.player.cards.length} 张` : '等待数据'}</span></div><div class="deck-stat"><span>卡牌</span><strong>${state.player.cards.length || '--'}</strong></div><div class="deck-stat"><span>遗物</span><strong>${state.player.relics.length || '--'}</strong></div><div class="deck-stat"><span>药水</span><strong>${state.player.potions.length || '--'}</strong></div><div class="deck-stat"><span>候选牌</span><strong>${options.length || '--'}</strong></div><div class="data-empty" style="margin-top:18px">推荐会结合当前卡组、生命、遗物和牌面描述判断。</div></section></div>`;
 }
 
 const MAP_TYPE_LABELS = {
@@ -190,7 +231,8 @@ function routeView() {
     const recommended = Boolean(rec && sameRoute(route, rec.primary.route));
     return `<div class="route-choice${recommended ? ' recommended' : ''}"><strong>${recommended ? '建议路线' : `路线 ${String(index + 1).padStart(2, '0')}`}</strong><span>${escapeHtml(labels)}</span></div>`;
   }).join('');
-  const title = rec?.primary?.label ? `下一步：${escapeHtml(rec.primary.label)}` : state.run.currentNode ? mapTypeLabel(state.run.currentNode) : '等待地图状态';
+  const targetPosition = rec?.primary?.targetPosition ? `${rec.primary.targetPosition}` : '';
+  const title = rec?.primary?.label ? `下一步：${escapeHtml(targetPosition)}${escapeHtml(rec.primary.label)}` : state.run.currentNode ? mapTypeLabel(state.run.currentNode) : '等待地图状态';
   const reason = rec?.reason ? escapeHtml(rec.reason) : (nodes.length
     ? `本层 ${nodes.length} 个节点，从当前位置出发有 ${routes.length} 条可达 Boss 的路线${map.routesTruncated ? '（已截断）' : ''}。`
     : '启动游戏并打开地图后，这里会显示真实位置和全部路线。');
@@ -249,6 +291,7 @@ function render() {
   const copy = {
     combat: ['COMBAT / LIVE STATE', '战斗数据在同步', '出牌顺序先不做。这里只显示真实手牌和敌人，路线建议在地图页。'],
     draft: ['REWARD / CARD REWARD', '这张牌值得拿吗？', '把卡组当前缺口、未来路线和战斗表现放在一起判断。'],
+    event: ['EVENT / LIVE CHOICE', '这个事件怎么选？', 'Agent 会比较每个选项的即时收益、代价与对当前卡组的长期影响。'],
     route: showingRest()
       ? ['REST / CAMPFIRE', '回血还是升级？', '根据生命缺口、后续精英和未升级的牌，给出休息处选择。']
       : ['MAP / ACT ' + String(state.run.act || 1).padStart(2, '0'), '下一步往哪里走？', '把战斗风险、卡组成长和遗物收益，压缩成一条可执行的路线。']
@@ -256,7 +299,9 @@ function render() {
   document.querySelector('#page-eyebrow').textContent = copy[0];
   document.querySelector('#page-title').textContent = copy[1];
   document.querySelector('#page-description').textContent = copy[2];
-  viewContainer.innerHTML = showingRest()
+  viewContainer.innerHTML = showingEvent()
+    ? eventView()
+    : showingRest()
     ? restView()
     : state.mode === 'combat' ? combatView()
     : state.mode === 'draft' ? (state.decision ? codexOptionsView('reward', COPY.draft[1]) : draftView())
@@ -354,6 +399,8 @@ function applyBridgeState(next) {
   if (next.run) state.run = { ...state.run, ...next.run };
   if (next.player) state.player = { ...state.player, ...next.player };
   state.map = next.map || { visited: [] };
+  state.event = next.event || null;
+  state.cardReward = next.cardReward || null;
   const incomingCombat = next.combat;
   state.combat = incomingCombat ? {
     ...incomingCombat,
@@ -380,8 +427,14 @@ function applyBridgeState(next) {
   }
   state.selectedCard = '';
   state.syncedAt = Date.now();
-  if (atRestSite(next.run, state.combat)) state.mode = 'route';
-  if (state.mode === 'combat' || state.mode === 'route') render();
+  if (showingEvent()) {
+    state.mode = 'event';
+    if (state.recommendation?.task !== 'event_choice') state.recommendation = null;
+  } else if (state.cardReward?.options?.length) {
+    state.mode = 'draft';
+    if (state.recommendation?.task !== 'card_reward') state.recommendation = null;
+  } else if (atRestSite(next.run, state.combat)) state.mode = 'route';
+  if (state.mode === 'combat' || state.mode === 'route' || state.mode === 'event' || state.mode === 'draft') render();
 }
 
 setInterval(() => {
@@ -396,6 +449,7 @@ window.gamebuddyBridge?.onState(applyBridgeState);
 window.gamebuddyBridge?.onEvent(event => {
   if (event.name === 'card.reward.opened') {
     state.mode = 'draft';
+    state.recommendation = null;
     render();
     showToast('发现新的卡牌奖励');
   }
@@ -409,6 +463,12 @@ window.gamebuddyBridge?.onEvent(event => {
     render();
     showToast('休息处：回血还是升级');
   }
+  if (event.name === 'event.opened') {
+    state.mode = 'event';
+    state.recommendation = null;
+    render();
+    showToast('发现事件选项，Agent 正在分析');
+  }
 });
 window.gamebuddyBridge?.onObservation(observation => {
   if (!observation || !observation.decision) return;
@@ -416,10 +476,24 @@ window.gamebuddyBridge?.onObservation(observation => {
   if (state.mode === 'draft' || state.mode === 'event') render();
 });
 window.gamebuddyBridge?.onRecommendation(recommendation => {
-  if (!recommendation || (recommendation.task !== 'map_route' && recommendation.task !== 'rest_site')) return;
+  if (!recommendation || !['map_route', 'rest_site', 'event_choice', 'card_reward'].includes(recommendation.task)) return;
   state.recommendation = recommendation;
   if (recommendation.task === 'rest_site') state.mode = 'route';
-  if (state.mode === 'route') render();
+  if (recommendation.task === 'event_choice') state.mode = 'event';
+  if (recommendation.task === 'card_reward') state.mode = 'draft';
+  if (state.mode === 'route' || state.mode === 'event' || state.mode === 'draft') render();
+});
+window.gamebuddyBridge?.onAgentStatus(status => {
+  state.agentStatus = status || { status: 'idle', task: null };
+  if (status?.status === 'thinking' && status.task === 'event_choice') {
+    state.mode = 'event';
+    state.recommendation = null;
+  }
+  if (status?.status === 'thinking' && status.task === 'card_reward') {
+    state.mode = 'draft';
+    state.recommendation = null;
+  }
+  if (state.mode === 'event' || state.mode === 'draft') render();
 });
 window.gamebuddyBridge?.onStatus(status => {
   setBridgeStatus(status);

@@ -78,6 +78,18 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
 
 `combat` 在非战斗房间可以为 `null`；在战斗中必须包含手牌、三类牌堆和敌人数组。
 
+卡牌奖励界面打开时，`cardReward` 为非空，候选牌的 `index` 是奖励界面中的零基数组下标。桌面端展示时会转换为用户可见的“第 N 张”，推荐只指出应选哪一张，不会自动点击。
+
+```json
+{
+  "cardReward": {
+    "options": [
+      { "index": 0, "id": "Bash", "name": "痛击", "type": "Attack", "cost": 2, "upgraded": false, "description": "造成伤害。" }
+    ]
+  }
+}
+```
+
 `map.nodes` 是当前 Act 的完整 DAG。节点 `id` 为 `"row,col"`，`children` 是下一层可走节点。`type` 取值：`Monster`、`Elite`、`Unknown`、`Shop`、`Treasure`、`RestSite`、`Boss`、`Ancient`、`Unassigned`。`Unknown` 就是问号，走进去之前不会揭示具体事件。`map.routes` 是从 `current`（没有当前位置时从 `start`）沿 `children` 走到 Boss 的全部路径，最多 256 条；超出时 `routesTruncated` 为 `true`。后续路线推荐应消费这份图，而不是再去读游戏内存。
 
 ## 事件消息
@@ -96,7 +108,7 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
 - `rest.opened`
 - `combat.ended`
 
-`card.played` 和 `card.reward.opened` 会在 Mod 接入对应 STS2 生命周期 Hook 后加入；桌面端协议已经预留这些事件。
+`card.played` 和 `card.reward.opened` 会在对应 STS2 界面或生命周期出现时加入；`card.reward.opened` 的完整候选牌仍以同一时刻的 `state.cardReward.options` 为准。
 
 ## Bridge 状态
 
@@ -131,7 +143,7 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
 
 ## Agent 建议
 
-主进程里的 `agent/` 消费 `gamebuddy.observation.v1`，产出 `gamebuddy.recommendation.v1`。当前实现路线任务 `map_route` 和休息处任务 `rest_site`；战斗出牌 `combat_play` 暂缓。没有配置 LLM 时用规则打分：每个节点拆成**收益**和**风险**。精英按遗物缺口和生命评估；火堆同时计算回血和未升级牌的敲升级价值；商店按金币、卡组厚度和打击/防御数量计算删牌与购物。同一条路上精英后面有火堆时会加协同分。进入休息处后会单独建议 **回血还是升级哪一张牌**。有 OpenAI 兼容接口时再让模型在前 5 条里解释和改选。
+主进程里的 `agent/` 消费 `gamebuddy.observation.v1`，产出 `gamebuddy.recommendation.v1`。当前实现路线任务 `map_route`、休息处任务 `rest_site`、事件任务 `event_choice` 和战斗后选牌任务 `card_reward`；战斗出牌 `combat_play` 暂缓。路线推荐采用简单、可解释的规则：优先选择可达路线上的**精英数量**，再比较**火堆数量**，完全相同时才用生命、金币和卡组等上下文分数处理平局。路线任务固定由规则引擎决定，不交给 LLM 改选。进入休息处后会单独建议 **回血还是升级哪一张牌**；卡牌奖励会把真实牌面候选传给 Agent，推荐具体的候选下标和理由。
 
 ```json
 {
@@ -153,7 +165,25 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
 
 `fresh=false` 时不发新建议。应用只展示建议，不会替玩家点地图。
 
-LLM 默认读取本机 Codex CLI 配置（`~/.codex/config.toml`、`~/.codex/auth.json`）。环境变量 `GAMEBUDDY_LLM_BASE_URL`、`GAMEBUDDY_LLM_API_KEY`、`GAMEBUDDY_LLM_MODEL`、`GAMEBUDDY_LLM_WIRE_API` 可以覆盖。`wire_api = "responses"` 时请求 `/v1/responses`。
+卡牌奖励建议格式：
+
+```json
+{
+  "schema": "gamebuddy.recommendation.v1",
+  "task": "card_reward",
+  "source": "rules",
+  "confidence": 0.65,
+  "reason": "当前卡组缺少稳定防御，建议选择这张牌。",
+  "primary": {
+    "action": "CHOOSE_CARD",
+    "cardIndex": 1,
+    "cardId": "ExampleCard",
+    "cardName": "示例牌"
+  }
+}
+```
+
+LLM 只读取项目 `.env` 中的环境变量：`GAMEBUDDY_LLM_BASE_URL`、`GAMEBUDDY_LLM_API_KEY`、`GAMEBUDDY_LLM_MODEL`、`GAMEBUDDY_LLM_WIRE_API` 和 `GAMEBUDDY_LLM_REASONING_EFFORT`。`GAMEBUDDY_LLM_WIRE_API=responses` 时请求 `/v1/responses`。
 
 ## 接入边界
 

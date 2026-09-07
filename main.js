@@ -29,7 +29,8 @@ if (llmConfig.enabled) {
 }
 const orchestrator = createOrchestrator({
   llm: createOpenAiClient(llmConfig),
-  onRecommendation: recommendation => broadcast('bridge-recommendation', recommendation)
+  onRecommendation: recommendation => broadcast('bridge-recommendation', recommendation),
+  onAgentStatus: status => broadcast('agent-status', status)
 });
 
 function withRoutableState(state) {
@@ -137,7 +138,7 @@ function connectBridge() {
         if (result.accepted) broadcast('bridge-observation', observation);
         void considerObservation(observation, {
           force: result.kind === 'duplicate'
-            || (result.kind === 'event' && (result.event?.name === 'map.opened' || result.event?.name === 'rest.opened'))
+            || (result.kind === 'event' && (result.event?.name === 'map.opened' || result.event?.name === 'rest.opened' || result.event?.name === 'event.opened'))
         });
       }
     } catch (error) {
