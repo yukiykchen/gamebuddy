@@ -105,9 +105,13 @@ function deckContext(state, knowledge) {
   const cards = knowledge.deckCards || state?.player?.cards || [];
   const facts = cards.map(cardFacts);
   const counts = new Map();
+  const tagCounts = new Map();
   for (const card of cards) {
     const key = normalizeKey(card.id || card.name);
     if (key) counts.set(key, (counts.get(key) || 0) + 1);
+    for (const tag of card.evaluation?.mechanicTags || []) {
+      tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
+    }
   }
   return {
     size: cards.length,
@@ -117,6 +121,7 @@ function deckContext(state, knowledge) {
     draw: facts.reduce((sum, fact) => sum + fact.draw, 0),
     blockCards: facts.filter(fact => fact.block > 0).length,
     counts,
+    tagCounts,
     act: numeric(state?.run?.act) || 1
   };
 }
@@ -191,6 +196,18 @@ function analyzeCard(card, state, context, threats, coachItem) {
     } else if (knowledgePrior < 35) {
       cons.push('基础数据表现偏低，需要明确的牌组协同才能发挥');
     }
+  }
+
+  const synergyTags = ['poison', 'shiv', 'discard', 'exhaust', 'strength', 'self_damage', 'vulnerable', 'orb', 'doom', 'summon', 'stars', 'forge', 'replay', 'retain'];
+  const matchedSynergies = (card.evaluation?.mechanicTags || [])
+    .filter(tag => synergyTags.includes(tag))
+    .map(tag => ({ tag, count: context.tagCounts.get(tag) || 0 }))
+    .filter(item => item.count > 0)
+    .sort((left, right) => right.count - left.count);
+  if (matchedSynergies.length) {
+    const best = matchedSynergies[0];
+    score += Math.min(8, 2 + best.count * 1.5);
+    pros.push(`与牌组已有的 ${best.count} 张「${best.tag}」相关牌形成协同`);
   }
 
   if (facts.damage) {
@@ -291,6 +308,7 @@ function analyzeCard(card, state, context, threats, coachItem) {
     cons: cons.slice(0, 3),
     scenarios: [...new Set(scenarios)].slice(0, 4),
     fit: { boss: fit.boss, elite: fit.elite },
+    knowledgeEvaluation: card.evaluation?.advice || null,
     stats: coachItem ? {
       archetypeDelta: coachItem.commitment_delta ?? null,
       winnerSupport: coachItem.winner_support ?? null,
@@ -373,6 +391,14 @@ async function recommendCardReward(observation, { llm, now = Date.now(), codex =
         eliteSoon: threats.eliteSoon,
         bossSoon: threats.bossSoon,
         archetype: knowledge.coach?.target?.name || null,
+        nextBoss: reward.context?.nextBoss || null,
+        defeatedEnemies: reward.context?.defeatedEnemies || [],
+        deck: (knowledge.deckCards || []).map(card => ({
+          id: card.id || card.name,
+          name: card.name || card.id,
+          upgraded: Boolean(card.upgraded)
+        })),
+        relics: (knowledge.relics || []).map(relic => ({ id: relic.id || relic.name, name: relic.name || relic.id })),
         candidates: candidates.map((candidate, index) => candidate.action === 'SKIP'
           ? { index, action: 'SKIP', score: candidate.score }
           : {
@@ -383,6 +409,7 @@ async function recommendCardReward(observation, { llm, now = Date.now(), codex =
               score: candidate.score,
               pros: candidate.card.pros,
               cons: candidate.card.cons,
+              knowledgeEvaluation: candidate.card.knowledgeEvaluation,
               bossFit: candidate.card.fit.boss,
               eliteFit: candidate.card.fit.elite
             })

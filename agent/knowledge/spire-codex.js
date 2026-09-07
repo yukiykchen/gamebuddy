@@ -54,7 +54,8 @@ function attachEvaluation(card) {
       prior: evaluation.prior,
       community: evaluation.community,
       expertConsensus: evaluation.expertConsensus,
-      mechanicTags: evaluation.mechanicTags
+      mechanicTags: evaluation.mechanicTags,
+      advice: evaluation.evaluation || null
     }
   };
 }
@@ -114,7 +115,7 @@ function createSpireCodexClient({
     try {
       const catalogs = await loadCatalogs();
       const cards = (reward.cards || []).map(card => attachEvaluation(resolveItem(card, catalogs.cardIndex)));
-      const deckCards = (state?.player?.cards || []).map(card => resolveItem(card, catalogs.cardIndex));
+      const deckCards = (state?.player?.cards || []).map(card => attachEvaluation(resolveItem(card, catalogs.cardIndex)));
       const relics = (state?.player?.relics || []).map(relic => resolveItem(relic, catalogs.relicIndex));
       const offerIds = cards.map(card => card.id).filter(Boolean);
       const deckIds = [...new Set(deckCards.map(card => card.id).filter(Boolean))];
@@ -147,7 +148,7 @@ function createSpireCodexClient({
         available: false,
         source: 'bridge',
         cards: (reward.cards || []).map(card => attachEvaluation(typeof card === 'string' ? { id: card, name: card } : card)),
-        deckCards: state?.player?.cards || [],
+        deckCards: (state?.player?.cards || []).map(card => attachEvaluation(typeof card === 'string' ? { id: card, name: card } : card)),
         relics: state?.player?.relics || [],
         coach: null
       };

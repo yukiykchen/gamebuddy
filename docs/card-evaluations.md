@@ -33,6 +33,11 @@
 - `community`：Spire Codex 社区统计快照。
 - `expertConsensus`：多个高手 Tier 的归一化信号和证据链接。
 - `mechanicTags`：伤害、格挡、抽牌、回能、AOE、成长、控制等机械标签。
+- `evaluation`：每张牌必有的可解释评价对象，包含 `rank`、`expertSummary`、`goodWhen`、`badWhen` 和 `sourceTimestamp`。
+
+`evaluation.expertSummary` 是 GameBuddy 根据同版本专家档位、社区数据、卡牌文本和机制生成的原创中文归纳，不是专家逐字原话。存在同版本专家记录时，`sourceType` 为 `expert-tier+synthesis` 并保留视频时间点；没有专家记录时会明确标记为社区数据或机制综合评价，`sourceTimestamp` 为 `null`，不会伪造专家出处。
+
+奖励选择时，Agent 不会直接按 `rank` 取最高档，而是逐张检查 `goodWhen` 和 `badWhen` 是否与当前完整牌组、升级状态、遗物、生命、章节、路线、精英和 Boss 相符。规则层计算已成型标签协同，启用模型时再对三张候选和“跳过”进行一次受限复核。
 
 当社区数据和高手评价都存在时，基础先验暂按 `70% × Codex Score + 30% × 高手 Tier 归一化分` 计算。这个权重只是保守初值，后续应通过历史选牌回测校准。
 

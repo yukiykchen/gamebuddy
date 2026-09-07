@@ -143,7 +143,7 @@ function createOpenAiClient(config = readLlmConfig(), { fetchImpl = globalThis.f
       payload
     ),
     completeCardReward: payload => completeJson(
-      '你是杀戮尖塔 2 的选牌顾问。结合当前牌组厚度、流派、章节、生命、近期精英/Boss，以及每张候选牌的优缺点做选择。允许选择 SKIP，避免为了拿牌而拿牌。只能从候选列表中选择，不能发明卡牌或数值。用 JSON 回答：{"index":0,"reason":"两句中文解释，说明为什么适合当前局面以及相对其他选项的优势"}。',
+      '你是杀戮尖塔 2 的选牌顾问。逐张核对候选牌的知识库 rank、expertSummary、goodWhen、badWhen，再与实际完整牌组、升级状态、遗物、章节、生命、下一位 Boss 和近期精英对照。知识库评价只是单卡先验；条件不满足时必须降低它的价值，已有核心协同时应提高价值。允许选择 SKIP，避免为了拿牌而拿牌。只能从候选列表中选择，不能发明卡牌或数值。用 JSON 回答：{"index":0,"reason":"两句中文解释，说明当前局面满足或不满足哪些拿取条件，以及相对其他选项的优势"}。',
       payload
     )
   };

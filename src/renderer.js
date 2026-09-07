@@ -145,9 +145,13 @@ function draftView() {
     const cons = (card.cons || []).slice(0, 2).map(item => `<li>${escapeHtml(item)}</li>`).join('');
     const boss = card.fit?.boss;
     const elite = card.fit?.elite;
+    const knowledge = card.knowledgeEvaluation;
     const fitClass = level => level === '强' ? 'strong' : level === '中' ? 'medium' : 'weak';
     const fit = boss || elite
       ? `<div class="draft-fit"><span class="fit-${fitClass(elite?.level)}">精英 ${escapeHtml(elite?.level || '--')}</span><span class="fit-${fitClass(boss?.level)}">Boss ${escapeHtml(boss?.level || '--')}</span></div>`
+      : '';
+    const knowledgeHtml = knowledge
+      ? `<div class="card-knowledge"><div class="knowledge-head"><span>${escapeHtml(knowledge.rank || '未评级')}</span><strong>${escapeHtml(knowledge.sourceName || 'GameBuddy')}</strong></div><p>${escapeHtml(knowledge.expertSummary || '')}</p><div class="knowledge-condition good">适合：${escapeHtml((knowledge.goodWhen || []).slice(0, 2).join('；'))}</div><div class="knowledge-condition bad">慎拿：${escapeHtml((knowledge.badWhen || []).slice(0, 2).join('；'))}</div>${knowledge.sourceTimestamp ? `<div class="knowledge-source">${escapeHtml(knowledge.gameVersion || '')} · 来源时间点 ${escapeHtml(knowledge.sourceTimestamp)}</div>` : `<div class="knowledge-source">${escapeHtml(knowledge.gameVersion || '')} · 无专家时间点，使用社区/机制综合评价</div>`}</div>`
       : '';
     return `<article class="draft-card ${recommended ? 'top-pick' : ''}" data-card="${escapeHtml(card.name || card.id)}">
       <div class="draft-card-head"><span class="pick-tag">${recommended ? '首选' : rec ? `第 ${index + 1} 位` : '分析中'}</span><strong>${Number.isFinite(card.score) ? card.score : '--'}</strong></div>
@@ -155,6 +159,7 @@ function draftView() {
       <div class="draft-card-meta">${escapeHtml(card.type || '未知')} · ${escapeHtml(card.rarity || '未知')} · ${card.cost === null ? 'X' : escapeHtml(card.cost ?? '?')} 费</div>
       <p>${escapeHtml(card.description || '正在从 Spire Codex 获取卡牌说明与对局统计。')}</p>
       ${fit}
+      ${knowledgeHtml}
       ${pros || cons ? `<ul class="draft-notes">${pros}${cons}</ul>` : ''}
     </article>`;
   }).join('');

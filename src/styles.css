@@ -184,6 +184,15 @@ h1 { margin: 9px 0 7px; color: var(--cream); font: 500 30px Georgia, "Songti SC"
 .draft-fit span { padding: 4px 6px; border: 1px solid #4a5050; color: #929b99; font-size: 9px; }
 .draft-fit .fit-strong { border-color: #688d7d; color: var(--mint); }
 .draft-fit .fit-medium { border-color: #806d48; color: var(--amber); }
+.card-knowledge { margin-top: 12px; padding: 10px; border: 1px solid #3e4542; background: #1d2220; }
+.knowledge-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.knowledge-head span { padding: 2px 6px; border: 1px solid #806d48; color: var(--amber); font-size: 9px; font-weight: 700; }
+.knowledge-head strong { overflow: hidden; color: #8f9894; font-size: 8px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+.card-knowledge p { margin-top: 8px; color: #c0b8aa; font-size: 9px; }
+.knowledge-condition { margin-top: 7px; color: #9da59f; font-size: 8px; line-height: 1.5; }
+.knowledge-condition.good { color: #8fb9a5; }
+.knowledge-condition.bad { color: #b28b82; }
+.knowledge-source { margin-top: 7px; color: #716e68; font-size: 8px; }
 .draft-notes { margin: 12px 0 0; padding: 0; list-style: none; }
 .draft-notes li { position: relative; margin-top: 7px; padding-left: 11px; color: #958f86; font-size: 9px; line-height: 1.45; }
 .draft-notes li::before { content: "−"; position: absolute; left: 0; color: #a66e63; }
