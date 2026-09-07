@@ -15,6 +15,7 @@ using MegaCrit.Sts2.Core.Logging;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.MonsterMoves.Intents;
 using MegaCrit.Sts2.Core.Map;
+using MegaCrit.Sts2.Core.Nodes.Cards.Holders;
 using MegaCrit.Sts2.Core.Nodes.Screens.Map;
 using MegaCrit.Sts2.Core.Runs;
 
@@ -36,6 +37,10 @@ public static class GameBuddyExporter
     private static int _lastTurn = -1;
     private static bool _wasMapVisible;
     private static bool _wasAtRest;
+    private static Node? _activeCardRewardScreen;
+    private static string _lastCardRewardSignature = string.Empty;
+    private static List<string> _lastCombatEnemies = new();
+    private static string? _lastCombatNodeType;
 
     public static void Initialize(string modDirectory)
     {
@@ -93,6 +98,12 @@ public static class GameBuddyExporter
                 _server?.BroadcastState(json);
             }
 
+            if (snapshot.Combat is not null)
+            {
+                _lastCombatEnemies = snapshot.Combat.Enemies.Select(enemy => enemy.Name).ToList();
+                _lastCombatNodeType = snapshot.Run.CurrentNode ?? snapshot.Run.Room;
+            }
+            PublishCardRewardIfReady(snapshot);
             PublishTransitions(snapshot);
         }
         catch (Exception ex)
@@ -129,6 +140,87 @@ public static class GameBuddyExporter
     {
         var message = JsonSerializer.Serialize(new BridgeEvent("event", name, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), data), JsonOptions);
         _server?.BroadcastEvent(message);
+    }
+
+    public static void TrackCardRewardScreen(Node screen)
+    {
+        _activeCardRewardScreen = screen;
+        _lastCardRewardSignature = string.Empty;
+    }
+
+    public static void ClearCardRewardScreen(Node screen)
+    {
+        if (ReferenceEquals(_activeCardRewardScreen, screen))
+        {
+            _activeCardRewardScreen = null;
+            _lastCardRewardSignature = string.Empty;
+        }
+    }
+
+    private static void PublishCardRewardIfReady(GameBuddyState snapshot)
+    {
+        var screen = _activeCardRewardScreen;
+        if (screen is null || !GodotObject.IsInstanceValid(screen))
+        {
+            _activeCardRewardScreen = null;
+            return;
+        }
+
+        var cards = new List<CardModel>();
+        CollectRewardCards(screen, cards, 0);
+        var unique = cards
+            .Where(card => card is not null && !string.IsNullOrWhiteSpace(card.Id.Entry))
+            .GroupBy(card => card.Id.Entry, StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.First())
+            .Take(6)
+            .ToList();
+        if (unique.Count == 0)
+        {
+            return;
+        }
+
+        var mapped = MapCards(unique);
+        var signature = string.Join("|", mapped.Select(card => $"{card.Id}:{card.Upgraded}"));
+        if (string.Equals(signature, _lastCardRewardSignature, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        _lastCardRewardSignature = signature;
+        PublishEvent("card.reward.opened", new
+        {
+            cards = mapped,
+            canSkip = true,
+            source = "combat",
+            context = new
+            {
+                act = snapshot.Run.Act,
+                floor = snapshot.Run.Floor,
+                defeatedType = _lastCombatNodeType,
+                defeatedEnemies = _lastCombatEnemies
+            }
+        });
+    }
+
+    private static void CollectRewardCards(Node node, List<CardModel> cards, int depth)
+    {
+        if (depth > 15)
+        {
+            return;
+        }
+
+        foreach (var child in node.GetChildren())
+        {
+            if (child is NCardHolder holder && holder.CardModel is not null)
+            {
+                cards.Add(holder.CardModel);
+                continue;
+            }
+            if (child is Node childNode)
+            {
+                CollectRewardCards(childNode, cards, depth + 1);
+            }
+        }
     }
 
     private static GameBuddyState BuildSnapshot(RunState runState, Player player)

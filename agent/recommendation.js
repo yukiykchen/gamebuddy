@@ -26,6 +26,18 @@ function validateRecommendation(recommendation) {
       return { ok: false, reason: 'rest_site SMITH needs cardName' };
     }
   }
+  if (recommendation.task === 'card_reward') {
+    if (primary.action !== 'TAKE_CARD' && primary.action !== 'SKIP') {
+      return { ok: false, reason: 'card_reward action must be TAKE_CARD or SKIP' };
+    }
+    if (primary.action === 'TAKE_CARD') {
+      if (typeof primary.cardId !== 'string' || !primary.cardId) return { ok: false, reason: 'card_reward TAKE_CARD needs cardId' };
+      if (typeof primary.cardName !== 'string' || !primary.cardName) return { ok: false, reason: 'card_reward TAKE_CARD needs cardName' };
+    }
+    if (!Array.isArray(recommendation.options) || !recommendation.options.length) {
+      return { ok: false, reason: 'card_reward needs analyzed options' };
+    }
+  }
   if (recommendation.alternatives !== undefined) {
     if (!Array.isArray(recommendation.alternatives)) return { ok: false, reason: 'alternatives must be an array' };
   }

@@ -1,6 +1,7 @@
 const { validateRecommendation } = require('./recommendation');
 const { recommendRoute, routeSignature, ensureMapRoutes } = require('./tasks/route');
 const { isRestSite, recommendRest, restSignature } = require('./tasks/rest');
+const { findCardReward, recommendCardReward, cardRewardSignature } = require('./tasks/card-reward');
 const { createOpenAiClient, readLlmConfig } = require('./llm/openai');
 
 function hasRoutableMap(state) {
@@ -12,6 +13,7 @@ function selectTask(observation) {
   const state = observation?.state;
   if (!state) return null;
   if (!state.combat) {
+    if (findCardReward(observation)) return 'card_reward';
     const recent = observation.recentEvents || [];
     for (let i = recent.length - 1; i >= 0; i -= 1) {
       const name = recent[i]?.name;
@@ -25,6 +27,7 @@ function selectTask(observation) {
 }
 
 function signatureFor(task, state) {
+  if (task === 'card_reward') return '';
   if (task === 'rest_site') return restSignature(state);
   if (task === 'map_route') return routeSignature(state);
   return '';
@@ -45,14 +48,16 @@ function createOrchestrator({
     if (!task) return lastRecommendation;
     if (!observation?.fresh && !force && lastRecommendation) return lastRecommendation;
 
-    const signature = `${task}:${signatureFor(task, observation.state)}`;
+    const signature = `${task}:${task === 'card_reward' ? cardRewardSignature(observation) : signatureFor(task, observation.state)}`;
     if (!force && signature === lastSignature && lastRecommendation) return lastRecommendation;
 
     const current = ++generation;
     try {
-      const recommendation = task === 'rest_site'
-        ? await recommendRest(observation.state, { llm: client, now: now() })
-        : await recommendRoute(observation.state, { llm: client, now: now() });
+      const recommendation = task === 'card_reward'
+        ? await recommendCardReward(observation, { llm: client, now: now() })
+        : task === 'rest_site'
+          ? await recommendRest(observation.state, { llm: client, now: now() })
+          : await recommendRoute(observation.state, { llm: client, now: now() });
       if (current !== generation) return lastRecommendation;
       const validation = recommendation ? validateRecommendation(recommendation) : { ok: false };
       if (!validation.ok) return lastRecommendation;

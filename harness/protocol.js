@@ -1,6 +1,24 @@
 const SUPPORTED_SCHEMA = 'gamebuddy.state.v1';
 const SUPPORTED_EVENTS = new Set(['combat.started', 'turn.started', 'combat.ended', 'map.opened', 'rest.opened', 'card.played', 'card.reward.opened']);
 
+function validateReward(reward, prefix = 'reward') {
+  if (!reward || typeof reward !== 'object') return { ok: false, reason: `${prefix} must be an object` };
+  const cards = reward.cards || reward.offered || reward.options;
+  if (!Array.isArray(cards) || cards.length < 1 || cards.length > 6) {
+    return { ok: false, reason: `${prefix} cards must contain 1 to 6 entries` };
+  }
+  for (const card of cards) {
+    if (typeof card === 'string' && card) continue;
+    if (!card || typeof card !== 'object' || (!card.id && !card.name)) {
+      return { ok: false, reason: `${prefix} card entries need an id or name` };
+    }
+  }
+  if (reward.canSkip !== undefined && typeof reward.canSkip !== 'boolean') {
+    return { ok: false, reason: `${prefix}.canSkip must be a boolean` };
+  }
+  return { ok: true };
+}
+
 function validateState(state) {
   if (!state || typeof state !== 'object') return { ok: false, reason: 'state must be an object' };
   for (const field of ['schema', 'timestamp', 'source', 'run', 'player', 'combat']) {
@@ -45,6 +63,10 @@ function validateState(state) {
       if (!Array.isArray(route) || route.some(id => typeof id !== 'string')) return { ok: false, reason: 'map.routes entries must be id arrays' };
     }
   }
+  if (state.reward !== undefined && state.reward !== null) {
+    const validation = validateReward(state.reward, 'state.reward');
+    if (!validation.ok) return validation;
+  }
   for (const field of ['hp', 'maxHp', 'block', 'gold', 'energy', 'maxEnergy']) {
     if (!Number.isFinite(state.player[field])) return { ok: false, reason: `player.${field} is invalid` };
   }
@@ -66,6 +88,10 @@ function validateMessage(message) {
   if (message.type !== 'event') return { ok: false, reason: `unsupported message type ${message.type || 'missing'}` };
   if (typeof message.name !== 'string' || !SUPPORTED_EVENTS.has(message.name)) return { ok: false, reason: `unsupported event ${message.name || 'missing'}` };
   if (!Number.isFinite(message.timestamp)) return { ok: false, reason: 'event timestamp must be a number' };
+  if (message.name === 'card.reward.opened' && message.data !== undefined && message.data !== null) {
+    const validation = validateReward(message.data, 'card.reward.opened data');
+    if (!validation.ok) return validation;
+  }
   return { ok: true };
 }
 

@@ -1,4 +1,5 @@
 using Godot;
+using HarmonyLib;
 using MegaCrit.Sts2.Core.Logging;
 using MegaCrit.Sts2.Core.Modding;
 
@@ -14,6 +15,17 @@ public class Entry
         try
         {
             GameBuddyExporter.Initialize(modDirectory);
+
+            try
+            {
+                new Harmony("com.gamebuddy.bridge").PatchAll(typeof(Entry).Assembly);
+                GameBuddyDiagnostics.Write(modDirectory, "Harmony reward-screen patches applied");
+            }
+            catch (Exception ex)
+            {
+                GameBuddyDiagnostics.Write(modDirectory, $"Harmony reward-screen patches failed: {ex}");
+                Log.Warn($"[GameBuddyBridge] reward-screen patches failed: {ex.Message}");
+            }
 
             if (Engine.GetMainLoop() is not SceneTree tree)
             {

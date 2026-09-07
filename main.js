@@ -113,7 +113,7 @@ function connectBridge() {
         if (result.accepted) broadcast('bridge-observation', observation);
         void considerObservation(observation, {
           force: result.kind === 'duplicate'
-            || (result.kind === 'event' && (result.event?.name === 'map.opened' || result.event?.name === 'rest.opened'))
+            || (result.kind === 'event' && (result.event?.name === 'map.opened' || result.event?.name === 'rest.opened' || result.event?.name === 'card.reward.opened'))
         });
       }
     } catch (error) {

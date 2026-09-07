@@ -80,6 +80,21 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
 
 `map.nodes` 是当前 Act 的完整 DAG。节点 `id` 为 `"row,col"`，`children` 是下一层可走节点。`type` 取值：`Monster`、`Elite`、`Unknown`、`Shop`、`Treasure`、`RestSite`、`Boss`、`Ancient`、`Unassigned`。`Unknown` 就是问号，走进去之前不会揭示具体事件。`map.routes` 是从 `current`（没有当前位置时从 `start`）沿 `children` 走到 Boss 的全部路径，最多 256 条；超出时 `routesTruncated` 为 `true`。后续路线推荐应消费这份图，而不是再去读游戏内存。
 
+卡牌奖励也可以临时出现在状态的可选 `reward` 字段中。常规 Mod 通过下方事件发送，状态字段主要供其他适配器和回放使用：
+
+```json
+{
+  "reward": {
+    "cards": [
+      { "id": "ANGER", "name": "愤怒", "type": "Attack", "cost": 0, "upgraded": false }
+    ],
+    "canSkip": true,
+    "source": "combat",
+    "context": { "act": 1, "floor": 6, "defeatedType": "Elite", "defeatedEnemies": ["劫掠者"] }
+  }
+}
+```
+
 ## 事件消息
 
 事件采用统一的 WebSocket 消息格式：
@@ -96,7 +111,27 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
 - `rest.opened`
 - `combat.ended`
 
-`card.played` 和 `card.reward.opened` 会在 Mod 接入对应 STS2 生命周期 Hook 后加入；桌面端协议已经预留这些事件。
+`card.reward.opened` 在 `NCardRewardSelectionScreen` 打开或刷新时发送，`data.cards` 为当前可见候选牌；桌面端据此触发 `card_reward` Agent：
+
+```json
+{
+  "type": "event",
+  "name": "card.reward.opened",
+  "timestamp": 1723370000000,
+  "data": {
+    "cards": [
+      { "id": "ANGER", "name": "愤怒", "type": "Attack", "cost": 0, "upgraded": false },
+      { "id": "IRON_WAVE", "name": "铁斩波", "type": "Attack", "cost": 1, "upgraded": false },
+      { "id": "SHRUG_IT_OFF", "name": "耸肩无视", "type": "Skill", "cost": 1, "upgraded": false }
+    ],
+    "canSkip": true,
+    "source": "combat",
+    "context": { "act": 1, "floor": 6, "defeatedType": "Elite", "defeatedEnemies": ["劫掠者"] }
+  }
+}
+```
+
+`card.played` 仍待接入对应 STS2 生命周期 Hook。
 
 ## Bridge 状态
 
@@ -131,7 +166,13 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
 
 ## Agent 建议
 
-主进程里的 `agent/` 消费 `gamebuddy.observation.v1`，产出 `gamebuddy.recommendation.v1`。当前实现路线任务 `map_route` 和休息处任务 `rest_site`；战斗出牌 `combat_play` 暂缓。没有配置 LLM 时用规则打分：每个节点拆成**收益**和**风险**。精英按遗物缺口和生命评估；火堆同时计算回血和未升级牌的敲升级价值；商店按金币、卡组厚度和打击/防御数量计算删牌与购物。同一条路上精英后面有火堆时会加协同分。进入休息处后会单独建议 **回血还是升级哪一张牌**。有 OpenAI 兼容接口时再让模型在前 5 条里解释和改选。
+主进程里的 `agent/` 消费 `gamebuddy.observation.v1`，产出 `gamebuddy.recommendation.v1`。当前实现卡牌奖励 `card_reward`、路线 `map_route` 和休息处 `rest_site`；战斗出牌 `combat_play` 暂缓。
+
+卡牌奖励 Agent 会先读取 Spire Codex 公共 API 的简体中文卡牌数据，并调用 `/api/runs/pick-coach` 取得当前牌组/遗物对应的流派、相似胜局支持度和 offer-conditioned 拿取率。随后把这些社区统计与本局章节、牌组厚度、费用曲线、伤害/格挡/抽牌/能量、近期精英和 Boss 需求一起评分。每张候选牌都会输出优点、缺点、适用场景以及精英/Boss 适配度；三张都不能改善牌组时可以建议 `SKIP`。API 超时或不可用时自动退回本地规则，不阻塞选牌界面。
+
+Spire Codex API 默认地址为 `https://spire-codex.com/api`，可用 `GAMEBUDDY_SPIRE_CODEX_URL` 覆盖。GameBuddy 不复制 Spire Codex 的源码或整库数据。
+
+路线任务在没有配置 LLM 时用规则打分：每个节点拆成**收益**和**风险**。精英按遗物缺口和生命评估；火堆同时计算回血和未升级牌的敲升级价值；商店按金币、卡组厚度和打击/防御数量计算删牌与购物。同一条路上精英后面有火堆时会加协同分。进入休息处后会单独建议 **回血还是升级哪一张牌**。有 OpenAI 兼容接口时，模型只在规则生成的候选中复核选择和解释。
 
 ```json
 {

@@ -141,6 +141,10 @@ function createOpenAiClient(config = readLlmConfig(), { fetchImpl = globalThis.f
     completeRest: payload => completeJson(
       '你是杀戮尖塔 2 的休息处顾问。在回血和升级之间权衡：残血或后面有精英时优先回血；生命健康时升级核心牌，不要优先升打击和防御。只从给定候选里选一条。用 JSON 回答：{"index":0,"reason":"两句中文解释"}。',
       payload
+    ),
+    completeCardReward: payload => completeJson(
+      '你是杀戮尖塔 2 的选牌顾问。结合当前牌组厚度、流派、章节、生命、近期精英/Boss，以及每张候选牌的优缺点做选择。允许选择 SKIP，避免为了拿牌而拿牌。只能从候选列表中选择，不能发明卡牌或数值。用 JSON 回答：{"index":0,"reason":"两句中文解释，说明为什么适合当前局面以及相对其他选项的优势"}。',
+      payload
     )
   };
 }

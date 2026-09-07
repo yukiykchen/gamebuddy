@@ -5,6 +5,7 @@ const { createObservationStore } = require('./observation-store');
 const { validateRecommendation } = require('../agent/recommendation');
 const { rankRoutes, recommendRoute, scoreNode, scoreParts, buildScoreContext, ensureMapRoutes } = require('../agent/tasks/route');
 const { isRestSite, recommendRest, rankSmithCards } = require('../agent/tasks/rest');
+const { findCardReward, recommendCardReward } = require('../agent/tasks/card-reward');
 const { parseJsonObject, createOpenAiClient, readLlmConfig, extractResponseText } = require('../agent/llm/openai');
 const { loadCodexLlmConfig } = require('../agent/llm/codex-config');
 const { createOrchestrator } = require('../agent/orchestrator');
@@ -250,7 +251,44 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   });
   assert.equal(viaEvent.task, 'rest_site');
 
-  console.log('Agent route cases passed: 23');
+  const rewardObservation = {
+    schema: 'gamebuddy.observation.v1',
+    fresh: true,
+    state: mapState,
+    recentEvents: [{
+      name: 'card.reward.opened',
+      data: {
+        cards: [
+          { id: 'ANGER', name: '愤怒' },
+          { id: 'IRON_WAVE', name: '铁斩波' },
+          { id: 'BARRICADE', name: '壁垒' }
+        ],
+        canSkip: true,
+        context: { defeatedType: 'Elite' }
+      }
+    }]
+  };
+  const fakeCodex = {
+    loadDraftContext: async () => ({
+      source: 'spire-codex',
+      deckCards: mapState.player.cards,
+      relics: [],
+      coach: null,
+      cards: [
+        { id: 'ANGER', name: '愤怒', type_key: 'Attack', rarity_key: 'Common', cost: 0, damage: 6 },
+        { id: 'IRON_WAVE', name: '铁斩波', type_key: 'Attack', rarity_key: 'Common', cost: 1, damage: 5, block: 5 },
+        { id: 'BARRICADE', name: '壁垒', type_key: 'Power', rarity_key: 'Rare', cost: 3, description: '格挡不再在回合开始时失去。' }
+      ]
+    })
+  };
+  assert.equal(findCardReward(rewardObservation).cards.length, 3);
+  const rewardRec = await recommendCardReward(rewardObservation, { codex: fakeCodex, now: 14 });
+  assert.equal(validateRecommendation(rewardRec).ok, true);
+  assert.equal(rewardRec.task, 'card_reward');
+  assert.equal(rewardRec.options.length, 3);
+  assert.ok(rewardRec.options.every(card => card.fit?.boss && card.fit?.elite));
+
+  console.log('Agent recommendation cases passed: 28');
 }).catch(error => {
   console.error(error);
   process.exit(1);

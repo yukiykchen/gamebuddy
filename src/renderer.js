@@ -10,6 +10,7 @@ const state = {
   enemy: null,
   hand: [],
   map: { visited: [] },
+  reward: null,
   recommendation: null
 };
 
@@ -126,7 +127,49 @@ function restView() {
 }
 
 function draftView() {
-  return `<div class="draft-layout"><section class="panel draft-offer"><div class="draft-kicker">REWARD / CARD REWARD</div><h2 class="draft-title">等待真实卡牌奖励</h2><div class="data-empty large-empty">进入奖励界面后，Mod 会把游戏提供的卡牌传给这里，再生成选牌建议。</div></section><section class="panel draft-side"><div class="panel-heading"><span class="panel-title">当前卡组</span><span class="panel-meta">${state.player.cards.length ? `${state.player.cards.length} 张` : '等待数据'}</span></div><div class="deck-stat"><span>卡牌</span><strong>${state.player.cards.length || '--'}</strong></div><div class="deck-stat"><span>遗物</span><strong>${state.player.relics.length || '--'}</strong></div><div class="deck-stat"><span>药水</span><strong>${state.player.potions.length || '--'}</strong></div></section></div>`;
+  const rec = state.recommendation?.task === 'card_reward' ? state.recommendation : null;
+  const rawCards = state.reward?.cards || state.reward?.offered || state.reward?.options || [];
+  const options = rec?.options?.length
+    ? rec.options
+    : rawCards.map(card => typeof card === 'string' ? { id: card, name: card } : card);
+  if (!options.length) {
+    return `<div class="draft-layout"><section class="panel draft-offer"><div class="draft-kicker">REWARD / CARD REWARD</div><h2 class="draft-title">等待真实卡牌奖励</h2><div class="data-empty large-empty">战斗结束并打开选牌界面后，Mod 会同步候选牌、当前牌组与战斗上下文。</div></section><section class="panel draft-side"><div class="panel-heading"><span class="panel-title">当前卡组</span><span class="panel-meta">${state.player.cards.length ? `${state.player.cards.length} 张` : '等待数据'}</span></div><div class="deck-stat"><span>卡牌</span><strong>${state.player.cards.length || '--'}</strong></div><div class="deck-stat"><span>遗物</span><strong>${state.player.relics.length || '--'}</strong></div><div class="deck-stat"><span>药水</span><strong>${state.player.potions.length || '--'}</strong></div></section></div>`;
+  }
+
+  const primaryId = rec?.primary?.action === 'TAKE_CARD' ? String(rec.primary.cardId) : '';
+  const skipPick = rec?.primary?.action === 'SKIP';
+  const cardHtml = options.map((card, index) => {
+    const id = String(card.id || card.name || index);
+    const recommended = primaryId && id === primaryId;
+    const pros = (card.pros || []).slice(0, 2).map(item => `<li class="positive">${escapeHtml(item)}</li>`).join('');
+    const cons = (card.cons || []).slice(0, 2).map(item => `<li>${escapeHtml(item)}</li>`).join('');
+    const boss = card.fit?.boss;
+    const elite = card.fit?.elite;
+    const fitClass = level => level === '强' ? 'strong' : level === '中' ? 'medium' : 'weak';
+    const fit = boss || elite
+      ? `<div class="draft-fit"><span class="fit-${fitClass(elite?.level)}">精英 ${escapeHtml(elite?.level || '--')}</span><span class="fit-${fitClass(boss?.level)}">Boss ${escapeHtml(boss?.level || '--')}</span></div>`
+      : '';
+    return `<article class="draft-card ${recommended ? 'top-pick' : ''}" data-card="${escapeHtml(card.name || card.id)}">
+      <div class="draft-card-head"><span class="pick-tag">${recommended ? '首选' : rec ? `第 ${index + 1} 位` : '分析中'}</span><strong>${Number.isFinite(card.score) ? card.score : '--'}</strong></div>
+      <div class="card-name">${escapeHtml(card.name || card.id)}</div>
+      <div class="draft-card-meta">${escapeHtml(card.type || '未知')} · ${escapeHtml(card.rarity || '未知')} · ${card.cost === null ? 'X' : escapeHtml(card.cost ?? '?')} 费</div>
+      <p>${escapeHtml(card.description || '正在从 Spire Codex 获取卡牌说明与对局统计。')}</p>
+      ${fit}
+      ${pros || cons ? `<ul class="draft-notes">${pros}${cons}</ul>` : ''}
+    </article>`;
+  }).join('');
+  const title = skipPick
+    ? '建议跳过这次奖励'
+    : rec?.primary?.cardName
+      ? `建议拿「${escapeHtml(rec.primary.cardName)}」`
+      : '正在结合当前局势分析';
+  const reason = rec?.reason || '正在读取卡牌数据、当前牌组、遗物、路线与社区对局统计。';
+  const sourceLabel = rec
+    ? `${rec.source === 'llm' ? '模型复核' : '规则评分'} · ${rec.knowledgeSource === 'spire-codex' ? 'Spire Codex' : '桥接数据'}`
+    : '分析中';
+  const context = rec?.context || {};
+  const defeatedType = state.reward?.context?.defeatedType;
+  return `<div class="draft-layout"><section class="panel draft-offer"><div class="draft-kicker">REWARD / CARD REWARD</div><h2 class="draft-title">${title}</h2><p class="recommendation-reason">${escapeHtml(reason)}</p>${skipPick ? '<div class="skip-advice">跳过也是有效选择：避免弱牌稀释核心循环。</div>' : ''}<div class="draft-cards">${cardHtml}</div></section><section class="panel draft-side"><div class="panel-heading"><span class="panel-title">选牌依据</span><span class="panel-meta">${escapeHtml(sourceLabel)}</span></div><div class="deck-stat"><span>卡组厚度</span><strong>${state.player.cards.length || '--'} 张</strong></div><div class="deck-stat"><span>遗物</span><strong>${state.player.relics.length || '--'}</strong></div><div class="deck-stat"><span>当前生命</span><strong>${state.player.hp || '--'} / ${state.player.maxHp || '--'}</strong></div><div class="deck-stat"><span>近期精英</span><strong>${context.eliteSoon ? '有' : '未发现'}</strong></div><div class="deck-stat"><span>接近 Boss</span><strong>${context.bossSoon ? '是' : '否'}</strong></div><div class="deck-stat"><span>刚结束战斗</span><strong>${escapeHtml(defeatedType || '普通战斗')}</strong></div>${context.archetype ? `<div class="archetype-note"><span>当前流派</span><strong>${escapeHtml(context.archetype)}</strong></div>` : ''}<div class="data-empty draft-disclaimer">建议只辅助判断，不会替你点击卡牌。</div></section></div>`;
 }
 
 const MAP_TYPE_LABELS = {
@@ -231,7 +274,7 @@ function updateRunSummary() {
 }
 
 function bindViewActions() {
-  document.querySelectorAll('[data-card]').forEach(button => button.addEventListener('click', () => { state.selectedCard = button.dataset.card; render(); showToast(`已查看「${button.dataset.card}」，出牌建议稍后接入`); }));
+  document.querySelectorAll('[data-card]').forEach(button => button.addEventListener('click', () => { state.selectedCard = button.dataset.card; render(); showToast(state.mode === 'draft' ? `正在查看「${button.dataset.card}」的拿取分析` : `已查看「${button.dataset.card}」，出牌建议稍后接入`); }));
   document.querySelector('#open-route-view')?.addEventListener('click', () => { state.mode = 'route'; render(); });
   document.querySelector('#confirm-action')?.addEventListener('click', () => showToast('建议已记录，GameBuddy 不会自动操作游戏'));
   document.querySelector('#more-actions')?.addEventListener('click', () => showToast('其他方案将在决策引擎接入后显示'));
@@ -267,6 +310,7 @@ function setBridgeStatus(status) {
     state.combat = null;
     state.enemy = null;
     state.hand = [];
+    state.reward = null;
     state.selectedCard = '';
     state.recommendation = null;
     state.syncedAt = 0;
@@ -297,6 +341,7 @@ function applyBridgeState(next) {
   if (next.run) state.run = { ...state.run, ...next.run };
   if (next.player) state.player = { ...state.player, ...next.player };
   state.map = next.map || { visited: [] };
+  if (Object.prototype.hasOwnProperty.call(next, 'reward')) state.reward = next.reward;
   const incomingCombat = next.combat;
   state.combat = incomingCombat ? {
     ...incomingCombat,
@@ -322,9 +367,10 @@ function applyBridgeState(next) {
     }));
   }
   state.selectedCard = '';
+  if (next.combat) state.reward = null;
   state.syncedAt = Date.now();
   if (atRestSite(next.run, state.combat)) state.mode = 'route';
-  if (state.mode === 'combat' || state.mode === 'route') render();
+  if (state.mode === 'combat' || state.mode === 'route' || state.mode === 'draft') render();
 }
 
 setInterval(() => {
@@ -338,11 +384,14 @@ setBridgeStatus({ status: 'waiting' });
 window.gamebuddyBridge?.onState(applyBridgeState);
 window.gamebuddyBridge?.onEvent(event => {
   if (event.name === 'card.reward.opened') {
+    state.reward = event.data || null;
     state.mode = 'draft';
     render();
     showToast('发现新的卡牌奖励');
   }
   if (event.name === 'map.opened') {
+    state.reward = null;
+    if (state.recommendation?.task === 'card_reward') state.recommendation = null;
     state.mode = 'route';
     render();
     showToast('地图已打开，路线建议已准备');
@@ -354,10 +403,11 @@ window.gamebuddyBridge?.onEvent(event => {
   }
 });
 window.gamebuddyBridge?.onRecommendation(recommendation => {
-  if (!recommendation || (recommendation.task !== 'map_route' && recommendation.task !== 'rest_site')) return;
+  if (!recommendation || (recommendation.task !== 'map_route' && recommendation.task !== 'rest_site' && recommendation.task !== 'card_reward')) return;
   state.recommendation = recommendation;
   if (recommendation.task === 'rest_site') state.mode = 'route';
-  if (state.mode === 'route') render();
+  if (recommendation.task === 'card_reward') state.mode = 'draft';
+  if (state.mode === 'route' || state.mode === 'draft') render();
 });
 window.gamebuddyBridge?.onStatus(status => {
   setBridgeStatus(status);

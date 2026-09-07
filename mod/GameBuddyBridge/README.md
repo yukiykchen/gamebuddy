@@ -11,6 +11,7 @@
 - 敌人：名称、生命、格挡、是否存活、`Monster.NextMove` 类型
 - 敌人攻击意图：通过 `AttackIntent.GetTotalDamage` 计算当前预估伤害
 - 状态变化事件：战斗开始/结束、回合开始、地图打开、进入休息处
+- 卡牌奖励：监听 `NCardRewardSelectionScreen` 打开和刷新，导出当前候选牌及刚结束的战斗类型/敌人
 
 ## 构建环境
 
@@ -35,3 +36,5 @@ dotnet build .\mod\GameBuddyBridge\GameBuddyBridge.csproj -c Release `
 事件不会覆盖服务器保存的最近状态。新客户端连接或发送 `request_snapshot` 时，服务端始终先返回最近一份 `state` 快照。
 
 桌面端已经把回放桥和真实 Mod 桥放在同一个协议边界，后续 Agent 只需要订阅桌面端状态，不需要了解 Godot 或 STS2 内部对象。
+
+卡牌奖励通过 Harmony 生命周期 Hook 采集，但仍然只读：Mod 不会调用卡牌选择或跳过接口。游戏更新后若 `NCardRewardSelectionScreen` 的生命周期发生变化，日志会记录 `Harmony reward-screen patches failed`，其余状态采集仍会继续运行。
