@@ -1,4 +1,11 @@
 const DEFAULT_BASE_URL = 'https://spire-codex.com/api';
+const cardEvaluations = require('./card-evaluations.json');
+const evaluationIndex = new Map();
+for (const card of cardEvaluations.cards || []) {
+  for (const key of [card.id, card.name, card.nameEn]) {
+    if (key) evaluationIndex.set(normalizeKey(key), card);
+  }
+}
 
 function normalizeKey(value) {
   return String(value || '')
@@ -31,6 +38,23 @@ function resolveItem(ref, index) {
   const raw = typeof ref === 'string' ? { id: ref, name: ref } : (ref || {});
   const match = index.get(normalizeKey(raw.id)) || index.get(normalizeKey(raw.name));
   return match ? { ...raw, ...match, originalId: raw.id || raw.name } : { ...raw };
+}
+
+function attachEvaluation(card) {
+  const evaluation = evaluationIndex.get(normalizeKey(card?.id))
+    || evaluationIndex.get(normalizeKey(card?.originalId))
+    || evaluationIndex.get(normalizeKey(card?.name));
+  if (!evaluation) return card;
+  return {
+    ...card,
+    evaluation: {
+      capturedAt: cardEvaluations.capturedAt,
+      prior: evaluation.prior,
+      community: evaluation.community,
+      expertConsensus: evaluation.expertConsensus,
+      mechanicTags: evaluation.mechanicTags
+    }
+  };
 }
 
 function asList(body, key) {
@@ -87,7 +111,7 @@ function createSpireCodexClient({
   async function loadDraftContext(state, reward) {
     try {
       const catalogs = await loadCatalogs();
-      const cards = (reward.cards || []).map(card => resolveItem(card, catalogs.cardIndex));
+      const cards = (reward.cards || []).map(card => attachEvaluation(resolveItem(card, catalogs.cardIndex)));
       const deckCards = (state?.player?.cards || []).map(card => resolveItem(card, catalogs.cardIndex));
       const relics = (state?.player?.relics || []).map(relic => resolveItem(relic, catalogs.relicIndex));
       const offerIds = cards.map(card => card.id).filter(Boolean);
@@ -120,7 +144,7 @@ function createSpireCodexClient({
       return {
         available: false,
         source: 'bridge',
-        cards: (reward.cards || []).map(card => typeof card === 'string' ? { id: card, name: card } : card),
+        cards: (reward.cards || []).map(card => attachEvaluation(typeof card === 'string' ? { id: card, name: card } : card)),
         deckCards: state?.player?.cards || [],
         relics: state?.player?.relics || [],
         coach: null

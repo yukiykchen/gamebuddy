@@ -180,6 +180,18 @@ function analyzeCard(card, state, context, threats, coachItem) {
   const scenarios = [];
   let score = 42;
 
+  const knowledgePrior = typeof card.evaluation?.prior?.score === 'number'
+    ? card.evaluation.prior.score
+    : null;
+  if (Number.isFinite(knowledgePrior)) {
+    score += Math.max(-10, Math.min(12, (knowledgePrior - 50) * 0.24));
+    if (knowledgePrior >= 78) {
+      pros.push(`基础评价为 ${card.evaluation.prior.tier} 级，多来源先验表现较好`);
+    } else if (knowledgePrior < 35) {
+      cons.push('基础数据表现偏低，需要明确的牌组协同才能发挥');
+    }
+  }
+
   if (facts.damage) {
     const efficiency = facts.cost === null ? facts.damage / 2 : facts.damage / Math.max(1, facts.cost);
     score += Math.min(12, efficiency * 0.8);
@@ -282,8 +294,19 @@ function analyzeCard(card, state, context, threats, coachItem) {
       archetypeDelta: coachItem.commitment_delta ?? null,
       winnerSupport: coachItem.winner_support ?? null,
       takeScore: coachItem.take_score ?? null,
-      takeBase: coachItem.take_base ?? null
-    } : null
+      takeBase: coachItem.take_base ?? null,
+      knowledgePrior: Number.isFinite(knowledgePrior) ? knowledgePrior : null,
+      knowledgeTier: card.evaluation?.prior?.tier || null,
+      knowledgeConfidence: card.evaluation?.prior?.confidence || null
+    } : (Number.isFinite(knowledgePrior) ? {
+      archetypeDelta: null,
+      winnerSupport: null,
+      takeScore: null,
+      takeBase: null,
+      knowledgePrior,
+      knowledgeTier: card.evaluation?.prior?.tier || null,
+      knowledgeConfidence: card.evaluation?.prior?.confidence || null
+    } : null)
   };
 }
 
