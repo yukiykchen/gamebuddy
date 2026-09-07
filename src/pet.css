@@ -23,6 +23,7 @@ button { font: inherit; }
 .guide-close:hover { border-color: var(--red); color: white; }
 .guide-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 13px 16px; scrollbar-width: thin; scrollbar-color: #59665f transparent; }
 .guide-summary { margin: 0 0 12px; color: #d8cbb8; font-size: 12px; line-height: 1.55; }
+.guide-summary.strategy { padding: 9px 10px; border-left: 2px solid var(--amber); background: rgba(228, 166, 77, .08); color: var(--cream); }
 .guide-section { margin-top: 14px; }
 .guide-section-title { margin-bottom: 6px; color: var(--amber); font-size: 11px; font-weight: 800; letter-spacing: .08em; }
 .guide-monster { padding: 11px; border: 1px solid rgba(255, 255, 255, .08); border-radius: 9px; background: rgba(255, 255, 255, .025); }
@@ -35,6 +36,9 @@ button { font: inherit; }
 .guide-list li + li { margin-top: 3px; }
 .guide-list.danger li::marker { color: var(--red); }
 .guide-list.tip li::marker { color: var(--mint); }
+.guide-list.check li::marker { color: var(--amber); }
+.guide-list.target li::marker { color: #8cb8e8; }
+.guide-list.avoid li::marker { color: #a58dce; }
 .guide-innate { margin-top: 7px; color: #dbbd85; font-size: 10px; line-height: 1.45; }
 .guide-source { padding: 8px 16px; border-top: 1px solid rgba(255, 255, 255, .07); color: #74817b; font-size: 9px; }
 .speech { position: absolute; top: 3px; left: 8px; right: 8px; padding: 7px 6px; border: 1px solid #4e5e59; background: rgba(24, 32, 30, .95); color: var(--cream); font-size: 11px; line-height: 1.2; opacity: 0; transform: translateY(5px); transition: opacity .18s ease, transform .18s ease; }

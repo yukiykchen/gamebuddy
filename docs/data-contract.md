@@ -183,6 +183,10 @@ Spire Codex API 默认地址为 `https://spire-codex.com/api`，可用 `GAMEBUDD
 
 进入 `Elite` / `Boss` 房间且 `combat` 非空时，主进程还会生成独立的 `gamebuddy.encounter-guide.v1` 攻略消息并发送给桌面宠物。该消息不占用 recommendation 槽位，因此不会覆盖路线、休息处或卡牌奖励建议。攻略按楼层和地图坐标去重，每场只自动弹出一次，战斗结束后自动收起。
 
+`strategy` 来自 `agent/knowledge/encounter-strategies.json`，以遭遇稳定 ID 匹配，覆盖 stable `v0.107.1` 的 12 个 Boss 和 12 个精英。字段包括 `summary`、`dangerWindows`、`deckChecks`、`priorityTargets`、`tips`、`avoid`、`confidence`、`reviewStatus` 和可追溯的 `sources`。社区攻略不覆盖 Spire Codex 的机制事实；如果版本或遭遇无法匹配，则不显示推测性打法。
+
+同一份 `strategy` 也会挂到卡牌奖励 Agent 的 `threats.knownBoss`、`possibleElites` 和 `knownUpcomingElites` 上，并随完整遭遇上下文送入 LLM。这样模型评判奖励牌时能针对具体遭遇的牌组检查和常见失误，而不是只看到笼统的 Boss / Elite 标签。
+
 路线任务在没有配置 LLM 时用规则打分：每个节点拆成**收益**和**风险**。精英按遗物缺口和生命评估；火堆同时计算回血和未升级牌的敲升级价值；商店按金币、卡组厚度和打击/防御数量计算删牌与购物。同一条路上精英后面有火堆时会加协同分。进入休息处后会单独建议 **回血还是升级哪一张牌**。有 OpenAI 兼容接口时，模型只在规则生成的候选中复核选择和解释。
 
 ```json

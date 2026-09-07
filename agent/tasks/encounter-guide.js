@@ -1,7 +1,9 @@
 const { createSpireCodexClient, stripMarkup } = require('../knowledge/spire-codex');
 const cardEvaluations = require('../knowledge/card-evaluations.json');
+const encounterStrategies = require('../knowledge/encounter-strategies.json');
 
 const codexClient = createSpireCodexClient();
+const strategyIndex = new Map((encounterStrategies.encounters || []).map(item => [item.id, item]));
 
 const POWER_NAMES = {
   ARTIFACT: '人工制品',
@@ -126,6 +128,26 @@ function monsterGuide(monster) {
   };
 }
 
+function communityStrategy(encounter) {
+  const profile = strategyIndex.get(encounter?.id);
+  if (!profile) return null;
+  return {
+    summary: profile.summary,
+    dangerWindows: profile.dangerWindows || [],
+    deckChecks: profile.deckChecks || [],
+    priorityTargets: profile.priorityTargets || [],
+    tips: profile.tips || [],
+    avoid: profile.avoid || [],
+    confidence: profile.confidence,
+    reviewStatus: profile.reviewStatus,
+    capturedAt: encounterStrategies.capturedAt,
+    sources: (profile.sources || []).map(sourceId => {
+      const source = encounterStrategies.sources?.[sourceId];
+      return source ? { id: sourceId, title: source.title, url: source.url } : { id: sourceId };
+    })
+  };
+}
+
 async function buildEncounterGuide(state, { codex = codexClient, now = Date.now() } = {}) {
   const kind = encounterKind(state);
   if (!kind) return null;
@@ -134,6 +156,7 @@ async function buildEncounterGuide(state, { codex = codexClient, now = Date.now(
     const monsters = (knowledge.monsters || []).map(monsterGuide);
     if (!monsters.length) throw new Error('no matching monsters');
     const advice = dangerAndTips(knowledge.monsters || []);
+    const strategy = communityStrategy(knowledge.encounter);
     return {
       schema: 'gamebuddy.encounter-guide.v1',
       timestamp: now,
@@ -142,8 +165,9 @@ async function buildEncounterGuide(state, { codex = codexClient, now = Date.now(
       source: knowledge.source,
       gameVersion: cardEvaluations.game?.version || null,
       monsters,
-      dangers: advice.dangers,
-      tips: advice.tips
+      strategy,
+      dangers: [...new Set([...(strategy?.dangerWindows || []), ...advice.dangers])].slice(0, 6),
+      tips: [...new Set([...(strategy?.tips || []), ...advice.tips])].slice(0, 7)
     };
   } catch {
     const names = (state.combat?.enemies || []).map(enemy => enemy?.name).filter(Boolean);
@@ -155,6 +179,7 @@ async function buildEncounterGuide(state, { codex = codexClient, now = Date.now(
       source: 'bridge',
       gameVersion: cardEvaluations.game?.version || null,
       monsters: names.map(name => ({ name, hp: '资料暂未匹配', innate: [], cycle: '暂无可靠机制资料', moves: [] })),
+      strategy: null,
       dangers: [],
       tips: ['Spire Codex 暂时不可用或未匹配该敌人；本次不生成猜测内容。']
     };

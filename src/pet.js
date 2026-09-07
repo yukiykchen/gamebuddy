@@ -36,9 +36,15 @@ function setEncounterGuide(guide) {
       <div class="guide-cycle">行动循环：${escapeHtml(monster.cycle)}</div>
       ${guideList('招式', monster.moves || [])}
     </article>`).join('');
-  guideContent.innerHTML = `<p class="guide-summary">进入本场战斗时自动读取的机制攻略。数值中的“高阶”来自高登塔难度数据。</p>${monsters}${guideList('主要危险', guide.dangers, 'danger')}${guideList('应对建议', guide.tips, 'tip')}`;
+  const strategy = guide.strategy;
+  const summary = strategy?.summary
+    ? `<p class="guide-summary strategy">${escapeHtml(strategy.summary)}</p>`
+    : '<p class="guide-summary">本场只有机制数据，暂无匹配的社区打法档案。</p>';
+  guideContent.innerHTML = `${summary}${guideList('先检查你的牌组', strategy?.deckChecks, 'check')}${guideList('目标优先级', strategy?.priorityTargets, 'target')}${monsters}${guideList('主要危险', guide.dangers, 'danger')}${guideList('应对建议', guide.tips, 'tip')}${guideList('常见失误', strategy?.avoid, 'avoid')}`;
+  const sourceCount = strategy?.sources?.length || 0;
+  const confidence = strategy?.confidence === 'high' ? '高可信' : strategy?.confidence === 'medium' ? '中可信' : '';
   guideSource.textContent = guide.source === 'spire-codex'
-    ? `数据来源：Spire Codex · stable ${guide.gameVersion || '当前版本'}`
+    ? `机制：Spire Codex · 攻略：${sourceCount} 个社区来源${confidence ? ` · ${confidence}` : ''} · stable ${guide.gameVersion || '当前版本'}`
     : '数据来源：游戏 Bridge · 未匹配到完整资料';
   guidePanel.classList.add('visible');
   say(`${guide.kind === 'boss' ? 'Boss' : '精英'}攻略来了`, 'alert');

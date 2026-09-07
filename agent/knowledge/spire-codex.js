@@ -1,6 +1,8 @@
 const DEFAULT_BASE_URL = 'https://spire-codex.com/api';
 const cardEvaluations = require('./card-evaluations.json');
+const encounterStrategies = require('./encounter-strategies.json');
 const evaluationIndex = new Map();
+const encounterStrategyIndex = new Map((encounterStrategies.encounters || []).map(item => [normalizeKey(item.id), item]));
 for (const card of cardEvaluations.cards || []) {
   for (const key of [card.id, card.name, card.nameEn]) {
     if (key) evaluationIndex.set(normalizeKey(key), card);
@@ -99,6 +101,7 @@ function compactMonster(monster) {
 
 function compactEncounter(encounter, monsterIndex) {
   if (!encounter) return null;
+  const strategy = encounterStrategyIndex.get(normalizeKey(encounter.id));
   return {
     id: encounter.id || null,
     name: encounter.name || encounter.id || '未知遭遇',
@@ -107,6 +110,16 @@ function compactEncounter(encounter, monsterIndex) {
     isWeak: Boolean(encounter.is_weak),
     tags: encounter.tags || [],
     exact: false,
+    strategy: strategy ? {
+      summary: strategy.summary,
+      dangerWindows: strategy.dangerWindows,
+      deckChecks: strategy.deckChecks,
+      priorityTargets: strategy.priorityTargets,
+      tips: strategy.tips,
+      avoid: strategy.avoid,
+      confidence: strategy.confidence,
+      sources: strategy.sources
+    } : null,
     monsters: (encounter.monsters || []).map(ref => compactMonster(resolveItem(ref, monsterIndex))).filter(Boolean)
   };
 }
