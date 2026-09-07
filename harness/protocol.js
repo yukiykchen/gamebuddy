@@ -55,6 +55,11 @@ function validateState(state) {
       if (!node || typeof node !== 'object') return { ok: false, reason: 'map.nodes entries must be objects' };
       if (typeof node.id !== 'string' || typeof node.type !== 'string') return { ok: false, reason: 'map node needs id and type' };
       if (!Array.isArray(node.children)) return { ok: false, reason: 'map node children must be an array' };
+      for (const field of ['encounterId', 'encounterName']) {
+        if (node[field] !== undefined && node[field] !== null && typeof node[field] !== 'string') {
+          return { ok: false, reason: `map node ${field} must be a string or null` };
+        }
+      }
     }
   }
   if (state.map.routes !== undefined) {

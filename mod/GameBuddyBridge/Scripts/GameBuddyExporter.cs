@@ -195,9 +195,13 @@ public static class GameBuddyExporter
             context = new
             {
                 act = snapshot.Run.Act,
+                actId = snapshot.Run.ActId,
+                actName = snapshot.Run.ActName,
                 floor = snapshot.Run.Floor,
                 defeatedType = _lastCombatNodeType,
-                defeatedEnemies = _lastCombatEnemies
+                defeatedEnemies = _lastCombatEnemies,
+                nextBossId = snapshot.Run.NextBossId,
+                nextBoss = snapshot.Run.NextBoss
             }
         });
     }
@@ -238,6 +242,11 @@ public static class GameBuddyExporter
 
         var currentPoint = runState.CurrentMapPoint;
         var coord = runState.CurrentMapCoord;
+        var mapSnapshot = BuildMapSnapshot(runState);
+        var nextBossId = runState.Act.BossEncounter.Id.Entry;
+        var nextBoss = runState.Act.BossEncounter.Title.GetFormattedText();
+        var secondBossId = runState.Act.SecondBossEncounter?.Id.Entry;
+        var secondBoss = runState.Act.SecondBossEncounter?.Title.GetFormattedText();
         return new GameBuddyState(
             "gamebuddy.state.v1",
             DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
@@ -249,7 +258,13 @@ public static class GameBuddyExporter
                 player.Character.Id.Entry,
                 runState.TotalFloor,
                 currentPoint?.PointType.ToString(),
-                coord.HasValue ? $"{coord.Value.row},{coord.Value.col}" : null),
+                coord.HasValue ? $"{coord.Value.row},{coord.Value.col}" : null,
+                runState.Act.Id.Entry,
+                runState.Act.Title.GetFormattedText(),
+                nextBossId,
+                nextBoss,
+                secondBossId,
+                secondBoss),
             new PlayerSnapshot(
                 player.Creature.CurrentHp,
                 player.Creature.MaxHp,
@@ -258,10 +273,10 @@ public static class GameBuddyExporter
                 combat?.Energy ?? 0,
                 combat?.MaxEnergy ?? 0,
                 MapCards(player.Deck.Cards),
-                player.Relics.Select(relic => relic.Title.GetFormattedText()).ToList(),
-                player.Potions.Select(potion => potion.Title.GetFormattedText()).ToList()),
+                player.Relics.Select(relic => new OwnedItemSnapshot(relic.Id.Entry, relic.Title.GetFormattedText())).ToList(),
+                player.Potions.Select(potion => new OwnedItemSnapshot(potion.Id.Entry, potion.Title.GetFormattedText())).ToList()),
             combatState,
-            BuildMapSnapshot(runState));
+            mapSnapshot);
     }
 
     private static MapSnapshot BuildMapSnapshot(RunState runState)
@@ -288,12 +303,19 @@ public static class GameBuddyExporter
                     }
                 }
 
+                var encounter = ReadMember(point, "Encounter", "EncounterModel", "BossEncounter", "RoomModel");
+                var encounterId = ReadTextMember(point, "EncounterId", "EncounterModelId")
+                    ?? ReadTextMember(encounter, "Id", "Entry");
+                var encounterName = ReadTextMember(point, "EncounterName")
+                    ?? ReadTextMember(encounter, "Title", "Name");
                 nodes.Add(new MapNodeSnapshot(
                     CoordId(point.coord),
                     point.coord.row,
                     point.coord.col,
                     MapTypeName(point.PointType),
-                    children));
+                    children,
+                    encounterId,
+                    encounterName));
             }
 
             var byId = new Dictionary<string, MapNodeSnapshot>(StringComparer.Ordinal);
@@ -305,6 +327,19 @@ public static class GameBuddyExporter
             var start = map.StartingMapPoint is { } startPoint ? CoordId(startPoint.coord) : null;
             var boss = map.BossMapPoint is { } bossPoint ? CoordId(bossPoint.coord) : null;
             var secondBoss = map.SecondBossMapPoint is { } secondBossPoint ? CoordId(secondBossPoint.coord) : null;
+            if (boss is not null && byId.TryGetValue(boss, out var bossNode))
+            {
+                var encounter = runState.Act.BossEncounter;
+                var enriched = bossNode with { EncounterId = encounter.Id.Entry, EncounterName = encounter.Title.GetFormattedText() };
+                byId[boss] = enriched;
+                nodes[nodes.FindIndex(node => node.Id == boss)] = enriched;
+            }
+            if (secondBoss is not null && byId.TryGetValue(secondBoss, out var secondBossNode) && runState.Act.SecondBossEncounter is { } secondEncounter)
+            {
+                var enriched = secondBossNode with { EncounterId = secondEncounter.Id.Entry, EncounterName = secondEncounter.Title.GetFormattedText() };
+                byId[secondBoss] = enriched;
+                nodes[nodes.FindIndex(node => node.Id == secondBoss)] = enriched;
+            }
             var originCandidates = ResolveOriginIds(byId, current, start);
             var routes = new List<List<string>>();
             var truncated = false;
@@ -472,6 +507,56 @@ public static class GameBuddyExporter
 
     private static string MapTypeName(MapPointType type) => type.ToString();
 
+    private static object? ReadMember(object? source, params string[] names)
+    {
+        if (source is null) return null;
+        var type = source.GetType();
+        const System.Reflection.BindingFlags flags = System.Reflection.BindingFlags.Instance
+            | System.Reflection.BindingFlags.Public
+            | System.Reflection.BindingFlags.NonPublic
+            | System.Reflection.BindingFlags.IgnoreCase;
+        foreach (var name in names)
+        {
+            try
+            {
+                var property = type.GetProperty(name, flags);
+                if (property is not null && property.GetIndexParameters().Length == 0)
+                {
+                    var value = property.GetValue(source);
+                    if (value is not null) return value;
+                }
+                var field = type.GetField(name, flags);
+                if (field?.GetValue(source) is { } fieldValue) return fieldValue;
+            }
+            catch
+            {
+                // Optional early-access metadata can move between game patches.
+            }
+        }
+        return null;
+    }
+
+    private static string? ReadTextMember(object? source, params string[] names)
+    {
+        var value = ReadMember(source, names);
+        if (value is null) return null;
+        if (value is string text) return string.IsNullOrWhiteSpace(text) ? null : text;
+
+        try
+        {
+            var formatted = value.GetType().GetMethod("GetFormattedText", Type.EmptyTypes)?.Invoke(value, null)?.ToString();
+            if (!string.IsNullOrWhiteSpace(formatted)) return formatted;
+        }
+        catch
+        {
+            // Fall through to nested identifier/text properties.
+        }
+
+        var nested = ReadMember(value, "Entry", "Value", "Name");
+        var result = nested?.ToString();
+        return string.IsNullOrWhiteSpace(result) ? null : result;
+    }
+
     private static List<CardSnapshot> MapCards(IEnumerable<CardModel> cards)
     {
         return cards.Select(card => new CardSnapshot(
@@ -508,11 +593,12 @@ public sealed record BridgeMessage<T>(string Type, T Data);
 public sealed record BridgeEvent(string Type, string Name, long Timestamp, object? Data);
 
 public sealed record GameBuddyState(string Schema, long Timestamp, string Source, RunSnapshot Run, PlayerSnapshot Player, CombatSnapshot? Combat, MapSnapshot Map);
-public sealed record RunSnapshot(int Act, int Floor, string? Room, string Character, int TotalFloor, string? CurrentNode, string? CurrentCoord);
-public sealed record PlayerSnapshot(int Hp, int MaxHp, int Block, int Gold, int Energy, int MaxEnergy, List<CardSnapshot> Cards, List<string> Relics, List<string> Potions);
+public sealed record RunSnapshot(int Act, int Floor, string? Room, string Character, int TotalFloor, string? CurrentNode, string? CurrentCoord, string ActId, string ActName, string? NextBossId, string? NextBoss, string? SecondBossId, string? SecondBoss);
+public sealed record PlayerSnapshot(int Hp, int MaxHp, int Block, int Gold, int Energy, int MaxEnergy, List<CardSnapshot> Cards, List<OwnedItemSnapshot> Relics, List<OwnedItemSnapshot> Potions);
 public sealed record CombatSnapshot(int Turn, List<CardSnapshot> Hand, List<CardSnapshot> DrawPile, List<CardSnapshot> DiscardPile, List<CardSnapshot> ExhaustPile, List<EnemySnapshot> Enemies);
 public sealed record EnemySnapshot(string Name, int Hp, int MaxHp, int Block, string? Intent, int Damage, bool Alive);
 public sealed record CardSnapshot(string Id, string Name, string Type, int? Cost, bool Upgraded);
+public sealed record OwnedItemSnapshot(string Id, string Name);
 public sealed record MapSnapshot(
     List<string> Visited,
     string? Current,
@@ -524,7 +610,7 @@ public sealed record MapSnapshot(
     List<MapNodeSnapshot> Nodes,
     List<List<string>> Routes,
     bool RoutesTruncated);
-public sealed record MapNodeSnapshot(string Id, int Row, int Col, string Type, List<string> Children);
+public sealed record MapNodeSnapshot(string Id, int Row, int Col, string Type, List<string> Children, string? EncounterId, string? EncounterName);
 
 internal sealed class GameBuddyWebSocketServer
 {

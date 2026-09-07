@@ -24,6 +24,9 @@ function normalizeReward(payload, state) {
       floor: payload.context?.floor ?? state?.run?.floor ?? null,
       defeatedType: payload.context?.defeatedType || payload.defeatedType || null,
       defeatedEnemies: payload.context?.defeatedEnemies || payload.defeatedEnemies || [],
+      actId: payload.context?.actId ?? state?.run?.actId ?? null,
+      actName: payload.context?.actName ?? state?.run?.actName ?? null,
+      nextBossId: payload.context?.nextBossId || payload.nextBossId || state?.run?.nextBossId || null,
       nextBoss: payload.context?.nextBoss || payload.nextBoss || null
     }
   };
@@ -59,12 +62,22 @@ function upcomingThreats(state, reward) {
   };
 }
 
+function threatTagSet(knowledge, threats) {
+  const encounters = [
+    knowledge?.threats?.knownBoss,
+    ...(knowledge?.threats?.knownUpcomingElites || []),
+    ...(threats?.eliteSoon ? (knowledge?.threats?.possibleElites || []) : [])
+  ].filter(Boolean);
+  return new Set(encounters.flatMap(encounter => (encounter.monsters || [])
+    .flatMap(monster => monster.mechanicTags || [])));
+}
+
 function numeric(value) {
   return Number.isFinite(Number(value)) ? Number(value) : 0;
 }
 
 function cardFacts(card) {
-  const description = stripMarkup(card.description || card.text || '');
+  const description = stripMarkup((card.upgraded && card.upgrade_description) || card.description || card.text || '');
   const cost = card.is_x_cost || card.isXCost ? null : (Number.isFinite(Number(card.cost)) ? Number(card.cost) : null);
   const damage = numeric(card.damage) * Math.max(1, numeric(card.hit_count || card.hitCount) || 1);
   const block = numeric(card.block);
@@ -176,7 +189,7 @@ function fitAnalysis(facts, threats) {
   };
 }
 
-function analyzeCard(card, state, context, threats, coachItem) {
+function analyzeCard(card, state, context, threats, coachItem, enemyTags = new Set()) {
   const facts = cardFacts(card);
   const fit = fitAnalysis(facts, threats);
   const copies = context.counts.get(normalizeKey(card.id || card.name)) || 0;
@@ -258,6 +271,22 @@ function analyzeCard(card, state, context, threats, coachItem) {
   if (context.draw === 0 && facts.draw > 0) score += 4;
   if (threats.eliteSoon) score += fit.elitePoints * 2;
   if (threats.bossSoon) score += fit.bossPoints * 2;
+  if ((enemyTags.has('summons') || enemyTags.has('aoe')) && facts.isAoE) {
+    score += 6;
+    pros.push('已知/本章高威胁遭遇包含多目标机制，群体处理能力更有价值');
+  }
+  if ((enemyTags.has('multi_hit') || enemyTags.has('scaling')) && facts.isControl) {
+    score += 5;
+    pros.push('弱化或降力量能针对多段攻击/成长型敌人');
+  }
+  if (enemyTags.has('burst_damage') && facts.block >= 8) {
+    score += 4;
+    pros.push('高额格挡能覆盖敌人的爆发回合');
+  }
+  if (enemyTags.has('status_cards') && (facts.draw > 0 || facts.exhausts)) {
+    score += 3;
+    pros.push('抽牌或消耗能力有助于处理状态牌污染');
+  }
 
   if (Number.isFinite(coachItem?.coach_score)) {
     score += Math.min(16, Math.max(0, coachItem.coach_score) * 0.6);
@@ -367,8 +396,9 @@ async function recommendCardReward(observation, { llm, now = Date.now(), codex =
   const knowledge = await codex.loadDraftContext(state, reward);
   const context = deckContext(state, knowledge);
   const threats = upcomingThreats(state, reward);
+  const enemyTags = threatTagSet(knowledge, threats);
   const stats = coachMap(knowledge.coach);
-  const options = knowledge.cards.map(card => analyzeCard(card, state, context, threats, stats.get(normalizeKey(card.id || card.name))))
+  const options = knowledge.cards.map(card => analyzeCard(card, state, context, threats, stats.get(normalizeKey(card.id || card.name)), enemyTags))
     .sort((left, right) => right.score - left.score || left.name.localeCompare(right.name, 'zh-CN'));
   if (!options.length) return null;
 
@@ -383,22 +413,45 @@ async function recommendCardReward(observation, { llm, now = Date.now(), codex =
   if (llm?.enabled && typeof llm.completeCardReward === 'function') {
     try {
       const pick = await llm.completeCardReward({
-        act: state.run?.act,
-        floor: state.run?.floor,
-        hp: state.player?.hp,
-        maxHp: state.player?.maxHp,
+        gameVersion: knowledge.cards[0]?.evaluation?.gameVersion || null,
+        player: {
+          act: state.run?.act,
+          floor: state.run?.floor,
+          hp: state.player?.hp,
+          maxHp: state.player?.maxHp,
+          block: state.player?.block,
+          gold: state.player?.gold,
+          energy: state.player?.energy,
+          maxEnergy: state.player?.maxEnergy
+        },
         deckSize: context.size,
         eliteSoon: threats.eliteSoon,
         bossSoon: threats.bossSoon,
         archetype: knowledge.coach?.target?.name || null,
-        nextBoss: reward.context?.nextBoss || null,
-        defeatedEnemies: reward.context?.defeatedEnemies || [],
+        threats: knowledge.threats,
         deck: (knowledge.deckCards || []).map(card => ({
           id: card.id || card.name,
           name: card.name || card.id,
-          upgraded: Boolean(card.upgraded)
+          type: card.type || card.type_key || null,
+          cost: card.cost ?? null,
+          upgraded: Boolean(card.upgraded),
+          description: stripMarkup((card.upgraded && card.upgrade_description) || card.description || card.text || '') || null,
+          mechanicTags: card.evaluation?.mechanicTags || []
         })),
-        relics: (knowledge.relics || []).map(relic => ({ id: relic.id || relic.name, name: relic.name || relic.id })),
+        relics: (knowledge.relics || []).map(relic => ({
+          id: relic.id || relic.name,
+          name: relic.name || relic.id,
+          rarity: relic.rarity || null,
+          effect: stripMarkup(relic.description || relic.description_raw || '') || null,
+          notes: relic.notes || null
+        })),
+        potions: (knowledge.potions || []).map(potion => ({
+          id: potion.id || potion.name,
+          name: potion.name || potion.id,
+          rarity: potion.rarity || null,
+          effect: stripMarkup(potion.description || potion.description_raw || '') || null
+        })),
+        map: state.map || null,
         candidates: candidates.map((candidate, index) => candidate.action === 'SKIP'
           ? { index, action: 'SKIP', score: candidate.score }
           : {
@@ -453,7 +506,12 @@ async function recommendCardReward(observation, { llm, now = Date.now(), codex =
       bossSoon: threats.bossSoon,
       defeatedElite: threats.defeatedElite,
       defeatedBoss: threats.defeatedBoss,
-      archetype: knowledge.coach?.target?.name || null
+      archetype: knowledge.coach?.target?.name || null,
+      gold: state.player?.gold ?? null,
+      potions: (knowledge.potions || []).map(potion => potion.name || potion.id),
+      knownBoss: knowledge.threats?.knownBoss?.name || null,
+      knownUpcomingElites: (knowledge.threats?.knownUpcomingElites || []).map(item => item.name),
+      possibleElites: (knowledge.threats?.possibleElites || []).map(item => item.name)
     },
     knowledgeSource: knowledge.source
   };
@@ -468,6 +526,9 @@ function cardRewardSignature(observation) {
     context: reward.context,
     deck: (observation?.state?.player?.cards || []).map(card => [card.id || card, Boolean(card.upgraded)]),
     relics: observation?.state?.player?.relics || [],
+    potions: observation?.state?.player?.potions || [],
+    gold: observation?.state?.player?.gold ?? null,
+    map: observation?.state?.map || null,
     act: observation?.state?.run?.act ?? null,
     floor: observation?.state?.run?.floor ?? null
   });
