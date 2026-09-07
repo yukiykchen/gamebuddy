@@ -8,6 +8,14 @@
   </head>
   <body>
     <main class="pet-stage" id="pet-stage">
+      <aside class="encounter-guide" id="encounter-guide" aria-live="polite">
+        <div class="guide-head">
+          <div><span class="guide-kicker" id="guide-kicker">精英攻略</span><h1 id="guide-title">敌人机制</h1></div>
+          <button class="guide-close" id="guide-close" aria-label="关闭本场攻略">×</button>
+        </div>
+        <div class="guide-scroll" id="guide-content"></div>
+        <div class="guide-source" id="guide-source">数据来源：Spire Codex</div>
+      </aside>
       <button class="pet-button" id="pet-button" aria-label="打开 GameBuddy 建议面板">
         <span class="speech" id="speech">等你出牌</span>
         <span class="pet-glow"></span>

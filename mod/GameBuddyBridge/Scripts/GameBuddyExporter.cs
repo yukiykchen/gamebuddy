@@ -585,7 +585,7 @@ public static class GameBuddyExporter
             }
         }
 
-        return new EnemySnapshot(enemy.Name, enemy.CurrentHp, enemy.MaxHp, enemy.Block, intent, damage, enemy.IsAlive);
+        return new EnemySnapshot(enemy.Monster?.Id.Entry, enemy.Name, enemy.CurrentHp, enemy.MaxHp, enemy.Block, intent, damage, enemy.IsAlive);
     }
 }
 
@@ -596,7 +596,7 @@ public sealed record GameBuddyState(string Schema, long Timestamp, string Source
 public sealed record RunSnapshot(int Act, int Floor, string? Room, string Character, int TotalFloor, string? CurrentNode, string? CurrentCoord, string ActId, string ActName, string? NextBossId, string? NextBoss, string? SecondBossId, string? SecondBoss);
 public sealed record PlayerSnapshot(int Hp, int MaxHp, int Block, int Gold, int Energy, int MaxEnergy, List<CardSnapshot> Cards, List<OwnedItemSnapshot> Relics, List<OwnedItemSnapshot> Potions);
 public sealed record CombatSnapshot(int Turn, List<CardSnapshot> Hand, List<CardSnapshot> DrawPile, List<CardSnapshot> DiscardPile, List<CardSnapshot> ExhaustPile, List<EnemySnapshot> Enemies);
-public sealed record EnemySnapshot(string Name, int Hp, int MaxHp, int Block, string? Intent, int Damage, bool Alive);
+public sealed record EnemySnapshot(string? Id, string Name, int Hp, int MaxHp, int Block, string? Intent, int Damage, bool Alive);
 public sealed record CardSnapshot(string Id, string Name, string Type, int? Cost, bool Upgraded);
 public sealed record OwnedItemSnapshot(string Id, string Name);
 public sealed record MapSnapshot(

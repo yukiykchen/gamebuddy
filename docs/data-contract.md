@@ -49,6 +49,7 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
     "exhaustPile": [],
     "enemies": [
       {
+        "id": "SNAKE_PLANT",
         "name": "蛇花",
         "hp": 78,
         "maxHp": 96,
@@ -179,6 +180,8 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
 卡牌奖励 Agent 会读取 Spire Codex 公共 API 的简体中文卡牌、遗物、药水、怪物和遭遇数据，并调用 `/api/runs/pick-coach` 取得当前牌组/遗物对应的流派、相似胜局支持度和 offer-conditioned 拿取率。送给模型的实时上下文包括：完整牌组与升级状态、每件遗物和药水的完整效果、金币/生命/能量、当前 Act 的全部地图节点与路线、已确定 Boss 的完整招式和机制，以及本章可能精英池。规则层也会针对多目标、多段攻击、成长、爆发和状态牌污染等机制加权。三张都不能改善牌组时可以建议 `SKIP`。API 超时或不可用时自动退回 Bridge 数据和本地规则，不阻塞选牌界面。
 
 Spire Codex API 默认地址为 `https://spire-codex.com/api`，可用 `GAMEBUDDY_SPIRE_CODEX_URL` 覆盖。GameBuddy 不复制 Spire Codex 的源码或整库数据。
+
+进入 `Elite` / `Boss` 房间且 `combat` 非空时，主进程还会生成独立的 `gamebuddy.encounter-guide.v1` 攻略消息并发送给桌面宠物。该消息不占用 recommendation 槽位，因此不会覆盖路线、休息处或卡牌奖励建议。攻略按楼层和地图坐标去重，每场只自动弹出一次，战斗结束后自动收起。
 
 路线任务在没有配置 LLM 时用规则打分：每个节点拆成**收益**和**风险**。精英按遗物缺口和生命评估；火堆同时计算回血和未升级牌的敲升级价值；商店按金币、卡组厚度和打击/防御数量计算删牌与购物。同一条路上精英后面有火堆时会加协同分。进入休息处后会单独建议 **回血还是升级哪一张牌**。有 OpenAI 兼容接口时，模型只在规则生成的候选中复核选择和解释。
 

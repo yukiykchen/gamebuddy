@@ -162,6 +162,7 @@ function createSpireCodexClient({
   timeoutMs = 4500
 } = {}) {
   let catalogsPromise;
+  let encounterCatalogsPromise;
 
   async function fetchJson(pathname) {
     if (typeof fetchImpl !== 'function') throw new Error('fetch is not available');
@@ -179,31 +180,51 @@ function createSpireCodexClient({
     }
   }
 
+  async function loadEncounterCatalogs() {
+    if (!encounterCatalogsPromise) {
+      encounterCatalogsPromise = Promise.all([
+        fetchJson('/monsters?lang=zhs'),
+        fetchJson('/encounters?lang=zhs'),
+        fetchJson('/powers?lang=zhs').catch(() => [])
+      ]).then(([monstersBody, encountersBody, powersBody]) => {
+        const monsters = asList(monstersBody, 'monsters');
+        const encounters = asList(encountersBody, 'encounters');
+        const powers = asList(powersBody, 'powers');
+        return {
+          monsters,
+          encounters,
+          powers,
+          monsterIndex: makeIndex(monsters),
+          encounterIndex: makeIndex(encounters),
+          powerIndex: makeIndex(powers)
+        };
+      }).catch(error => {
+        encounterCatalogsPromise = undefined;
+        throw error;
+      });
+    }
+    return encounterCatalogsPromise;
+  }
+
   async function loadCatalogs() {
     if (!catalogsPromise) {
       catalogsPromise = Promise.all([
         fetchJson('/cards?lang=zhs'),
         fetchJson('/relics?lang=zhs'),
         fetchJson('/potions?lang=zhs'),
-        fetchJson('/monsters?lang=zhs'),
-        fetchJson('/encounters?lang=zhs')
-      ]).then(([cardsBody, relicsBody, potionsBody, monstersBody, encountersBody]) => {
+        loadEncounterCatalogs()
+      ]).then(([cardsBody, relicsBody, potionsBody, encounterCatalogs]) => {
         const cards = asList(cardsBody, 'cards');
         const relics = asList(relicsBody, 'relics');
         const potions = asList(potionsBody, 'potions');
-        const monsters = asList(monstersBody, 'monsters');
-        const encounters = asList(encountersBody, 'encounters');
         return {
           cards,
           relics,
           potions,
-          monsters,
-          encounters,
           cardIndex: makeIndex(cards),
           relicIndex: makeIndex(relics),
           potionIndex: makeIndex(potions),
-          monsterIndex: makeIndex(monsters),
-          encounterIndex: makeIndex(encounters)
+          ...encounterCatalogs
         };
       }).catch(error => {
         catalogsPromise = undefined;
@@ -302,7 +323,71 @@ function createSpireCodexClient({
     }
   }
 
-  return { loadDraftContext };
+  async function loadEncounterContext(state) {
+    const catalogs = await loadEncounterCatalogs();
+    const kind = /boss/i.test(`${state?.run?.room || ''} ${state?.run?.currentNode || ''}`) ? 'Boss' : 'Elite';
+    const enemyRefs = (state?.combat?.enemies || []).filter(enemy => enemy && enemy.alive !== false);
+    const actualEnemies = enemyRefs.map(enemy => (
+      catalogs.monsterIndex.get(normalizeKey(enemy?.id))
+      || catalogs.monsterIndex.get(normalizeKey(enemy?.name))
+      || null
+    )).filter(Boolean);
+    const actualKeys = new Set(enemyRefs.flatMap(enemy => [normalizeKey(enemy.id), normalizeKey(enemy.name)]).filter(Boolean));
+    const actId = state?.run?.actId || null;
+    const act = state?.run?.act;
+    let encounter = null;
+    if (kind === 'Boss' && state?.run?.nextBossId) {
+      const resolved = resolveItem(state.run.nextBossId, catalogs.encounterIndex);
+      if (catalogs.encounterIndex.has(normalizeKey(state.run.nextBossId))) encounter = resolved;
+    }
+    if (!encounter) {
+      encounter = catalogs.encounters
+        .filter(item => String(item.room_type).toLowerCase() === kind.toLowerCase() && actMatches(item.act, act, actId))
+        .map(item => ({
+          item,
+          matches: (item.monsters || []).filter(monster => actualKeys.has(normalizeKey(monster.id)) || actualKeys.has(normalizeKey(monster.name))).length
+        }))
+        .sort((left, right) => right.matches - left.matches)
+        .find(item => item.matches > 0)?.item || null;
+    }
+    const encounterMonsters = (encounter?.monsters || []).map(ref => resolveItem(ref, catalogs.monsterIndex));
+    const monstersToExplain = [...new Map([...encounterMonsters, ...actualEnemies]
+      .filter(monster => catalogs.monsterIndex.has(normalizeKey(monster.id)) || catalogs.monsterIndex.has(normalizeKey(monster.name)))
+      .map(monster => [monster.id || monster.name, monster])).values()];
+    const monsters = monstersToExplain.map(monster => ({
+      ...compactMonster(monster),
+      innatePowers: (monster.innate_powers || []).map(power => ({
+        ...power,
+        knowledge: resolveItem(power.power_id, catalogs.powerIndex)
+      })),
+      moves: (monster.moves || []).map(move => ({
+        id: move.id || null,
+        name: move.name || move.id || null,
+        intent: move.intent || null,
+        damage: move.damage || null,
+        block: move.block ?? null,
+        heal: move.heal ?? null,
+        powers: (move.powers || []).map(power => ({
+          ...power,
+          knowledge: resolveItem(power.power_id, catalogs.powerIndex)
+        }))
+      }))
+    }));
+    return {
+      available: true,
+      source: 'spire-codex',
+      kind,
+      encounter: encounter ? {
+        id: encounter.id,
+        name: encounter.name,
+        act: encounter.act,
+        tags: encounter.tags || []
+      } : null,
+      monsters
+    };
+  }
+
+  return { loadDraftContext, loadEncounterContext };
 }
 
 module.exports = { DEFAULT_BASE_URL, normalizeKey, stripMarkup, mechanicTags, createSpireCodexClient };

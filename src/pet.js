@@ -2,6 +2,47 @@ const stage = document.querySelector('#pet-stage');
 const speech = document.querySelector('#speech');
 const statusDot = document.querySelector('.status-dot');
 const statusLabel = document.querySelector('#pet-status-label');
+const guidePanel = document.querySelector('#encounter-guide');
+const guideKicker = document.querySelector('#guide-kicker');
+const guideTitle = document.querySelector('#guide-title');
+const guideContent = document.querySelector('#guide-content');
+const guideSource = document.querySelector('#guide-source');
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function guideList(title, items, className = '') {
+  if (!items?.length) return '';
+  return `<section class="guide-section"><div class="guide-section-title">${escapeHtml(title)}</div><ul class="guide-list ${className}">${items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>`;
+}
+
+function setEncounterGuide(guide) {
+  if (!guide) {
+    guidePanel.classList.remove('visible');
+    guideContent.innerHTML = '';
+    return;
+  }
+  guideKicker.textContent = guide.kind === 'boss' ? 'BOSS 攻略' : '精英攻略';
+  guideTitle.textContent = guide.title || '敌人机制';
+  const monsters = (guide.monsters || []).map(monster => `
+    <article class="guide-monster">
+      <div class="guide-monster-head"><strong>${escapeHtml(monster.name)}</strong><span>${escapeHtml(monster.hp)}</span></div>
+      ${(monster.innate || []).length ? `<div class="guide-innate">固有机制：${monster.innate.map(escapeHtml).join('；')}</div>` : ''}
+      <div class="guide-cycle">行动循环：${escapeHtml(monster.cycle)}</div>
+      ${guideList('招式', monster.moves || [])}
+    </article>`).join('');
+  guideContent.innerHTML = `<p class="guide-summary">进入本场战斗时自动读取的机制攻略。数值中的“高阶”来自高登塔难度数据。</p>${monsters}${guideList('主要危险', guide.dangers, 'danger')}${guideList('应对建议', guide.tips, 'tip')}`;
+  guideSource.textContent = guide.source === 'spire-codex'
+    ? `数据来源：Spire Codex · stable ${guide.gameVersion || '当前版本'}`
+    : '数据来源：游戏 Bridge · 未匹配到完整资料';
+  guidePanel.classList.add('visible');
+  say(`${guide.kind === 'boss' ? 'Boss' : '精英'}攻略来了`, 'alert');
+}
 
 function say(message, mood = '') {
   speech.textContent = message;
@@ -84,6 +125,11 @@ petButton.addEventListener('contextmenu', event => {
   event.preventDefault();
   window.windowControls?.showPetMenu({ x: event.clientX, y: event.clientY });
 });
+document.querySelector('#guide-close').addEventListener('click', () => {
+  setEncounterGuide(null);
+  window.windowControls?.dismissEncounterGuide();
+});
 window.gamebuddyBridge?.onStatus(setStatus);
 window.gamebuddyBridge?.onState(setState);
 window.gamebuddyBridge?.onRecommendation(setRecommendation);
+window.gamebuddyBridge?.onEncounterGuide(setEncounterGuide);
