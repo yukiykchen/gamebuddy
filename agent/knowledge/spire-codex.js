@@ -49,6 +49,8 @@ function attachEvaluation(card) {
     ...card,
     evaluation: {
       capturedAt: cardEvaluations.capturedAt,
+      gameVersion: cardEvaluations.game?.version || null,
+      dataChannel: cardEvaluations.game?.channel || null,
       prior: evaluation.prior,
       community: evaluation.community,
       expertConsensus: evaluation.expertConsensus,

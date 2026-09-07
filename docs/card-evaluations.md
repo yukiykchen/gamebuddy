@@ -2,6 +2,15 @@
 
 `agent/knowledge/card-evaluations.json` 是奖励选牌 Agent 的单卡基础先验，`docs/card-evaluations.csv` 是便于筛选和人工复核的总表。
 
+## 版本范围
+
+当前提交内的快照面向《杀戮尖塔 2》主分支（stable）`v0.107.1`，生成日期为 2026-09-07。同期 Steam `public-beta` 为 `v0.111.0`，两者存在卡牌重做、数值和稀有度差异，不能混用。
+
+- JSON 顶层 `game.version`、`game.channel`、`game.statisticsBracket` 明确记录目标版本。
+- CSV 每一行都带 `game_version`、`data_channel`、`captured_at`。
+- 社区评分请求限制到同一版本 bracket。
+- 高手 Tier 只纳入 `patches` 明确包含目标版本的评价。
+
 ## 数据来源
 
 - [Spire Codex](https://spire-codex.com/tier-list)：卡牌中文数据、社区对局数量、胜率和经过贝叶斯收缩的 Codex Score。
@@ -34,3 +43,12 @@ npm run knowledge:cards
 ```
 
 每次更新都会记录 `capturedAt`。由于游戏处于 Early Access，卡牌平衡调整后应重新生成，并重点检查专家评价中的 `patches` 是否过期。
+
+默认生成当前 stable 版本；生成当前 beta 版本时使用：
+
+```powershell
+$env:GAMEBUDDY_CARD_DATA_CHANNEL="beta"
+npm run knowledge:cards
+```
+
+需要复现固定历史版本时设置 `GAMEBUDDY_CARD_DATA_VERSION`，例如 `v0.107.1`。同步脚本会自动查询当前 stable 与 beta 版本并写入元数据，显式版本变量只用于复现或回测。

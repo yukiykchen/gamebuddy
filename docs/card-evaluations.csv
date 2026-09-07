@@ -1,578 +1,578 @@
-id,name,name_en,color,type,rarity,cost,prior_score,prior_tier,confidence,codex_score,picks,win_rate,expert_score,expert_evidence,mechanic_tags,expert_sources
-HUDDLE_UP,抱团,Huddle Up,colorless,技能,罕见,1,100,S,medium,100,33223,63.4,,0,draw|exhaust,
-JACKPOT,大奖,Jackpot,colorless,攻击,稀有,3,93,S,medium,100,25482,59.3,75,1,damage|draw,Navegreed
-DISCOVERY,发现,Discovery,colorless,技能,罕见,1,78,A,medium,79,41886,51.7,75,1,exhaust,Navegreed
-SPLASH,飞溅,Splash,colorless,技能,罕见,1,78,A,medium,79,34839,51.6,75,1,,Navegreed
-PROWESS,非凡技艺,Prowess,colorless,能力,罕见,1,73,B,medium,72,41391,49.5,75,1,scaling,Navegreed
-THE_GAMBIT,孤注一掷,The Gambit,colorless,技能,稀有,0,78,A,medium,100,7491,59.9,25,1,block,Navegreed
-ROLLING_BOULDER,滚石,Rolling Boulder,colorless,能力,稀有,3,71,B,medium,90,22088,55.1,25,1,aoe,Navegreed
-DARK_SHACKLES,黑暗镣铐,Dark Shackles,colorless,技能,罕见,0,93,S,medium,100,42580,58.1,75,1,scaling|exhaust,Navegreed
-BEAT_DOWN,狠揍,Beat Down,colorless,技能,稀有,3,78,A,medium,100,8679,63,25,1,draw,Navegreed
-CATASTROPHE,横祸,Catastrophe,colorless,技能,罕见,2,66,B,medium,84,17803,53.1,25,1,draw,Navegreed
-JACK_OF_ALL_TRADES,花样百出,Jack of All Trades,colorless,技能,罕见,0,65,B,medium,82,22565,52.5,25,1,draw|exhaust,Navegreed
-NOSTALGIA,怀旧,Nostalgia,colorless,能力,稀有,1,85,A,medium,100,16888,62.1,50,1,draw,Navegreed
-KNOCKDOWN,击倒,Knockdown,colorless,攻击,稀有,3,100,S,medium,100,16103,73.8,,0,damage,
-IMPATIENCE,急躁,Impatience,colorless,技能,罕见,0,70,B,medium,100,16746,58.2,0,1,draw,Navegreed
-RALLY,集结,Rally,colorless,技能,稀有,2,100,S,medium,100,21255,69.8,,0,block,
-STRATAGEM,计策,Stratagem,colorless,能力,罕见,1,66,B,medium,84,17227,53.2,25,1,draw,Navegreed
-SALVO,箭雨,Salvo,colorless,攻击,稀有,1,78,A,medium,100,10117,63.4,25,1,damage|retain,Navegreed
-CALAMITY,劫难,Calamity,colorless,能力,稀有,3,85,A,medium,100,9285,63.4,50,1,,Navegreed
-GOLD_AXE,金斧,Gold Axe,colorless,攻击,稀有,1,70,B,medium,100,29159,64.6,0,1,,Navegreed
-PURITY,净化,Purity,colorless,技能,罕见,0,78,A,medium,100,22212,57.9,25,1,draw|exhaust|retain,Navegreed
-ULTIMATE_STRIKE,究极打击,Ultimate Strike,colorless,攻击,罕见,1,54,C,medium,55,68242,44.5,50,1,damage,Navegreed
-ULTIMATE_DEFEND,究极防御,Ultimate Defend,colorless,技能,罕见,1,70,B,medium,68,66719,48.2,75,1,block,Navegreed
-EQUILIBRIUM,均衡,Equilibrium,colorless,技能,罕见,2,80,A,medium,82,22793,52.5,75,1,block|retain,Navegreed
-INTERCEPT,拦截,Intercept,colorless,技能,罕见,1,87,A,medium,87,10929,54,,0,block,
-FASTEN,勒紧,Fasten,colorless,能力,罕见,1,74,B,medium,63,52421,46.7,100,1,,Navegreed
-VOLLEY,连射,Volley,colorless,攻击,罕见,X,50,C,medium,61,14556,46.3,25,1,damage,Navegreed
-ALCHEMIZE,炼制药水,Alchemize,colorless,技能,稀有,1,100,S,medium,100,18011,61.4,100,1,exhaust,Navegreed
-FLASH_OF_STEEL,亮剑,Flash of Steel,colorless,攻击,罕见,0,76,B,medium,87,45093,54,50,1,damage|draw,Navegreed
-SCRAWL,潦草急就,Scrawl,colorless,技能,稀有,1,85,A,medium,100,14093,71.1,50,1,draw|exhaust,Navegreed
-BOLAS,流星锤,Bolas,colorless,攻击,稀有,0,78,A,medium,100,14287,59.3,25,1,damage,Navegreed
-MAYHEM,乱战,Mayhem,colorless,能力,稀有,2,78,A,medium,100,29905,63.4,25,1,draw,Navegreed
-SECRET_TECHNIQUE,秘密技法,Secret Technique,colorless,技能,稀有,0,93,S,medium,100,20676,69.5,75,1,draw|exhaust,Navegreed
-SECRET_WEAPON,秘密武器,Secret Weapon,colorless,技能,稀有,0,78,A,medium,100,15537,64.8,25,1,draw|exhaust,Navegreed
-FINESSE,妙计,Finesse,colorless,技能,罕见,0,86,A,medium,90,56750,55,75,1,block|draw,Navegreed
-MIMIC,拟态,Mimic,colorless,技能,稀有,1,100,S,medium,100,16587,67.4,,0,exhaust,
-FISTICUFFS,拳斗,Fisticuffs,colorless,攻击,罕见,1,65,B,medium,72,27321,49.6,50,1,damage,Navegreed
-GANG_UP,群起攻之,Gang Up,colorless,攻击,罕见,1,100,S,medium,100,34634,58.8,,0,damage,
-DRAMATIC_ENTRANCE,闪亮登场,Dramatic Entrance,colorless,攻击,罕见,0,54,C,medium,55,35083,44.3,50,1,damage|aoe|exhaust|innate,Navegreed
-ENTROPY,熵,Entropy,colorless,能力,稀有,1,85,A,medium,100,15922,60.7,50,1,draw,Navegreed
-THINKING_AHEAD,深谋远虑,Thinking Ahead,colorless,技能,罕见,0,75,B,medium,96,22928,56.9,25,1,draw|exhaust,Navegreed
-PANACHE,神气制胜,Panache,colorless,能力,罕见,0,67,B,medium,85,35679,53.5,25,1,aoe,Navegreed
-PRODUCTION,生产制造,Production,colorless,技能,罕见,0,68,B,medium,87,62358,54,25,1,energy|exhaust,Navegreed
-TAG_TEAM,双打组合,Tag Team,colorless,攻击,罕见,2,89,A,medium,89,19220,54.6,,0,damage,
-REND,撕碎,Rend,colorless,攻击,稀有,2,70,B,medium,100,5760,65.3,0,1,damage,Navegreed
-HAND_OF_GREED,贪婪之手,Hand of Greed,colorless,攻击,稀有,2,55,C,medium,68,7506,48.4,25,1,damage,Navegreed
-SEEKER_STRIKE,探寻打击,Seeker Strike,colorless,攻击,罕见,1,72,B,medium,81,17008,52.4,50,1,damage|draw,Navegreed
-ANOINTED,天选,Anointed,colorless,技能,稀有,1,70,B,medium,100,7341,70,0,1,draw|exhaust,Navegreed
-LIFT,托举,Lift,colorless,技能,罕见,1,86,A,medium,86,18417,53.8,,0,block,
-OMNISLICE,万向斩,Omnislice,colorless,攻击,罕见,0,51,C,medium,52,28042,43.4,50,1,damage,Navegreed
-HIDDEN_GEM,未掘宝石,Hidden Gem,colorless,技能,稀有,1,85,A,medium,100,62962,60.4,50,1,draw,Navegreed
-THRUMMING_HATCHET,无休手斧,Thrumming Hatchet,colorless,攻击,罕见,1,50,C,medium,50,15652,43,50,1,damage,Navegreed
-BEACON_OF_HOPE,希望灯塔,Beacon of Hope,colorless,能力,稀有,1,100,S,medium,100,38240,74.3,,0,,
-BELIEVE_IN_YOU,相信着你,Believe in You,colorless,技能,罕见,0,95,S,medium,95,60922,56.4,,0,energy,
-COORDINATE,协同配合,Coordinate,colorless,技能,罕见,1,80,A,medium,80,17260,52.1,,0,scaling,
-MIND_BLAST,心灵震慑,Mind Blast,colorless,攻击,罕见,1,58,C,medium,83,16317,52.8,0,1,draw|innate,Navegreed
-RESTLESSNESS,心神不宁,Restlessness,colorless,技能,罕见,0,62,C,medium,88,20338,54.4,0,1,draw|energy|retain,Navegreed
-PROLONG,延伸,Prolong,colorless,技能,罕见,0,68,B,medium,86,34235,53.7,25,1,exhaust,Navegreed
-PANIC_BUTTON,应急按钮,Panic Button,colorless,技能,罕见,0,68,B,medium,86,9912,53.8,25,1,block|exhaust,Navegreed
-ETERNAL_ARMOR,永恒铠甲,Eternal Armor,colorless,能力,稀有,3,78,A,medium,100,14802,63.2,25,1,,Navegreed
-THE_BOMB,炸弹,The Bomb,colorless,技能,罕见,2,52,C,medium,42,17892,40.5,75,1,aoe,Navegreed
-MASTER_OF_STRATEGY,战略大师,Master of Strategy,colorless,技能,稀有,0,93,S,medium,100,36044,68.7,75,1,draw|exhaust,Navegreed
-SHOCKWAVE,震荡波,Shockwave,colorless,技能,罕见,2,94,S,medium,91,32475,55.2,100,1,aoe|control|exhaust,Navegreed
-PREP_TIME,准备时间,Prep Time,colorless,能力,罕见,1,55,C,medium,68,21384,48.3,25,1,,Navegreed
-AUTOMATION,自动化,Automation,colorless,能力,罕见,1,82,A,medium,95,42228,56.4,50,1,draw|energy,Navegreed
-SPORE_MIND,孢子心灵,Spore Mind,curse,诅咒,诅咒,1,,,low,,,,,0,exhaust,
-CLUMSY,笨拙,Clumsy,curse,诅咒,诅咒,-1,,,low,,,,,0,,
-NORMALITY,凡庸,Normality,curse,诅咒,诅咒,-1,,,low,,,,,0,damage,
-DECAY,腐朽,Decay,curse,诅咒,诅咒,-1,,,low,,,,,0,damage,
-REGRET,悔恨,Regret,curse,诅咒,诅咒,-1,,,low,,,,,0,,
-ASCENDERS_BANE,进阶之灾,Ascender's Bane,curse,诅咒,诅咒,-1,,,low,,,,,0,,
-WRITHE,苦恼,Writhe,curse,诅咒,诅咒,-1,,,low,,,,,0,innate,
-GUILTY,愧疚,Guilty,curse,诅咒,诅咒,-1,,,low,,,,,0,,
-CURSE_OF_THE_BELL,铃铛的诅咒,Curse of the Bell,curse,诅咒,诅咒,-1,,,low,,,,,0,,
-BAD_LUCK,霉运,Bad Luck,curse,诅咒,诅咒,-1,,,low,,,,,0,,
-INJURY,受伤,Injury,curse,诅咒,诅咒,-1,,,low,,,,,0,,
-POOR_SLEEP,睡眠不佳,Poor Sleep,curse,诅咒,诅咒,-1,,,low,,,,,0,retain,
-GREED,贪婪,Greed,curse,诅咒,诅咒,-1,,,low,,,,,0,,
-SHAME,羞耻,Shame,curse,诅咒,诅咒,-1,,,low,,,,,0,,
-DOUBT,疑虑,Doubt,curse,诅咒,诅咒,-1,,,low,,,,,0,control,
-FOLLY,愚行,Folly,curse,诅咒,诅咒,-1,,,low,,,,,0,innate,
-DEBT,债务,Debt,curse,诅咒,诅咒,-1,,,low,,,,,0,,
-ENTHRALLED,执迷,Enthralled,curse,诅咒,诅咒,2,,,low,,,,,0,,
-SHADOW_SHIELD,暗影之盾,Shadow Shield,defect,技能,罕见,2,52,C,high,41,58909,40.1,78,2,block|generate,Navegreed|JapaneseExport
-WHITE_NOISE,白噪声,White Noise,defect,技能,罕见,1,41,D,high,53,100754,43.8,13,2,exhaust,Navegreed|JapaneseExport
-TEMPEST,暴风雨,Tempest,defect,技能,罕见,X,38,D,high,49,59304,42.8,13,2,generate,Navegreed|JapaneseExport
-BULK_UP,暴涨,Bulk Up,defect,能力,罕见,2,63,C,high,61,60488,46.3,68,2,scaling,Navegreed|JapaneseExport
-COMPILE_DRIVER,编译冲击,Compile Driver,defect,攻击,普通,1,55,C,high,56,62375,44.7,53,2,damage|draw,Navegreed|JapaneseExport
-HAILSTORM,冰雹风暴,Hailstorm,defect,能力,罕见,1,61,C,high,50,58619,43,88,2,aoe,Navegreed|JapaneseExport
-GLACIER,冰川,Glacier,defect,技能,罕见,2,68,B,high,54,83680,44,100,2,block|generate,Navegreed|JapaneseExport
-CHILL,冰寒,Chill,defect,技能,罕见,0,69,B,high,56,74734,44.8,100,2,exhaust|generate,Navegreed|JapaneseExport
-ICE_LANCE,冰之长枪,Ice Lance,defect,攻击,稀有,3,80,A,high,71,35732,49.3,100,2,damage|generate,Navegreed|JapaneseExport
-GLASSWORK,玻璃工艺,Glasswork,defect,技能,罕见,1,37,D,high,35,53110,38.4,43,2,block|generate,Navegreed|JapaneseExport
-RAINBOW,彩虹,Rainbow,defect,技能,稀有,2,57,C,high,58,29262,45.4,55,2,exhaust|generate,Navegreed|JapaneseExport
-SUPERCRITICAL,超临界态,Supercritical,defect,技能,稀有,0,84,A,high,81,57243,52.3,90,2,energy|exhaust,Navegreed|JapaneseExport
-HYPERBEAM,超能光束,Hyperbeam,defect,攻击,稀有,2,35,D,high,50,16847,42.9,0,2,damage|aoe|scaling,Navegreed|JapaneseExport
-OVERCLOCK,超频,Overclock,defect,技能,罕见,0,77,B,high,71,73312,49.1,90,2,draw,Navegreed|JapaneseExport
-FTL,超越光速,FTL,defect,攻击,罕见,0,56,C,high,51,71402,43.2,68,2,damage|draw,Navegreed|JapaneseExport
-MOMENTUM_STRIKE,趁势打击,Momentum Strike,defect,攻击,普通,1,26,F,high,27,77057,36.1,23,2,damage,Navegreed|JapaneseExport
-CHARGE_BATTERY,充电,Charge Battery,defect,技能,普通,1,48,D,high,35,187598,38.5,78,2,block|energy,Navegreed|JapaneseExport
-CREATIVE_AI,创造性AI,Creative AI,defect,能力,稀有,3,69,B,high,79,57535,51.7,45,2,,Navegreed|JapaneseExport
-STRIKE_DEFECT,打击,Strike,defect,攻击,基础,1,,,low,,,,,0,damage,
-SHATTER,打碎,Shatter,defect,攻击,稀有,1,66,B,high,51,42788,43.1,100,2,damage|aoe,Navegreed|JapaneseExport
-BARRAGE,弹幕齐射,Barrage,defect,攻击,普通,1,47,D,high,29,56106,36.7,90,2,damage,Navegreed|JapaneseExport
-ZAP,电击,Zap,defect,技能,基础,1,,,low,,,,,0,generate,
-VOLTAIC,电流相生,Voltaic,defect,技能,稀有,3,54,C,high,71,48592,49.3,13,2,exhaust|generate,Navegreed|JapaneseExport
-ITERATION,迭代,Iteration,defect,能力,罕见,1,71,B,high,72,60705,49.5,68,2,draw,Navegreed|JapaneseExport
-MULTI_CAST,多重释放,Multi-Cast,defect,技能,稀有,X,58,C,high,60,27731,45.8,53,2,,Navegreed|JapaneseExport
-DEFEND_DEFECT,防御,Defend,defect,技能,基础,1,,,low,,,,,0,block,
-LEAP,飞跃,Leap,defect,技能,普通,1,32,F,high,31,106805,37.2,35,2,block,Navegreed|JapaneseExport
-SUNDER,分离,Sunder,defect,攻击,罕见,3,31,F,high,19,31667,33.5,58,2,damage|energy,Navegreed|JapaneseExport
-BOOST_AWAY,高速脱离,Boost Away,defect,技能,普通,0,52,C,high,45,118342,41.4,68,2,block,Navegreed|JapaneseExport
-SCRAPE,刮削,Scrape,defect,攻击,罕见,1,47,D,high,63,40629,47,10,2,damage|draw|discard,Navegreed|JapaneseExport
-BEAM_CELL,光束射线,Beam Cell,defect,攻击,普通,0,33,F,high,42,122658,40.6,13,2,damage|control,Navegreed|JapaneseExport
-COLD_SNAP,寒流,Cold Snap,defect,攻击,普通,1,47,D,high,30,102460,36.8,88,2,damage|generate,Navegreed|JapaneseExport
-TRASH_TO_TREASURE,化废为宝,Trash to Treasure,defect,能力,稀有,1,85,A,high,78,37675,51.3,100,2,generate,Navegreed|JapaneseExport
-BUFFER,缓冲,Buffer,defect,能力,稀有,2,90,S,high,85,41770,53.3,100,2,,Navegreed|JapaneseExport
-ECHO_FORM,回响形态,Echo Form,defect,能力,稀有,3,92,S,high,88,78697,54.2,100,2,,Navegreed|JapaneseExport
-CHAOS,混沌,Chaos,defect,技能,罕见,1,28,F,high,40,45653,39.9,0,2,generate,Navegreed|JapaneseExport
-ROCKET_PUNCH,火箭飞拳,Rocket Punch,defect,攻击,罕见,2,72,B,high,69,46932,48.6,78,2,damage|draw|generate,Navegreed|JapaneseExport
-MACHINE_LEARNING,机器学习,Machine Learning,defect,能力,稀有,1,93,S,high,90,58136,55,100,2,draw,Navegreed|JapaneseExport
-FOCUSED_STRIKE,集中打击,Focused Strike,defect,攻击,普通,1,29,F,high,24,78283,35.2,40,2,damage|scaling,Navegreed|JapaneseExport
-FUSION,聚变,Fusion,defect,技能,罕见,1,47,D,high,43,51416,40.9,55,2,exhaust|generate,Navegreed|JapaneseExport
-NULL,空值,Null,defect,攻击,罕见,2,64,C,high,48,46150,42.4,100,2,damage|control|generate,Navegreed|JapaneseExport
-SKIM,快速检索,Skim,defect,技能,罕见,1,76,B,high,79,63036,51.7,68,2,draw,Navegreed|JapaneseExport
-CAPACITOR,扩容,Capacitor,defect,能力,罕见,1,61,C,high,49,118900,42.5,90,2,,Navegreed|JapaneseExport
-STORM,雷暴,Storm,defect,能力,罕见,1,49,D,high,60,73358,45.9,23,2,generate,Navegreed|JapaneseExport
-THUNDER,雷霆,Thunder,defect,能力,罕见,1,38,D,high,46,93193,41.7,20,2,,Navegreed|JapaneseExport
-COOLHEADED,冷静头脑,Coolheaded,defect,技能,普通,1,58,C,high,49,153070,42.5,78,2,draw|generate,Navegreed|JapaneseExport
-COOLANT,冷却剂,Coolant,defect,能力,稀有,1,76,B,high,75,31336,50.5,78,2,,Navegreed|JapaneseExport
-HELIX_DRILL,螺旋钻击,Helix Drill,defect,攻击,稀有,0,69,B,high,83,22073,52.9,35,2,damage,Navegreed|JapaneseExport
-MODDED,模组改造,Modded,defect,技能,稀有,0,79,A,high,74,61467,50.1,90,2,draw,Navegreed|JapaneseExport
-SCAVENGE,内存清理,Scavenge,defect,技能,罕见,1,54,C,high,63,42143,46.9,33,2,energy|exhaust,Navegreed|JapaneseExport
-TURBO,内核加速,TURBO,defect,技能,普通,0,60,C,high,53,121194,43.9,78,2,energy,Navegreed|JapaneseExport
-ENERGY_SURGE,能量涌动,Energy Surge,defect,技能,罕见,1,87,A,medium,87,76967,54.1,,0,energy|exhaust,
-BIASED_COGNITION,偏差认知,Biased Cognition,defect,能力,先古,1,65,B,high,60,5663,45.8,77,3,scaling,"Navegreed|JapaneseExport, Navegreed, Opem, VmService"
-DARKNESS,漆黑,Darkness,defect,技能,罕见,1,57,C,high,38,51451,39.5,100,2,generate,Navegreed|JapaneseExport
-BOOT_SEQUENCE,启动流程,Boot Sequence,defect,技能,罕见,0,67,B,high,53,87510,43.7,100,2,block|exhaust|innate,Navegreed|JapaneseExport
-FIGHT_THROUGH,强撑,Fight Through,defect,技能,罕见,1,62,C,high,55,52598,44.3,78,2,block,Navegreed|JapaneseExport
-BALL_LIGHTNING,球状闪电,Ball Lightning,defect,攻击,普通,1,29,F,high,21,113691,34.1,48,2,damage|generate,Navegreed|JapaneseExport
-HOLOGRAM,全息影像,Hologram,defect,技能,普通,1,57,C,high,54,164421,44.2,65,2,block|exhaust,Navegreed|JapaneseExport
-HOTFIX,热修复,Hotfix,defect,技能,普通,0,44,D,high,40,130062,39.9,53,2,scaling|exhaust,Navegreed|JapaneseExport
-SYNTHESIS,人工合成,Synthesis,defect,攻击,罕见,2,48,D,high,49,32629,42.5,45,2,damage,Navegreed|JapaneseExport
-FLAK_CANNON,散射炮,Flak Cannon,defect,攻击,稀有,2,80,A,high,81,36258,52.3,78,2,damage|exhaust,Navegreed|JapaneseExport
-UPROAR,骚动,Uproar,defect,攻击,普通,2,39,D,high,35,49559,38.3,48,2,damage|draw,Navegreed|JapaneseExport
-SWEEPING_BEAM,扫荡射线,Sweeping Beam,defect,攻击,普通,1,22,F,high,27,74791,36.1,10,2,damage|draw|aoe,Navegreed|JapaneseExport
-ADAPTIVE_STRIKE,适应打击,Adaptive Strike,defect,攻击,稀有,2,47,D,high,58,32857,45.4,23,2,damage,Navegreed|JapaneseExport
-DOUBLE_ENERGY,双倍能量,Double Energy,defect,技能,罕见,1,50,C,high,57,71850,45.1,35,2,exhaust,Navegreed|JapaneseExport
-DUALCAST,双重释放,Dualcast,defect,技能,基础,1,,,low,,,,,0,,
-QUADCAST,四重释放,Quadcast,defect,技能,先古,1,30,F,high,30,19489,36.8,30,2,,"Navegreed|JapaneseExport, Navegreed, Opem, VmService"
-DEFRAGMENT,碎片整理,Defragment,defect,能力,稀有,1,86,A,high,80,63437,52,100,2,scaling,Navegreed|JapaneseExport
-TESLA_COIL,特斯拉线圈,Tesla Coil,defect,攻击,罕见,0,35,D,high,35,67540,38.3,35,2,damage,Navegreed|JapaneseExport
-SYNCHRONIZE,同步,Synchronize,defect,技能,罕见,1,63,C,high,51,40238,43.1,90,2,scaling|exhaust,Navegreed|JapaneseExport
-CONSUMING_SHADOW,吞噬暗影,Consuming Shadow,defect,能力,稀有,2,54,C,high,54,25115,44.1,55,2,generate,Navegreed|JapaneseExport
-ALL_FOR_ONE,万物一心,All for One,defect,攻击,稀有,2,77,B,high,87,45802,54.1,55,2,damage,Navegreed|JapaneseExport
-GUNK_UP,污秽攻击,Gunk Up,defect,攻击,普通,1,38,D,high,34,64746,38.2,48,2,damage,Navegreed|JapaneseExport
-SIGNAL_BOOST,信号增强,Signal Boost,defect,技能,稀有,1,74,B,high,81,50981,52.2,58,2,exhaust,Navegreed|JapaneseExport
-SPINNER,旋转工艺,Spinner,defect,能力,稀有,1,65,B,high,68,45238,48.3,58,2,generate,Navegreed|JapaneseExport
-LOOP,循环,Loop,defect,能力,罕见,1,59,C,high,45,89316,41.4,90,2,,Navegreed|JapaneseExport
-COMPACT,压缩,Compact,defect,技能,罕见,1,70,B,high,57,77437,45.1,100,2,block,Navegreed|JapaneseExport
-SMOKESTACK,烟囱,Smokestack,defect,能力,罕见,1,45,D,high,50,47233,43,33,2,aoe|generate,Navegreed|JapaneseExport
-GO_FOR_THE_EYES,眼部攻击,Go for the Eyes,defect,攻击,普通,0,51,C,high,44,131382,41.1,68,2,damage|control,Navegreed|JapaneseExport
-FERAL,野性,Feral,defect,能力,罕见,2,51,C,high,58,74529,45.4,35,2,,Navegreed|JapaneseExport
-GENETIC_ALGORITHM,遗传算法,Genetic Algorithm,defect,技能,稀有,1,71,B,high,58,40058,45.3,100,2,block|exhaust,Navegreed|JapaneseExport
-IGNITION,引火,Ignition,defect,技能,稀有,1,96,S,medium,96,34437,56.9,,0,exhaust|generate,
-LIGHTNING_ROD,引雷针,Lightning Rod,defect,技能,普通,1,31,F,high,30,152560,37,33,2,block|generate,Navegreed|JapaneseExport
-METEOR_STRIKE,陨石打击,Meteor Strike,defect,攻击,稀有,5,64,C,high,77,22881,50.9,33,2,damage|generate,Navegreed|JapaneseExport
-CLAW,爪击,Claw,defect,攻击,普通,0,35,D,high,29,120629,36.7,50,2,damage,Snakebite_Enjoyer|JapaneseExport
-REFRACT,折射,Refract,defect,攻击,罕见,3,42,D,high,31,40433,37.1,68,2,damage|generate,Navegreed|JapaneseExport
-REBOOT,重启,Reboot,defect,技能,稀有,0,74,B,high,91,43375,55.3,33,2,draw|exhaust,Navegreed|JapaneseExport
-SUBROUTINE,子程序,Subroutine,defect,能力,罕见,1,71,B,high,64,95401,47.1,88,2,,Navegreed|JapaneseExport
-WHISTLE,吹哨,Whistle,event,攻击,先古,3,,,low,,,,,0,damage|exhaust,
-REBOUND,弹回,Rebound,event,攻击,事件,1,,,low,,,,,0,damage|draw,
-STACK,堆栈,Stack,event,技能,事件,1,,,low,,,,,0,,
-RELAX,放松,Relax,event,技能,先古,3,,,low,,,,,0,block|draw|energy|exhaust,
-FEEDING_FRENZY,疯狂进食,Feeding Frenzy,event,技能,事件,0,,,low,,,,,0,scaling,
-MAD_SCIENCE,疯狂科学,Mad Science,event,攻击,事件,1,,,low,,,,,0,damage|block,
-ENTRENCH,巩固,Entrench,event,技能,事件,2,,,low,,,,,0,,
-TORIC_TOUGHNESS,坚韧之环,Toric Toughness,event,技能,事件,2,,,low,,,,,0,block,
-CLASH,交锋,Clash,event,攻击,事件,0,,,low,,,,,0,damage,
-ENLIGHTENMENT,开悟,Enlightenment,event,技能,事件,0,,,low,,,,,0,exhaust,
-RIP_AND_TEAR,狂乱撕扯,Rip and Tear,event,攻击,事件,1,,,low,,,,,0,damage,
-APPARITION,灵体,Apparition,event,技能,先古,1,,,low,,,,,0,exhaust,
-HELLO_WORLD,你好世界,Hello World,event,能力,事件,1,,,low,,,,,0,,
-NEOWS_FURY,涅奥之怒,Neow's Fury,event,攻击,先古,1,,,low,,,,,0,damage|draw|exhaust,
-OUTMANEUVER,抢占先机,Outmaneuver,event,技能,事件,1,,,low,,,,,0,energy,
-EXTERMINATE,杀灭,Exterminate,event,攻击,事件,1,,,low,,,,,0,damage|aoe,
-APOTHEOSIS,神化,Apotheosis,event,技能,先古,2,,,low,,,,,0,exhaust|innate,
-DISTRACTION,声东击西,Distraction,event,技能,事件,1,,,low,,,,,0,exhaust,
-DUAL_WIELD,双持,Dual Wield,event,技能,事件,1,,,low,,,,,0,draw,
-MAUL,撕咬,Maul,event,攻击,先古,1,,,low,,,,,0,damage,
-CALTROPS,铁蒺藜,Caltrops,event,能力,事件,1,,,low,,,,,0,,
-WISH,许愿,Wish,event,技能,先古,0,,,low,,,,,0,draw|exhaust,
-SQUASH,压扁,Squash,event,攻击,事件,1,,,low,,,,,0,damage|control,
-BYRD_SWOOP,异鸟扑击,Byrd Swoop,event,攻击,事件,0,,,low,,,,,0,damage,
-METAMORPHOSIS,羽化,Metamorphosis,event,技能,事件,2,,,low,,,,,0,draw|exhaust,
-BRIGHTEST_FLAME,至亮之焰,Brightest Flame,event,技能,先古,0,,,low,,,,,0,draw|energy,
-PECK,啄击,Peck,event,攻击,事件,1,,,low,,,,,0,damage,
-RAMPAGE,暴走,Rampage,ironclad,攻击,罕见,1,27,F,high,33,55411,37.7,13,2,damage,Baalorlord|Navegreed
-FORGOTTEN_RITUAL,被遗忘的仪式,Forgotten Ritual,ironclad,技能,罕见,1,64,C,high,70,60193,49,50,2,energy|exhaust,Baalorlord|Navegreed
-HOWL_FROM_BEYOND,彼岸咆哮,Howl from Beyond,ironclad,攻击,罕见,3,43,D,high,45,47746,41.4,38,2,damage|aoe|exhaust,Baalorlord|Navegreed
-BARRICADE,壁垒,Barricade,ironclad,能力,稀有,3,83,A,high,91,59266,55.2,63,2,,Baalorlord|Navegreed
-STOMP,踩踏,Stomp,ironclad,攻击,罕见,3,38,D,high,38,66022,39.3,38,2,damage|aoe,Baalorlord|Navegreed
-CRUELTY,残酷,Cruelty,ironclad,能力,稀有,1,85,A,high,78,80063,51.4,100,2,control,Baalorlord|Navegreed
-DISMANTLE,拆卸,Dismantle,ironclad,攻击,罕见,1,46,D,high,49,77328,42.7,38,2,damage|control,Baalorlord|Navegreed
-TEAR_ASUNDER,扯碎,Tear Asunder,ironclad,攻击,稀有,2,74,B,high,84,30914,53.2,50,2,damage,Baalorlord|Navegreed
-STRIKE_IRONCLAD,打击,Strike,ironclad,攻击,基础,1,25,F,medium,,,,25,1,damage,Baalorlord
-HELLRAISER,地狱狂徒,Hellraiser,ironclad,能力,稀有,2,50,C,high,66,55975,47.9,13,2,draw,Baalorlord|Navegreed
-INFERNAL_BLADE,地狱之刃,Infernal Blade,ironclad,技能,罕见,1,43,D,high,51,76174,43.2,25,2,exhaust,Baalorlord|Navegreed
-DEMONIC_SHIELD,恶魔护盾,Demonic Shield,ironclad,技能,罕见,0,88,A,medium,94,46383,56.2,75,1,exhaust,Baalorlord
-DEMON_FORM,恶魔形态,Demon Form,ironclad,能力,稀有,3,58,C,high,75,62911,50.3,17,3,scaling,Baalorlord — Main|Baalorlord — Beta|Navegreed
-FIEND_FIRE,恶魔之焰,Fiend Fire,ironclad,攻击,稀有,2,87,A,high,81,35040,52.2,100,2,damage|exhaust,Baalorlord|Navegreed
-DEFEND_IRONCLAD,防御,Defend,ironclad,技能,基础,1,25,F,medium,,,,25,1,block,Baalorlord
-BLOODLETTING,放血,Bloodletting,ironclad,技能,普通,0,66,B,high,52,224982,43.7,100,2,energy,Baalorlord|Navegreed
-SWORD_BOOMERANG,飞剑回旋镖,Sword Boomerang,ironclad,攻击,普通,1,40,D,high,46,71813,41.6,25,2,damage,Baalorlord|Navegreed
-CRIMSON_MANTLE,绯红披风,Crimson Mantle,ironclad,能力,稀有,1,88,A,high,94,61869,56,75,2,,Baalorlord|Navegreed
-CONFLAGRATION,焚烧,Conflagration,ironclad,攻击,稀有,1,69,B,high,71,53144,49.2,63,2,damage|aoe,Baalorlord|Navegreed
-ANGER,愤怒,Anger,ironclad,攻击,普通,0,41,D,high,32,113048,37.6,63,2,damage,Baalorlord|Navegreed
-CORRUPTION,腐化,Corruption,ironclad,能力,先古,3,80,A,high,87,5544,54.1,63,4,exhaust,"Baalorlord|Navegreed|JapaneseExport, Navegreed, Opem, VmService"
-AGGRESSION,好勇斗狠,Aggression,ironclad,能力,稀有,1,77,B,high,88,46755,54.4,50,2,,Baalorlord|Navegreed
-DARK_EMBRACE,黑暗之拥,Dark Embrace,ironclad,能力,稀有,2,98,S,high,97,34876,57.2,100,2,draw|exhaust,Baalorlord|Navegreed
-ASHEN_STRIKE,灰烬打击,Ashen Strike,ironclad,攻击,罕见,1,62,C,high,62,60553,46.4,63,2,damage|exhaust,Baalorlord|Navegreed
-FLAME_BARRIER,火焰屏障,Flame Barrier,ironclad,技能,罕见,2,53,C,high,49,102430,42.7,63,2,block,Baalorlord|Navegreed
-OFFERING,祭品,Offering,ironclad,技能,稀有,0,100,S,high,100,80144,58.2,100,2,draw|energy|exhaust,Baalorlord|Navegreed
-UNMOVABLE,坚定不移,Unmovable,ironclad,能力,稀有,2,93,S,high,90,64643,54.8,100,2,,Baalorlord|Navegreed
-TRUE_GRIT,坚毅,True Grit,ironclad,技能,普通,1,48,D,high,52,128365,43.4,38,2,block|exhaust,Baalorlord|Navegreed
-POMMEL_STRIKE,剑柄打击,Pommel Strike,ironclad,攻击,普通,1,64,C,high,49,205474,42.5,100,2,damage|draw,Baalorlord|Navegreed
-PILLAGE,劫掠,Pillage,ironclad,攻击,罕见,1,60,C,high,64,55383,47,50,2,damage|draw,Baalorlord|Navegreed
-STAMPEDE,惊逃,Stampede,ironclad,能力,罕见,2,43,D,high,51,102120,43.1,25,2,,Baalorlord|Navegreed
-COLOSSUS,巨像,Colossus,ironclad,技能,罕见,1,73,B,high,66,111994,47.7,88,2,block|control,Baalorlord|Navegreed
-RAGE,狂怒,Rage,ironclad,技能,罕见,0,63,C,high,52,99711,43.4,88,2,,Baalorlord|Navegreed
-FEED,狂宴,Feed,ironclad,攻击,稀有,1,54,C,high,50,40618,43,63,2,damage|exhaust,Baalorlord|Navegreed
-IMPERVIOUS,岿然不动,Impervious,ironclad,技能,稀有,2,87,A,high,87,53431,53.9,88,2,block|exhaust,Baalorlord|Navegreed
-BRAND,烙印,Brand,ironclad,技能,稀有,0,70,B,high,78,56089,51.3,50,2,scaling|exhaust,Baalorlord|Navegreed
-ONE_TWO_PUNCH,连环拳,One-Two Punch,ironclad,技能,稀有,1,63,C,high,74,56935,50,38,2,,Baalorlord|Navegreed
-MANGLE,凌虐,Mangle,ironclad,攻击,稀有,3,76,B,high,92,43706,55.5,38,2,damage|scaling,Baalorlord|Navegreed
-BREAK,破击,Break,ironclad,攻击,先古,1,58,C,high,61,35930,46.2,50,3,damage|control,"Baalorlord|Navegreed|JapaneseExport, Navegreed, Opem, VmService"
-HAVOC,破灭,Havoc,ironclad,技能,普通,1,42,D,high,55,52569,44.3,13,2,draw|exhaust,Baalorlord|Navegreed
-BULLY,欺凌,Bully,ironclad,攻击,罕见,0,61,C,high,66,85553,47.7,50,2,damage|control,Baalorlord|Navegreed
-PACTS_END,契约终结,Pact's End,ironclad,攻击,稀有,0,75,B,high,75,35011,50.6,75,2,damage|draw|aoe|exhaust,Baalorlord|Navegreed
-CASCADE,倾泻,Cascade,ironclad,技能,稀有,X,80,A,high,93,47375,55.7,50,2,draw,Baalorlord|Navegreed
-BODY_SLAM,全身撞击,Body Slam,ironclad,攻击,普通,1,59,C,high,63,99077,47,50,2,,Baalorlord|Navegreed
-INFLAME,燃烧,Inflame,ironclad,能力,罕见,1,40,D,high,47,112100,42.1,25,2,scaling,Baalorlord|Navegreed
-BURNING_PACT,燃烧契约,Burning Pact,ironclad,技能,罕见,1,77,B,high,72,87076,49.5,88,2,draw|exhaust,Baalorlord|Navegreed
-MOLTEN_FIST,熔融之拳,Molten Fist,ironclad,攻击,普通,1,43,D,high,50,166083,42.8,25,2,damage|control|exhaust,Baalorlord|Navegreed
-TANK,肉盾,Tank,ironclad,能力,稀有,1,70,B,medium,100,11645,60.8,0,1,,Baalorlord
-THUNDERCLAP,闪电霹雳,Thunderclap,ironclad,攻击,普通,1,36,D,high,40,129185,39.8,25,2,damage|aoe|control,Baalorlord|Navegreed
-UPPERCUT,上勾拳,Uppercut,ironclad,攻击,罕见,2,63,C,high,58,78436,45.4,75,2,damage|control,Baalorlord|Navegreed
-NOT_YET,时候未到,Not Yet,ironclad,技能,稀有,2,74,B,high,74,44672,50.3,75,2,exhaust,Baalorlord|Navegreed
-JUGGERNAUT,势不可当,Juggernaut,ironclad,能力,稀有,2,64,C,high,75,38522,50.3,38,2,,Baalorlord|Navegreed
-TWIN_STRIKE,双重打击,Twin Strike,ironclad,攻击,普通,1,36,D,high,35,103003,38.5,38,2,damage,Baalorlord|Navegreed
-RUPTURE,撕裂,Rupture,ironclad,能力,罕见,1,56,C,high,58,91939,45.4,50,2,scaling,Baalorlord|Navegreed
-SHRUG_IT_OFF,耸肩无视,Shrug It Off,ironclad,技能,普通,1,55,C,high,47,235659,42,75,2,block|draw,Baalorlord|Navegreed
-STOKE,添柴,Stoke,ironclad,技能,稀有,1,89,A,high,89,40484,54.6,88,2,exhaust,Baalorlord|Navegreed
-TAUNT,挑衅,Taunt,ironclad,技能,罕见,1,62,C,high,57,135468,45.1,75,2,block|control,Baalorlord|Navegreed
-IRON_WAVE,铁斩波,Iron Wave,ironclad,攻击,普通,1,37,D,high,36,98064,38.8,38,2,damage|block,Baalorlord|Navegreed
-BASH,痛击,Bash,ironclad,攻击,基础,2,25,F,medium,,,,25,1,damage|control,Baalorlord
-THRASH,痛殴,Thrash,ironclad,攻击,稀有,1,74,B,high,74,51515,50.1,75,2,damage|exhaust,Baalorlord|Navegreed
-HEADBUTT,头槌,Headbutt,ironclad,攻击,普通,1,59,C,high,52,113124,43.6,75,2,damage|draw,Baalorlord|Navegreed
-BREAKTHROUGH,突破,Breakthrough,ironclad,攻击,普通,1,29,F,high,25,103415,35.4,38,2,damage|aoe,Baalorlord|Navegreed
-PERFECTED_STRIKE,完美打击,Perfected Strike,ironclad,攻击,普通,2,28,F,high,29,121320,36.5,25,2,damage,Baalorlord|Navegreed
-FEEL_NO_PAIN,无惧疼痛,Feel No Pain,ironclad,能力,罕见,1,80,A,high,77,74822,51,88,2,exhaust,Baalorlord|Navegreed
-UNRELENTING,无情猛攻,Unrelenting,ironclad,攻击,罕见,2,42,D,high,43,57221,40.7,38,2,damage,Baalorlord|Navegreed
-ARMAMENTS,武装,Armaments,ironclad,技能,普通,1,40,D,high,41,177944,40.4,38,2,block,Baalorlord|Navegreed
-EVIL_EYE,邪眼,Evil Eye,ironclad,技能,罕见,1,65,B,high,60,69451,45.8,75,2,block|exhaust,Baalorlord|Navegreed
-PYRE,薪火之源,Pyre,ironclad,能力,稀有,2,74,B,high,79,89789,51.6,63,2,energy,Baalorlord|Navegreed
-VICIOUS,凶恶,Vicious,ironclad,能力,罕见,1,71,B,high,74,87605,50.1,63,2,draw|control,Baalorlord|Navegreed
-WHIRLWIND,旋风斩,Whirlwind,ironclad,攻击,罕见,X,52,C,high,47,68867,42.1,63,2,damage|aoe,Baalorlord|Navegreed
-BLOOD_WALL,血墙,Blood Wall,ironclad,技能,普通,2,50,C,high,44,114045,41.3,63,2,block,Baalorlord|Navegreed
-STONE_ARMOR,岩石铠甲,Stone Armor,ironclad,能力,罕见,1,53,C,high,59,84906,45.6,38,2,,Baalorlord|Navegreed
-CINDER,余烬,Cinder,ironclad,攻击,普通,2,16,F,high,17,34610,33.1,13,2,damage|exhaust,Baalorlord|Navegreed
-FIGHT_ME,与我一战！,Fight Me!,ironclad,攻击,罕见,2,45,D,high,37,48539,39.1,63,2,damage|scaling,Baalorlord|Navegreed
-INFERNO,狱火,Inferno,ironclad,能力,罕见,1,50,C,high,50,56057,42.9,50,2,aoe,Baalorlord|Navegreed
-SETUP_STRIKE,预备打击,Setup Strike,ironclad,攻击,普通,1,32,F,high,34,115045,38,28,3,damage|scaling,Baalorlord — Main|Baalorlord — Beta|Navegreed
-HEMOKINESIS,御血术,Hemokinesis,ironclad,攻击,罕见,1,49,D,high,38,37538,39.4,75,2,damage,Baalorlord|Navegreed
-PRIMAL_FORCE,原始力量,Primal Force,ironclad,技能,稀有,0,55,C,high,52,31039,43.7,63,2,,Baalorlord|Navegreed
-SPITE,怨恨,Spite,ironclad,攻击,罕见,0,54,C,high,56,45324,44.7,50,2,damage,Baalorlord|Navegreed
-EXPECT_A_FIGHT,跃跃欲试,Expect a Fight,ironclad,技能,罕见,2,59,C,high,57,68098,45.1,63,2,,Baalorlord|Navegreed
-JUGGLING,杂耍,Juggling,ironclad,能力,罕见,1,52,C,high,64,54787,47.3,25,2,,Baalorlord|Navegreed
-BATTLE_TRANCE,战斗专注,Battle Trance,ironclad,技能,罕见,0,76,B,high,71,122601,49.3,88,2,draw,Baalorlord|Navegreed
-DRUM_OF_BATTLE,战鼓,Drum of Battle,ironclad,技能,罕见,1,58,C,high,72,38303,49.4,25,2,draw|energy|exhaust,Baalorlord|Navegreed
-TREMBLE,战栗,Tremble,ironclad,技能,普通,1,51,C,high,46,187453,41.9,63,2,control|exhaust,Baalorlord|Navegreed
-BLUDGEON,重锤,Bludgeon,ironclad,攻击,罕见,3,44,D,high,42,60236,40.6,50,2,damage,Baalorlord|Navegreed
-SECOND_WIND,重振精神,Second Wind,ironclad,技能,罕见,1,70,B,high,68,56929,48.5,75,2,block|exhaust,Baalorlord|Navegreed
-DOMINATE,主宰,Dominate,ironclad,技能,罕见,1,76,B,high,71,116857,49.3,88,2,scaling|control|exhaust,Baalorlord|Navegreed
-GLIMPSE_BEYOND,彼岸一瞥,Glimpse Beyond,necrobinder,技能,稀有,1,100,S,medium,100,42447,66.2,,0,draw|exhaust,
-SCOURGE,鞭打,Scourge,necrobinder,技能,普通,1,41,D,high,45,117204,41.3,33,2,draw,Navegreed|JapaneseExport
-REAVE,剥夺,Reave,necrobinder,攻击,普通,1,33,F,high,39,81464,39.6,20,2,damage|draw,Navegreed|JapaneseExport
-SOW,播种,Sow,necrobinder,攻击,普通,1,34,F,high,20,66355,33.8,68,2,damage|aoe|retain,Navegreed|JapaneseExport
-CAPTURE_SPIRIT,捕捉灵魂,Capture Spirit,necrobinder,技能,罕见,1,79,A,high,70,82307,48.9,100,2,damage|draw,Navegreed|JapaneseExport
-UNDEATH,不死,Undeath,necrobinder,技能,稀有,0,79,A,high,80,47909,51.8,78,2,block,Navegreed|JapaneseExport
-UNLEASH,出击,Unleash,necrobinder,攻击,基础,1,50,C,medium,,,,50,2,damage,Navegreed|JapaneseExport
-POKE,戳击,Poke,necrobinder,攻击,普通,0,45,D,high,39,107497,39.6,58,2,damage,Navegreed|JapaneseExport
-VEILPIERCER,刺破帷幕,Veilpiercer,necrobinder,攻击,罕见,1,56,C,high,66,31454,47.8,33,2,damage,Navegreed|JapaneseExport
-DEBILITATE,摧残,Debilitate,necrobinder,攻击,罕见,1,90,S,high,100,88761,58,68,2,damage|control,Navegreed|JapaneseExport
-STRIKE_NECROBINDER,打击,Strike,necrobinder,攻击,基础,1,,,low,,,,,0,damage,
-TIMES_UP,大限已至,Time's Up,necrobinder,攻击,稀有,2,72,B,high,85,38899,53.6,43,2,exhaust,Navegreed|JapaneseExport
-COUNTDOWN,倒数计时,Countdown,necrobinder,能力,罕见,1,51,C,high,54,87711,44.2,43,2,,Navegreed|JapaneseExport
-RIGHT_HAND_HAND,得力助手,Right Hand Hand,necrobinder,攻击,罕见,0,53,C,high,62,53725,46.5,33,2,damage|energy,Navegreed|JapaneseExport
-DEFILE,玷污,Defile,necrobinder,攻击,普通,1,37,D,high,35,61727,38.4,43,2,damage,Navegreed|JapaneseExport
-SCULPTING_STRIKE,雕琢打击,Sculpting Strike,necrobinder,攻击,普通,1,47,D,high,58,38871,45.4,23,2,damage,Navegreed|JapaneseExport
-HANG,吊杀,Hang,necrobinder,攻击,稀有,1,71,B,high,79,44850,51.7,53,2,damage,Navegreed|JapaneseExport
-SHROUD,厄运之衣,Shroud,necrobinder,能力,罕见,1,58,C,high,65,69971,47.6,43,2,block,Navegreed|JapaneseExport
-DEFEND_NECROBINDER,防御,Defend,necrobinder,技能,基础,1,,,low,,,,,0,block,
-GRAVEBLAST,坟冢爆射,Graveblast,necrobinder,攻击,普通,1,53,C,high,72,99630,49.6,10,2,damage|exhaust,Navegreed|JapaneseExport
-PUTREFY,腐败,Putrefy,necrobinder,技能,罕见,1,83,A,high,81,75843,52.1,88,2,control|exhaust,Navegreed|JapaneseExport
-NEGATIVE_PULSE,负能量脉冲,Negative Pulse,necrobinder,技能,普通,1,41,D,high,35,161046,38.5,55,2,block|aoe,Navegreed|JapaneseExport
-CALCIFY,钙化,Calcify,necrobinder,能力,罕见,1,59,C,high,55,49283,44.5,68,2,,Navegreed|JapaneseExport
-ERADICATE,根除,Eradicate,necrobinder,攻击,稀有,X,91,S,high,96,36349,56.6,78,2,damage|retain,Navegreed|JapaneseExport
-WISP,鬼火,Wisp,necrobinder,技能,普通,0,50,C,high,58,178701,45.2,33,2,energy|exhaust,Navegreed|JapaneseExport
-LEGION_OF_BONE,骸骨军团,Legion of Bone,necrobinder,技能,罕见,2,100,S,medium,100,48485,60,,0,exhaust,
-BODYGUARD,护卫,Bodyguard,necrobinder,技能,基础,1,50,C,medium,,,,50,2,,Navegreed|JapaneseExport
-EIDOLON,幻景,Eidolon,necrobinder,技能,稀有,2,68,B,high,78,11696,51.3,43,2,exhaust,Navegreed|JapaneseExport
-INVOKE,唤起,Invoke,necrobinder,技能,普通,1,56,C,high,56,180658,44.7,55,2,energy,Navegreed|JapaneseExport
-BLIGHT_STRIKE,荒疫打击,Blight Strike,necrobinder,攻击,普通,1,28,F,high,31,80823,37.1,20,2,damage,Navegreed|JapaneseExport
-SPIRIT_OF_ASH,灰烬之灵,Spirit of Ash,necrobinder,能力,稀有,1,92,S,high,93,30213,55.8,88,2,,Navegreed|JapaneseExport
-HIGH_FIVE,击掌,High Five,necrobinder,攻击,罕见,2,57,C,high,58,65119,45.3,55,2,damage|aoe|control,Navegreed|JapaneseExport
-SEANCE,降灵,Seance,necrobinder,技能,稀有,1,80,A,high,100,41872,58.1,33,2,draw,Navegreed|JapaneseExport
-CLEANSE,洁净,Cleanse,necrobinder,技能,罕见,1,62,C,high,74,53480,50.1,33,2,draw|exhaust,Navegreed|JapaneseExport
-SIC_EM,紧追不放,Sic 'Em,necrobinder,攻击,罕见,1,43,D,high,47,52144,42,33,2,damage,Navegreed|JapaneseExport
-FORBIDDEN_GRIMOIRE,禁忌魔典,Forbidden Grimoire,necrobinder,能力,先古,2,89,A,high,97,11931,57.1,69,4,,"Navegreed|JapaneseExport|JapaneseExport, Navegreed, Opem, VmService"
-NEUROSURGE,精神过载,Neurosurge,necrobinder,能力,稀有,0,100,S,high,100,53806,60.3,100,2,draw|energy,Navegreed|JapaneseExport
-HAUNT,纠缠,Haunt,necrobinder,能力,罕见,1,63,C,high,66,72258,47.8,55,2,,Navegreed|JapaneseExport
-THE_SCYTHE,巨镰,The Scythe,necrobinder,攻击,稀有,2,52,C,high,56,32765,44.7,43,2,damage|exhaust,Navegreed|JapaneseExport
-FEAR,恐惧,Fear,necrobinder,攻击,普通,1,40,D,high,53,95130,43.9,10,2,damage|control,Navegreed|JapaneseExport
-MISERY,苦难,Misery,necrobinder,攻击,稀有,0,71,B,high,93,55195,55.7,20,2,damage,Navegreed|JapaneseExport
-AFTERLIFE,来生,Afterlife,necrobinder,技能,普通,1,59,C,high,51,86878,43.1,78,2,exhaust,Navegreed|JapaneseExport
-SOUL_STORM,灵魂风暴,Soul Storm,necrobinder,攻击,稀有,1,57,C,high,77,35294,51.1,10,2,damage|exhaust,Navegreed|JapaneseExport
-PARSE,领会,Parse,necrobinder,技能,罕见,1,69,B,high,90,48519,54.8,20,2,draw,Navegreed|JapaneseExport
-DEMESNE,领域,Demesne,necrobinder,能力,稀有,3,100,S,high,100,72771,59.5,100,2,draw|energy,Navegreed|JapaneseExport
-BURY,埋葬,Bury,necrobinder,攻击,罕见,4,48,D,high,64,29017,47.3,10,2,damage,Navegreed|JapaneseExport
-RATTLE,猛晃,Rattle,necrobinder,攻击,罕见,1,46,D,high,52,46534,43.5,33,2,damage,Navegreed|JapaneseExport
-SHARED_FATE,命运同担,Shared Fate,necrobinder,技能,稀有,0,96,S,high,100,30391,60.5,88,2,scaling|exhaust,Navegreed|JapaneseExport
-END_OF_DAYS,末日降临,End of Days,necrobinder,技能,稀有,3,71,B,high,68,51052,48.4,78,2,aoe,Navegreed|JapaneseExport
-DRAIN_POWER,能量汲取,Drain Power,necrobinder,攻击,普通,1,36,D,high,37,89389,39,33,2,damage|draw,Navegreed|JapaneseExport
-BANSHEES_CRY,女妖之嚎,Banshee's Cry,necrobinder,攻击,稀有,9,96,S,high,99,23445,57.8,88,2,damage|energy|aoe,Navegreed|JapaneseExport
-SEVERANCE,切断,Severance,necrobinder,攻击,罕见,2,54,C,high,63,52486,47,33,2,damage|draw,Navegreed|JapaneseExport
-DREDGE,清淤,Dredge,necrobinder,技能,罕见,1,78,A,high,93,54082,55.9,43,2,draw|exhaust,Navegreed|JapaneseExport
-FETCH,取回,Fetch,necrobinder,攻击,罕见,0,69,B,high,65,73944,47.6,78,2,damage|draw,Navegreed|JapaneseExport
-ENFEEBLING_TOUCH,弱化之触,Enfeebling Touch,necrobinder,技能,罕见,1,90,S,high,85,109892,53.4,100,2,scaling,Navegreed|JapaneseExport
-SENTRY_MODE,哨卫模式,Sentry Mode,necrobinder,能力,稀有,2,78,A,high,82,41802,52.6,68,2,,Navegreed|JapaneseExport
-REAP,收割,Reap,necrobinder,攻击,普通,3,41,D,high,35,58423,38.5,55,2,damage|retain,Navegreed|JapaneseExport
-PROTECTOR,守护者,Protector,necrobinder,攻击,先古,1,39,D,high,52,19943,43.4,8,3,damage,"Navegreed|JapaneseExport|JapaneseExport, Navegreed, Opem, VmService"
-GRAVE_WARDEN,守墓人,Grave Warden,necrobinder,技能,普通,1,60,C,high,53,199393,43.8,78,2,block|draw,Navegreed|JapaneseExport
-PAGESTORM,书页风暴,Pagestorm,necrobinder,能力,罕见,1,89,A,high,90,44639,55,88,2,draw,Navegreed|JapaneseExport
-REAPER_FORM,死神形态,Reaper Form,necrobinder,能力,稀有,3,85,A,high,84,57885,53.2,88,2,,Navegreed|JapaneseExport
-DEATHBRINGER,死亡使者,Deathbringer,necrobinder,技能,罕见,2,70,B,high,57,87443,44.9,100,2,aoe|control,Navegreed|JapaneseExport
-DEATH_MARCH,死亡行军,Death March,necrobinder,攻击,罕见,1,55,C,high,65,34369,47.4,33,2,damage|draw,Navegreed|JapaneseExport
-DEATHS_DOOR,死亡之门,Death's Door,necrobinder,技能,罕见,1,59,C,high,60,62062,46,55,2,block,Navegreed|JapaneseExport
-DANSE_MACABRE,死亡之舞,Danse Macabre,necrobinder,能力,罕见,1,76,B,high,76,45657,50.9,75,2,energy,Navegreed|JapaneseExport
-REANIMATE,死者苏生,Reanimate,necrobinder,技能,稀有,3,89,A,high,89,47748,54.7,88,2,exhaust,Navegreed|JapaneseExport
-BONE_SHARDS,碎骨,Bone Shards,necrobinder,攻击,罕见,1,56,C,high,42,42597,40.5,88,2,damage|block|aoe,Navegreed|JapaneseExport
-DEVOUR_LIFE,吞噬生命,Devour Life,necrobinder,能力,稀有,1,71,B,high,82,43011,52.7,45,2,,Navegreed|JapaneseExport
-DELAY,拖延,Delay,necrobinder,技能,罕见,2,76,B,high,65,72661,47.4,100,2,block|energy,Navegreed|JapaneseExport
-DIRGE,挽歌,Dirge,necrobinder,技能,罕见,X,76,B,high,76,85700,50.8,75,2,draw|exhaust,Navegreed|JapaneseExport
-PULL_FROM_BELOW,亡魂牵引,Pull from Below,necrobinder,攻击,罕见,1,68,B,high,78,35323,51.3,43,2,damage,Navegreed|JapaneseExport
-NECRO_MASTERY,亡灵精通,Necro Mastery,necrobinder,能力,稀有,2,69,B,high,79,46946,51.5,45,2,aoe,Navegreed|JapaneseExport
-DEFY,违逆,Defy,necrobinder,技能,普通,1,71,B,high,58,178369,45.3,100,2,block|control,Navegreed|JapaneseExport
-NO_ESCAPE,无处可逃,No Escape,necrobinder,技能,罕见,1,54,C,high,59,84106,45.5,43,2,damage,Navegreed|JapaneseExport
-PULL_AGGRO,吸引仇恨,Pull Aggro,necrobinder,技能,普通,2,42,D,high,42,104830,40.5,43,2,block,Navegreed|JapaneseExport
-SACRIFICE,牺牲,Sacrifice,necrobinder,技能,稀有,1,66,B,high,70,16736,48.9,58,2,retain,Navegreed|JapaneseExport
-SNAP,响指,Snap,necrobinder,攻击,普通,1,48,D,high,49,91144,42.5,45,2,damage|retain,Navegreed|JapaneseExport
-CALL_OF_THE_VOID,虚空之唤,Call of the Void,necrobinder,能力,稀有,1,97,S,high,96,50533,56.7,100,2,draw,Navegreed|JapaneseExport
-SLEIGHT_OF_FLESH,血肉戏法,Sleight of Flesh,necrobinder,能力,罕见,2,75,B,high,70,75148,49,88,2,,Navegreed|JapaneseExport
-OBLIVION,湮灭,Oblivion,necrobinder,技能,稀有,0,79,A,high,83,48558,52.8,68,2,,Navegreed|JapaneseExport
-MELANCHOLY,忧郁,Melancholy,necrobinder,技能,罕见,3,49,D,high,52,35069,43.4,43,2,block|energy,Navegreed|JapaneseExport
-FRIENDSHIP,友谊,Friendship,necrobinder,能力,罕见,1,86,A,high,80,114735,51.9,100,2,energy|scaling,Navegreed|JapaneseExport
-BORROWED_TIME,预借时间,Borrowed Time,necrobinder,技能,罕见,1,73,B,high,82,81369,52.5,53,2,energy,Navegreed|JapaneseExport
-SPUR,增生,Spur,necrobinder,技能,罕见,1,56,C,high,57,74731,45,55,2,retain,Navegreed|JapaneseExport
-SQUEEZE,榨取,Squeeze,necrobinder,攻击,稀有,3,72,B,high,78,35425,51.3,58,2,damage,Navegreed|JapaneseExport
-LETHALITY,致死性,Lethality,necrobinder,能力,罕见,1,80,A,high,72,113357,49.5,100,2,,Navegreed|JapaneseExport
-TRANSFIGURE,重构,Transfigure,necrobinder,技能,稀有,1,79,A,high,94,52710,56.2,43,2,energy|exhaust,Navegreed|JapaneseExport
-FLATTEN,重压,Flatten,necrobinder,攻击,普通,2,37,D,high,38,103169,39.3,33,2,damage,Navegreed|JapaneseExport
-SPOILS_MAP,藏宝图,Spoils Map,quest,任务,任务,-1,,,low,,,,,0,,
-LANTERN_KEY,灯火钥匙,Lantern Key,quest,任务,任务,-1,,,low,,,,,0,,
-BYRDONIS_EGG,多尼斯异鸟蛋,Byrdonis Egg,quest,任务,任务,-1,,,low,,,,,0,,
-PALE_BLUE_DOT,暗淡蓝点,Pale Blue Dot,regent,能力,罕见,1,82,A,medium,100,37568,58.2,40,1,draw,Navegreed
-HEGEMONY,霸权,Hegemony,regent,攻击,罕见,2,51,C,medium,56,45518,44.8,40,1,damage|energy,Navegreed
-TYRANNY,暴政,Tyranny,regent,能力,稀有,1,94,S,medium,100,33605,59.3,80,1,draw|exhaust,Navegreed
-SUPERMASSIVE,超质量体,Supermassive,regent,攻击,罕见,1,63,C,medium,73,32440,49.9,40,1,damage|generate,Navegreed
-CHARGE,冲锋！！,CHARGE!!,regent,技能,罕见,1,78,A,medium,69,73315,48.6,100,1,draw,Navegreed
-VENERATE,崇拜,Venerate,regent,技能,基础,1,,,low,,,,,0,,
-HEIRLOOM_HAMMER,传承之锤,Heirloom Hammer,regent,攻击,稀有,2,55,C,medium,78,25291,51.4,0,1,damage,Navegreed
-GENESIS,创世纪,Genesis,regent,能力,稀有,2,72,B,medium,86,58791,53.6,40,1,,Navegreed
-PILLAR_OF_CREATION,创世之柱,Pillar of Creation,regent,能力,罕见,1,87,A,medium,82,56949,52.4,100,1,block|generate,Navegreed
-HAMMER_TIME,锤子时间,Hammer Time,regent,能力,稀有,2,100,S,medium,100,28531,59.6,,0,,
-REFINE_BLADE,淬炼刀刃,Refine Blade,regent,技能,普通,1,58,C,medium,48,130553,42.4,80,1,energy,Navegreed
-STRIKE_REGENT,打击,Strike,regent,攻击,基础,1,,,low,,,,,0,damage,
-BIG_BANG,大爆炸,Big Bang,regent,技能,稀有,0,100,S,medium,100,85770,58.5,100,1,draw|energy|exhaust,Navegreed
-REFLECT,倒映,Reflect,regent,技能,罕见,1,72,B,medium,60,100816,46,100,1,block,Navegreed
-TERRAFORMING,地形改造,Terraforming,regent,技能,罕见,1,40,D,medium,57,30931,45.1,0,1,,Navegreed
-MONOLOGUE,独白,Monologue,regent,技能,罕见,0,43,D,medium,62,41655,46.5,0,1,scaling,Navegreed
-BEAT_INTO_SHAPE,锻打成型,Beat into Shape,regent,攻击,稀有,1,57,C,medium,73,38813,49.9,20,1,damage,Navegreed
-DEFEND_REGENT,防御,Defend,regent,技能,基础,1,,,low,,,,,0,block,
-THE_SEALED_THRONE,封印王座,The Sealed Throne,regent,能力,先古,1,78,A,high,100,17918,58.1,27,3,,"Navegreed|JapaneseExport, Navegreed, Opem, VmService"
-RADIATE,辐射,Radiate,regent,攻击,罕见,0,65,B,medium,67,61055,48.1,60,1,damage|aoe,Navegreed
-RESONANCE,共鸣,Resonance,regent,技能,罕见,1,46,D,medium,65,42059,47.4,0,1,aoe|scaling,Navegreed
-SPECTRUM_SHIFT,光谱偏移,Spectrum Shift,regent,能力,罕见,2,79,A,medium,78,73543,51.4,80,1,draw,Navegreed
-PHOTON_CUT,光子切割,Photon Cut,regent,攻击,普通,1,42,D,medium,52,66580,43.4,20,1,damage|draw,Navegreed
-KNOW_THY_PLACE,何人僭越,Know Thy Place,regent,技能,普通,0,64,C,medium,57,143527,45.1,80,1,control|exhaust,Navegreed
-BLACK_HOLE,黑洞,Black Hole,regent,能力,罕见,1,60,C,medium,60,95259,46,60,1,aoe,Navegreed
-BOMBARDMENT,轰击,Bombardment,regent,攻击,稀有,3,84,A,medium,85,43361,53.4,80,1,damage|exhaust,Navegreed
-GUARDS,护驾！！！,GUARDS!!!,regent,技能,稀有,2,93,S,medium,90,38129,55,100,1,exhaust,Navegreed
-ORBIT,环绕轨道,Orbit,regent,能力,罕见,2,79,A,medium,78,113058,51.3,80,1,energy,Navegreed
-GLOW,辉光,Glow,regent,技能,普通,1,71,B,medium,59,176098,45.8,100,1,draw,Navegreed
-CONVERGENCE,汇流,Convergence,regent,技能,罕见,1,80,A,medium,71,89543,49.3,100,1,energy|retain,Navegreed
-COMET,彗星,Comet,regent,攻击,稀有,0,80,A,medium,89,45176,54.7,60,1,damage|control,Navegreed
-FOREGONE_CONCLUSION,既定事项,Foregone Conclusion,regent,技能,稀有,1,70,B,medium,92,31109,55.7,20,1,draw,Navegreed
-GAMMA_BLAST,伽马爆破,Gamma Blast,regent,攻击,罕见,0,72,B,medium,69,68141,48.6,80,1,damage|control,Navegreed
-SWORD_SAGE,剑圣,Sword Sage,regent,能力,稀有,2,69,B,medium,90,47408,55,20,1,,Navegreed
-KNOCKOUT_BLOW,决胜一击,Knockout Blow,regent,攻击,罕见,3,28,F,medium,32,32019,37.5,20,1,damage,Navegreed
-DECISIONS_DECISIONS,抉择，抉择,"Decisions, Decisions",regent,技能,稀有,0,82,A,medium,100,56673,58,40,1,draw|exhaust,Navegreed
-MANIFEST_AUTHORITY,君权自授,Manifest Authority,regent,技能,罕见,1,66,B,medium,69,65155,48.7,60,1,block,Navegreed
-LARGESSE,慷慨捐助,Largesse,regent,技能,罕见,0,94,S,medium,94,37757,56.2,,0,,
-QUASAR,类星体,Quasar,regent,技能,罕见,0,74,B,medium,71,50457,49.4,80,1,,Navegreed
-PARTICLE_WALL,粒子墙,Particle Wall,regent,技能,罕见,0,66,B,medium,68,79308,48.4,60,1,block,Navegreed
-GLITTERSTREAM,流光溢彩,Glitterstream,regent,技能,普通,2,52,C,medium,48,101278,42.5,60,1,block,Navegreed
-METEOR_SHOWER,流星雨,Meteor Shower,regent,攻击,先古,0,75,B,high,64,26570,47,100,2,damage|aoe|control,"Navegreed|JapaneseExport, Navegreed, Opem, VmService"
-SHINING_STRIKE,明耀打击,Shining Strike,regent,攻击,罕见,1,43,D,medium,53,75541,43.8,20,1,damage|draw,Navegreed
-COLLISION_COURSE,碰撞轨迹,Collision Course,regent,攻击,普通,0,55,C,medium,44,62539,41.1,80,1,damage,Navegreed
-CRASH_LANDING,迫降,Crash Landing,regent,攻击,稀有,1,72,B,medium,69,24403,48.7,80,1,damage|aoe,Navegreed
-SEVEN_STARS,七星,Seven Stars,regent,攻击,稀有,2,53,C,medium,75,39852,50.6,0,1,damage|aoe,Navegreed
-CLOAK_OF_STARS,群星斗篷,Cloak of Stars,regent,技能,普通,0,53,C,medium,50,132921,43.1,60,1,block,Navegreed
-CHILD_OF_THE_STARS,群星之子,Child of the Stars,regent,能力,罕见,1,80,A,medium,71,108689,49.1,100,1,,Navegreed
-FURNACE,熔炉,Furnace,regent,能力,罕见,1,55,C,medium,61,90879,46.1,40,1,,Navegreed
-MAKE_IT_SO,如此甚好,Make It So,regent,攻击,稀有,0,80,A,medium,88,39710,54.4,60,1,damage|draw,Navegreed
-ROYAL_GAMBLE,胜券在王,Royal Gamble,regent,技能,罕见,0,75,B,medium,73,82233,49.8,80,1,exhaust,Navegreed
-GATHER_LIGHT,收集光辉,Gather Light,regent,技能,普通,1,52,C,medium,49,195820,42.6,60,1,block,Navegreed
-I_AM_INVINCIBLE,所向无敌,I Am Invincible,regent,技能,稀有,1,60,C,medium,77,35500,51.2,20,1,block|draw,Navegreed
-SOLAR_STRIKE,太阳打击,Solar Strike,regent,攻击,普通,1,28,F,medium,40,97711,40,0,1,damage,Navegreed
-HEAVENLY_DRILL,天际钻头,Heavenly Drill,regent,攻击,稀有,X,74,B,medium,89,24191,54.6,40,1,damage|energy,Navegreed
-CELESTIAL_MIGHT,天穹之力,Celestial Might,regent,攻击,普通,2,43,D,medium,36,44172,38.6,60,1,damage,Navegreed
-ROYALTIES,王国资产,Royalties,regent,能力,稀有,1,66,B,medium,68,29911,48.3,60,1,,Navegreed
-KINGLY_PUNCH,王者之拳,Kingly Punch,regent,攻击,罕见,1,43,D,medium,35,36841,38.3,60,1,damage|draw,Navegreed
-KINGLY_KICK,王者之踢,Kingly Kick,regent,攻击,罕见,4,44,D,medium,37,33733,39.1,60,1,damage|draw,Navegreed
-MONARCHS_GAZE,王之凝视,Monarch's Gaze,regent,能力,稀有,2,67,B,medium,95,30291,56.4,0,1,scaling,Navegreed
-GLIMMER,微光,Glimmer,regent,技能,罕见,1,71,B,medium,84,44631,53,40,1,draw,Navegreed
-ARSENAL,武器库,Arsenal,regent,能力,稀有,1,79,A,medium,96,33656,56.6,40,1,scaling|generate,Navegreed
-BEGONE,下去！,BEGONE!,regent,技能,普通,1,63,C,medium,55,91701,44.6,80,1,,Navegreed
-CRUSH_UNDER,下砸,Crush Under,regent,攻击,普通,1,39,D,medium,39,96375,39.5,40,1,damage|aoe|scaling,Navegreed
-BUNDLE_OF_JOY,新生之喜,Bundle of Joy,regent,技能,稀有,1,81,A,medium,90,31193,54.8,60,1,draw|exhaust,Navegreed
-CRESCENT_SPEAR,新月长矛,Crescent Spear,regent,攻击,普通,1,41,D,medium,41,77572,40.2,40,1,damage,Navegreed
-STARDUST,星尘,Stardust,regent,攻击,罕见,0,54,C,medium,69,71984,48.7,20,1,damage,Navegreed
-ASTRAL_PULSE,星界脉冲,Astral Pulse,regent,攻击,普通,0,50,C,medium,29,100760,36.7,100,1,damage|aoe,Navegreed
-DYING_STAR,星灭,Dying Star,regent,攻击,稀有,1,82,A,medium,92,52497,55.6,60,1,damage|aoe|scaling,Navegreed
-ALIGNMENT,星位序列,Alignment,regent,技能,罕见,0,63,C,medium,73,75641,49.7,40,1,energy,Navegreed
-PATTER,星星点点,Patter,regent,技能,普通,1,50,C,medium,54,84469,44.1,40,1,block,Navegreed
-VOID_FORM,虚空形态,Void Form,regent,能力,稀有,3,89,A,medium,93,73580,55.7,80,1,,Navegreed
-GUIDING_STAR,引导之星,Guiding Star,regent,攻击,普通,1,50,C,medium,54,72236,44,40,1,damage|draw,Navegreed
-HIDDEN_CACHE,隐秘藏品,Hidden Cache,regent,技能,普通,1,54,C,medium,52,179605,43.5,60,1,,Navegreed
-COSMIC_INDIFFERENCE,宇宙冷漠,Cosmic Indifference,regent,技能,普通,1,49,D,medium,62,149596,46.5,20,1,block|draw,Navegreed
-PROPHESIZE,预言,Prophesize,regent,技能,罕见,2,64,C,medium,92,23193,55.4,0,1,draw,Navegreed
-LUNAR_BLAST,月面射击,Lunar Blast,regent,攻击,罕见,0,58,C,medium,74,22059,50,20,1,damage,Navegreed
-FALLING_STAR,陨星,Falling Star,regent,攻击,基础,0,,,low,,,,,0,damage|control,
-DEVASTATE,葬送,Devastate,regent,攻击,罕见,1,32,F,medium,46,41695,41.8,0,1,damage,Navegreed
-WROUGHT_IN_WAR,战火铸就,Wrought in War,regent,攻击,普通,1,45,D,medium,38,89487,39.2,60,1,damage,Navegreed
-SPOILS_OF_BATTLE,战利品,Spoils of Battle,regent,技能,普通,1,45,D,medium,55,101371,44.4,20,1,draw,Navegreed
-PARRY,招架,Parry,regent,能力,罕见,1,50,C,medium,63,78114,47,20,1,,Navegreed
-CONQUEROR,征服者,Conqueror,regent,技能,罕见,1,44,D,medium,63,70574,46.8,0,1,,Navegreed
-SUMMON_FORTH,征召上前,Summon Forth,regent,技能,罕见,1,52,C,medium,65,78835,47.5,20,1,,Navegreed
-NEUTRON_AEGIS,中子护盾,Neutron Aegis,regent,能力,稀有,1,68,B,medium,80,30496,51.8,40,1,,Navegreed
-THE_SMITH,铸剑者,The Smith,regent,技能,稀有,1,74,B,medium,80,53223,51.8,60,1,,Navegreed
-BULWARK,铸墙,Bulwark,regent,技能,罕见,2,70,B,medium,65,98852,47.4,80,1,block,Navegreed
-SEEKING_EDGE,追踪之刃,Seeking Edge,regent,能力,稀有,1,64,C,medium,74,52083,50.1,40,1,aoe,Navegreed
-SHADOW_STEP,暗影步,Shadow Step,silent,技能,稀有,1,63,C,medium,83,44021,52.8,17,1,draw|discard,Navegreed
-EXPOSE,暴露,Expose,silent,技能,罕见,0,82,A,medium,82,130483,52.4,83,1,control|exhaust,Navegreed
-BURST,爆发,Burst,silent,技能,稀有,1,69,B,medium,91,63705,55.2,17,1,,Navegreed
-BACKSTAB,背刺,Backstab,silent,攻击,罕见,0,53,C,medium,54,90147,44.1,50,1,damage|exhaust|innate,Navegreed
-REFLEX,本能反应,Reflex,silent,技能,罕见,3,71,B,medium,80,65083,52,50,1,draw|discard,Navegreed
-DAGGER_SPRAY,匕首雨,Dagger Spray,silent,攻击,普通,1,34,F,medium,27,89740,35.9,50,1,damage|aoe,Navegreed
-TOOLS_OF_THE_TRADE,必备工具,Tools of the Trade,silent,能力,稀有,1,95,S,medium,100,67605,58.9,83,1,draw|discard,Navegreed
-BLUR,残影,Blur,silent,技能,罕见,1,65,B,medium,72,102554,49.4,50,1,block,Navegreed
-DASH,冲刺,Dash,silent,攻击,罕见,2,42,D,medium,46,56500,41.6,33,1,damage|block,Navegreed
-UNTOUCHABLE,触不可及,Untouchable,silent,技能,普通,2,49,D,medium,56,132929,44.6,33,1,block|discard,Navegreed
-ACCELERANT,触媒,Accelerant,silent,能力,稀有,1,63,C,medium,82,61280,52.4,17,1,scaling,Navegreed
-SKEWER,串刺,Skewer,silent,攻击,罕见,X,44,D,medium,55,23691,44.4,17,1,damage,Navegreed
-ASSASSINATE,刺杀,Assassinate,silent,攻击,稀有,0,80,A,medium,93,63847,55.9,50,1,damage|control|exhaust|innate,Navegreed
-STRIKE_SILENT,打击,Strike,silent,攻击,基础,1,,,low,,,,,0,damage,
-POISONED_STAB,带毒刺击,Poisoned Stab,silent,攻击,普通,1,33,F,medium,33,101763,38,33,1,damage|scaling,Navegreed
-BOUNCING_FLASK,弹跳药瓶,Bouncing Flask,silent,技能,罕见,2,38,D,medium,54,64199,44.1,0,1,scaling,Navegreed
-KNIFE_TRAP,刀刃陷阱,Knife Trap,silent,技能,稀有,2,85,A,medium,100,72572,59.9,50,1,exhaust,Navegreed
-BLADE_DANCE,刀刃之舞,Blade Dance,silent,技能,普通,1,55,C,medium,57,203128,45.1,50,1,draw|exhaust,Navegreed
-FAN_OF_KNIVES,刀扇,Fan of Knives,silent,能力,稀有,2,83,A,medium,90,75392,55,67,1,aoe,Navegreed
-SCARE,恫吓,Scare,silent,技能,罕见,0,33,F,medium,,,,33,1,aoe|control|exhaust,Navegreed
-CLOAK_AND_DAGGER,斗篷与匕首,Cloak and Dagger,silent,技能,普通,1,55,C,medium,57,192772,45,50,1,block|draw,Navegreed
-NOXIOUS_FUMES,毒雾,Noxious Fumes,silent,能力,罕见,1,61,C,medium,59,134893,45.5,67,1,aoe|scaling,Navegreed
-OUTBREAK,毒性爆发,Outbreak,silent,能力,罕见,1,46,D,medium,58,77292,45.3,17,1,aoe|scaling,Navegreed
-EXPERTISE,独门技术,Expertise,silent,技能,罕见,1,59,C,medium,84,43701,53.1,0,1,draw,Navegreed
-FLICK_FLACK,翻越撑击,Flick-Flack,silent,攻击,普通,1,30,F,medium,36,111193,38.8,17,1,damage|aoe|discard,Navegreed
-DEFEND_SILENT,防御,Defend,silent,技能,基础,1,,,low,,,,,0,block,
-FLECHETTES,飞镖,Flechettes,silent,攻击,罕见,1,50,C,medium,58,40204,45.3,33,1,damage,Navegreed
-CORROSIVE_WAVE,腐蚀波,Corrosive Wave,silent,技能,稀有,1,67,B,medium,88,45943,54.4,17,1,draw|aoe|scaling,Navegreed
-STORM_OF_STEEL,钢铁风暴,Storm of Steel,silent,技能,稀有,1,67,B,medium,89,52375,54.6,17,1,discard,Navegreed
-TRACKING,跟踪,Tracking,silent,能力,稀有,2,100,S,medium,100,59437,59.6,100,1,control,Navegreed
-BUBBLE_BUBBLE,咕嘟冒泡,Bubble Bubble,silent,技能,罕见,1,47,D,medium,60,67164,46,17,1,scaling,Navegreed
-SNEAKY,鬼祟,Sneaky,silent,能力,稀有,2,100,S,medium,100,47809,64.9,,0,discard,
-BACKFLIP,后空翻,Backflip,silent,技能,普通,1,65,B,medium,64,204634,47.2,67,1,block|draw,Navegreed
-GRAND_FINALE,华丽收场,Grand Finale,silent,攻击,稀有,0,43,D,medium,61,18572,46.1,0,1,damage|draw|aoe,Navegreed
-PHANTOM_BLADES,幻影之刃,Phantom Blades,silent,能力,罕见,1,71,B,medium,73,83939,49.9,67,1,retain,Navegreed
-ECHOING_SLASH,回响斩击,Echoing Slash,silent,攻击,稀有,1,43,D,medium,47,37087,42.2,33,1,damage|aoe,Navegreed
-WELL_LAID_PLANS,计划妥当,Well-Laid Plans,silent,能力,罕见,1,68,B,medium,54,39847,44,100,1,retain,Navegreed
-CALCULATED_GAMBLE,计算下注,Calculated Gamble,silent,技能,罕见,0,74,B,medium,84,111279,53.3,50,1,draw|exhaust|discard,Navegreed
-FLANKING,夹击,Flanking,silent,技能,罕见,2,100,S,medium,100,67219,62,,0,,
-PIERCING_WAIL,尖啸,Piercing Wail,silent,技能,普通,1,67,B,medium,67,218558,48.1,67,1,aoe|scaling|exhaust,Navegreed
-STRANGLE,紧勒,Strangle,silent,攻击,罕见,1,49,D,medium,63,67805,46.9,17,1,damage,Navegreed
-PINPOINT,精密瞄准,Pinpoint,silent,攻击,罕见,3,48,D,medium,54,45991,44.2,33,1,damage,Navegreed
-PRECISE_CUT,精确切击,Precise Cut,silent,攻击,罕见,0,46,D,medium,51,35620,43.1,33,1,damage,Navegreed
-ACCURACY,精准,Accuracy,silent,能力,罕见,1,75,B,medium,78,153762,51.2,67,1,,Navegreed
-RICOCHET,连续反弹,Ricochet,silent,攻击,普通,2,47,D,medium,46,114364,41.8,50,1,damage|discard,Navegreed
-PREDATOR,猎杀者,Predator,silent,攻击,普通,2,41,D,medium,45,41176,41.4,33,1,damage|draw,Navegreed
-FOOTWORK,灵动步法,Footwork,silent,能力,罕见,1,78,A,medium,69,151716,48.8,100,1,scaling,Navegreed
-POUNCE,猛扑,Pounce,silent,攻击,罕见,2,41,D,medium,44,41937,41.1,33,1,damage,Navegreed
-HAZE,迷雾,Haze,silent,技能,罕见,3,44,D,medium,56,80630,44.7,17,1,aoe|scaling|discard,Navegreed
-MEMENTO_MORI,铭记死亡,Memento Mori,silent,攻击,罕见,1,40,D,medium,57,32231,44.9,0,1,damage|discard,Navegreed
-ABRASIVE,磨蚀,Abrasive,silent,能力,稀有,3,85,A,medium,93,65918,55.9,67,1,scaling|discard,Navegreed
-BLADE_OF_INK,墨之刃,Blade of Ink,silent,技能,稀有,1,95,S,medium,100,52512,59.2,83,1,draw,Navegreed
-MASTER_PLANNER,谋划专家,Master Planner,silent,能力,稀有,2,58,C,medium,83,41826,52.9,0,1,,Navegreed
-MURDER,谋杀,Murder,silent,攻击,稀有,3,57,C,medium,82,35501,52.5,0,1,damage|draw,Navegreed
-DEFLECT,偏折,Deflect,silent,技能,普通,0,48,D,medium,55,139020,44.4,33,1,block,Navegreed
-SLICE,切割,Slice,silent,攻击,普通,0,40,D,medium,43,78223,40.7,33,1,damage,Navegreed
-SERPENT_FORM,群蛇形态,Serpent Form,silent,能力,稀有,3,75,B,medium,93,57061,55.7,33,1,,Navegreed
-SHADOWMELD,融入暗影,Shadowmeld,silent,技能,稀有,1,65,B,medium,79,42157,51.5,33,1,,Navegreed
-LEG_SWEEP,扫腿,Leg Sweep,silent,技能,罕见,2,72,B,medium,67,80275,48.1,83,1,block|control,Navegreed
-DODGE_AND_ROLL,闪躲翻滚,Dodge and Roll,silent,技能,普通,1,48,D,medium,55,95387,44.6,33,1,block,Navegreed
-SNAKEBITE,蛇咬,Snakebite,silent,技能,普通,2,34,F,medium,41,97782,40.3,17,1,scaling|retain,Navegreed
-ADRENALINE,肾上腺素,Adrenaline,silent,技能,稀有,0,100,S,medium,100,98838,59.8,100,1,draw|energy|exhaust,Navegreed
-MIRAGE,蜃景,Mirage,silent,技能,罕见,1,48,D,medium,68,49624,48.3,0,1,aoe|scaling|exhaust,Navegreed
-SURVIVOR,生存者,Survivor,silent,技能,基础,1,,,low,,,,,0,block|discard,
-HAND_TRICK,手上技法,Hand Trick,silent,技能,罕见,1,46,D,medium,59,51546,45.7,17,1,block,Navegreed
-THE_HUNT,狩猎,The Hunt,silent,攻击,稀有,1,59,C,medium,56,32938,44.7,67,1,damage|exhaust,Navegreed
-SPEEDSTER,速行者,Speedster,silent,能力,罕见,2,51,C,medium,65,63487,47.5,17,1,draw|aoe,Navegreed
-ESCAPE_PLAN,逃脱计划,Escape Plan,silent,技能,罕见,0,65,B,medium,79,109540,51.5,33,1,block|draw,Navegreed
-DAGGER_THROW,投掷匕首,Dagger Throw,silent,攻击,普通,1,42,D,medium,46,146840,41.8,33,1,damage|draw|discard,Navegreed
-SUCKER_PUNCH,突然一拳,Sucker Punch,silent,攻击,普通,1,42,D,medium,46,75031,41.7,33,1,damage|control,Navegreed
-ENVENOM,涂毒,Envenom,silent,能力,稀有,2,67,B,medium,82,62514,52.7,33,1,scaling,Navegreed
-MALAISE,萎靡,Malaise,silent,技能,稀有,X,95,S,medium,100,37037,60.9,83,1,scaling|control|exhaust,Navegreed
-INFINITE_BLADES,无尽刀刃,Infinite Blades,silent,能力,罕见,1,72,B,medium,74,133708,50.2,67,1,,Navegreed
-LEADING_STRIKE,先制打击,Leading Strike,silent,攻击,普通,1,57,C,medium,52,174835,43.6,67,1,damage,Navegreed
-UP_MY_SLEEVE,袖里乾坤,Up My Sleeve,silent,技能,罕见,2,52,C,medium,67,106181,48,17,1,draw,Navegreed
-SUPPRESS,压制,Suppress,silent,攻击,先古,0,68,B,high,72,26760,49.4,58,2,damage|control|innate,"Navegreed|JapaneseExport, Navegreed, Opem, VmService"
-NIGHTMARE,夜魇,Nightmare,silent,技能,稀有,3,69,B,medium,92,41999,55.5,17,1,exhaust,Navegreed
-HIDDEN_DAGGERS,隐秘匕首,Hidden Daggers,silent,技能,罕见,0,73,B,medium,76,95869,50.8,67,1,draw|discard,Navegreed
-WRAITH_FORM,幽魂形态,Wraith Form,silent,能力,先古,3,58,C,high,75,5012,50.4,17,3,scaling,"Navegreed|JapaneseExport, Navegreed, Opem, VmService"
-AFTERIMAGE,余像,Afterimage,silent,能力,稀有,1,100,S,medium,100,85760,61.1,100,1,,Navegreed
-ANTICIPATE,预判,Anticipate,silent,技能,普通,0,39,D,medium,49,98327,42.7,17,1,scaling,Navegreed
-ACROBATICS,杂技,Acrobatics,silent,技能,罕见,1,69,B,medium,77,153143,51.1,50,1,draw|discard,Navegreed
-PREPARED,早有准备,Prepared,silent,技能,普通,0,68,B,medium,61,247796,46.2,83,1,draw|discard,Navegreed
-TACTICIAN,战术大师,Tactician,silent,技能,罕见,3,67,B,medium,74,95786,50.3,50,1,energy|discard,Navegreed
-DEADLY_POISON,致命毒药,Deadly Poison,silent,技能,普通,1,27,F,medium,39,116685,39.5,0,1,scaling,Navegreed
-NEUTRALIZE,中和,Neutralize,silent,攻击,基础,0,,,low,,,,,0,damage|control,
-FINISHER,终结技,Finisher,silent,攻击,罕见,1,59,C,medium,70,71856,48.8,33,1,damage,Navegreed
-BULLET_TIME,子弹时间,Bullet Time,silent,技能,稀有,3,61,C,medium,80,49846,51.9,17,1,draw,Navegreed
-WITHER,凋萎,Wither,status,状态,状态,-1,,,low,,,,,0,damage,
-TOXIC,毒素,Toxic,status,状态,状态,1,,,low,,,,,0,damage|exhaust,
-INFECTION,感染,Infection,status,状态,状态,-1,,,low,,,,,0,damage,
-BECKON,呼唤,Beckon,status,状态,状态,1,,,low,,,,,0,,
-FRANTIC_ESCAPE,狂乱逃离,Frantic Escape,status,状态,状态,1,,,low,,,,,0,,
-SOOT,煤灰,Soot,status,状态,状态,-1,,,low,,,,,0,,
-SLIMED,黏液,Slimed,status,状态,状态,1,,,low,,,,,0,draw|exhaust,
-WOUND,伤口,Wound,status,状态,状态,-1,,,low,,,,,0,,
-DEBRIS,碎屑,Debris,status,状态,状态,1,,,low,,,,,0,exhaust,
-VOID,虚空,Void,status,状态,状态,-1,,,low,,,,,0,draw|energy,
-DAZED,晕眩,Dazed,status,状态,状态,-1,,,low,,,,,0,,
-BURN,灼伤,Burn,status,状态,状态,-1,,,low,,,,,0,damage,
-GIANT_ROCK,巨石,Giant Rock,token,攻击,衍生,1,,,low,,,,,0,damage,
-SOVEREIGN_BLADE,君王之剑,Sovereign Blade,token,攻击,衍生,2,,,low,,,,,0,damage|retain,
-SLOTH,懒惰,Sloth,token,状态,状态,-1,,,low,,,,,0,,
-LUMINESCE,冷光,Luminesce,token,技能,衍生,0,,,low,,,,,0,energy|exhaust|retain,
-SOUL,灵魂,Soul,token,技能,衍生,0,,,low,,,,,0,draw|exhaust,
-MINION_STRIKE,仆从打击,Minion Strike,token,攻击,衍生,0,,,low,,,,,0,damage|draw|exhaust,
-MINION_DIVE_BOMB,仆从俯冲,Minion Dive Bomb,token,攻击,衍生,0,,,low,,,,,0,damage|exhaust,
-MINION_SACRIFICE,仆从捐躯,Minion Sacrifice,token,技能,衍生,0,,,low,,,,,0,block|exhaust,
-FUEL,燃料,Fuel,token,技能,衍生,0,,,low,,,,,0,draw|energy|exhaust,
-SWEEPING_GAZE,扫荡凝视,Sweeping Gaze,token,攻击,衍生,0,,,low,,,,,0,damage|exhaust,
-WASTE_AWAY,衰朽,Waste Away,token,状态,状态,-1,,,low,,,,,0,,
-DISINTEGRATION,瓦解,Disintegration,token,状态,状态,-1,,,low,,,,,0,,
-SHIV,小刀,Shiv,token,攻击,衍生,0,,,low,,,,,0,damage|exhaust,
-MIND_ROT,心灵腐化,Mind Rot,token,状态,状态,-1,,,low,,,,,0,draw,
+game_version,data_channel,captured_at,id,name,name_en,color,type,rarity,cost,prior_score,prior_tier,confidence,codex_score,picks,win_rate,expert_score,expert_evidence,mechanic_tags,expert_sources
+v0.107.1,stable,2026-09-07T11:14:32.214Z,HUDDLE_UP,抱团,Huddle Up,colorless,技能,罕见,1,100,S,medium,100,6893,55.2,,0,draw|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,JACKPOT,大奖,Jackpot,colorless,攻击,稀有,3,100,S,medium,100,6765,53.5,,0,damage|draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DISCOVERY,发现,Discovery,colorless,技能,罕见,1,82,A,medium,82,10485,46.3,,0,exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SPLASH,飞溅,Splash,colorless,技能,罕见,1,85,A,medium,85,9268,47.2,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PROWESS,非凡技艺,Prowess,colorless,能力,罕见,1,77,B,medium,77,10647,44.7,,0,scaling,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,THE_GAMBIT,孤注一掷,The Gambit,colorless,技能,稀有,0,100,S,medium,100,1842,57.6,,0,block,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ROLLING_BOULDER,滚石,Rolling Boulder,colorless,能力,稀有,3,94,S,medium,94,6173,49.9,,0,aoe,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DARK_SHACKLES,黑暗镣铐,Dark Shackles,colorless,技能,罕见,0,100,S,medium,100,11094,52.3,,0,scaling|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BEAT_DOWN,狠揍,Beat Down,colorless,技能,稀有,3,100,S,medium,100,2349,57.3,,0,draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CATASTROPHE,横祸,Catastrophe,colorless,技能,罕见,2,88,A,medium,88,4508,48.2,,0,draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,JACK_OF_ALL_TRADES,花样百出,Jack of All Trades,colorless,技能,罕见,0,92,S,medium,92,5963,49.4,,0,draw|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,NOSTALGIA,怀旧,Nostalgia,colorless,能力,稀有,1,100,S,medium,100,4201,55.9,,0,draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,KNOCKDOWN,击倒,Knockdown,colorless,攻击,稀有,3,100,S,medium,100,3915,67.4,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,IMPATIENCE,急躁,Impatience,colorless,技能,罕见,0,100,S,medium,100,3961,52.3,,0,draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,RALLY,集结,Rally,colorless,技能,稀有,2,100,S,medium,100,5250,63.4,,0,block,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,STRATAGEM,计策,Stratagem,colorless,能力,罕见,1,100,S,medium,100,5833,52.5,,0,draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SALVO,箭雨,Salvo,colorless,攻击,稀有,1,100,S,medium,100,2733,58,,0,damage|retain,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CALAMITY,劫难,Calamity,colorless,能力,稀有,3,100,S,medium,100,2629,60.7,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,GOLD_AXE,金斧,Gold Axe,colorless,攻击,稀有,1,100,S,medium,100,8706,59.5,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PURITY,净化,Purity,colorless,技能,罕见,0,100,S,medium,100,4909,52.5,,0,draw|exhaust|retain,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ULTIMATE_STRIKE,究极打击,Ultimate Strike,colorless,攻击,罕见,1,55,C,medium,55,19015,38.2,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ULTIMATE_DEFEND,究极防御,Ultimate Defend,colorless,技能,罕见,1,66,B,medium,66,17717,41.6,,0,block,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,EQUILIBRIUM,均衡,Equilibrium,colorless,技能,罕见,2,83,A,medium,83,5207,46.6,,0,block|retain,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,INTERCEPT,拦截,Intercept,colorless,技能,罕见,1,88,A,medium,88,2619,48.5,,0,block,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FASTEN,勒紧,Fasten,colorless,能力,罕见,1,60,C,medium,60,12672,39.6,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,VOLLEY,连射,Volley,colorless,攻击,罕见,X,74,B,medium,74,3879,44.1,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ALCHEMIZE,炼制药水,Alchemize,colorless,技能,稀有,1,100,S,medium,100,4531,55.4,,0,exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FLASH_OF_STEEL,亮剑,Flash of Steel,colorless,攻击,罕见,0,92,S,medium,92,11082,49.3,,0,damage|draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SCRAWL,潦草急就,Scrawl,colorless,技能,稀有,1,100,S,medium,100,3324,67.7,,0,draw|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BOLAS,流星锤,Bolas,colorless,攻击,稀有,0,100,S,medium,100,4112,53,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,MAYHEM,乱战,Mayhem,colorless,能力,稀有,2,100,S,medium,100,7454,57.3,,0,draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SECRET_TECHNIQUE,秘密技法,Secret Technique,colorless,技能,稀有,0,100,S,medium,100,4911,62,,0,draw|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SECRET_WEAPON,秘密武器,Secret Weapon,colorless,技能,稀有,0,100,S,medium,100,4305,57.8,,0,draw|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FINESSE,妙计,Finesse,colorless,技能,罕见,0,93,S,medium,93,13581,49.5,,0,block|draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,MIMIC,拟态,Mimic,colorless,技能,稀有,1,100,S,medium,100,4246,60.7,,0,exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FISTICUFFS,拳斗,Fisticuffs,colorless,攻击,罕见,1,87,A,medium,87,7244,47.8,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,GANG_UP,群起攻之,Gang Up,colorless,攻击,罕见,1,100,S,medium,100,8445,53.6,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DRAMATIC_ENTRANCE,闪亮登场,Dramatic Entrance,colorless,攻击,罕见,0,63,C,medium,63,10231,40.5,,0,damage|aoe|exhaust|innate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ENTROPY,熵,Entropy,colorless,能力,稀有,1,100,S,medium,100,4108,53.7,,0,draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,THINKING_AHEAD,深谋远虑,Thinking Ahead,colorless,技能,罕见,0,89,A,medium,89,5102,48.4,,0,draw|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PANACHE,神气制胜,Panache,colorless,能力,罕见,0,91,S,medium,91,9990,49,,0,aoe,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PRODUCTION,生产制造,Production,colorless,技能,罕见,0,85,A,medium,85,15292,47.3,,0,energy|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,TAG_TEAM,双打组合,Tag Team,colorless,攻击,罕见,2,94,S,medium,94,5115,50,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,REND,撕碎,Rend,colorless,攻击,稀有,2,100,S,medium,100,1774,62.6,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,HAND_OF_GREED,贪婪之手,Hand of Greed,colorless,攻击,稀有,2,78,A,medium,78,2225,45.3,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SEEKER_STRIKE,探寻打击,Seeker Strike,colorless,攻击,罕见,1,91,S,medium,91,4599,49.2,,0,damage|draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ANOINTED,天选,Anointed,colorless,技能,稀有,1,100,S,medium,100,2207,64.4,,0,draw|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,LIFT,托举,Lift,colorless,技能,罕见,1,87,A,medium,87,5096,47.9,,0,block,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,OMNISLICE,万向斩,Omnislice,colorless,攻击,罕见,0,62,C,medium,62,7758,40.4,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,HIDDEN_GEM,未掘宝石,Hidden Gem,colorless,技能,稀有,1,100,S,medium,100,13965,55.1,,0,draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,THRUMMING_HATCHET,无休手斧,Thrumming Hatchet,colorless,攻击,罕见,1,61,C,medium,61,4355,40,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BEACON_OF_HOPE,希望灯塔,Beacon of Hope,colorless,能力,稀有,1,100,S,medium,100,9003,67.9,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BELIEVE_IN_YOU,相信着你,Believe in You,colorless,技能,罕见,0,93,S,medium,93,14613,49.7,,0,energy,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,COORDINATE,协同配合,Coordinate,colorless,技能,罕见,1,83,A,medium,83,4120,46.7,,0,scaling,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,MIND_BLAST,心灵震慑,Mind Blast,colorless,攻击,罕见,1,89,A,medium,89,4791,48.5,,0,draw|innate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,RESTLESSNESS,心神不宁,Restlessness,colorless,技能,罕见,0,86,A,medium,86,5182,47.6,,0,draw|energy|retain,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PROLONG,延伸,Prolong,colorless,技能,罕见,0,89,A,medium,89,8707,48.5,,0,exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PANIC_BUTTON,应急按钮,Panic Button,colorless,技能,罕见,0,94,S,medium,94,2832,50.1,,0,block|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ETERNAL_ARMOR,永恒铠甲,Eternal Armor,colorless,能力,稀有,3,100,S,medium,100,4410,58.3,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,THE_BOMB,炸弹,The Bomb,colorless,技能,罕见,2,50,C,medium,50,5238,36.8,,0,aoe,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,MASTER_OF_STRATEGY,战略大师,Master of Strategy,colorless,技能,稀有,0,100,S,medium,100,8532,63.4,,0,draw|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SHOCKWAVE,震荡波,Shockwave,colorless,技能,罕见,2,95,S,medium,95,8387,50.2,,0,aoe|control|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PREP_TIME,准备时间,Prep Time,colorless,能力,罕见,1,75,B,medium,75,5745,44.3,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,AUTOMATION,自动化,Automation,colorless,能力,罕见,1,96,S,medium,96,9774,50.4,,0,draw|energy,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SPORE_MIND,孢子心灵,Spore Mind,curse,诅咒,诅咒,1,,,low,,,,,0,exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CLUMSY,笨拙,Clumsy,curse,诅咒,诅咒,-1,,,low,,,,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,NORMALITY,凡庸,Normality,curse,诅咒,诅咒,-1,,,low,,,,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DECAY,腐朽,Decay,curse,诅咒,诅咒,-1,,,low,,,,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,REGRET,悔恨,Regret,curse,诅咒,诅咒,-1,,,low,,,,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ASCENDERS_BANE,进阶之灾,Ascender's Bane,curse,诅咒,诅咒,-1,,,low,,,,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,WRITHE,苦恼,Writhe,curse,诅咒,诅咒,-1,,,low,,,,,0,innate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,GUILTY,愧疚,Guilty,curse,诅咒,诅咒,-1,,,low,,,,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CURSE_OF_THE_BELL,铃铛的诅咒,Curse of the Bell,curse,诅咒,诅咒,-1,,,low,,,,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BAD_LUCK,霉运,Bad Luck,curse,诅咒,诅咒,-1,,,low,,,,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,INJURY,受伤,Injury,curse,诅咒,诅咒,-1,,,low,,,,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,POOR_SLEEP,睡眠不佳,Poor Sleep,curse,诅咒,诅咒,-1,,,low,,,,,0,retain,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,GREED,贪婪,Greed,curse,诅咒,诅咒,-1,,,low,,,,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SHAME,羞耻,Shame,curse,诅咒,诅咒,-1,,,low,,,,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DOUBT,疑虑,Doubt,curse,诅咒,诅咒,-1,,,low,,,,,0,control,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FOLLY,愚行,Folly,curse,诅咒,诅咒,-1,,,low,,,,,0,innate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DEBT,债务,Debt,curse,诅咒,诅咒,-1,,,low,,,,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ENTHRALLED,执迷,Enthralled,curse,诅咒,诅咒,2,,,low,,,,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SHADOW_SHIELD,暗影之盾,Shadow Shield,defect,技能,罕见,2,44,D,medium,44,14890,34.9,,0,block|generate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,WHITE_NOISE,白噪声,White Noise,defect,技能,罕见,1,53,C,medium,53,26958,37.5,,0,exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,TEMPEST,暴风雨,Tempest,defect,技能,罕见,X,52,C,medium,52,15431,37.3,,0,generate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BULK_UP,暴涨,Bulk Up,defect,能力,罕见,2,63,C,medium,63,15532,40.6,,0,scaling,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,COMPILE_DRIVER,编译冲击,Compile Driver,defect,攻击,普通,1,53,C,medium,53,13760,37.7,,0,damage|draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,HAILSTORM,冰雹风暴,Hailstorm,defect,能力,罕见,1,48,D,medium,48,15986,36.1,,0,aoe,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,GLACIER,冰川,Glacier,defect,技能,罕见,2,53,C,medium,53,20621,37.5,,0,block|generate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CHILL,冰寒,Chill,defect,技能,罕见,0,55,C,medium,55,18242,38.2,,0,exhaust|generate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ICE_LANCE,冰之长枪,Ice Lance,defect,攻击,稀有,3,69,B,medium,69,9027,42.5,,0,damage|generate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,GLASSWORK,玻璃工艺,Glasswork,defect,技能,罕见,1,37,D,medium,37,12935,32.6,,0,block|generate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,RAINBOW,彩虹,Rainbow,defect,技能,稀有,2,57,C,medium,57,7697,38.8,,0,exhaust|generate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SUPERCRITICAL,超临界态,Supercritical,defect,技能,稀有,0,78,A,medium,78,14598,45.2,,0,energy|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,HYPERBEAM,超能光束,Hyperbeam,defect,攻击,稀有,2,57,C,medium,57,4417,38.7,,0,damage|aoe|scaling,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,OVERCLOCK,超频,Overclock,defect,技能,罕见,0,72,B,medium,72,17861,43.4,,0,draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FTL,超越光速,FTL,defect,攻击,罕见,0,51,C,medium,51,18752,37,,0,damage|draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,MOMENTUM_STRIKE,趁势打击,Momentum Strike,defect,攻击,普通,1,30,F,medium,30,21322,30.8,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CHARGE_BATTERY,充电,Charge Battery,defect,技能,普通,1,36,D,medium,36,50210,32.5,,0,block|energy,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CREATIVE_AI,创造性AI,Creative AI,defect,能力,稀有,3,79,A,medium,79,14902,45.4,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,STRIKE_DEFECT,打击,Strike,defect,攻击,基础,1,,,low,,,,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SHATTER,打碎,Shatter,defect,攻击,稀有,1,60,C,medium,60,12862,39.6,,0,damage|aoe,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BARRAGE,弹幕齐射,Barrage,defect,攻击,普通,1,32,F,medium,32,14624,31.4,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ZAP,电击,Zap,defect,技能,基础,1,,,low,,,,,0,generate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,VOLTAIC,电流相生,Voltaic,defect,技能,稀有,3,71,B,medium,71,12525,43.1,,0,exhaust|generate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ITERATION,迭代,Iteration,defect,能力,罕见,1,70,B,medium,70,15068,42.8,,0,draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,MULTI_CAST,多重释放,Multi-Cast,defect,技能,稀有,X,58,C,medium,58,6955,39.2,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DEFEND_DEFECT,防御,Defend,defect,技能,基础,1,,,low,,,,,0,block,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,LEAP,飞跃,Leap,defect,技能,普通,1,36,D,medium,36,29361,32.3,,0,block,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SUNDER,分离,Sunder,defect,攻击,罕见,3,25,F,medium,25,8363,29.1,,0,damage|energy,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BOOST_AWAY,高速脱离,Boost Away,defect,技能,普通,0,49,D,medium,49,30799,36.3,,0,block,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SCRAPE,刮削,Scrape,defect,攻击,罕见,1,64,C,medium,64,10532,40.8,,0,damage|draw|discard,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BEAM_CELL,光束射线,Beam Cell,defect,攻击,普通,0,44,D,medium,44,33544,35,,0,damage|control,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,COLD_SNAP,寒流,Cold Snap,defect,攻击,普通,1,31,F,medium,31,25942,30.9,,0,damage|generate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,TRASH_TO_TREASURE,化废为宝,Trash to Treasure,defect,能力,稀有,1,82,A,medium,82,9745,46.4,,0,generate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BUFFER,缓冲,Buffer,defect,能力,稀有,2,82,A,medium,82,10578,46.5,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ECHO_FORM,回响形态,Echo Form,defect,能力,稀有,3,84,A,medium,84,20007,46.8,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CHAOS,混沌,Chaos,defect,技能,罕见,1,38,D,medium,38,11823,33.2,,0,generate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ROCKET_PUNCH,火箭飞拳,Rocket Punch,defect,攻击,罕见,2,74,B,medium,74,12161,43.8,,0,damage|draw|generate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,MACHINE_LEARNING,机器学习,Machine Learning,defect,能力,稀有,1,89,A,medium,89,14431,48.5,,0,draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FOCUSED_STRIKE,集中打击,Focused Strike,defect,攻击,普通,1,24,F,medium,24,20393,28.8,,0,damage|scaling,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FUSION,聚变,Fusion,defect,技能,罕见,1,44,D,medium,44,14889,35,,0,exhaust|generate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,NULL,空值,Null,defect,攻击,罕见,2,51,C,medium,51,12421,37,,0,damage|control|generate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SKIM,快速检索,Skim,defect,技能,罕见,1,78,A,medium,78,14504,45.2,,0,draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CAPACITOR,扩容,Capacitor,defect,能力,罕见,1,46,D,medium,46,31233,35.6,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,STORM,雷暴,Storm,defect,能力,罕见,1,59,C,medium,59,20454,39.5,,0,generate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,THUNDER,雷霆,Thunder,defect,能力,罕见,1,46,D,medium,46,25683,35.5,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,COOLHEADED,冷静头脑,Coolheaded,defect,技能,普通,1,47,D,medium,47,35843,35.7,,0,draw|generate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,COOLANT,冷却剂,Coolant,defect,能力,稀有,1,71,B,medium,71,7662,42.9,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,HELIX_DRILL,螺旋钻击,Helix Drill,defect,攻击,稀有,0,90,S,medium,90,5866,48.7,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,MODDED,模组改造,Modded,defect,技能,稀有,0,70,B,medium,70,15365,42.7,,0,draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SCAVENGE,内存清理,Scavenge,defect,技能,罕见,1,64,C,medium,64,9805,40.9,,0,energy|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,TURBO,内核加速,TURBO,defect,技能,普通,0,58,C,medium,58,29603,39.1,,0,energy,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ENERGY_SURGE,能量涌动,Energy Surge,defect,技能,罕见,1,85,A,medium,85,19215,47.1,,0,energy|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BIASED_COGNITION,偏差认知,Biased Cognition,defect,能力,先古,1,56,C,medium,56,1289,38.5,,0,scaling,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DARKNESS,漆黑,Darkness,defect,技能,罕见,1,38,D,medium,38,12895,33.1,,0,generate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BOOT_SEQUENCE,启动流程,Boot Sequence,defect,技能,罕见,0,54,C,medium,54,23285,38,,0,block|exhaust|innate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FIGHT_THROUGH,强撑,Fight Through,defect,技能,罕见,1,58,C,medium,58,13919,39,,0,block,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BALL_LIGHTNING,球状闪电,Ball Lightning,defect,攻击,普通,1,23,F,medium,23,30860,28.5,,0,damage|generate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,HOLOGRAM,全息影像,Hologram,defect,技能,普通,1,54,C,medium,54,39787,38,,0,block|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,HOTFIX,热修复,Hotfix,defect,技能,普通,0,35,D,medium,35,31204,32.3,,0,scaling|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SYNTHESIS,人工合成,Synthesis,defect,攻击,罕见,2,53,C,medium,53,8805,37.7,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FLAK_CANNON,散射炮,Flak Cannon,defect,攻击,稀有,2,91,S,medium,91,9791,48.9,,0,damage|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,UPROAR,骚动,Uproar,defect,攻击,普通,2,38,D,medium,38,13696,33.2,,0,damage|draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SWEEPING_BEAM,扫荡射线,Sweeping Beam,defect,攻击,普通,1,32,F,medium,32,19625,31.1,,0,damage|draw|aoe,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ADAPTIVE_STRIKE,适应打击,Adaptive Strike,defect,攻击,稀有,2,58,C,medium,58,8698,39.2,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DOUBLE_ENERGY,双倍能量,Double Energy,defect,技能,罕见,1,55,C,medium,55,18811,38.3,,0,exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DUALCAST,双重释放,Dualcast,defect,技能,基础,1,,,low,,,,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,QUADCAST,四重释放,Quadcast,defect,技能,先古,1,20,F,medium,20,5064,27.5,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DEFRAGMENT,碎片整理,Defragment,defect,能力,稀有,1,72,B,medium,72,15345,43.4,,0,scaling,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,TESLA_COIL,特斯拉线圈,Tesla Coil,defect,攻击,罕见,0,40,D,medium,40,19288,33.7,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SYNCHRONIZE,同步,Synchronize,defect,技能,罕见,1,51,C,medium,51,9851,36.9,,0,scaling|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CONSUMING_SHADOW,吞噬暗影,Consuming Shadow,defect,能力,稀有,2,54,C,medium,54,6545,38,,0,generate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ALL_FOR_ONE,万物一心,All for One,defect,攻击,稀有,2,90,S,medium,90,11781,48.7,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,GUNK_UP,污秽攻击,Gunk Up,defect,攻击,普通,1,43,D,medium,43,17526,34.7,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SIGNAL_BOOST,信号增强,Signal Boost,defect,技能,稀有,1,77,B,medium,77,13034,44.7,,0,exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SPINNER,旋转工艺,Spinner,defect,能力,稀有,1,64,C,medium,64,11043,40.8,,0,generate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,LOOP,循环,Loop,defect,能力,罕见,1,41,D,medium,41,23857,34,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,COMPACT,压缩,Compact,defect,技能,罕见,1,61,C,medium,61,19852,40,,0,block,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SMOKESTACK,烟囱,Smokestack,defect,能力,罕见,1,56,C,medium,56,12936,38.6,,0,aoe|generate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,GO_FOR_THE_EYES,眼部攻击,Go for the Eyes,defect,攻击,普通,0,45,D,medium,45,35120,35.3,,0,damage|control,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FERAL,野性,Feral,defect,能力,罕见,2,58,C,medium,58,20703,39.2,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,GENETIC_ALGORITHM,遗传算法,Genetic Algorithm,defect,技能,稀有,1,57,C,medium,57,10178,38.9,,0,block|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,IGNITION,引火,Ignition,defect,技能,稀有,1,96,S,medium,96,7725,50.5,,0,exhaust|generate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,LIGHTNING_ROD,引雷针,Lightning Rod,defect,技能,普通,1,33,F,medium,33,41397,31.5,,0,block|generate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,METEOR_STRIKE,陨石打击,Meteor Strike,defect,攻击,稀有,5,77,B,medium,77,5721,44.9,,0,damage|generate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CLAW,爪击,Claw,defect,攻击,普通,0,32,F,medium,32,33916,31.2,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,REFRACT,折射,Refract,defect,攻击,罕见,3,33,F,medium,33,10445,31.5,,0,damage|generate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,REBOOT,重启,Reboot,defect,技能,稀有,0,88,A,medium,88,10472,48.3,,0,draw|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SUBROUTINE,子程序,Subroutine,defect,能力,罕见,1,64,C,medium,64,25492,40.8,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,WHISTLE,吹哨,Whistle,event,攻击,先古,3,,,low,,,,,0,damage|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,REBOUND,弹回,Rebound,event,攻击,事件,1,,,low,,,,,0,damage|draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,STACK,堆栈,Stack,event,技能,事件,1,,,low,,,,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,RELAX,放松,Relax,event,技能,先古,3,,,low,,,,,0,block|draw|energy|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FEEDING_FRENZY,疯狂进食,Feeding Frenzy,event,技能,事件,0,,,low,,,,,0,scaling,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,MAD_SCIENCE,疯狂科学,Mad Science,event,攻击,事件,1,,,low,,,,,0,damage|block,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ENTRENCH,巩固,Entrench,event,技能,事件,2,,,low,,,,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,TORIC_TOUGHNESS,坚韧之环,Toric Toughness,event,技能,事件,2,,,low,,,,,0,block,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CLASH,交锋,Clash,event,攻击,事件,0,,,low,,,,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ENLIGHTENMENT,开悟,Enlightenment,event,技能,事件,0,,,low,,,,,0,exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,RIP_AND_TEAR,狂乱撕扯,Rip and Tear,event,攻击,事件,1,,,low,,,,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,APPARITION,灵体,Apparition,event,技能,先古,1,,,low,,,,,0,exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,HELLO_WORLD,你好世界,Hello World,event,能力,事件,1,,,low,,,,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,NEOWS_FURY,涅奥之怒,Neow's Fury,event,攻击,先古,1,,,low,,,,,0,damage|draw|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,OUTMANEUVER,抢占先机,Outmaneuver,event,技能,事件,1,,,low,,,,,0,energy,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,EXTERMINATE,杀灭,Exterminate,event,攻击,事件,1,,,low,,,,,0,damage|aoe,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,APOTHEOSIS,神化,Apotheosis,event,技能,先古,2,,,low,,,,,0,exhaust|innate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DISTRACTION,声东击西,Distraction,event,技能,事件,1,,,low,,,,,0,exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DUAL_WIELD,双持,Dual Wield,event,技能,事件,1,,,low,,,,,0,draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,MAUL,撕咬,Maul,event,攻击,先古,1,,,low,,,,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CALTROPS,铁蒺藜,Caltrops,event,能力,事件,1,,,low,,,,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,WISH,许愿,Wish,event,技能,先古,0,,,low,,,,,0,draw|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SQUASH,压扁,Squash,event,攻击,事件,1,,,low,,,,,0,damage|control,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BYRD_SWOOP,异鸟扑击,Byrd Swoop,event,攻击,事件,0,,,low,,,,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,METAMORPHOSIS,羽化,Metamorphosis,event,技能,事件,2,,,low,,,,,0,draw|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BRIGHTEST_FLAME,至亮之焰,Brightest Flame,event,技能,先古,0,,,low,,,,,0,draw|energy,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PECK,啄击,Peck,event,攻击,事件,1,,,low,,,,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,RAMPAGE,暴走,Rampage,ironclad,攻击,罕见,1,34,F,medium,38,15452,33,25,1,damage,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FORGOTTEN_RITUAL,被遗忘的仪式,Forgotten Ritual,ironclad,技能,罕见,1,65,B,medium,72,14098,43.2,50,1,energy|exhaust,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,HOWL_FROM_BEYOND,彼岸咆哮,Howl from Beyond,ironclad,攻击,罕见,3,51,C,medium,52,12321,37.3,50,1,damage|aoe|exhaust,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BARRICADE,壁垒,Barricade,ironclad,能力,稀有,3,77,B,medium,88,15819,48,50,1,,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,STOMP,踩踏,Stomp,ironclad,攻击,罕见,3,52,C,medium,42,18088,34.2,75,1,damage|aoe,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CRUELTY,残酷,Cruelty,ironclad,能力,稀有,1,91,S,medium,87,19437,47.7,100,1,control,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DISMANTLE,拆卸,Dismantle,ironclad,攻击,罕见,1,55,C,medium,57,21604,38.9,50,1,damage|control,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,TEAR_ASUNDER,扯碎,Tear Asunder,ironclad,攻击,稀有,2,81,A,medium,94,8497,49.9,50,1,damage,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,STRIKE_IRONCLAD,打击,Strike,ironclad,攻击,基础,1,25,F,medium,,,,25,1,damage,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,HELLRAISER,地狱狂徒,Hellraiser,ironclad,能力,稀有,2,56,C,medium,69,15865,42.4,25,1,draw,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,INFERNAL_BLADE,地狱之刃,Infernal Blade,ironclad,技能,罕见,1,53,C,medium,54,22665,38,50,1,exhaust,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DEMONIC_SHIELD,恶魔护盾,Demonic Shield,ironclad,技能,罕见,0,89,A,medium,95,11723,50.2,75,1,exhaust,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DEMON_FORM,恶魔形态,Demon Form,ironclad,能力,稀有,3,54,C,medium,77,17617,44.9,0,1,scaling,Baalorlord — Main
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FIEND_FIRE,恶魔之焰,Fiend Fire,ironclad,攻击,稀有,2,90,S,medium,85,8778,47.2,100,1,damage|exhaust,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DEFEND_IRONCLAD,防御,Defend,ironclad,技能,基础,1,25,F,medium,,,,25,1,block,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BLOODLETTING,放血,Bloodletting,ironclad,技能,普通,0,69,B,medium,55,62113,38.1,100,1,energy,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SWORD_BOOMERANG,飞剑回旋镖,Sword Boomerang,ironclad,攻击,普通,1,44,D,medium,52,19276,37.2,25,1,damage,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CRIMSON_MANTLE,绯红披风,Crimson Mantle,ironclad,能力,稀有,1,88,A,medium,94,16516,50,75,1,,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CONFLAGRATION,焚烧,Conflagration,ironclad,攻击,稀有,1,70,B,medium,79,15673,45.6,50,1,damage|aoe,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ANGER,愤怒,Anger,ironclad,攻击,普通,0,51,C,medium,40,32058,33.8,75,1,damage,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CORRUPTION,腐化,Corruption,ironclad,能力,先古,3,90,S,medium,97,1355,51.2,75,1,exhaust,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,AGGRESSION,好勇斗狠,Aggression,ironclad,能力,稀有,1,85,A,medium,89,12600,48.5,75,1,,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DARK_EMBRACE,黑暗之拥,Dark Embrace,ironclad,能力,稀有,2,98,S,medium,97,8125,50.8,100,1,draw|exhaust,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ASHEN_STRIKE,灰烬打击,Ashen Strike,ironclad,攻击,罕见,1,71,B,medium,69,16346,42.3,75,1,damage|exhaust,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FLAME_BARRIER,火焰屏障,Flame Barrier,ironclad,技能,罕见,2,59,C,medium,52,27037,37.4,75,1,block,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,OFFERING,祭品,Offering,ironclad,技能,稀有,0,100,S,medium,100,20191,52.5,100,1,draw|energy|exhaust,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,UNMOVABLE,坚定不移,Unmovable,ironclad,能力,稀有,2,94,S,medium,91,16804,48.9,100,1,,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,TRUE_GRIT,坚毅,True Grit,ironclad,技能,普通,1,54,C,medium,55,29660,38.1,50,1,block|exhaust,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,POMMEL_STRIKE,剑柄打击,Pommel Strike,ironclad,攻击,普通,1,65,B,medium,50,53666,36.6,100,1,damage|draw,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PILLAGE,劫掠,Pillage,ironclad,攻击,罕见,1,76,B,medium,65,13239,41.2,100,1,damage|draw,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,STAMPEDE,惊逃,Stampede,ironclad,能力,罕见,2,54,C,medium,55,28011,38.3,50,1,,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,COLOSSUS,巨像,Colossus,ironclad,技能,罕见,1,77,B,medium,67,31591,41.7,100,1,block|control,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,RAGE,狂怒,Rage,ironclad,技能,罕见,0,68,B,medium,54,27257,37.8,100,1,,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FEED,狂宴,Feed,ironclad,攻击,稀有,1,65,B,medium,60,11255,39.7,75,1,damage|exhaust,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,IMPERVIOUS,岿然不动,Impervious,ironclad,技能,稀有,2,90,S,medium,85,13856,47.3,100,1,block|exhaust,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BRAND,烙印,Brand,ironclad,技能,稀有,0,72,B,medium,82,14132,46.3,50,1,scaling|exhaust,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ONE_TWO_PUNCH,连环拳,One-Two Punch,ironclad,技能,稀有,1,76,B,medium,76,16023,44.6,75,1,,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,MANGLE,凌虐,Mangle,ironclad,攻击,稀有,3,73,B,medium,93,11879,49.5,25,1,damage|scaling,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BREAK,破击,Break,ironclad,攻击,先古,1,73,B,medium,62,10089,40.4,100,1,damage|control,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,HAVOC,破灭,Havoc,ironclad,技能,普通,1,38,D,medium,54,13992,37.9,0,1,draw|exhaust,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BULLY,欺凌,Bully,ironclad,攻击,罕见,0,72,B,medium,70,25010,42.6,75,1,damage|control,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PACTS_END,契约终结,Pact's End,ironclad,攻击,稀有,0,79,A,medium,81,9638,46,75,1,damage|draw|aoe|exhaust,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CASCADE,倾泻,Cascade,ironclad,技能,稀有,X,89,A,medium,95,11938,50.4,75,1,draw,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BODY_SLAM,全身撞击,Body Slam,ironclad,攻击,普通,1,67,B,medium,64,25917,40.8,75,1,,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,INFLAME,燃烧,Inflame,ironclad,能力,罕见,1,43,D,medium,50,32081,36.6,25,1,scaling,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BURNING_PACT,燃烧契约,Burning Pact,ironclad,技能,罕见,1,74,B,medium,74,19945,43.9,75,1,draw|exhaust,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,MOLTEN_FIST,熔融之拳,Molten Fist,ironclad,攻击,普通,1,51,C,medium,52,48673,37.4,50,1,damage|control|exhaust,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,TANK,肉盾,Tank,ironclad,能力,稀有,1,70,B,medium,100,2633,56.2,0,1,,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,THUNDERCLAP,闪电霹雳,Thunderclap,ironclad,攻击,普通,1,40,D,medium,47,37011,35.8,25,1,damage|aoe|control,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,UPPERCUT,上勾拳,Uppercut,ironclad,攻击,罕见,2,66,B,medium,62,20918,40.3,75,1,damage|control,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,NOT_YET,时候未到,Not Yet,ironclad,技能,稀有,2,81,A,medium,83,14876,46.5,75,1,exhaust,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,JUGGERNAUT,势不可当,Juggernaut,ironclad,能力,稀有,2,74,B,medium,74,11031,44.1,75,1,,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,TWIN_STRIKE,双重打击,Twin Strike,ironclad,攻击,普通,1,37,D,medium,42,29353,34.3,25,1,damage,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,RUPTURE,撕裂,Rupture,ironclad,能力,罕见,1,58,C,medium,62,25743,40.2,50,1,scaling,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SHRUG_IT_OFF,耸肩无视,Shrug It Off,ironclad,技能,普通,1,56,C,medium,48,62121,36.2,75,1,block|draw,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,STOKE,添柴,Stoke,ironclad,技能,稀有,1,97,S,medium,95,9772,50.2,100,1,exhaust,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,TAUNT,挑衅,Taunt,ironclad,技能,罕见,1,65,B,medium,61,32575,40,75,1,block|control,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,IRON_WAVE,铁斩波,Iron Wave,ironclad,攻击,普通,1,46,D,medium,44,27659,34.9,50,1,damage|block,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BASH,痛击,Bash,ironclad,攻击,基础,2,25,F,medium,,,,25,1,damage|control,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,THRASH,痛殴,Thrash,ironclad,攻击,稀有,1,82,A,medium,74,12496,43.8,100,1,damage|exhaust,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,HEADBUTT,头槌,Headbutt,ironclad,攻击,普通,1,60,C,medium,54,28187,37.8,75,1,damage|draw,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BREAKTHROUGH,突破,Breakthrough,ironclad,攻击,普通,1,39,D,medium,34,27060,31.9,50,1,damage|aoe,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PERFECTED_STRIKE,完美打击,Perfected Strike,ironclad,攻击,普通,2,40,D,medium,35,36657,32.2,50,1,damage,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FEEL_NO_PAIN,无惧疼痛,Feel No Pain,ironclad,能力,罕见,1,76,B,medium,76,18469,44.5,75,1,exhaust,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,UNRELENTING,无情猛攻,Unrelenting,ironclad,攻击,罕见,2,51,C,medium,52,16968,37.2,50,1,damage,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ARMAMENTS,武装,Armaments,ironclad,技能,普通,1,47,D,medium,46,46908,35.5,50,1,block,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,EVIL_EYE,邪眼,Evil Eye,ironclad,技能,罕见,1,75,B,medium,64,18446,40.8,100,1,block|exhaust,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PYRE,薪火之源,Pyre,ironclad,能力,稀有,2,80,A,medium,82,23768,46.2,75,1,energy,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,VICIOUS,凶恶,Vicious,ironclad,能力,罕见,1,86,A,medium,80,22991,45.6,100,1,draw|control,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,WHIRLWIND,旋风斩,Whirlwind,ironclad,攻击,罕见,X,58,C,medium,51,18122,37,75,1,damage|aoe,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BLOOD_WALL,血墙,Blood Wall,ironclad,技能,普通,2,51,C,medium,51,29806,36.9,50,1,block,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,STONE_ARMOR,岩石铠甲,Stone Armor,ironclad,能力,罕见,1,61,C,medium,65,23982,41.2,50,1,,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CINDER,余烬,Cinder,ironclad,攻击,普通,2,26,F,medium,27,9798,29.6,25,1,damage|exhaust,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FIGHT_ME,与我一战！,Fight Me!,ironclad,攻击,罕见,2,55,C,medium,46,14800,35.5,75,1,damage|scaling,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,INFERNO,狱火,Inferno,ironclad,能力,罕见,1,50,C,medium,60,14974,39.8,25,1,aoe,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SETUP_STRIKE,预备打击,Setup Strike,ironclad,攻击,普通,1,35,D,medium,39,32336,33.3,25,1,damage|scaling,Baalorlord — Main
+v0.107.1,stable,2026-09-07T11:14:32.214Z,HEMOKINESIS,御血术,Hemokinesis,ironclad,攻击,罕见,1,58,C,medium,50,10374,36.8,75,1,damage,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PRIMAL_FORCE,原始力量,Primal Force,ironclad,技能,稀有,0,54,C,medium,56,8105,38.6,50,1,,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SPITE,怨恨,Spite,ironclad,攻击,罕见,0,56,C,medium,59,11902,39.3,50,1,damage,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,EXPECT_A_FIGHT,跃跃欲试,Expect a Fight,ironclad,技能,罕见,2,64,C,medium,59,16063,39.3,75,1,,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,JUGGLING,杂耍,Juggling,ironclad,能力,罕见,1,61,C,medium,65,14590,41.1,50,1,,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BATTLE_TRANCE,战斗专注,Battle Trance,ironclad,技能,罕见,0,71,B,medium,69,30001,42.3,75,1,draw,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DRUM_OF_BATTLE,战鼓,Drum of Battle,ironclad,技能,罕见,1,62,C,medium,78,11489,45.2,25,1,draw|energy|exhaust,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,TREMBLE,战栗,Tremble,ironclad,技能,普通,1,51,C,medium,51,55904,36.9,50,1,control|exhaust,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BLUDGEON,重锤,Bludgeon,ironclad,攻击,罕见,3,55,C,medium,47,16780,35.7,75,1,damage,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SECOND_WIND,重振精神,Second Wind,ironclad,技能,罕见,1,62,C,medium,67,13287,41.7,50,1,block|exhaust,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DOMINATE,主宰,Dominate,ironclad,技能,罕见,1,83,A,medium,75,36021,44.1,100,1,scaling|control|exhaust,Baalorlord
+v0.107.1,stable,2026-09-07T11:14:32.214Z,GLIMPSE_BEYOND,彼岸一瞥,Glimpse Beyond,necrobinder,技能,稀有,1,100,S,medium,100,10011,57.9,,0,draw|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SCOURGE,鞭打,Scourge,necrobinder,技能,普通,1,43,D,medium,43,32268,34.7,,0,draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,REAVE,剥夺,Reave,necrobinder,攻击,普通,1,35,D,medium,35,20862,32.3,,0,damage|draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SOW,播种,Sow,necrobinder,攻击,普通,1,24,F,medium,24,18258,29,,0,damage|aoe|retain,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CAPTURE_SPIRIT,捕捉灵魂,Capture Spirit,necrobinder,技能,罕见,1,66,B,medium,66,19088,41.5,,0,damage|draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,UNDEATH,不死,Undeath,necrobinder,技能,稀有,0,74,B,medium,74,12907,43.8,,0,block,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,UNLEASH,出击,Unleash,necrobinder,攻击,基础,1,,,low,,,,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,POKE,戳击,Poke,necrobinder,攻击,普通,0,41,D,medium,41,30309,33.9,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,VEILPIERCER,刺破帷幕,Veilpiercer,necrobinder,攻击,罕见,1,63,C,medium,63,8081,40.7,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DEBILITATE,摧残,Debilitate,necrobinder,攻击,罕见,1,98,S,medium,98,21928,51,,0,damage|control,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,STRIKE_NECROBINDER,打击,Strike,necrobinder,攻击,基础,1,,,low,,,,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,TIMES_UP,大限已至,Time's Up,necrobinder,攻击,稀有,2,85,A,medium,85,10417,47.3,,0,exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,COUNTDOWN,倒数计时,Countdown,necrobinder,能力,罕见,1,56,C,medium,56,24674,38.5,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,RIGHT_HAND_HAND,得力助手,Right Hand Hand,necrobinder,攻击,罕见,0,60,C,medium,60,14597,39.7,,0,damage|energy,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DEFILE,玷污,Defile,necrobinder,攻击,普通,1,35,D,medium,35,16456,32.2,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SCULPTING_STRIKE,雕琢打击,Sculpting Strike,necrobinder,攻击,普通,1,57,C,medium,57,8904,38.7,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,HANG,吊杀,Hang,necrobinder,攻击,稀有,1,76,B,medium,76,11362,44.6,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SHROUD,厄运之衣,Shroud,necrobinder,能力,罕见,1,64,C,medium,64,19157,41,,0,block,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DEFEND_NECROBINDER,防御,Defend,necrobinder,技能,基础,1,,,low,,,,,0,block,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,GRAVEBLAST,坟冢爆射,Graveblast,necrobinder,攻击,普通,1,68,B,medium,68,23631,42.2,,0,damage|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PUTREFY,腐败,Putrefy,necrobinder,技能,罕见,1,78,A,medium,78,19995,45.2,,0,control|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,NEGATIVE_PULSE,负能量脉冲,Negative Pulse,necrobinder,技能,普通,1,37,D,medium,37,44399,32.9,,0,block|aoe,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CALCIFY,钙化,Calcify,necrobinder,能力,罕见,1,54,C,medium,54,14274,38,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ERADICATE,根除,Eradicate,necrobinder,攻击,稀有,X,95,S,medium,95,9522,50.2,,0,damage|retain,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,WISP,鬼火,Wisp,necrobinder,技能,普通,0,54,C,medium,54,47596,37.9,,0,energy|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,LEGION_OF_BONE,骸骨军团,Legion of Bone,necrobinder,技能,罕见,2,100,S,medium,100,11318,52.1,,0,exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BODYGUARD,护卫,Bodyguard,necrobinder,技能,基础,1,,,low,,,,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,EIDOLON,幻景,Eidolon,necrobinder,技能,稀有,2,85,A,medium,85,2395,47.3,,0,exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,INVOKE,唤起,Invoke,necrobinder,技能,普通,1,52,C,medium,52,46740,37.4,,0,energy,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BLIGHT_STRIKE,荒疫打击,Blight Strike,necrobinder,攻击,普通,1,36,D,medium,36,23366,32.6,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SPIRIT_OF_ASH,灰烬之灵,Spirit of Ash,necrobinder,能力,稀有,1,90,S,medium,90,7293,48.8,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,HIGH_FIVE,击掌,High Five,necrobinder,攻击,罕见,2,56,C,medium,56,17320,38.6,,0,damage|aoe|control,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SEANCE,降灵,Seance,necrobinder,技能,稀有,1,88,A,medium,88,8581,48,,0,draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CLEANSE,洁净,Cleanse,necrobinder,技能,罕见,1,68,B,medium,68,12037,42.1,,0,draw|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SIC_EM,紧追不放,Sic 'Em,necrobinder,攻击,罕见,1,50,C,medium,50,14511,36.7,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FORBIDDEN_GRIMOIRE,禁忌魔典,Forbidden Grimoire,necrobinder,能力,先古,2,87,A,medium,87,2598,48.1,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,NEUROSURGE,精神过载,Neurosurge,necrobinder,能力,稀有,0,100,S,medium,100,12836,54.5,,0,draw|energy,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,HAUNT,纠缠,Haunt,necrobinder,能力,罕见,1,58,C,medium,58,17706,39,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,THE_SCYTHE,巨镰,The Scythe,necrobinder,攻击,稀有,2,58,C,medium,58,8840,39.1,,0,damage|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FEAR,恐惧,Fear,necrobinder,攻击,普通,1,54,C,medium,54,24543,37.8,,0,damage|control,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,MISERY,苦难,Misery,necrobinder,攻击,稀有,0,89,A,medium,89,14386,48.6,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,AFTERLIFE,来生,Afterlife,necrobinder,技能,普通,1,52,C,medium,52,24006,37.2,,0,exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SOUL_STORM,灵魂风暴,Soul Storm,necrobinder,攻击,稀有,1,74,B,medium,74,8514,43.8,,0,damage|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PARSE,领会,Parse,necrobinder,技能,罕见,1,81,A,medium,81,11462,46.1,,0,draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DEMESNE,领域,Demesne,necrobinder,能力,稀有,3,100,S,medium,100,18586,51.6,,0,draw|energy,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BURY,埋葬,Bury,necrobinder,攻击,罕见,4,72,B,medium,72,8176,43.2,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,RATTLE,猛晃,Rattle,necrobinder,攻击,罕见,1,54,C,medium,54,12469,38,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SHARED_FATE,命运同担,Shared Fate,necrobinder,技能,稀有,0,100,S,medium,100,7425,54.3,,0,scaling|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,END_OF_DAYS,末日降临,End of Days,necrobinder,技能,稀有,3,70,B,medium,70,14281,42.8,,0,aoe,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DRAIN_POWER,能量汲取,Drain Power,necrobinder,攻击,普通,1,40,D,medium,40,23575,33.5,,0,damage|draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BANSHEES_CRY,女妖之嚎,Banshee's Cry,necrobinder,攻击,稀有,9,93,S,medium,93,5730,49.7,,0,damage|energy|aoe,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SEVERANCE,切断,Severance,necrobinder,攻击,罕见,2,58,C,medium,58,12926,39,,0,damage|draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DREDGE,清淤,Dredge,necrobinder,技能,罕见,1,92,S,medium,92,13074,49.3,,0,draw|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FETCH,取回,Fetch,necrobinder,攻击,罕见,0,62,C,medium,62,19462,40.2,,0,damage|draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ENFEEBLING_TOUCH,弱化之触,Enfeebling Touch,necrobinder,技能,罕见,1,82,A,medium,82,28492,46.2,,0,scaling,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SENTRY_MODE,哨卫模式,Sentry Mode,necrobinder,能力,稀有,2,78,A,medium,78,11007,45.1,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,REAP,收割,Reap,necrobinder,攻击,普通,3,41,D,medium,41,15439,33.9,,0,damage|retain,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PROTECTOR,守护者,Protector,necrobinder,攻击,先古,1,41,D,medium,41,5081,34.1,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,GRAVE_WARDEN,守墓人,Grave Warden,necrobinder,技能,普通,1,48,D,medium,48,49943,36.2,,0,block|draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PAGESTORM,书页风暴,Pagestorm,necrobinder,能力,罕见,1,83,A,medium,83,10909,46.7,,0,draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,REAPER_FORM,死神形态,Reaper Form,necrobinder,能力,稀有,3,86,A,medium,86,15579,47.5,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DEATHBRINGER,死亡使者,Deathbringer,necrobinder,技能,罕见,2,56,C,medium,56,24384,38.6,,0,aoe|control,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DEATH_MARCH,死亡行军,Death March,necrobinder,攻击,罕见,1,62,C,medium,62,9169,40.4,,0,damage|draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DEATHS_DOOR,死亡之门,Death's Door,necrobinder,技能,罕见,1,59,C,medium,59,16321,39.5,,0,block,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DANSE_MACABRE,死亡之舞,Danse Macabre,necrobinder,能力,罕见,1,75,B,medium,75,12249,44.2,,0,energy,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,REANIMATE,死者苏生,Reanimate,necrobinder,技能,稀有,3,87,A,medium,87,12277,47.8,,0,exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BONE_SHARDS,碎骨,Bone Shards,necrobinder,攻击,罕见,1,44,D,medium,44,11101,34.8,,0,damage|block|aoe,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DEVOUR_LIFE,吞噬生命,Devour Life,necrobinder,能力,稀有,1,78,A,medium,78,10381,45.3,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DELAY,拖延,Delay,necrobinder,技能,罕见,2,65,B,medium,65,19144,41.1,,0,block|energy,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DIRGE,挽歌,Dirge,necrobinder,技能,罕见,X,72,B,medium,72,19818,43.3,,0,draw|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PULL_FROM_BELOW,亡魂牵引,Pull from Below,necrobinder,攻击,罕见,1,76,B,medium,76,8844,44.5,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,NECRO_MASTERY,亡灵精通,Necro Mastery,necrobinder,能力,稀有,2,76,B,medium,76,12231,44.4,,0,aoe,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DEFY,违逆,Defy,necrobinder,技能,普通,1,54,C,medium,54,45699,38,,0,block|control,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,NO_ESCAPE,无处可逃,No Escape,necrobinder,技能,罕见,1,59,C,medium,59,23158,39.3,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PULL_AGGRO,吸引仇恨,Pull Aggro,necrobinder,技能,普通,2,43,D,medium,43,27736,34.6,,0,block,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SACRIFICE,牺牲,Sacrifice,necrobinder,技能,稀有,1,70,B,medium,70,4418,42.8,,0,retain,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SNAP,响指,Snap,necrobinder,攻击,普通,1,51,C,medium,51,23618,37,,0,damage|retain,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CALL_OF_THE_VOID,虚空之唤,Call of the Void,necrobinder,能力,稀有,1,94,S,medium,94,12399,49.9,,0,draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SLEIGHT_OF_FLESH,血肉戏法,Sleight of Flesh,necrobinder,能力,罕见,2,70,B,medium,70,20247,42.6,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,OBLIVION,湮灭,Oblivion,necrobinder,技能,稀有,0,83,A,medium,83,13374,46.5,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,MELANCHOLY,忧郁,Melancholy,necrobinder,技能,罕见,3,52,C,medium,52,8918,37.4,,0,block|energy,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FRIENDSHIP,友谊,Friendship,necrobinder,能力,罕见,1,74,B,medium,74,27863,44,,0,energy|scaling,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BORROWED_TIME,预借时间,Borrowed Time,necrobinder,技能,罕见,1,76,B,medium,76,18948,44.5,,0,energy,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SPUR,增生,Spur,necrobinder,技能,罕见,1,56,C,medium,56,18745,38.5,,0,retain,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SQUEEZE,榨取,Squeeze,necrobinder,攻击,稀有,3,83,A,medium,83,9609,46.6,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,LETHALITY,致死性,Lethality,necrobinder,能力,罕见,1,70,B,medium,70,29789,42.7,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,TRANSFIGURE,重构,Transfigure,necrobinder,技能,稀有,1,92,S,medium,92,12559,49.3,,0,energy|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FLATTEN,重压,Flatten,necrobinder,攻击,普通,2,39,D,medium,39,28289,33.4,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SPOILS_MAP,藏宝图,Spoils Map,quest,任务,任务,-1,,,low,,,,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,LANTERN_KEY,灯火钥匙,Lantern Key,quest,任务,任务,-1,,,low,,,,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BYRDONIS_EGG,多尼斯异鸟蛋,Byrdonis Egg,quest,任务,任务,-1,,,low,,,,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PALE_BLUE_DOT,暗淡蓝点,Pale Blue Dot,regent,能力,罕见,1,97,S,medium,97,8622,50.9,,0,draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,HEGEMONY,霸权,Hegemony,regent,攻击,罕见,2,62,C,medium,62,11811,40.2,,0,damage|energy,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,TYRANNY,暴政,Tyranny,regent,能力,稀有,1,100,S,medium,100,7421,53.7,,0,draw|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SUPERMASSIVE,超质量体,Supermassive,regent,攻击,罕见,1,78,A,medium,78,8500,45.2,,0,damage|generate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CHARGE,冲锋！！,CHARGE!!,regent,技能,罕见,1,71,B,medium,71,16721,43.1,,0,draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,VENERATE,崇拜,Venerate,regent,技能,基础,1,,,low,,,,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,HEIRLOOM_HAMMER,传承之锤,Heirloom Hammer,regent,攻击,稀有,2,79,A,medium,79,6976,45.5,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,GENESIS,创世纪,Genesis,regent,能力,稀有,2,87,A,medium,87,14708,47.7,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PILLAR_OF_CREATION,创世之柱,Pillar of Creation,regent,能力,罕见,1,85,A,medium,85,14521,47.1,,0,block|generate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,HAMMER_TIME,锤子时间,Hammer Time,regent,能力,稀有,2,100,S,medium,100,7456,53.8,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,REFINE_BLADE,淬炼刀刃,Refine Blade,regent,技能,普通,1,54,C,medium,54,35812,37.8,,0,energy,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,STRIKE_REGENT,打击,Strike,regent,攻击,基础,1,,,low,,,,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BIG_BANG,大爆炸,Big Bang,regent,技能,稀有,0,100,S,medium,100,21857,52.6,,0,draw|energy|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,REFLECT,倒映,Reflect,regent,技能,罕见,1,62,C,medium,62,24451,40.2,,0,block,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,TERRAFORMING,地形改造,Terraforming,regent,技能,罕见,1,59,C,medium,59,8057,39.5,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,MONOLOGUE,独白,Monologue,regent,技能,罕见,0,63,C,medium,63,10909,40.5,,0,scaling,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BEAT_INTO_SHAPE,锻打成型,Beat into Shape,regent,攻击,稀有,1,77,B,medium,77,10399,44.9,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DEFEND_REGENT,防御,Defend,regent,技能,基础,1,,,low,,,,,0,block,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,THE_SEALED_THRONE,封印王座,The Sealed Throne,regent,能力,先古,1,88,A,medium,88,4265,48.3,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,RADIATE,辐射,Radiate,regent,攻击,罕见,0,66,B,medium,66,14514,41.4,,0,damage|aoe,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,RESONANCE,共鸣,Resonance,regent,技能,罕见,1,69,B,medium,69,9778,42.3,,0,aoe|scaling,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SPECTRUM_SHIFT,光谱偏移,Spectrum Shift,regent,能力,罕见,2,80,A,medium,80,18729,45.7,,0,draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PHOTON_CUT,光子切割,Photon Cut,regent,攻击,普通,1,52,C,medium,52,15424,37.4,,0,damage|draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,KNOW_THY_PLACE,何人僭越,Know Thy Place,regent,技能,普通,0,61,C,medium,61,37351,40.1,,0,control|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BLACK_HOLE,黑洞,Black Hole,regent,能力,罕见,1,60,C,medium,60,24123,39.7,,0,aoe,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BOMBARDMENT,轰击,Bombardment,regent,攻击,稀有,3,86,A,medium,86,11136,47.7,,0,damage|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,GUARDS,护驾！！！,GUARDS!!!,regent,技能,稀有,2,90,S,medium,90,8535,48.7,,0,exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ORBIT,环绕轨道,Orbit,regent,能力,罕见,2,78,A,medium,78,27787,45.1,,0,energy,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,GLOW,辉光,Glow,regent,技能,普通,1,59,C,medium,59,39924,39.4,,0,draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CONVERGENCE,汇流,Convergence,regent,技能,罕见,1,73,B,medium,73,21336,43.6,,0,energy|retain,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,COMET,彗星,Comet,regent,攻击,稀有,0,89,A,medium,89,11689,48.4,,0,damage|control,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FOREGONE_CONCLUSION,既定事项,Foregone Conclusion,regent,技能,稀有,1,91,S,medium,91,7180,49.1,,0,draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,GAMMA_BLAST,伽马爆破,Gamma Blast,regent,攻击,罕见,0,70,B,medium,70,17042,42.6,,0,damage|control,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SWORD_SAGE,剑圣,Sword Sage,regent,能力,稀有,2,97,S,medium,97,13039,50.9,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,KNOCKOUT_BLOW,决胜一击,Knockout Blow,regent,攻击,罕见,3,39,D,medium,39,8584,33.4,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DECISIONS_DECISIONS,抉择，抉择,"Decisions, Decisions",regent,技能,稀有,0,100,S,medium,100,13530,52.5,,0,draw|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,MANIFEST_AUTHORITY,君权自授,Manifest Authority,regent,技能,罕见,1,73,B,medium,73,16747,43.7,,0,block,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,LARGESSE,慷慨捐助,Largesse,regent,技能,罕见,0,95,S,medium,95,9756,50.2,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,QUASAR,类星体,Quasar,regent,技能,罕见,0,77,B,medium,77,12579,44.8,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PARTICLE_WALL,粒子墙,Particle Wall,regent,技能,罕见,0,67,B,medium,67,18824,41.8,,0,block,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,GLITTERSTREAM,流光溢彩,Glitterstream,regent,技能,普通,2,53,C,medium,53,26150,37.6,,0,block,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,METEOR_SHOWER,流星雨,Meteor Shower,regent,攻击,先古,0,67,B,medium,67,6726,41.9,,0,damage|aoe|control,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SHINING_STRIKE,明耀打击,Shining Strike,regent,攻击,罕见,1,57,C,medium,57,19424,38.8,,0,damage|draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,COLLISION_COURSE,碰撞轨迹,Collision Course,regent,攻击,普通,0,52,C,medium,52,17568,37.2,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CRASH_LANDING,迫降,Crash Landing,regent,攻击,稀有,1,75,B,medium,75,6727,44.3,,0,damage|aoe,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SEVEN_STARS,七星,Seven Stars,regent,攻击,稀有,2,78,A,medium,78,10059,45,,0,damage|aoe,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CLOAK_OF_STARS,群星斗篷,Cloak of Stars,regent,技能,普通,0,52,C,medium,52,33274,37.4,,0,block,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CHILD_OF_THE_STARS,群星之子,Child of the Stars,regent,能力,罕见,1,67,B,medium,67,25610,41.9,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FURNACE,熔炉,Furnace,regent,能力,罕见,1,66,B,medium,66,25694,41.4,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,MAKE_IT_SO,如此甚好,Make It So,regent,攻击,稀有,0,93,S,medium,93,10075,49.5,,0,damage|draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ROYAL_GAMBLE,胜券在王,Royal Gamble,regent,技能,罕见,0,72,B,medium,72,20170,43.4,,0,exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,GATHER_LIGHT,收集光辉,Gather Light,regent,技能,普通,1,51,C,medium,51,50095,37.1,,0,block,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,I_AM_INVINCIBLE,所向无敌,I Am Invincible,regent,技能,稀有,1,83,A,medium,83,9414,46.6,,0,block|draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SOLAR_STRIKE,太阳打击,Solar Strike,regent,攻击,普通,1,45,D,medium,45,25600,35.1,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,HEAVENLY_DRILL,天际钻头,Heavenly Drill,regent,攻击,稀有,X,89,A,medium,89,6122,48.6,,0,damage|energy,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CELESTIAL_MIGHT,天穹之力,Celestial Might,regent,攻击,普通,2,46,D,medium,46,11492,35.5,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ROYALTIES,王国资产,Royalties,regent,能力,稀有,1,78,A,medium,78,7454,45.2,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,KINGLY_PUNCH,王者之拳,Kingly Punch,regent,攻击,罕见,1,40,D,medium,40,10233,33.6,,0,damage|draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,KINGLY_KICK,王者之踢,Kingly Kick,regent,攻击,罕见,4,44,D,medium,44,9156,34.9,,0,damage|draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,MONARCHS_GAZE,王之凝视,Monarch's Gaze,regent,能力,稀有,2,100,S,medium,100,8644,53,,0,scaling,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,GLIMMER,微光,Glimmer,regent,技能,罕见,1,86,A,medium,86,9474,47.6,,0,draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ARSENAL,武器库,Arsenal,regent,能力,稀有,1,95,S,medium,95,8366,50.3,,0,scaling|generate,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BEGONE,下去！,BEGONE!,regent,技能,普通,1,62,C,medium,62,22290,40.3,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CRUSH_UNDER,下砸,Crush Under,regent,攻击,普通,1,44,D,medium,44,24932,34.8,,0,damage|aoe|scaling,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BUNDLE_OF_JOY,新生之喜,Bundle of Joy,regent,技能,稀有,1,95,S,medium,95,8163,50.2,,0,draw|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CRESCENT_SPEAR,新月长矛,Crescent Spear,regent,攻击,普通,1,44,D,medium,44,22031,35,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,STARDUST,星尘,Stardust,regent,攻击,罕见,0,68,B,medium,68,17959,42.2,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ASTRAL_PULSE,星界脉冲,Astral Pulse,regent,攻击,普通,0,35,D,medium,35,23373,32.1,,0,damage|aoe,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DYING_STAR,星灭,Dying Star,regent,攻击,稀有,1,93,S,medium,93,13209,49.6,,0,damage|aoe|scaling,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ALIGNMENT,星位序列,Alignment,regent,技能,罕见,0,73,B,medium,73,16808,43.5,,0,energy,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PATTER,星星点点,Patter,regent,技能,普通,1,54,C,medium,54,21435,38,,0,block,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,VOID_FORM,虚空形态,Void Form,regent,能力,稀有,3,94,S,medium,94,18488,50,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,GUIDING_STAR,引导之星,Guiding Star,regent,攻击,普通,1,58,C,medium,58,17615,39,,0,damage|draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,HIDDEN_CACHE,隐秘藏品,Hidden Cache,regent,技能,普通,1,54,C,medium,54,45326,37.8,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,COSMIC_INDIFFERENCE,宇宙冷漠,Cosmic Indifference,regent,技能,普通,1,65,B,medium,65,35843,41.1,,0,block|draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PROPHESIZE,预言,Prophesize,regent,技能,罕见,2,91,S,medium,91,5297,49.2,,0,draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,LUNAR_BLAST,月面射击,Lunar Blast,regent,攻击,罕见,0,76,B,medium,76,5781,44.4,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FALLING_STAR,陨星,Falling Star,regent,攻击,基础,0,,,low,,,,,0,damage|control,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DEVASTATE,葬送,Devastate,regent,攻击,罕见,1,51,C,medium,51,10882,37.1,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,WROUGHT_IN_WAR,战火铸就,Wrought in War,regent,攻击,普通,1,46,D,medium,46,24942,35.6,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SPOILS_OF_BATTLE,战利品,Spoils of Battle,regent,技能,普通,1,60,C,medium,60,26635,39.7,,0,draw,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PARRY,招架,Parry,regent,能力,罕见,1,70,B,medium,70,23263,42.8,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CONQUEROR,征服者,Conqueror,regent,技能,罕见,1,68,B,medium,68,19042,42.1,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SUMMON_FORTH,征召上前,Summon Forth,regent,技能,罕见,1,70,B,medium,70,20875,42.8,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,NEUTRON_AEGIS,中子护盾,Neutron Aegis,regent,能力,稀有,1,85,A,medium,85,7463,47.2,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,THE_SMITH,铸剑者,The Smith,regent,技能,稀有,1,78,A,medium,78,13786,45.1,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BULWARK,铸墙,Bulwark,regent,技能,罕见,2,67,B,medium,67,24672,41.8,,0,block,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SEEKING_EDGE,追踪之刃,Seeking Edge,regent,能力,稀有,1,80,A,medium,80,13532,45.7,,0,aoe,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SHADOW_STEP,暗影步,Shadow Step,silent,技能,稀有,1,65,B,medium,86,11519,47.4,17,1,draw|discard,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,EXPOSE,暴露,Expose,silent,技能,罕见,0,77,B,medium,75,33936,44.3,83,1,control|exhaust,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BURST,爆发,Burst,silent,技能,稀有,1,65,B,medium,86,16116,47.5,17,1,,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BACKSTAB,背刺,Backstab,silent,攻击,罕见,0,53,C,medium,54,26673,37.9,50,1,damage|exhaust|innate,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,REFLEX,本能反应,Reflex,silent,技能,罕见,3,67,B,medium,74,15172,44,50,1,draw|discard,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DAGGER_SPRAY,匕首雨,Dagger Spray,silent,攻击,普通,1,36,D,medium,30,24743,30.8,50,1,damage|aoe,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,TOOLS_OF_THE_TRADE,必备工具,Tools of the Trade,silent,能力,稀有,1,90,S,medium,93,16723,49.7,83,1,draw|discard,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BLUR,残影,Blur,silent,技能,罕见,1,63,C,medium,68,26956,42.2,50,1,block,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DASH,冲刺,Dash,silent,攻击,罕见,2,42,D,medium,46,15399,35.5,33,1,damage|block,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,UNTOUCHABLE,触不可及,Untouchable,silent,技能,普通,2,43,D,medium,48,31133,36.1,33,1,block|discard,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ACCELERANT,触媒,Accelerant,silent,能力,稀有,1,62,C,medium,81,14386,46.1,17,1,scaling,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SKEWER,串刺,Skewer,silent,攻击,罕见,X,47,D,medium,60,6400,39.8,17,1,damage,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ASSASSINATE,刺杀,Assassinate,silent,攻击,稀有,0,80,A,medium,93,17393,49.6,50,1,damage|control|exhaust|innate,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,STRIKE_SILENT,打击,Strike,silent,攻击,基础,1,,,low,,,,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,POISONED_STAB,带毒刺击,Poisoned Stab,silent,攻击,普通,1,33,F,medium,33,29517,31.6,33,1,damage|scaling,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BOUNCING_FLASK,弹跳药瓶,Bouncing Flask,silent,技能,罕见,2,38,D,medium,54,17289,37.9,0,1,scaling,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,KNIFE_TRAP,刀刃陷阱,Knife Trap,silent,技能,稀有,2,85,A,medium,100,19924,53.6,50,1,exhaust,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BLADE_DANCE,刀刃之舞,Blade Dance,silent,技能,普通,1,54,C,medium,56,56959,38.6,50,1,draw|exhaust,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FAN_OF_KNIVES,刀扇,Fan of Knives,silent,能力,稀有,2,83,A,medium,90,20655,48.8,67,1,aoe,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SCARE,恫吓,Scare,silent,技能,罕见,0,56,C,medium,66,18538,41.4,33,1,aoe|control|exhaust,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CLOAK_AND_DAGGER,斗篷与匕首,Cloak and Dagger,silent,技能,普通,1,56,C,medium,58,54567,39,50,1,block|draw,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,NOXIOUS_FUMES,毒雾,Noxious Fumes,silent,能力,罕见,1,57,C,medium,53,37130,37.6,67,1,aoe|scaling,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,OUTBREAK,毒性爆发,Outbreak,silent,能力,罕见,1,42,D,medium,53,21658,37.7,17,1,aoe|scaling,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,EXPERTISE,独门技术,Expertise,silent,技能,罕见,1,55,C,medium,78,10335,45.1,0,1,draw,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FLICK_FLACK,翻越撑击,Flick-Flack,silent,攻击,普通,1,30,F,medium,36,28128,32.4,17,1,damage|aoe|discard,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DEFEND_SILENT,防御,Defend,silent,技能,基础,1,,,low,,,,,0,block,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FLECHETTES,飞镖,Flechettes,silent,攻击,罕见,1,52,C,medium,60,10475,39.7,33,1,damage,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CORROSIVE_WAVE,腐蚀波,Corrosive Wave,silent,技能,稀有,1,59,C,medium,77,10671,44.9,17,1,draw|aoe|scaling,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,STORM_OF_STEEL,钢铁风暴,Storm of Steel,silent,技能,稀有,1,67,B,medium,88,13890,48,17,1,discard,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,TRACKING,跟踪,Tracking,silent,能力,稀有,2,100,S,medium,100,16047,52.9,100,1,control,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BUBBLE_BUBBLE,咕嘟冒泡,Bubble Bubble,silent,技能,罕见,1,46,D,medium,59,18622,39.5,17,1,scaling,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SNEAKY,鬼祟,Sneaky,silent,能力,稀有,2,100,S,medium,100,12290,58.6,,0,discard,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BACKFLIP,后空翻,Backflip,silent,技能,普通,1,61,C,medium,59,52035,39.5,67,1,block|draw,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,GRAND_FINALE,华丽收场,Grand Finale,silent,攻击,稀有,0,44,D,medium,63,4965,40.5,0,1,damage|draw|aoe,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PHANTOM_BLADES,幻影之刃,Phantom Blades,silent,能力,罕见,1,73,B,medium,76,24521,44.5,67,1,retain,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ECHOING_SLASH,回响斩击,Echoing Slash,silent,攻击,稀有,1,50,C,medium,57,9811,38.7,33,1,damage|aoe,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,WELL_LAID_PLANS,计划妥当,Well-Laid Plans,silent,能力,罕见,1,55,C,medium,36,8865,32.4,100,1,retain,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,CALCULATED_GAMBLE,计算下注,Calculated Gamble,silent,技能,罕见,0,70,B,medium,79,26672,45.4,50,1,draw|exhaust|discard,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FLANKING,夹击,Flanking,silent,技能,罕见,2,100,S,medium,100,17779,54.5,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PIERCING_WAIL,尖啸,Piercing Wail,silent,技能,普通,1,64,C,medium,62,57668,40.3,67,1,aoe|scaling|exhaust,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,STRANGLE,紧勒,Strangle,silent,攻击,罕见,1,44,D,medium,56,18342,38.4,17,1,damage,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PINPOINT,精密瞄准,Pinpoint,silent,攻击,罕见,3,46,D,medium,51,10837,36.9,33,1,damage,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PRECISE_CUT,精确切击,Precise Cut,silent,攻击,罕见,0,46,D,medium,51,10323,37,33,1,damage,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ACCURACY,精准,Accuracy,silent,能力,罕见,1,74,B,medium,77,43364,44.9,67,1,,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,RICOCHET,连续反弹,Ricochet,silent,攻击,普通,2,45,D,medium,43,29078,34.5,50,1,damage|discard,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PREDATOR,猎杀者,Predator,silent,攻击,普通,2,43,D,medium,47,13584,35.7,33,1,damage|draw,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FOOTWORK,灵动步法,Footwork,silent,能力,罕见,1,74,B,medium,63,39188,40.6,100,1,scaling,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,POUNCE,猛扑,Pounce,silent,攻击,罕见,2,46,D,medium,51,12138,36.9,33,1,damage,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,HAZE,迷雾,Haze,silent,技能,罕见,3,41,D,medium,51,21417,37.1,17,1,aoe|scaling|discard,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,MEMENTO_MORI,铭记死亡,Memento Mori,silent,攻击,罕见,1,39,D,medium,56,8872,38.5,0,1,damage|discard,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ABRASIVE,磨蚀,Abrasive,silent,能力,稀有,3,80,A,medium,86,17380,47.5,67,1,scaling|discard,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BLADE_OF_INK,墨之刃,Blade of Ink,silent,技能,稀有,1,95,S,medium,100,14612,55.1,83,1,draw,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,MASTER_PLANNER,谋划专家,Master Planner,silent,能力,稀有,2,54,C,medium,77,9998,44.9,0,1,,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,MURDER,谋杀,Murder,silent,攻击,稀有,3,57,C,medium,82,9203,46.2,0,1,damage|draw,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DEFLECT,偏折,Deflect,silent,技能,普通,0,47,D,medium,53,38925,37.6,33,1,block,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SLICE,切割,Slice,silent,攻击,普通,0,43,D,medium,47,23283,35.8,33,1,damage,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SERPENT_FORM,群蛇形态,Serpent Form,silent,能力,稀有,3,75,B,medium,93,15686,49.7,33,1,,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SHADOWMELD,融入暗影,Shadowmeld,silent,技能,稀有,1,60,C,medium,71,10632,43,33,1,,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,LEG_SWEEP,扫腿,Leg Sweep,silent,技能,罕见,2,73,B,medium,68,20630,42.1,83,1,block|control,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DODGE_AND_ROLL,闪躲翻滚,Dodge and Roll,silent,技能,普通,1,48,D,medium,54,26708,37.8,33,1,block,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SNAKEBITE,蛇咬,Snakebite,silent,技能,普通,2,34,F,medium,41,25944,34.1,17,1,scaling|retain,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ADRENALINE,肾上腺素,Adrenaline,silent,技能,稀有,0,100,S,medium,100,25140,52.5,100,1,draw|energy|exhaust,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,MIRAGE,蜃景,Mirage,silent,技能,罕见,1,43,D,medium,62,12512,40.4,0,1,aoe|scaling|exhaust,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SURVIVOR,生存者,Survivor,silent,技能,基础,1,,,low,,,,,0,block|discard,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,HAND_TRICK,手上技法,Hand Trick,silent,技能,罕见,1,46,D,medium,58,13622,39,17,1,block,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,THE_HUNT,狩猎,The Hunt,silent,攻击,稀有,1,59,C,medium,55,8609,38.2,67,1,damage|exhaust,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SPEEDSTER,速行者,Speedster,silent,能力,罕见,2,46,D,medium,59,15868,39.3,17,1,draw|aoe,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ESCAPE_PLAN,逃脱计划,Escape Plan,silent,技能,罕见,0,60,C,medium,71,27132,43.1,33,1,block|draw,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DAGGER_THROW,投掷匕首,Dagger Throw,silent,攻击,普通,1,41,D,medium,44,39062,34.9,33,1,damage|draw|discard,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SUCKER_PUNCH,突然一拳,Sucker Punch,silent,攻击,普通,1,43,D,medium,48,21698,36,33,1,damage|control,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ENVENOM,涂毒,Envenom,silent,能力,稀有,2,66,B,medium,80,17727,45.7,33,1,scaling,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,MALAISE,萎靡,Malaise,silent,技能,稀有,X,95,S,medium,100,8708,52.6,83,1,scaling|control|exhaust,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,INFINITE_BLADES,无尽刀刃,Infinite Blades,silent,能力,罕见,1,71,B,medium,72,38480,43.3,67,1,,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,LEADING_STRIKE,先制打击,Leading Strike,silent,攻击,普通,1,59,C,medium,55,51775,38.1,67,1,damage,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,UP_MY_SLEEVE,袖里乾坤,Up My Sleeve,silent,技能,罕见,2,52,C,medium,67,29238,41.9,17,1,draw,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SUPPRESS,压制,Suppress,silent,攻击,先古,0,64,C,medium,63,7217,40.7,67,1,damage|control|innate,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,NIGHTMARE,夜魇,Nightmare,silent,技能,稀有,3,69,B,medium,91,10286,49.1,17,1,exhaust,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,HIDDEN_DAGGERS,隐秘匕首,Hidden Daggers,silent,技能,罕见,0,73,B,medium,76,25525,44.6,67,1,draw|discard,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,WRAITH_FORM,幽魂形态,Wraith Form,silent,能力,先古,3,60,C,medium,64,1240,41.2,50,1,scaling,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,AFTERIMAGE,余像,Afterimage,silent,能力,稀有,1,100,S,medium,100,22848,54.4,100,1,,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ANTICIPATE,预判,Anticipate,silent,技能,普通,0,38,D,medium,47,25323,35.8,17,1,scaling,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,ACROBATICS,杂技,Acrobatics,silent,技能,罕见,1,65,B,medium,72,30952,43.4,50,1,draw|discard,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,PREPARED,早有准备,Prepared,silent,技能,普通,0,64,C,medium,56,63070,38.6,83,1,draw|discard,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,TACTICIAN,战术大师,Tactician,silent,技能,罕见,3,61,C,medium,65,22557,41.3,50,1,energy|discard,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DEADLY_POISON,致命毒药,Deadly Poison,silent,技能,普通,1,25,F,medium,36,32243,32.6,0,1,scaling,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,NEUTRALIZE,中和,Neutralize,silent,攻击,基础,0,,,low,,,,,0,damage|control,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FINISHER,终结技,Finisher,silent,攻击,罕见,1,60,C,medium,72,21110,43.2,33,1,damage,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BULLET_TIME,子弹时间,Bullet Time,silent,技能,稀有,3,60,C,medium,79,13442,45.4,17,1,draw,Navegreed
+v0.107.1,stable,2026-09-07T11:14:32.214Z,WITHER,凋萎,Wither,status,状态,状态,-1,,,low,,,,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,TOXIC,毒素,Toxic,status,状态,状态,1,,,low,,,,,0,damage|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,INFECTION,感染,Infection,status,状态,状态,-1,,,low,,,,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BECKON,呼唤,Beckon,status,状态,状态,1,,,low,,,,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FRANTIC_ESCAPE,狂乱逃离,Frantic Escape,status,状态,状态,1,,,low,,,,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SOOT,煤灰,Soot,status,状态,状态,-1,,,low,,,,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SLIMED,黏液,Slimed,status,状态,状态,1,,,low,,,,,0,draw|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,WOUND,伤口,Wound,status,状态,状态,-1,,,low,,,,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DEBRIS,碎屑,Debris,status,状态,状态,1,,,low,,,,,0,exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,VOID,虚空,Void,status,状态,状态,-1,,,low,,,,,0,draw|energy,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DAZED,晕眩,Dazed,status,状态,状态,-1,,,low,,,,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,BURN,灼伤,Burn,status,状态,状态,-1,,,low,,,,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,GIANT_ROCK,巨石,Giant Rock,token,攻击,衍生,1,,,low,,,,,0,damage,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SOVEREIGN_BLADE,君王之剑,Sovereign Blade,token,攻击,衍生,2,,,low,,,,,0,damage|retain,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SLOTH,懒惰,Sloth,token,状态,状态,-1,,,low,,,,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,LUMINESCE,冷光,Luminesce,token,技能,衍生,0,,,low,,,,,0,energy|exhaust|retain,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SOUL,灵魂,Soul,token,技能,衍生,0,,,low,,,,,0,draw|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,MINION_STRIKE,仆从打击,Minion Strike,token,攻击,衍生,0,,,low,,,,,0,damage|draw|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,MINION_DIVE_BOMB,仆从俯冲,Minion Dive Bomb,token,攻击,衍生,0,,,low,,,,,0,damage|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,MINION_SACRIFICE,仆从捐躯,Minion Sacrifice,token,技能,衍生,0,,,low,,,,,0,block|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,FUEL,燃料,Fuel,token,技能,衍生,0,,,low,,,,,0,draw|energy|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SWEEPING_GAZE,扫荡凝视,Sweeping Gaze,token,攻击,衍生,0,,,low,,,,,0,damage|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,WASTE_AWAY,衰朽,Waste Away,token,状态,状态,-1,,,low,,,,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,DISINTEGRATION,瓦解,Disintegration,token,状态,状态,-1,,,low,,,,,0,,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,SHIV,小刀,Shiv,token,攻击,衍生,0,,,low,,,,,0,damage|exhaust,
+v0.107.1,stable,2026-09-07T11:14:32.214Z,MIND_ROT,心灵腐化,Mind Rot,token,状态,状态,-1,,,low,,,,,0,draw,

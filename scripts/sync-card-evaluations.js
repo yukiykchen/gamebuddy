@@ -6,6 +6,8 @@ const JSON_OUTPUT = path.join(ROOT, 'agent', 'knowledge', 'card-evaluations.json
 const CSV_OUTPUT = path.join(ROOT, 'docs', 'card-evaluations.csv');
 const CODEX_API = process.env.GAMEBUDDY_SPIRE_CODEX_URL || 'https://spire-codex.com/api';
 const EXPERT_SITE = 'https://sts2tierlists.com';
+const DATA_CHANNEL = String(process.env.GAMEBUDDY_CARD_DATA_CHANNEL || 'stable').toLowerCase();
+const VERSION_OVERRIDE = String(process.env.GAMEBUDDY_CARD_DATA_VERSION || '').trim();
 const CARD_GUIDES = new Set(['ironclad', 'silent', 'defect', 'necrobinder', 'regent', 'colorless']);
 
 async function fetchJson(url) {
@@ -87,11 +89,38 @@ async function loadExpertEntries() {
   return body.filter(item => CARD_GUIDES.has(item.guideId));
 }
 
+async function loadGameVersions() {
+  const [changelogs, beta] = await Promise.all([
+    fetchJson(`${CODEX_API}/changelogs`),
+    fetchJson(`${CODEX_API}/beta/version`)
+  ]);
+  const stableVersion = changelogs
+    .map(item => String(item.title || '').match(/Slay the Spire 2 (v\d+\.\d+\.\d+)/i)?.[1])
+    .find(Boolean);
+  return {
+    stable: stableVersion || null,
+    beta: beta.beta_version || null
+  };
+}
+
+function apiUrl(pathname, params = {}) {
+  const url = new URL(`${CODEX_API.replace(/\/$/, '')}${pathname}`);
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== null && value !== undefined && value !== '') url.searchParams.set(key, value);
+  }
+  return url.toString();
+}
+
 async function main() {
+  if (!['stable', 'beta'].includes(DATA_CHANNEL)) throw new Error('GAMEBUDDY_CARD_DATA_CHANNEL must be stable or beta');
+  const availableVersions = await loadGameVersions();
+  const gameVersion = VERSION_OVERRIDE || availableVersions[DATA_CHANNEL];
+  if (!gameVersion) throw new Error(`Could not determine current ${DATA_CHANNEL} game version`);
+  const patchVersion = gameVersion.replace(/^v/i, '');
   const [cardsZh, cardsEn, scores, expertItems] = await Promise.all([
-    fetchJson(`${CODEX_API}/cards?lang=zhs`),
-    fetchJson(`${CODEX_API}/cards?lang=eng`),
-    fetchJson(`${CODEX_API}/runs/scores/cards?lang=zhs`),
+    fetchJson(apiUrl('/cards', { lang: 'zhs', channel: DATA_CHANNEL })),
+    fetchJson(apiUrl('/cards', { lang: 'eng', channel: DATA_CHANNEL })),
+    fetchJson(apiUrl('/runs/scores/cards', { lang: 'zhs', channel: DATA_CHANNEL, bracket: gameVersion })),
     loadExpertEntries()
   ]);
   const capturedAt = new Date().toISOString();
@@ -101,7 +130,7 @@ async function main() {
 
   for (const item of expertItems) {
     const name = `${item.guideId}:${normalize(item.name)}`;
-    const entries = (item.evaluations || []).map(entry => ({
+    const entries = (item.evaluations || []).filter(entry => (entry.patches || []).some(patch => patch.replace(/^v/i, '') === patchVersion)).map(entry => ({
       guideId: item.guideId,
       source: entry.source,
       patches: entry.patches || [],
@@ -164,28 +193,34 @@ async function main() {
   }).sort((left, right) => left.color.localeCompare(right.color) || left.name.localeCompare(right.name, 'zh-CN'));
 
   const payload = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     capturedAt,
+    game: {
+      version: gameVersion,
+      channel: DATA_CHANNEL,
+      availableVersions,
+      statisticsBracket: gameVersion
+    },
     methodology: {
       purpose: '为奖励选牌 Agent 提供单卡基础先验；最终建议必须继续结合牌组、遗物、章节和敌人。',
       priorBlend: 'Spire Codex Bayesian score 70% + normalized expert tier signal 30% when both exist.',
       copyright: 'Only rankings, patch identifiers and source links are retained from editorial sources; commentary is not copied.',
       caveats: [
         '胜率与拿取数据存在玩家水平、章节和幸存者偏差，不能解释为因果效果。',
-        'Early Access 更新会改变卡牌数值，必须按 capturedAt 和专家 patches 判断时效。',
+        `本快照严格面向 ${DATA_CHANNEL} ${gameVersion}；Early Access 更新后必须重新生成。`,
         '无论基础档位多高，都不能替代实时牌组和具体敌人分析。'
       ]
     },
     sources: [
-      { id: 'spire-codex', url: 'https://spire-codex.com/tier-list', kind: 'bayesian-community-win-rate' },
-      { id: 'sts2-tier-lists', url: EXPERT_SITE, kind: 'expert-tier-index' }
+      { id: 'spire-codex', url: 'https://spire-codex.com/tier-list', kind: 'bayesian-community-win-rate', version: gameVersion, channel: DATA_CHANNEL },
+      { id: 'sts2-tier-lists', url: EXPERT_SITE, kind: 'expert-tier-index', versionFilter: patchVersion }
     ],
     cards
   };
 
-  const headers = ['id', 'name', 'name_en', 'color', 'type', 'rarity', 'cost', 'prior_score', 'prior_tier', 'confidence', 'codex_score', 'picks', 'win_rate', 'expert_score', 'expert_evidence', 'mechanic_tags', 'expert_sources'];
+  const headers = ['game_version', 'data_channel', 'captured_at', 'id', 'name', 'name_en', 'color', 'type', 'rarity', 'cost', 'prior_score', 'prior_tier', 'confidence', 'codex_score', 'picks', 'win_rate', 'expert_score', 'expert_evidence', 'mechanic_tags', 'expert_sources'];
   const rows = cards.map(card => [
-    card.id, card.name, card.nameEn, card.color, card.type, card.rarity, card.cost,
+    gameVersion, DATA_CHANNEL, capturedAt, card.id, card.name, card.nameEn, card.color, card.type, card.rarity, card.cost,
     card.prior.score, card.prior.tier, card.prior.confidence,
     card.community?.codexScore, card.community?.picks, card.community?.winRate,
     card.expertConsensus.normalizedScore, card.expertConsensus.evidenceCount,
@@ -195,7 +230,7 @@ async function main() {
 
   await fs.writeFile(JSON_OUTPUT, `${JSON.stringify(payload, null, 2)}\n`);
   await fs.writeFile(CSV_OUTPUT, `${headers.join(',')}\n${rows.join('\n')}\n`);
-  console.log(`Wrote ${cards.length} cards to ${path.relative(ROOT, JSON_OUTPUT)} and ${path.relative(ROOT, CSV_OUTPUT)}`);
+  console.log(`Wrote ${cards.length} cards for ${DATA_CHANNEL} ${gameVersion} to ${path.relative(ROOT, JSON_OUTPUT)} and ${path.relative(ROOT, CSV_OUTPUT)}`);
 }
 
 main().catch(error => {

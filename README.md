@@ -125,7 +125,7 @@ Electron 启动后可以在三个决策工作台之间切换。启动时会尝�
 
 选牌建议会结合当前牌组、遗物、章节、近期精英/Boss 与 [Spire Codex](https://spire-codex.com) 的卡牌资料及社区对局统计。外部 API 不可用时会自动使用本地规则，并且始终允许把“跳过奖励”作为候选，避免牌组被低价值卡稀释。
 
-项目内置一份可刷新的全量卡牌评价知识库：机器读取 `agent/knowledge/card-evaluations.json`，人工筛选使用 `docs/card-evaluations.csv`。它综合社区统计和带补丁版本的高手 Tier 证据，但只作为单卡基础先验，实时局势仍然决定最终推荐。数据结构和更新方式见 [docs/card-evaluations.md](./docs/card-evaluations.md)，平衡更新后执行 `npm run knowledge:cards` 即可重新生成。
+项目内置一份可刷新的全量卡牌评价知识库：机器读取 `agent/knowledge/card-evaluations.json`，人工筛选使用 `docs/card-evaluations.csv`。它明确记录游戏版本和 stable/beta 渠道，综合同版本社区统计与带补丁版本的高手 Tier 证据，但只作为单卡基础先验，实时局势仍然决定最终推荐。数据结构和更新方式见 [docs/card-evaluations.md](./docs/card-evaluations.md)，平衡更新后执行 `npm run knowledge:cards` 即可重新生成。
 
 ## 工程边界
 
