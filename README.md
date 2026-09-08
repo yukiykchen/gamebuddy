@@ -1,167 +1,182 @@
 # GameBuddy
 
-GameBuddy 是面向《杀戮尖塔 2》的 Windows AI 桌面搭子原型，目标是在游戏运行时提供：
+GameBuddy 是面向《杀戮尖塔 2》的 Windows AI 桌面搭子。它通过只读 Mod 获取当前对局状态，在主面板和悬浮桌宠中提供选牌、路线、休息处以及 Boss / 精英攻略建议；它不会替玩家点击、出牌或修改游戏状态。
 
-- 战斗中的出牌顺序和风险解释（暂缓）
-- 卡牌奖励中的选牌建议
-- 地图节点和路线选择
+当前策略资料锁定《杀戮尖塔 2》stable `v0.107.1`。项目仍处于 `0.1.0` 原型阶段：核心链路和离线 Replay Harness 已实现，真实游戏 Mod 仍需在安装了游戏的 Windows 机器上完成最终验收。
 
-当前 Demo 已经包含一个独立的透明悬浮桌面宠物。它会常驻桌面、置顶显示、响应实时状态变化，并可以点击打开完整决策面板。
+## 立即体验
 
-进入精英或 Boss 战时，桌面宠物会自动展开本场攻略，直接显示实际敌人的固有机制、HP、行动循环、全部招式，以及社区交叉审核后的牌组检查、目标优先级、主要危险、应对建议和常见失误。档案完整覆盖 stable `v0.107.1` 的 12 个 Boss 与 12 个精英遭遇，机制事实运行时取自 Spire Codex，打法则保留社区来源和可信度。同一场战斗只弹出一次；玩家手动关闭后不会因回合更新反复打扰。无法可靠匹配敌人时只显示“资料未匹配”，不会让模型猜测机制。
-
-## 启动原型
+开发环境需要 Node.js 20+。首次安装依赖后，可直接启动带固定回放数据的完整界面：
 
 ```bash
-npm install
-npm start
-```
-
-一键启动桌面宠物和回放数据：
-
-```bash
+npm ci
 npm run demo
 ```
 
-这个命令只使用 Replay Bridge，不读取真实游戏；真实 Mod 接入后仍然使用同一个桌面端入口。直接执行 `npm start` 时，没有真实 Bridge 就只显示等待状态，不再用虚拟对局填充界面。
+`demo` 会同时启动 Replay Bridge 和 Electron，不读取真实游戏，也不需要 LLM API Key。关闭 Electron 后，Replay Bridge 会一起退出。
 
-### 桌面宠物操作
-
-- 左键单击宠物：打开 GameBuddy 主面板。
-- 按住宠物拖动：移动宠物位置。
-- 右键单击宠物：打开原生菜单，可打开主面板或关闭桌面宠物。
-- 关闭桌面宠物不会退出 GameBuddy；可从系统托盘的“显示 / 隐藏桌面宠物”重新显示。
-
-## 接入真实游戏
-
-需要 Windows、Steam 版《杀戮尖塔 2》、Godot .NET 4.5.1 和 .NET 9 SDK。先构建并自动复制只读 Mod：
-
-```powershell
-npm run mod:build
-# 或指定游戏目录
-npm run mod:build -- -Sts2Dir "C:\Program Files (x86)\Steam\steamapps\common\Slay the Spire 2"
-```
-
-启动游戏并进入一局后，再执行 `npm start`。桌面端会连接 `ws://127.0.0.1:27182`，状态从 `WAIT` 变为 `LIVE`。可以先用 `npm run harness:inspect -- --once` 验证 Mod 是否真的发出了合法状态。
-
-### Windows 实际安装流程
-
-1. 在 Windows 上构建 Mod，并指定 STS2 安装目录：
-
-   ```powershell
-   dotnet build .\mod\GameBuddyBridge\GameBuddyBridge.csproj -c Release `
-     -p:Sts2Dir="E:\SteamLibrary\steamapps\common\Slay the Spire 2" `
-     -p:CopyModAfterBuild=true
-   ```
-
-2. 确认以下文件位于游戏目录：
-
-   ```text
-   <STS2>\mods\GameBuddyBridge\GameBuddyBridge.json
-   <STS2>\mods\GameBuddyBridge\gamebuddy_bridge.dll
-   ```
-
-3. 完整退出并重新启动游戏，在 Mod 设置中启用 `GameBuddy Bridge`。游戏只会在启动时加载 Mod。
-4. 进入一局游戏后启动 GameBuddy：`npm start`。
-5. 用以下命令确认真实快照：
-
-   ```powershell
-   npm run harness:inspect -- --once
-   ```
-
-   输出中的 `source=sts2-mod-bridge` 和 `LIVE` 表示数据来自真实游戏；没有启动游戏时不会自动填充虚拟对局。
-
-## 本地 Harness 回放
-
-不需要启动游戏即可回放一组实时对局状态：
+如果只启动桌面端：
 
 ```bash
-npm run harness:validate
-npm run harness:replay
-# 另开终端
 npm start
 ```
 
-自动化首包检查：
+桌面端默认连接 `ws://127.0.0.1:27182`。没有运行 Replay Bridge 或游戏 Mod 时显示 `WAIT`，这是正常状态。
 
-```bash
-npm run harness:smoke
-```
+完整的安装、模型配置、真实游戏接入和故障排查见 [启动与开发指南](./docs/getting-started.md)。
 
-Windows 真实联调后，可以用 `npm run harness:record` 保存一局状态，再把录制文件交给 Replay Bridge，避免 Agent 开发依赖正在运行的游戏。
-录制器会把状态快照和事件分别保存，事件文件名默认在状态文件后追加 `.events.json`。
+## 当前功能
 
-首次接入 Windows Mod 时，建议先使用 `npm run harness:inspect -- --once` 做无界面诊断，确认状态采集成功后再启动 Electron。
+| 功能 | 状态 | 当前实现 |
+| --- | --- | --- |
+| 主面板 | 已实现 | 展示战斗、卡牌奖励、地图路线和休息处状态 |
+| 悬浮桌宠 | 已实现 | 置顶、拖动、托盘控制、状态提醒及遭遇攻略弹窗 |
+| 实时游戏状态 Bridge | 已实现，待真机验收 | 只读采集角色、生命、牌组、遗物、药水、地图、敌人和事件 |
+| 卡牌奖励 Agent | 已实现 | 逐张分析优缺点、适用场景和 Boss / 精英适配，支持建议跳过 |
+| 地图路线 Agent | 已实现 | 结合生命、金币、遗物、精英、商店和休息处为可达路线评分 |
+| 休息处 Agent | 已实现 | 在回血和具体卡牌升级之间给出建议 |
+| Boss / 精英攻略 | 已实现 | 覆盖 stable `v0.107.1` 的 12 个 Boss 和 12 个精英 |
+| LLM 复核 | 已实现，可选 | 在规则候选范围内复核；未配置密钥时自动退回规则模式 |
+| Replay / 录制 / 协议校验 | 已实现 | 可离线回放、录制真实对局并验证协议与事件 |
+| 战斗出牌 Agent | 未实现 | 当前只展示真实战斗状态，不推荐具体出牌顺序 |
+| 自动操作游戏 | 不计划实现 | 产品边界是“只提供建议”，不会控制鼠标或调用选择接口 |
 
-提交前的统一工程门禁：
+更细的完成度、验证状态和限制见 [功能实现状态](./docs/feature-status.md)。
 
-```bash
-npm run harness:validate-all
-```
-
-宠物在 Replay Bridge 推送攻击意图时进入警戒状态，在手牌变化时进入思考状态。未来只需让 STS2 Mod Bridge 遵循同一份数据契约，桌面端无需改动数据接入方式。
-
-## Mac 开发，Windows 发布
-
-本项目可以在 macOS 上开发，使用 GitHub Actions 的 `windows-latest` Runner 生成 Windows 安装包。手动触发或推送 `v*` 标签后，工作流会产出 `GameBuddy-Setup-*.exe` 构件。
-
-本地也可以尝试打包：
-
-```bash
-npm run dist:win
-```
-
-在 macOS 上交叉构建 NSIS 安装包可能需要 Wine 和额外的 Windows 构建工具，因此团队协作时推荐使用仓库内的 Windows CI。最终的游戏 Mod Bridge、窗口行为和 DPI 适配仍需在 Windows 机器上验证。
-
-Electron 启动后可以在三个决策工作台之间切换。启动时会尝试连接 `ws://127.0.0.1:27182`；没有 Mod Bridge 时显示 `WAIT`，`npm run demo` 明确使用回放数据，真实游戏状态则显示 `LIVE`。
-
-## 后续接入
-
-接入层约定见 [docs/data-contract.md](./docs/data-contract.md)。第一阶段建议先实现：
-
-1. STS2 Mod Bridge：导出完整状态快照和关键事件。当前初版采集器位于 [mod/GameBuddyBridge](./mod/GameBuddyBridge)。
-2. 桌面端状态适配器：校验 schema、断线重连、保留最近快照。
-3. 决策引擎：先做规则 + 搜索，再逐步接入模型，保证建议可解释、可回放。
-
-应用只提供建议，不自动点击或代替玩家操作；这使调试、回放和用户信任都更容易建立。
-
-选牌建议会结合当前完整牌组、遗物效果、药水效果、金币、全部地图节点、已确定 Boss/本章可能精英机制与 [Spire Codex](https://spire-codex.com) 的卡牌资料及社区对局统计。未来精英身份未公开时不会假装已知；外部 API 不可用时会自动使用本地规则，并且始终允许把“跳过奖励”作为候选，避免牌组被低价值卡稀释。
-
-项目内置一份可刷新的全量卡牌评价知识库：机器读取 `agent/knowledge/card-evaluations.json`，人工筛选使用 `docs/card-evaluations.csv`。每张卡都包含档位、原创中文评价、适用场景、避用场景和可用的专家视频时间点。知识库明确记录游戏版本和 stable/beta 渠道，综合同版本社区统计与带补丁版本的高手 Tier 证据，但只作为单卡基础先验；奖励 Agent 会把评价条件与完整牌组、遗物、生命、路线和敌人对照后再做最终推荐。数据结构和更新方式见 [docs/card-evaluations.md](./docs/card-evaluations.md)，平衡更新后执行 `npm run knowledge:cards` 即可重新生成。
-
-## 工程边界
+## 核心工作方式
 
 ```text
-STS2 Mod Bridge / Replay Bridge
-        -> localhost WebSocket
-        -> Electron main process bridge
-        -> main panel + floating pet
-        -> agent loop
+Slay the Spire 2
+  -> GameBuddyBridge（只读 Mod）
+  -> localhost WebSocket / gamebuddy.state.v1
+  -> Electron 主进程 + Observation Store
+  -> 规则 Agent + 可选 LLM 复核
+  -> 主面板 + 悬浮桌宠
+
+开发时也可将第一、二层替换为 Replay Bridge，其余链路不变。
 ```
 
-主进程只负责连接、校验边界和广播状态。决策 Agent 在独立的 `agent/` 模块中，通过观察对象工作，避免把游戏读取、桌面展示和策略推理耦合在一起。
+Agent 的设计原则是“规则先产生合法候选，模型只做受限复核”：
 
-当前主进程已经通过 [harness/observation-store.js](./harness/observation-store.js) 整理最新状态、事件历史和 freshness。[agent/](./agent/) 消费这份观察对象，先做路线建议 `map_route`，进入休息处后再给 `rest_site`：回血还是升级哪一张牌。规则给可达路线和火堆选择打分；有密钥时再用模型解释。战斗出牌暂缓。
+- 地图建议只能从真实可达路线中选择。
+- 休息处建议只能在回血和真实可升级卡牌中选择。
+- 卡牌奖励建议只能在真实候选牌和 `SKIP` 中选择。
+- 只有 `exact=true` 的 Boss / 精英才能被模型视作已确定遭遇。
+- 外部接口失败时保留本地规则结果，不阻塞 UI。
 
-本地 `.env`（已 gitignore）会提供模型接口。启动时自动读取，默认：
+## 卡牌与遭遇知识
 
-- Base URL：`https://ai.gs88.shop`
-- Model：`gpt-5.5`
-- API：Codex `responses`
-- Reasoning：`xhigh`
+卡牌奖励 Agent 会综合：
 
-项目内 Codex CLI：
+- 当前完整牌组和升级状态；
+- 遗物、药水、生命、能量和金币；
+- 当前章节的完整地图和可达路线；
+- 已确定 Boss、已知近期精英和当前区域可能遭遇；
+- Spire Codex 卡牌与敌人机制数据；
+- 本地全卡评价先验和社区对局证据。
+
+全卡评价位于 `agent/knowledge/card-evaluations.json`，可筛选总表位于 `docs/card-evaluations.csv`，字段和更新方法见 [卡牌评价知识库](./docs/card-evaluations.md)。
+
+Boss / 精英策略位于 `agent/knowledge/encounter-strategies.json`。它覆盖 stable `v0.107.1` 的 24 个遭遇，记录牌组检查、危险窗口、目标优先级、应对方式、常见失误、来源和置信度。敌人的血量、能力、招式和行动模式运行时仍以 Spire Codex 为准，社区档案只提供策略层结论。
+
+## LLM 配置
+
+LLM 是可选能力。复制示例环境变量并填写自己的 API Key：
 
 ```bash
-npm run codex
+cp .env.example .env
 ```
 
-它使用 `.codex-cli/` 和同一套 `.env` 密钥，不会改掉 ChatGPT 桌面版那份 `~/.codex` 本地代理配置。
+Windows PowerShell：
 
-没有 API Key 时只用规则，桌面端仍然能给出下一步路点。
+```powershell
+Copy-Item .env.example .env
+```
 
-## Mod 构建边界
+默认配置：
 
-公开 GitHub Runner 没有《杀戮尖塔 2》私有程序集，因此不能在普通 CI 中编译 `GameBuddyBridge.dll`。仓库提供了一个需要自有 Windows Runner 的工作流：Runner 标签为 `self-hosted, windows, sts2`，机器上需要 Godot .NET 4.5.1、.NET 9 和本地 STS2 安装。普通 CI 会先验证 Mod 文件形状和协议标记，避免采集器悄悄漂移。
+```dotenv
+GAMEBUDDY_LLM_BASE_URL=https://ai.gs88.shop
+GAMEBUDDY_LLM_MODEL=gpt-5.5
+GAMEBUDDY_LLM_WIRE_API=responses
+GAMEBUDDY_LLM_REASONING_EFFORT=xhigh
+GAMEBUDDY_LLM_API_KEY=
+```
 
-真实游戏联调按 [docs/windows-validation.md](./docs/windows-validation.md) 执行。推送 `v*` tag 后，Windows 工作流除了上传安装包构件，还会创建 GitHub Release 并附带 `.exe`。
+不要提交 `.env`。如果没有配置 Key，启动日志会显示 `GameBuddy LLM: rules only`，选牌、路线和休息处仍可使用规则建议。
+
+## 接入真实游戏
+
+真实 Mod 目前只支持 Windows 开发环境，需要：
+
+- Windows 10/11 x64；
+- Steam 版《杀戮尖塔 2》；
+- Node.js 20+；
+- .NET 9 SDK；
+- 可用的 Godot .NET SDK 4.5.1；
+- 游戏本地程序集 `sts2.dll` 和 `0Harmony.dll`。
+
+构建并安装 Mod：
+
+```powershell
+npm run mod:build -- -Sts2Dir "C:\Program Files (x86)\Steam\steamapps\common\Slay the Spire 2"
+```
+
+重启游戏并启用 `GameBuddy Bridge`，进入一局后启动桌面端：
+
+```powershell
+npm start
+```
+
+先用以下命令确认 Mod 已发出合法快照：
+
+```powershell
+npm run harness:inspect -- --once
+```
+
+看到 `source=sts2-mod-bridge` 且桌面端变为 `LIVE`，说明实时链路已接通。逐项真机验收见 [Windows 联调验收](./docs/windows-validation.md)，Mod 自身说明见 [GameBuddyBridge](./mod/GameBuddyBridge/README.md)。
+
+## 常用命令
+
+| 命令 | 用途 |
+| --- | --- |
+| `npm run demo` | 一键启动 Replay Bridge 与 Electron |
+| `npm start` | 启动 Electron 并连接默认 Bridge |
+| `npm run harness:replay` | 单独回放固定状态数据 |
+| `npm run harness:inspect -- --once` | 读取一份 Bridge 状态并输出诊断 |
+| `npm run harness:record` | 录制真实对局，供后续离线回放 |
+| `npm run harness:validate-all` | 执行完整协议与 Harness 工程门禁 |
+| `npm run harness:smoke` | 校验 Replay WebSocket 首包 |
+| `npm run knowledge:cards` | 按指定 stable / beta 版本刷新全卡评价 |
+| `npm run mod:build -- -Sts2Dir ...` | 在 Windows 构建并安装游戏 Mod |
+| `npm run dist:win` | 构建 Windows NSIS 安装包 |
+| `npm run codex` | 使用项目隔离配置启动 Codex CLI |
+
+## 文档导航
+
+- [启动与开发指南](./docs/getting-started.md)：从零启动、模型配置、真实游戏接入和排错。
+- [功能实现状态](./docs/feature-status.md)：每项能力的完成度、实现位置、验证情况和限制。
+- [数据契约](./docs/data-contract.md)：状态、事件、Observation 和 Recommendation schema。
+- [卡牌评价知识库](./docs/card-evaluations.md)：版本范围、来源、评分字段和更新方法。
+- [Windows 联调验收](./docs/windows-validation.md)：真实游戏端到端验收清单。
+- [Harness 开发指南](./harness/README.md)：回放、录制、探针和固定夹具。
+- [GameBuddyBridge](./mod/GameBuddyBridge/README.md)：Mod 采集内容、构建方式和协议边界。
+
+## 发布与验证
+
+仓库包含三条 GitHub Actions 工作流：
+
+- Pull Request 或主干推送运行 Harness 校验和 Replay 冒烟测试；
+- `windows-latest` 构建 `GameBuddy-Setup-*.exe`；
+- 带有本地游戏安装的 `self-hosted, windows, sts2` Runner 构建 Mod。
+
+公开 Runner 无法获得游戏私有程序集，因此不能构建 `gamebuddy_bridge.dll`。Windows 安装包也不包含能够绕过游戏安装要求的 Mod 二进制；Mod 必须在合法安装游戏的 Windows 环境中构建。
+
+## 已知限制
+
+- 当前不提供战斗出牌顺序建议。
+- Mod 已编码实现，但尚未记录一轮完整的 Windows stable `v0.107.1` 真机验收结果。
+- 游戏处于 Early Access；版本变化后需要刷新卡牌知识，并复核 Boss / 精英档案。
+- Spire Codex 或模型服务不可用时，资料丰富度会下降，但规则模式仍可运行。
+- 当前主要面向单人对局；多人模式的状态语义和策略尚未专项验证。
+- 建议是辅助信息，不保证通关或避免战损。

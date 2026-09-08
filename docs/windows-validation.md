@@ -36,7 +36,10 @@ mods\GameBuddyBridge\GameBuddyBridge.json
 8. 打出一张牌，确认状态变化后桌面端刷新。
 9. 结束战斗或打开地图，确认 `combat.ended` / `map.opened` 事件带来对应 UI 变化。
 10. 在地图页确认出现「下一步」路线建议（无 API Key 时为规则打分；配置 LLM 后可看到「模型」来源）。
-11. 关闭游戏，确认 GameBuddy 回到等待状态并自动重连。
+11. 打开卡牌奖励，确认三张候选牌、当前牌组和 `card.reward.opened` 事件完整，界面能建议拿牌或跳过。
+12. 进入休息处，确认界面能在回血和具体卡牌升级之间给出建议。
+13. 进入精英和 Boss 战，确认桌宠分别弹出对应攻略，且手动关闭后本场不重复打扰。
+14. 关闭游戏，确认 GameBuddy 回到等待状态并自动重连。
 
 ## 记录结果
 
@@ -48,6 +51,10 @@ WebSocket connected: yes / no
 Combat snapshot: yes / no
 Hand updates: yes / no
 Enemy intent and damage: yes / no
+Card reward and recommendation: yes / no
+Rest recommendation: yes / no
+Elite guide popup: yes / no
+Boss guide popup: yes / no
 Reconnect: yes / no
 Notes:
 ```

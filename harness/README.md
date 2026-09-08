@@ -55,7 +55,7 @@ npm run harness:validate-all
 }
 ```
 
-桌面端主进程已经使用同一个 store 管理实时数据。[agent/](../agent/) 消费这层观察对象，当前只输出路线建议，不给出牌顺序。
+桌面端主进程已经使用同一个 store 管理实时数据。[agent/](../agent/) 消费这层观察对象，当前输出卡牌奖励、路线和休息处建议，并为 Boss / 精英生成独立攻略消息；战斗出牌顺序尚未实现。
 
 Replay Bridge 会在 `127.0.0.1:27182` 以 WebSocket 推送固定局面的连续快照。桌面宠物和主面板会共用同一条主进程连接，看到状态更新后分别改变内容和动作。
 
@@ -116,7 +116,7 @@ CI 会用 `npm run harness:smoke:lifecycle` 验证这组快照实际产生四类
 
 ## 接入真实游戏
 
-未来的 STS2 Mod Bridge 只需要连接同一个地址并发送：
+当前 `mod/GameBuddyBridge` 与 Replay Harness 使用同一地址和协议，状态消息形状为：
 
 ```json
 { "type": "state", "data": { "schema": "gamebuddy.state.v1", "...": "..." } }

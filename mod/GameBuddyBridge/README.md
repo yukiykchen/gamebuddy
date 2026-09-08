@@ -2,6 +2,8 @@
 
 这是运行在《杀戮尖塔 2》进程内的只读数据采集 Mod。它不调用出牌、移动、选择奖励或鼠标控制 API，只把当前对局状态通过本地 WebSocket 推给 GameBuddy 桌面端。
 
+从安装依赖到启动桌面端的完整流程见 [GameBuddy 启动与开发指南](../../docs/getting-started.md)，逐项真机检查见 [Windows 联调验收](../../docs/windows-validation.md)。
+
 ## 采集内容
 
 - 当前局：角色、Act、楼层、房间、当前地图节点
