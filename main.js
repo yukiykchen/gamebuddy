@@ -21,6 +21,9 @@ let petDragState;
 let encounterGuideKey = '';
 let dismissedEncounterGuideKey = '';
 let activeEncounterGuide = null;
+let activeCardRecommendation = null;
+const activeLlmRequests = new Map();
+let lastAgentThinking = { thinking: false, tasks: [], model: null };
 const observationStore = createObservationStore({ staleAfterMs: 5000 });
 const llmConfig = readLlmConfig();
 if (llmConfig.enabled) {
@@ -29,8 +32,8 @@ if (llmConfig.enabled) {
   console.log('GameBuddy LLM: rules only');
 }
 const orchestrator = createOrchestrator({
-  llm: createOpenAiClient(llmConfig),
-  onRecommendation: recommendation => broadcast('bridge-recommendation', recommendation)
+  llm: createOpenAiClient(llmConfig, { onThinkingChange: updateAgentThinking }),
+  onRecommendation: publishRecommendation
 });
 
 function withRoutableState(state) {
@@ -62,15 +65,44 @@ function broadcastBridgeStatus(status, detail = '') {
   broadcast('bridge-status', lastBridgeStatus);
 }
 
+function updateAgentThinking(thinking, detail = {}) {
+  const requestId = detail.requestId || detail.task || 'llm';
+  if (thinking) activeLlmRequests.set(requestId, detail);
+  else activeLlmRequests.delete(requestId);
+  const requests = [...activeLlmRequests.values()];
+  lastAgentThinking = {
+    thinking: requests.length > 0,
+    tasks: [...new Set(requests.map(request => request.task).filter(Boolean))],
+    model: detail.model || llmConfig.model || null
+  };
+  broadcast('bridge-agent-thinking', lastAgentThinking);
+}
+
+function publishRecommendation(recommendation) {
+  broadcast('bridge-recommendation', recommendation);
+  if (recommendation?.task === 'card_reward') {
+    activeCardRecommendation = recommendation;
+    syncPetWindowSize();
+    keepPetVisible();
+    petWindow?.webContents.send('bridge-card-recommendation', recommendation);
+  } else if (activeCardRecommendation) {
+    clearCardRecommendation();
+  }
+}
+
 function keepPetVisible() {
   if (petHiddenByUser || !petWindow || petWindow.isDestroyed()) return;
   petWindow.setAlwaysOnTop(true, 'screen-saver');
   petWindow.showInactive();
 }
 
-function resizePetWindow(expanded) {
+function resizePetWindow(mode = 'compact') {
   if (!petWindow || petWindow.isDestroyed()) return;
-  const target = expanded ? { width: 570, height: 520 } : { width: 214, height: 242 };
+  const target = mode === 'guide'
+    ? { width: 570, height: 520 }
+    : mode === 'card'
+      ? { width: 570, height: 340 }
+      : { width: 214, height: 242 };
   const bounds = petWindow.getBounds();
   const display = screen.getDisplayMatching(bounds).workArea;
   const right = bounds.x + bounds.width;
@@ -80,11 +112,26 @@ function resizePetWindow(expanded) {
   petWindow.setBounds({ x, y, ...target }, false);
 }
 
+function syncPetWindowSize() {
+  resizePetWindow(activeEncounterGuide ? 'guide' : activeCardRecommendation ? 'card' : 'compact');
+}
+
+function dismissCardRecommendation() {
+  clearCardRecommendation();
+}
+
+function clearCardRecommendation() {
+  if (!activeCardRecommendation) return;
+  activeCardRecommendation = null;
+  petWindow?.webContents.send('bridge-card-recommendation', null);
+  syncPetWindowSize();
+}
+
 function dismissEncounterGuide() {
   dismissedEncounterGuideKey = encounterGuideKey;
   activeEncounterGuide = null;
   petWindow?.webContents.send('bridge-encounter-guide', null);
-  resizePetWindow(false);
+  syncPetWindowSize();
 }
 
 function clearEncounterGuide() {
@@ -93,7 +140,7 @@ function clearEncounterGuide() {
   if (!activeEncounterGuide) return;
   activeEncounterGuide = null;
   petWindow?.webContents.send('bridge-encounter-guide', null);
-  resizePetWindow(false);
+  syncPetWindowSize();
 }
 
 async function considerEncounterGuide(state) {
@@ -107,7 +154,7 @@ async function considerEncounterGuide(state) {
   const guide = await buildEncounterGuide(state);
   if (encounterGuideKey !== key || dismissedEncounterGuideKey === key || !guide) return;
   activeEncounterGuide = guide;
-  resizePetWindow(true);
+  syncPetWindowSize();
   keepPetVisible();
   petWindow?.webContents.send('bridge-encounter-guide', guide);
 }
@@ -161,6 +208,7 @@ function connectBridge() {
       if (result.kind === 'event' && result.accepted) {
         broadcast('bridge-event', result.event);
         if (result.event?.name === 'combat.ended') clearEncounterGuide();
+        if (result.event?.name === 'combat.started') clearCardRecommendation();
       }
       if (result.accepted || (result.kind === 'duplicate' && !orchestrator.getRecommendation())) {
         const observation = observationStore.getObservation();
@@ -180,6 +228,7 @@ function connectBridge() {
     disconnected = true;
     if (bridgeSocket === socket) bridgeSocket = null;
     clearEncounterGuide();
+    clearCardRecommendation();
     broadcastBridgeStatus('waiting', '等待本地 Mod Bridge');
     clearTimeout(bridgeReconnectTimer);
     bridgeReconnectTimer = setTimeout(connectBridge, 2500);
@@ -260,8 +309,10 @@ function createPetWindow() {
     petWindow.webContents.send('bridge-observation', observationStore.getObservation());
     const recommendation = orchestrator.getRecommendation();
     if (recommendation) petWindow.webContents.send('bridge-recommendation', recommendation);
+    petWindow.webContents.send('bridge-agent-thinking', lastAgentThinking);
+    if (activeCardRecommendation) petWindow.webContents.send('bridge-card-recommendation', activeCardRecommendation);
     if (activeEncounterGuide) {
-      resizePetWindow(true);
+      syncPetWindowSize();
       petWindow.webContents.send('bridge-encounter-guide', activeEncounterGuide);
     }
   });
@@ -316,6 +367,7 @@ ipcMain.on('pet-drag-move', (_event, point) => {
 });
 ipcMain.on('pet-drag-end', () => { petDragState = undefined; });
 ipcMain.on('dismiss-encounter-guide', dismissEncounterGuide);
+ipcMain.on('dismiss-card-recommendation', dismissCardRecommendation);
 ipcMain.handle('get-observation', () => observationStore.getObservation());
 ipcMain.handle('refresh-recommendation', async () => {
   if (bridgeSocket?.readyState === WebSocket.OPEN) {

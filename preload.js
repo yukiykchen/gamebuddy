@@ -10,7 +10,8 @@ contextBridge.exposeInMainWorld('windowControls', {
   startPetDrag: point => ipcRenderer.send('pet-drag-start', point),
   movePet: point => ipcRenderer.send('pet-drag-move', point),
   endPetDrag: () => ipcRenderer.send('pet-drag-end'),
-  dismissEncounterGuide: () => ipcRenderer.send('dismiss-encounter-guide')
+  dismissEncounterGuide: () => ipcRenderer.send('dismiss-encounter-guide'),
+  dismissCardRecommendation: () => ipcRenderer.send('dismiss-card-recommendation')
 });
 
 contextBridge.exposeInMainWorld('gamebuddyBridge', {
@@ -20,6 +21,8 @@ contextBridge.exposeInMainWorld('gamebuddyBridge', {
   onObservation: callback => ipcRenderer.on('bridge-observation', (_event, observation) => callback(observation)),
   onRecommendation: callback => ipcRenderer.on('bridge-recommendation', (_event, recommendation) => callback(recommendation)),
   onEncounterGuide: callback => ipcRenderer.on('bridge-encounter-guide', (_event, guide) => callback(guide)),
+  onCardRecommendation: callback => ipcRenderer.on('bridge-card-recommendation', (_event, recommendation) => callback(recommendation)),
+  onAgentThinking: callback => ipcRenderer.on('bridge-agent-thinking', (_event, state) => callback(state)),
   getObservation: () => ipcRenderer.invoke('get-observation'),
   refreshRecommendation: () => ipcRenderer.invoke('refresh-recommendation')
 });

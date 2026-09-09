@@ -13,6 +13,25 @@ body { font-family: Inter, "Microsoft YaHei", sans-serif; }
 button { font: inherit; }
 .pet-stage { width: 100%; height: 100%; position: relative; -webkit-app-region: no-drag; }
 .pet-button { position: absolute; right: 0; bottom: 0; width: 214px; height: 242px; padding: 0; border: 0; background: transparent; cursor: pointer; -webkit-app-region: no-drag; }
+.card-recommendation { position: absolute; left: 0; bottom: 10px; width: 350px; max-height: 320px; display: none; flex-direction: column; overflow: hidden; border: 1px solid rgba(120, 198, 168, .72); border-radius: 14px 14px 14px 4px; background: rgba(20, 24, 24, .97); color: var(--cream); box-shadow: 0 18px 42px rgba(0, 0, 0, .42); }
+.card-recommendation.visible { display: flex; animation: panel-in .25s ease-out both; }
+.card-recommendation::after { content: ""; position: absolute; right: -7px; bottom: 88px; width: 13px; height: 13px; border-top: 1px solid rgba(120, 198, 168, .72); border-right: 1px solid rgba(120, 198, 168, .72); background: #141818; transform: rotate(45deg); }
+.card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 15px 16px 11px; border-bottom: 1px solid rgba(255, 255, 255, .08); }
+.card-kicker { color: var(--mint); font-size: 10px; font-weight: 800; letter-spacing: .13em; }
+.card-head h1 { margin: 4px 0 0; font-size: 19px; line-height: 1.25; }
+.card-close { width: 28px; height: 28px; flex: 0 0 auto; border: 1px solid #4e5e59; border-radius: 50%; background: transparent; color: #c7d0ca; cursor: pointer; }
+.card-close:hover { border-color: var(--mint); color: white; }
+.card-scroll { min-height: 0; overflow-y: auto; padding: 12px 16px; scrollbar-width: thin; scrollbar-color: #59665f transparent; }
+.card-reason { margin: 0; padding: 9px 10px; border-left: 2px solid var(--amber); background: rgba(228, 166, 77, .08); color: #eee4d4; font-size: 12px; line-height: 1.55; }
+.card-points { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; margin-top: 10px; }
+.card-point { padding: 8px 9px; border: 1px solid rgba(255, 255, 255, .07); border-radius: 8px; background: rgba(255, 255, 255, .025); }
+.card-point strong { color: var(--mint); font-size: 10px; letter-spacing: .05em; }
+.card-point.negative strong { color: var(--red); }
+.card-point.neutral { grid-column: 1 / -1; }
+.card-point.neutral strong { color: var(--amber); }
+.card-point ul { margin: 5px 0 0; padding-left: 15px; color: #bdc9c2; font-size: 10px; line-height: 1.45; }
+.card-point li + li { margin-top: 3px; }
+.card-meta { padding: 8px 16px; border-top: 1px solid rgba(255, 255, 255, .07); color: #74817b; font-size: 9px; }
 .encounter-guide { position: absolute; left: 0; top: 0; bottom: 8px; width: 350px; display: none; flex-direction: column; overflow: hidden; border: 1px solid rgba(231, 121, 107, .72); border-radius: 14px 14px 14px 4px; background: rgba(20, 24, 24, .97); color: var(--cream); box-shadow: 0 18px 42px rgba(0, 0, 0, .42); }
 .encounter-guide.visible { display: flex; }
 .encounter-guide::after { content: ""; position: absolute; right: -7px; bottom: 88px; width: 13px; height: 13px; border-top: 1px solid rgba(231, 121, 107, .72); border-right: 1px solid rgba(231, 121, 107, .72); background: #141818; transform: rotate(45deg); }
@@ -44,6 +63,18 @@ button { font: inherit; }
 .speech { position: absolute; top: 3px; left: 8px; right: 8px; padding: 7px 6px; border: 1px solid #4e5e59; background: rgba(24, 32, 30, .95); color: var(--cream); font-size: 11px; line-height: 1.2; opacity: 0; transform: translateY(5px); transition: opacity .18s ease, transform .18s ease; }
 .speech::after { content: ""; position: absolute; bottom: -5px; left: 50%; width: 8px; height: 8px; border-right: 1px solid #4e5e59; border-bottom: 1px solid #4e5e59; background: #18201e; transform: rotate(45deg) translateX(-50%); }
 .pet-button:hover .speech, .speech.visible { opacity: 1; transform: translateY(0); }
+.thinking-cloud { position: absolute; z-index: 3; left: 142px; top: 52px; width: 50px; height: 28px; display: flex; align-items: center; justify-content: center; gap: 4px; border: 1px solid rgba(120, 198, 168, .65); border-radius: 15px; background: rgba(20, 29, 27, .96); opacity: 0; transform: translateY(6px) scale(.88); transition: opacity .18s ease, transform .18s ease; }
+.thinking-cloud::after { content: ""; position: absolute; left: 6px; bottom: -5px; width: 8px; height: 8px; border-right: 1px solid rgba(120, 198, 168, .65); border-bottom: 1px solid rgba(120, 198, 168, .65); background: #141d1b; transform: rotate(45deg); }
+.thinking-cloud i { width: 5px; height: 5px; display: block; border-radius: 50%; background: var(--mint); animation: thought-dot .9s ease-in-out infinite; }
+.thinking-cloud i:nth-child(2) { animation-delay: .14s; }.thinking-cloud i:nth-child(3) { animation-delay: .28s; }
+.thinking-orbit { position: absolute; z-index: 2; left: 34px; top: 66px; width: 146px; height: 146px; display: block; border: 1px dashed rgba(120, 198, 168, .25); border-radius: 50%; opacity: 0; }
+.thinking-orbit i { position: absolute; width: 5px; height: 5px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 8px rgba(120, 198, 168, .85); }
+.thinking-orbit i:nth-child(1) { left: 12px; top: 28px; }.thinking-orbit i:nth-child(2) { right: 4px; top: 66px; }.thinking-orbit i:nth-child(3) { left: 60px; bottom: -3px; }
+.pet-stage.llm-thinking .thinking-cloud { opacity: 1; transform: translateY(0) scale(1); }
+.pet-stage.llm-thinking .thinking-orbit { opacity: 1; animation: orbit 3.2s linear infinite; }
+.pet-stage.llm-thinking .pet-body { animation: deep-think 1.25s ease-in-out infinite; }
+.pet-stage.llm-thinking .pet-glow { background: rgba(120, 198, 168, .24); animation: glow-pulse 1.25s ease-in-out infinite; }
+.pet-stage.llm-thinking .eye { animation: thinking-eye 1.25s ease-in-out infinite; }
 .pet-glow { position: absolute; left: 44px; top: 74px; width: 128px; height: 128px; border-radius: 50%; background: rgba(120, 198, 168, .12); filter: blur(10px); }
 .pet-body { position: absolute; left: 42px; top: 74px; width: 130px; height: 125px; display: block; border: 2px solid #6a8f7e; border-radius: 46% 46% 42% 42%; background: #b3c1ad; box-shadow: inset 0 -17px 0 rgba(46, 65, 58, .16), 0 7px 0 rgba(12, 17, 17, .24); animation: float 3s ease-in-out infinite; }
 .pet-face { position: absolute; left: 29px; top: 30px; width: 69px; height: 43px; display: block; border-radius: 40%; background: #dfe1cf; }
@@ -59,3 +90,12 @@ button { font: inherit; }
 .pet-stage.thinking .pet-body { animation: think 1.1s ease-in-out infinite; }.pet-stage.alert .pet-body { border-color: var(--red); }.pet-stage.alert .pet-glow { background: rgba(231, 121, 107, .16); }
 @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 @keyframes think { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-5px) rotate(2deg); } }
+@keyframes deep-think { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-7px) rotate(2deg); } }
+@keyframes thought-dot { 0%, 70%, 100% { transform: translateY(0); opacity: .45; } 35% { transform: translateY(-4px); opacity: 1; } }
+@keyframes orbit { to { transform: rotate(360deg); } }
+@keyframes glow-pulse { 0%, 100% { opacity: .55; transform: scale(.94); } 50% { opacity: 1; transform: scale(1.08); } }
+@keyframes thinking-eye { 0%, 100% { transform: translate(0, 0) scaleY(1); } 40% { transform: translate(2px, -1px) scaleY(.85); } 55% { transform: translate(2px, -1px) scaleY(.15); } 70% { transform: translate(-1px, 0) scaleY(1); } }
+@keyframes panel-in { from { opacity: 0; transform: translateX(10px) scale(.98); } to { opacity: 1; transform: translateX(0) scale(1); } }
+@media (prefers-reduced-motion: reduce) {
+  .pet-body, .thinking-cloud i, .thinking-orbit, .pet-glow, .eye, .card-recommendation.visible { animation: none !important; }
+}

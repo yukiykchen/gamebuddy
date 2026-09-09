@@ -7,6 +7,11 @@ const guideKicker = document.querySelector('#guide-kicker');
 const guideTitle = document.querySelector('#guide-title');
 const guideContent = document.querySelector('#guide-content');
 const guideSource = document.querySelector('#guide-source');
+const cardPanel = document.querySelector('#card-recommendation');
+const cardTitle = document.querySelector('#card-title');
+const cardReason = document.querySelector('#card-reason');
+const cardPoints = document.querySelector('#card-points');
+const cardMeta = document.querySelector('#card-meta');
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -19,6 +24,48 @@ function escapeHtml(value) {
 function guideList(title, items, className = '') {
   if (!items?.length) return '';
   return `<section class="guide-section"><div class="guide-section-title">${escapeHtml(title)}</div><ul class="guide-list ${className}">${items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>`;
+}
+
+function cardPointList(title, items, className) {
+  if (!items?.length) return '';
+  return `<section class="card-point ${className}"><strong>${escapeHtml(title)}</strong><ul>${items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>`;
+}
+
+function setCardRecommendation(recommendation) {
+  if (!recommendation) {
+    cardPanel.classList.remove('visible');
+    cardReason.textContent = '';
+    cardPoints.innerHTML = '';
+    return;
+  }
+  const primary = recommendation.primary || {};
+  const analysis = primary.analysis;
+  cardTitle.textContent = primary.action === 'SKIP'
+    ? '建议跳过这次奖励'
+    : `推荐「${primary.cardName || primary.label || '这张牌'}」`;
+  cardReason.textContent = recommendation.reason || '当前局面下，这是规则评分最高的选择。';
+  cardPoints.innerHTML = analysis
+    ? `${cardPointList('为什么适合', analysis.pros?.slice(0, 3), 'positive')}${cardPointList('需要留意', analysis.cons?.slice(0, 2), 'negative')}`
+    : cardPointList('为什么跳过', ['保持牌组精简，提高核心牌的抽取稳定性'], 'neutral');
+  const confidence = Math.round((Number(recommendation.confidence) || 0) * 100);
+  const source = recommendation.source === 'llm' ? 'LLM 复核' : '规则评分';
+  const version = analysis?.stats?.knowledgeVersion;
+  cardMeta.textContent = `${source} · 置信度 ${confidence}%${version ? ` · ${version}` : ''}`;
+  cardPanel.classList.add('visible');
+  say(primary.action === 'SKIP' ? '这次建议跳过，理由在左边' : `建议拿 ${primary.cardName || primary.label}`, '');
+}
+
+function setAgentThinking(state) {
+  const thinking = Boolean(state?.thinking);
+  stage.classList.toggle('llm-thinking', thinking);
+  if (!thinking) return;
+  const task = state.tasks?.[0];
+  const labels = {
+    card_reward: '正在比较三张奖励牌',
+    map_route: '正在推演后续路线',
+    rest_site: '正在权衡回血和升级'
+  };
+  say(labels[task] || '正在结合这局思考', 'thinking');
 }
 
 function setEncounterGuide(guide) {
@@ -90,6 +137,10 @@ function setState(next) {
 }
 
 function setRecommendation(recommendation) {
+  if (recommendation?.task === 'card_reward' && recommendation.primary?.label) {
+    say(recommendation.primary.action === 'SKIP' ? '这次建议跳过' : `建议${recommendation.primary.label}`, '');
+    return;
+  }
   if (recommendation?.task === 'rest_site' && recommendation.primary?.label) {
     say(`休息处建议${recommendation.primary.label}`, 'thinking');
     return;
@@ -135,7 +186,13 @@ document.querySelector('#guide-close').addEventListener('click', () => {
   setEncounterGuide(null);
   window.windowControls?.dismissEncounterGuide();
 });
+document.querySelector('#card-close').addEventListener('click', () => {
+  setCardRecommendation(null);
+  window.windowControls?.dismissCardRecommendation();
+});
 window.gamebuddyBridge?.onStatus(setStatus);
 window.gamebuddyBridge?.onState(setState);
 window.gamebuddyBridge?.onRecommendation(setRecommendation);
 window.gamebuddyBridge?.onEncounterGuide(setEncounterGuide);
+window.gamebuddyBridge?.onCardRecommendation(setCardRecommendation);
+window.gamebuddyBridge?.onAgentThinking(setAgentThinking);

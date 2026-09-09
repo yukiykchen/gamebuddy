@@ -8,6 +8,17 @@
   </head>
   <body>
     <main class="pet-stage" id="pet-stage">
+      <aside class="card-recommendation" id="card-recommendation" aria-live="polite">
+        <div class="card-head">
+          <div><span class="card-kicker">卡牌奖励建议</span><h1 id="card-title">推荐拿取</h1></div>
+          <button class="card-close" id="card-close" aria-label="关闭卡牌建议">×</button>
+        </div>
+        <div class="card-scroll">
+          <p class="card-reason" id="card-reason"></p>
+          <div class="card-points" id="card-points"></div>
+        </div>
+        <div class="card-meta" id="card-meta"></div>
+      </aside>
       <aside class="encounter-guide" id="encounter-guide" aria-live="polite">
         <div class="guide-head">
           <div><span class="guide-kicker" id="guide-kicker">精英攻略</span><h1 id="guide-title">敌人机制</h1></div>
@@ -18,6 +29,8 @@
       </aside>
       <button class="pet-button" id="pet-button" aria-label="打开 GameBuddy 建议面板">
         <span class="speech" id="speech">等你出牌</span>
+        <span class="thinking-cloud" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="thinking-orbit" aria-hidden="true"><i></i><i></i><i></i></span>
         <span class="pet-glow"></span>
         <span class="pet-body">
           <span class="pet-ear left"></span><span class="pet-ear right"></span>
