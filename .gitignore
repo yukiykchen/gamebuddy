@@ -13,3 +13,7 @@ runs/
 
 mod/RunmateBridge/.godot/
 .runtime/
+
+# local source checkouts
+/spire-agent/
+/spire-codex/
