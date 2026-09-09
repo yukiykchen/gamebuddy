@@ -13,18 +13,17 @@ function hasRoutableMap(state) {
 function selectTask(observation) {
   const state = observation?.state;
   if (!state) return null;
+  if (state.combat) return null;
   if (Array.isArray(state.cardReward?.options) && state.cardReward.options.length > 0) return 'card_reward';
   if (Array.isArray(state.event?.options) && state.event.options.length > 0) return 'event_choice';
-  if (!state.combat) {
-    if (findCardReward(observation)) return 'card_reward';
-    const recent = observation.recentEvents || [];
-    for (let i = recent.length - 1; i >= 0; i -= 1) {
-      const name = recent[i]?.name;
-      if (name === 'map.opened') break;
-      if (name === 'rest.opened') return 'rest_site';
-    }
-    if (isRestSite(state)) return 'rest_site';
+  if (findCardReward(observation)) return 'card_reward';
+  const recent = observation.recentEvents || [];
+  for (let i = recent.length - 1; i >= 0; i -= 1) {
+    const name = recent[i]?.name;
+    if (name === 'map.opened') break;
+    if (name === 'rest.opened') return 'rest_site';
   }
+  if (isRestSite(state)) return 'rest_site';
   if (hasRoutableMap(state)) return 'map_route';
   return null;
 }
@@ -50,7 +49,19 @@ function createOrchestrator({
 
   async function consider(observation, { force = false } = {}) {
     const task = selectTask(observation);
-    if (!task) return lastRecommendation;
+    if (!task) {
+      if (observation?.state?.combat) {
+        generation += 1;
+        lastSignature = '';
+        if (lastRecommendation) {
+          lastRecommendation = null;
+          onRecommendation?.(null);
+        }
+        onAgentStatus?.({ status: 'idle', task: null, timestamp: now() });
+        return null;
+      }
+      return lastRecommendation;
+    }
     if (!observation?.fresh && !force && lastRecommendation) return lastRecommendation;
 
     const signature = `${task}:${signatureFor(task, observation, observation.state)}`;

@@ -7,7 +7,7 @@ const { rankRoutes, recommendRoute, scoreNode, scoreParts, buildScoreContext, en
 const { isRestSite, recommendRest, rankSmithCards } = require('../agent/tasks/rest');
 const { findCardReward, recommendCardReward } = require('../agent/tasks/card-reward');
 const { parseJsonObject, createOpenAiClient, readLlmConfig, extractResponseText } = require('../agent/llm/openai');
-const { createOrchestrator } = require('../agent/orchestrator');
+const { createOrchestrator, selectTask } = require('../agent/orchestrator');
 
 const lifecycle = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'lifecycle.json'), 'utf8'));
 const mapState = lifecycle[2];
@@ -170,6 +170,15 @@ store.ingest({ type: 'state', data: mapState }, 1723370002000);
 const observation = store.getObservation(1723370002100);
 assert.equal(observation.fresh, true);
 
+const combatObservation = {
+  ...observation,
+  state: {
+    ...mapState,
+    combat: { turn: 1, hand: [], drawPile: [], discardPile: [], exhaustPile: [], enemies: [] }
+  }
+};
+assert.equal(selectTask(combatObservation), null);
+
 recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   assert.equal(validateRecommendation(rulesRec).ok, true);
   assert.equal(rulesRec.source, 'rules');
@@ -277,6 +286,20 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   orchestrator.clearRecommendation();
   assert.equal(orchestrator.getRecommendation(), null);
   assert.equal(published, null);
+
+  let combatPublished;
+  const combatOrchestrator = createOrchestrator({
+    llm: { enabled: false },
+    onRecommendation: rec => { combatPublished = rec; },
+    now: () => 3
+  });
+  const beforeCombat = await combatOrchestrator.consider(observation);
+  assert.equal(beforeCombat.task, 'map_route');
+  assert.equal(combatPublished.task, 'map_route');
+  const duringCombat = await combatOrchestrator.consider(combatObservation);
+  assert.equal(duringCombat, null);
+  assert.equal(combatPublished, null);
+  assert.equal(combatOrchestrator.getRecommendation(), null);
 
   const offGraphMap = {
     ...mapState.map,
