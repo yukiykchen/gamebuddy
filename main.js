@@ -209,6 +209,7 @@ function connectBridge() {
         broadcast('bridge-event', result.event);
         if (result.event?.name === 'combat.ended') clearEncounterGuide();
         if (result.event?.name === 'combat.started') clearCardRecommendation();
+        if (result.event?.name === 'map.opened') orchestrator.clearRecommendation();
       }
       if (result.accepted || (result.kind === 'duplicate' && !orchestrator.getRecommendation())) {
         const observation = observationStore.getObservation();

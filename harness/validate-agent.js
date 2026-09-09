@@ -82,6 +82,30 @@ assert.equal(eliteThenRest[0].targetType, 'Elite');
 assert.ok(eliteThenRest[0].route.includes('2,0'));
 assert.ok(eliteThenRest[0].score > eliteThenRest[1].score);
 
+const twoTreasureState = {
+  run: { ...mapState.run, room: 'RestSite', currentNode: 'RestSite', currentCoord: '1,1' },
+  player: mapState.player,
+  combat: null,
+  map: {
+    visited: ['0,1', '1,1'],
+    current: '1,1',
+    nodes: [
+      { id: '1,1', row: 1, col: 1, type: 'RestSite', children: ['2,0', '2,2'] },
+      { id: '2,0', row: 2, col: 0, type: 'Treasure', children: ['3,1'] },
+      { id: '2,2', row: 2, col: 2, type: 'Treasure', children: ['3,1'] },
+      { id: '3,1', row: 3, col: 1, type: 'Boss', children: [] }
+    ],
+    routes: [
+      ['1,1', '2,0', '3,1'],
+      ['1,1', '2,2', '3,1']
+    ]
+  }
+};
+const treasureRoutes = rankRoutes(twoTreasureState);
+assert.equal(treasureRoutes[0].displayLabel, '左侧宝箱');
+assert.equal(treasureRoutes[1].displayLabel, '右侧宝箱');
+assert.equal(treasureRoutes[0].score, treasureRoutes[1].score);
+
 function restState(hp) {
   return {
     ...mapState,
@@ -130,6 +154,27 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   assert.equal(llmRec.source, 'llm');
   assert.equal(llmRec.primary.label, '精英');
   assert.match(llmRec.reason, /精英/);
+
+  const tiedTreasureRec = await recommendRoute(twoTreasureState, { now: 2 });
+  assert.equal(tiedTreasureRec.tie.isTie, true);
+  assert.equal(tiedTreasureRec.tie.targets.length, 2);
+  assert.equal(tiedTreasureRec.primary.displayLabel, '左侧宝箱');
+  assert.match(tiedTreasureRec.reason, /可以任选/);
+
+  let capturedRoutePayload;
+  await recommendRoute(twoTreasureState, {
+    now: 2,
+    llm: {
+      enabled: true,
+      completeRoute: async payload => {
+        capturedRoutePayload = payload;
+        return { index: 0, reason: '选择左侧宝箱。' };
+      }
+    }
+  });
+  assert.equal(capturedRoutePayload.candidates[0].targetId, '2,0');
+  assert.equal(capturedRoutePayload.candidates[0].direction, '左侧');
+  assert.equal(capturedRoutePayload.candidates[1].direction, '右侧');
 
   const parsed = parseJsonObject('```json\n{"index":0,"reason":"去商店"}\n```');
   assert.equal(parsed.index, 0);
@@ -197,6 +242,9 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
     state: { ...mapState, map: { visited: [], routes: [] } }
   });
   assert.equal(empty, first);
+  orchestrator.clearRecommendation();
+  assert.equal(orchestrator.getRecommendation(), null);
+  assert.equal(published, null);
 
   const offGraphMap = {
     ...mapState.map,

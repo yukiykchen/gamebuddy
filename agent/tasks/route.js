@@ -204,6 +204,22 @@ function nextStep(route, current, visited) {
   return route.find(id => !seen.has(id)) || route[0];
 }
 
+function targetDirections(items) {
+  const targets = [...new Map(items
+    .filter(item => item.targetId)
+    .map(item => [item.targetId, {
+      id: item.targetId,
+      row: Number(item.target?.row),
+      col: Number(item.target?.col)
+    }])).values()]
+    .sort((left, right) => left.col - right.col || left.row - right.row || left.id.localeCompare(right.id));
+  if (targets.length < 2) return new Map();
+  return new Map(targets.map((target, index) => [
+    target.id,
+    index === 0 ? '左侧' : index === targets.length - 1 ? '右侧' : '中间'
+  ]));
+}
+
 function rankRoutes(state) {
   const map = ensureMapRoutes(state?.map || {});
   const routes = Array.isArray(map.routes) ? map.routes : [];
@@ -213,7 +229,7 @@ function rankRoutes(state) {
   const visited = Array.isArray(map.visited) ? map.visited : [];
   const ctx = buildScoreContext(state);
 
-  return routes.map((route, index) => {
+  const ranked = routes.map((route, index) => {
     const targetId = nextStep(route, current, visited);
     let score = 0;
     const upcoming = [];
@@ -247,15 +263,22 @@ function rankRoutes(state) {
       upcoming,
       targetId: targetId || route[route.length - 1] || '',
       targetType: target?.type || '',
+      target: target ? { row: target.row, col: target.col } : null,
       label: mapTypeLabel(target?.type)
     };
-  }).sort((a, b) => b.score - a.score || a.index - b.index);
+  });
+  const directions = targetDirections(ranked);
+  for (const item of ranked) {
+    item.direction = directions.get(item.targetId) || '';
+    item.displayLabel = `${item.direction}${item.label}`;
+  }
+  return ranked.sort((a, b) => b.score - a.score || a.index - b.index);
 }
 
 function explainRoute(ranked, state) {
   const ctx = buildScoreContext(state);
   const types = new Set(ranked.upcoming.map(node => node.type));
-  const nextLabel = ranked.label || '下一节点';
+  const nextLabel = ranked.displayLabel || ranked.label || '下一节点';
   const clauses = [];
 
   if (ranked.targetType === 'Elite' || types.has('Elite')) {
@@ -291,12 +314,34 @@ function toAlternative(item) {
     action: 'TAKE_ROUTE',
     targetId: item.targetId,
     label: item.label,
+    displayLabel: item.displayLabel,
+    direction: item.direction,
+    target: item.target,
     route: item.route,
     score: item.score
   };
 }
 
 function buildRecommendation(chosen, ranked, { source, reason, now }) {
+  const equalBest = chosen.score === ranked[0]?.score
+    ? ranked.filter(item => item.score === chosen.score && item.targetId !== chosen.targetId)
+    : [];
+  const equivalentItems = equalBest.length
+    ? [...new Map([chosen, ...equalBest].map(item => [item.targetId, item])).values()]
+      .sort((left, right) => (left.target?.col ?? 0) - (right.target?.col ?? 0))
+    : [];
+  const tie = equivalentItems.length > 1 ? {
+    isTie: true,
+    label: `${[...new Set(equivalentItems.map(item => item.displayLabel))].join('、')}等价`,
+    targets: equivalentItems.map(item => ({
+      targetId: item.targetId,
+      label: item.label,
+      displayLabel: item.displayLabel,
+      direction: item.direction,
+      target: item.target,
+      score: item.score
+    }))
+  } : null;
   return {
     schema: SCHEMA,
     task: 'map_route',
@@ -308,11 +353,15 @@ function buildRecommendation(chosen, ranked, { source, reason, now }) {
       action: 'TAKE_ROUTE',
       targetId: chosen.targetId,
       label: chosen.label,
+      displayLabel: chosen.displayLabel,
+      direction: chosen.direction,
+      target: chosen.target,
       route: chosen.route,
       routeIndex: chosen.index,
       score: chosen.score
     },
-    alternatives: ranked.filter(item => item !== chosen).slice(0, 4).map(toAlternative)
+    alternatives: ranked.filter(item => item !== chosen).slice(0, 4).map(toAlternative),
+    tie
   };
 }
 
@@ -334,6 +383,11 @@ function promptPayload(state, ranked) {
       index,
       score: item.score,
       next: item.label,
+      displayLabel: item.displayLabel,
+      targetId: item.targetId,
+      row: item.target?.row ?? null,
+      col: item.target?.col ?? null,
+      direction: item.direction || null,
       path: item.upcoming.map(node => mapTypeLabel(node.type)).join(' → '),
       payoff: item.upcoming.reduce((sum, node) => sum + (node.payoff || 0), 0),
       risk: item.upcoming.reduce((sum, node) => sum + (node.risk || 0), 0),
@@ -364,6 +418,16 @@ async function recommendRoute(state, { llm, now = Date.now() } = {}) {
       source = 'rules';
       reason = explainRoute(chosen, state);
     }
+  }
+
+  const equalBest = chosen.score === ranked[0]?.score
+    ? ranked.filter(item => item.score === chosen.score && item.targetId !== chosen.targetId)
+    : [];
+  if (equalBest.length) {
+    const labels = [...new Set([chosen, ...equalBest]
+      .sort((left, right) => (left.target?.col ?? 0) - (right.target?.col ?? 0))
+      .map(item => item.displayLabel))].join('和');
+    reason = `${labels}当前评分相同，后续收益与风险没有可验证差异，可以任选。`;
   }
 
   return buildRecommendation(chosen, ranked, { source, reason, now });

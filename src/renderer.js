@@ -202,7 +202,7 @@ function mapNodeClass(type, id) {
   const rec = state.recommendation?.task === 'map_route' ? state.recommendation : null;
   if (id && id === state.map?.current) classes.push('current');
   if (rec?.primary?.route?.includes(id) && id !== state.map?.current) classes.push('on-route');
-  if (id && id === rec?.primary?.targetId) classes.push('recommended');
+  if (id && (id === rec?.primary?.targetId || rec?.tie?.targets?.some(target => target.targetId === id))) classes.push('recommended');
   if (type === 'Elite') classes.push('elite');
   if (type === 'RestSite') classes.push('rest');
   if (type === 'Boss') classes.push('boss');
@@ -235,9 +235,11 @@ function routeView() {
       return mapTypeLabel(node?.type);
     }).join(' → ');
     const recommended = Boolean(rec && sameRoute(route, rec.primary.route));
-    return `<div class="route-choice${recommended ? ' recommended' : ''}"><strong>${recommended ? '建议路线' : `路线 ${String(index + 1).padStart(2, '0')}`}</strong><span>${escapeHtml(labels)}</span></div>`;
+    const equivalent = Boolean(rec?.tie?.targets?.some(target => route.includes(target.targetId)));
+    return `<div class="route-choice${recommended || equivalent ? ' recommended' : ''}"><strong>${equivalent ? '等价路线' : recommended ? '建议路线' : `路线 ${String(index + 1).padStart(2, '0')}`}</strong><span>${escapeHtml(labels)}</span></div>`;
   }).join('');
-  const title = rec?.primary?.label ? `下一步：${escapeHtml(rec.primary.label)}` : state.run.currentNode ? mapTypeLabel(state.run.currentNode) : '等待地图状态';
+  const routeTitle = rec?.tie?.isTie ? rec.tie.label : rec?.primary?.displayLabel || rec?.primary?.label;
+  const title = routeTitle ? `下一步：${escapeHtml(routeTitle)}` : state.run.currentNode ? mapTypeLabel(state.run.currentNode) : '等待地图状态';
   const reason = rec?.reason ? escapeHtml(rec.reason) : (nodes.length
     ? `本层 ${nodes.length} 个节点，从当前位置出发有 ${routes.length} 条可达 Boss 的路线${map.routesTruncated ? '（已截断）' : ''}。`
     : '启动游戏并打开地图后，这里会显示真实位置和全部路线。');
@@ -408,7 +410,12 @@ window.gamebuddyBridge?.onEvent(event => {
   }
 });
 window.gamebuddyBridge?.onRecommendation(recommendation => {
-  if (!recommendation || (recommendation.task !== 'map_route' && recommendation.task !== 'rest_site' && recommendation.task !== 'card_reward')) return;
+  if (!recommendation) {
+    state.recommendation = null;
+    if (state.mode === 'route' || state.mode === 'draft') render();
+    return;
+  }
+  if (recommendation.task !== 'map_route' && recommendation.task !== 'rest_site' && recommendation.task !== 'card_reward') return;
   state.recommendation = recommendation;
   if (recommendation.task === 'rest_site') state.mode = 'route';
   if (recommendation.task === 'card_reward') state.mode = 'draft';

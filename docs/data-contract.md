@@ -187,7 +187,7 @@ Spire Codex API 默认地址为 `https://spire-codex.com/api`，可用 `GAMEBUDD
 
 同一份 `strategy` 也会挂到卡牌奖励 Agent 的 `threats.knownBoss`、`possibleElites` 和 `knownUpcomingElites` 上，并随完整遭遇上下文送入 LLM。这样模型评判奖励牌时能针对具体遭遇的牌组检查和常见失误，而不是只看到笼统的 Boss / Elite 标签。
 
-路线任务在没有配置 LLM 时用规则打分：每个节点拆成**收益**和**风险**。精英按遗物缺口和生命评估；火堆同时计算回血和未升级牌的敲升级价值；商店按金币、卡组厚度和打击/防御数量计算删牌与购物。同一条路上精英后面有火堆时会加协同分。进入休息处后会单独建议 **回血还是升级哪一张牌**。有 OpenAI 兼容接口时，模型只在规则生成的候选中复核选择和解释。
+路线任务在没有配置 LLM 时用规则打分：每个节点拆成**收益**和**风险**。精英按遗物缺口和生命评估；火堆同时计算回血和未升级牌的敲升级价值；商店按金币、卡组厚度和打击/防御数量计算删牌与购物。同一条路上精英后面有火堆时会加协同分。进入休息处后会单独建议 **回血还是升级哪一张牌**。有 OpenAI 兼容接口时，模型只在规则生成的候选中复核选择和解释。同一层出现多个同类型节点时，建议会携带 `targetId`、`target.row`、`target.col`、`direction` 和 `displayLabel`；最高分存在多个不同目标时，`tie.isTie=true`，客户端应展示为等价路线而非任意宣称其中一条更优。
 
 ```json
 {
@@ -201,9 +201,24 @@ Spire Codex API 默认地址为 `https://spire-codex.com/api`，可用 `GAMEBUDD
     "action": "TAKE_ROUTE",
     "targetId": "2,0",
     "label": "商店",
+    "displayLabel": "左侧商店",
+    "direction": "左侧",
+    "target": { "row": 2, "col": 0 },
     "route": ["1,0", "2,0", "3,0"]
   },
-  "alternatives": []
+  "alternatives": [
+    {
+      "action": "TAKE_ROUTE",
+      "targetId": "2,1",
+      "label": "精英",
+      "displayLabel": "右侧精英",
+      "direction": "右侧",
+      "target": { "row": 2, "col": 1 },
+      "route": ["1,0", "2,1", "3,0"],
+      "score": 7
+    }
+  ],
+  "tie": null
 }
 ```
 

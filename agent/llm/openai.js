@@ -150,7 +150,7 @@ function createOpenAiClient(config = readLlmConfig(), { fetchImpl = globalThis.f
   return {
     enabled,
     completeRoute: payload => completeJson(
-      '你是杀戮尖塔 2 的路线顾问。权衡收益和风险：精英给遗物和更好的牌；火堆可回血或升级；商店可删牌和买东西提高战斗力。只从给定候选里选一条，不要发明新路线，不要建议出牌。用 JSON 回答：{"index":0,"reason":"两句中文解释"}。',
+      '你是杀戮尖塔 2 的路线顾问。权衡收益和风险：精英给遗物和更好的牌；火堆可回血或升级；商店可删牌和买东西提高战斗力。候选中的 targetId、row、col 和 direction 用于区分同类型节点；不得把左侧和右侧的同名节点混为一条路线。只从给定候选里选一条，不要发明新路线，不要建议出牌。若多条候选收益与风险相同，应明确说明它们等价。用 JSON 回答：{"index":0,"reason":"两句中文解释"}。',
       payload,
       'map_route'
     ),

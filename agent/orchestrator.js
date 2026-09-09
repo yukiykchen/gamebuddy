@@ -73,9 +73,17 @@ function createOrchestrator({
     }
   }
 
+  function clearRecommendation() {
+    generation += 1;
+    lastSignature = '';
+    lastRecommendation = null;
+    onRecommendation?.(null);
+  }
+
   return {
     consider,
     getRecommendation: () => lastRecommendation,
+    clearRecommendation,
     selectTask
   };
 }

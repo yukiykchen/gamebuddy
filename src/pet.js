@@ -137,6 +137,10 @@ function setState(next) {
 }
 
 function setRecommendation(recommendation) {
+  if (!recommendation) {
+    say('地图已打开，正在重新规划');
+    return;
+  }
   if (recommendation?.task === 'card_reward' && recommendation.primary?.label) {
     say(recommendation.primary.action === 'SKIP' ? '这次建议跳过' : `建议${recommendation.primary.label}`, '');
     return;
@@ -146,7 +150,11 @@ function setRecommendation(recommendation) {
     return;
   }
   if (recommendation?.task !== 'map_route' || !recommendation.primary?.label) return;
-  say(`下一路点建议走${recommendation.primary.label}`, 'thinking');
+  if (recommendation.tie?.isTie) {
+    say(`${recommendation.tie.label}，任选一边`);
+    return;
+  }
+  say(`下一步建议走${recommendation.primary.displayLabel || recommendation.primary.label}`, 'thinking');
 }
 
 const petButton = document.querySelector('#pet-button');
