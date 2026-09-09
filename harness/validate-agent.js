@@ -114,6 +114,32 @@ assert.equal(treasureRoutes[0].displayLabel, '左侧宝箱');
 assert.equal(treasureRoutes[1].displayLabel, '右侧宝箱');
 assert.equal(treasureRoutes[0].score, treasureRoutes[1].score);
 
+const fourBattleRoutes = rankRoutes({
+  ...twoTreasureState,
+  map: {
+    visited: ['1,2'],
+    current: '1,2',
+    nodes: [
+      { id: '1,2', row: 1, col: 2, type: 'RestSite', children: ['2,0', '2,1', '2,3', '2,4'] },
+      { id: '2,0', row: 2, col: 0, type: 'Monster', children: ['3,2'] },
+      { id: '2,1', row: 2, col: 1, type: 'Monster', children: ['3,2'] },
+      { id: '2,3', row: 2, col: 3, type: 'Monster', children: ['3,2'] },
+      { id: '2,4', row: 2, col: 4, type: 'Monster', children: ['3,2'] },
+      { id: '3,2', row: 3, col: 2, type: 'Boss', children: [] }
+    ],
+    routes: [
+      ['1,2', '2,0', '3,2'],
+      ['1,2', '2,1', '3,2'],
+      ['1,2', '2,3', '3,2'],
+      ['1,2', '2,4', '3,2']
+    ]
+  }
+});
+assert.deepEqual(
+  fourBattleRoutes.map(route => route.displayLabel),
+  ['从左第1个战斗', '从左第2个战斗', '从左第3个战斗', '从左第4个战斗']
+);
+
 function restState(hp) {
   return {
     ...mapState,

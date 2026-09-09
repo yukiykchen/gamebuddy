@@ -216,7 +216,11 @@ function targetDirections(items) {
   if (targets.length < 2) return new Map();
   return new Map(targets.map((target, index) => [
     target.id,
-    index === 0 ? '左侧' : index === targets.length - 1 ? '右侧' : '中间'
+    targets.length === 2
+      ? (index === 0 ? '左侧' : '右侧')
+      : targets.length === 3
+        ? ['左侧', '中间', '右侧'][index]
+        : `从左第${index + 1}个`
   ]));
 }
 

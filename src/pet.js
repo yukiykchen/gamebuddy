@@ -152,7 +152,7 @@ function setRecommendation(recommendation) {
   }
   if (recommendation?.task !== 'map_route' || !recommendation.primary?.label) return;
   if (recommendation.tie?.isTie) {
-    say(`${recommendation.tie.label}，任选一边`);
+    say(`${recommendation.tie.label}，任选其一`);
     return;
   }
   say(`下一步建议走${recommendation.primary.displayLabel || recommendation.primary.label}`, 'thinking');
