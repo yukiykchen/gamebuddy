@@ -10,11 +10,8 @@ const state = {
   enemy: null,
   hand: [],
   map: { visited: [] },
-  event: null,
-  cardReward: null,
-  recommendation: null,
-  agentStatus: { status: 'idle', task: null },
-  decision: null
+  reward: null,
+  recommendation: null
 };
 
 const viewContainer = document.querySelector('#view-container');
@@ -86,28 +83,6 @@ function showingRest() {
   return atRestSite();
 }
 
-function showingEvent() {
-  return Array.isArray(state.event?.options) && state.event.options.length > 0;
-}
-
-function eventView() {
-  const event = state.event || { title: '等待事件选项', description: '', options: [] };
-  const rec = state.recommendation?.task === 'event_choice' ? state.recommendation : null;
-  const thinking = state.agentStatus?.status === 'thinking' && state.agentStatus?.task === 'event_choice';
-  const sourceLabel = rec?.source === 'llm' ? 'KIMI AGENT' : '规则保底';
-  const options = (event.options || []).map((option, arrayIndex) => {
-    const optionIndex = Number(option.index ?? arrayIndex);
-    const recommended = rec?.primary?.optionIndex === optionIndex;
-    return `<article class="event-option ${recommended ? 'top-pick' : ''} ${option.locked ? 'locked' : ''}"><span class="pick-tag">${recommended ? 'Agent 建议' : option.locked ? '不可选' : `选项 ${String(optionIndex + 1).padStart(2, '0')}`}</span><h3>${escapeHtml(option.label)}</h3><p>${escapeHtml(option.description || '没有额外说明。')}</p></article>`;
-  }).join('');
-  const analysis = thinking
-    ? `<div class="agent-thinking"><span></span><div><strong>Agent 正在分析事件</strong><p>正在比较生命、金币、遗物、卡组与每个选项的代价和收益。</p></div></div>`
-    : rec
-      ? `<div class="event-reason"><div class="eyebrow">${sourceLabel}</div><h2>建议选择：${escapeHtml(rec.primary.label)}</h2><p>${escapeHtml(rec.reason)}</p></div>`
-      : `<div class="agent-thinking"><span></span><div><strong>等待 Agent 分析</strong><p>已收到事件选项，正在准备建议。</p></div></div>`;
-  return `<div class="event-layout"><section class="panel event-offer"><div class="draft-kicker">EVENT / LIVE CHOICE</div><h2 class="draft-title">${escapeHtml(event.title)}</h2><p class="event-description">${escapeHtml(event.description)}</p><div class="event-options">${options || '<div class="data-empty">正在读取事件选项。</div>'}</div></section><section class="panel event-side"><div class="panel-heading"><span class="panel-title">事件建议</span><span class="panel-meta">${thinking ? '分析中' : rec ? sourceLabel : '等待数据'}</span></div>${analysis}<div class="deck-stat"><span>生命</span><strong>${state.player.hp || 0} / ${state.player.maxHp || 0}</strong></div><div class="deck-stat"><span>金币</span><strong>${state.player.gold || 0}</strong></div><div class="deck-stat"><span>遗物</span><strong>${state.player.relics?.length || 0}</strong></div><div class="data-empty" style="margin-top:18px">GameBuddy 只给建议，不会替你点击事件选项。</div></section></div>`;
-}
-
 function atRestSite(run = state.run, combat = state.combat) {
   if (combat) return false;
   const room = String(run?.room || '');
@@ -152,23 +127,54 @@ function restView() {
 }
 
 function draftView() {
-  const reward = state.cardReward || { options: [] };
-  const options = Array.isArray(reward.options) ? reward.options : [];
   const rec = state.recommendation?.task === 'card_reward' ? state.recommendation : null;
-  const thinking = state.agentStatus?.status === 'thinking' && state.agentStatus?.task === 'card_reward';
-  const sourceLabel = rec?.source === 'llm' ? 'KIMI AGENT' : '规则保底';
-  const optionCards = options.map((card, arrayIndex) => {
-    const index = Number.isInteger(card.index) ? card.index : arrayIndex;
-    const recommended = rec?.primary?.cardIndex === index;
-    const description = String(card.description || '牌面描述暂不可用。').replace(/\[\/?[^\]]+\]/g, '').trim();
-    return `<article class="draft-card ${recommended ? 'top-pick' : ''}"><span class="pick-tag">${recommended ? 'Agent 建议' : `第 ${index + 1} 张`}</span><div class="card-name">${escapeHtml(card.name)}</div><div class="card-meta">${escapeHtml(card.type)} · ${card.cost ?? 'X'} 费${card.upgraded ? ' · 已升级' : ''}</div><p>${escapeHtml(description)}</p></article>`;
+  const rawCards = state.reward?.cards || state.reward?.offered || state.reward?.options || [];
+  const options = rec?.options?.length
+    ? rec.options
+    : rawCards.map(card => typeof card === 'string' ? { id: card, name: card } : card);
+  if (!options.length) {
+    return `<div class="draft-layout"><section class="panel draft-offer"><div class="draft-kicker">REWARD / CARD REWARD</div><h2 class="draft-title">等待真实卡牌奖励</h2><div class="data-empty large-empty">战斗结束并打开选牌界面后，Mod 会同步候选牌、当前牌组与战斗上下文。</div></section><section class="panel draft-side"><div class="panel-heading"><span class="panel-title">当前卡组</span><span class="panel-meta">${state.player.cards.length ? `${state.player.cards.length} 张` : '等待数据'}</span></div><div class="deck-stat"><span>卡牌</span><strong>${state.player.cards.length || '--'}</strong></div><div class="deck-stat"><span>遗物</span><strong>${state.player.relics.length || '--'}</strong></div><div class="deck-stat"><span>药水</span><strong>${state.player.potions.length || '--'}</strong></div></section></div>`;
+  }
+
+  const primaryId = rec?.primary?.action === 'TAKE_CARD' ? String(rec.primary.cardId) : '';
+  const skipPick = rec?.primary?.action === 'SKIP';
+  const cardHtml = options.map((card, index) => {
+    const id = String(card.id || card.name || index);
+    const recommended = primaryId && id === primaryId;
+    const pros = (card.pros || []).slice(0, 2).map(item => `<li class="positive">${escapeHtml(item)}</li>`).join('');
+    const cons = (card.cons || []).slice(0, 2).map(item => `<li>${escapeHtml(item)}</li>`).join('');
+    const boss = card.fit?.boss;
+    const elite = card.fit?.elite;
+    const knowledge = card.knowledgeEvaluation;
+    const fitClass = level => level === '强' ? 'strong' : level === '中' ? 'medium' : 'weak';
+    const fit = boss || elite
+      ? `<div class="draft-fit"><span class="fit-${fitClass(elite?.level)}">精英 ${escapeHtml(elite?.level || '--')}</span><span class="fit-${fitClass(boss?.level)}">Boss ${escapeHtml(boss?.level || '--')}</span></div>`
+      : '';
+    const knowledgeHtml = knowledge
+      ? `<div class="card-knowledge"><div class="knowledge-head"><span>${escapeHtml(knowledge.rank || '未评级')}</span><strong>${escapeHtml(knowledge.sourceName || 'GameBuddy')}</strong></div><p>${escapeHtml(knowledge.expertSummary || '')}</p><div class="knowledge-condition good">适合：${escapeHtml((knowledge.goodWhen || []).slice(0, 2).join('；'))}</div><div class="knowledge-condition bad">慎拿：${escapeHtml((knowledge.badWhen || []).slice(0, 2).join('；'))}</div>${knowledge.sourceTimestamp ? `<div class="knowledge-source">${escapeHtml(knowledge.gameVersion || '')} · 来源时间点 ${escapeHtml(knowledge.sourceTimestamp)}</div>` : `<div class="knowledge-source">${escapeHtml(knowledge.gameVersion || '')} · 无专家时间点，使用社区/机制综合评价</div>`}</div>`
+      : '';
+    return `<article class="draft-card ${recommended ? 'top-pick' : ''}" data-card="${escapeHtml(card.name || card.id)}">
+      <div class="draft-card-head"><span class="pick-tag">${recommended ? '首选' : rec ? `第 ${index + 1} 位` : '分析中'}</span><strong>${Number.isFinite(card.score) ? card.score : '--'}</strong></div>
+      <div class="card-name">${escapeHtml(card.name || card.id)}</div>
+      <div class="draft-card-meta">${escapeHtml(card.type || '未知')} · ${escapeHtml(card.rarity || '未知')} · ${card.cost === null ? 'X' : escapeHtml(card.cost ?? '?')} 费</div>
+      <p>${escapeHtml(card.description || '正在从 Spire Codex 获取卡牌说明与对局统计。')}</p>
+      ${fit}
+      ${knowledgeHtml}
+      ${pros || cons ? `<ul class="draft-notes">${pros}${cons}</ul>` : ''}
+    </article>`;
   }).join('');
-  const analysis = thinking
-    ? `<div class="agent-thinking"><span></span><div><strong>Agent 正在分析卡牌奖励</strong><p>正在比较每张牌的效果、费用、卡组缺口和后续战斗价值。</p></div></div>`
-    : rec
-      ? `<div class="event-reason"><div class="eyebrow">${sourceLabel}</div><h2>建议选第 ${Number(rec.primary.cardIndex) + 1} 张：${escapeHtml(rec.primary.cardName)}</h2><p>${escapeHtml(rec.reason)}</p></div>`
-      : `<div class="agent-thinking"><span></span><div><strong>等待 Agent 分析</strong><p>已读取候选卡牌，正在准备选牌建议。</p></div></div>`;
-  return `<div class="draft-layout"><section class="panel draft-offer"><div class="draft-kicker">REWARD / CARD REWARD</div><h2 class="draft-title">${rec ? `建议选择第 ${Number(rec.primary.cardIndex) + 1} 张` : '这三张牌怎么选？'}</h2>${analysis}<div class="draft-cards">${optionCards || '<div class="data-empty large-empty">正在读取真实卡牌奖励。</div>'}</div><div class="data-empty" style="margin-top:18px">GameBuddy 只给建议，不会替你点击选牌。</div></section><section class="panel draft-side"><div class="panel-heading"><span class="panel-title">当前卡组</span><span class="panel-meta">${state.player.cards.length ? `${state.player.cards.length} 张` : '等待数据'}</span></div><div class="deck-stat"><span>卡牌</span><strong>${state.player.cards.length || '--'}</strong></div><div class="deck-stat"><span>遗物</span><strong>${state.player.relics.length || '--'}</strong></div><div class="deck-stat"><span>药水</span><strong>${state.player.potions.length || '--'}</strong></div><div class="deck-stat"><span>候选牌</span><strong>${options.length || '--'}</strong></div><div class="data-empty" style="margin-top:18px">推荐会结合当前卡组、生命、遗物和牌面描述判断。</div></section></div>`;
+  const title = skipPick
+    ? '建议跳过这次奖励'
+    : rec?.primary?.cardName
+      ? `建议拿「${escapeHtml(rec.primary.cardName)}」`
+      : '正在结合当前局势分析';
+  const reason = rec?.reason || '正在读取卡牌数据、当前牌组、遗物、路线与社区对局统计。';
+  const sourceLabel = rec
+    ? `${rec.source === 'llm' ? '模型复核' : '规则评分'} · ${rec.knowledgeSource === 'spire-codex' ? 'Spire Codex' : '桥接数据'}`
+    : '分析中';
+  const context = rec?.context || {};
+  const defeatedType = state.reward?.context?.defeatedType;
+  return `<div class="draft-layout"><section class="panel draft-offer"><div class="draft-kicker">REWARD / CARD REWARD</div><h2 class="draft-title">${title}</h2><p class="recommendation-reason">${escapeHtml(reason)}</p>${skipPick ? '<div class="skip-advice">跳过也是有效选择：避免弱牌稀释核心循环。</div>' : ''}<div class="draft-cards">${cardHtml}</div></section><section class="panel draft-side"><div class="panel-heading"><span class="panel-title">选牌依据</span><span class="panel-meta">${escapeHtml(sourceLabel)}</span></div><div class="deck-stat"><span>卡组厚度</span><strong>${state.player.cards.length || '--'} 张</strong></div><div class="deck-stat"><span>遗物 / 药水</span><strong>${state.player.relics.length || 0} / ${state.player.potions.length || 0}</strong></div><div class="deck-stat"><span>金币</span><strong>${state.player.gold ?? '--'}</strong></div><div class="deck-stat"><span>当前生命</span><strong>${state.player.hp || '--'} / ${state.player.maxHp || '--'}</strong></div><div class="deck-stat"><span>近期精英</span><strong>${context.eliteSoon ? '有' : '未发现'}</strong></div><div class="deck-stat"><span>确定 Boss</span><strong>${escapeHtml(context.knownBoss || '尚未识别')}</strong></div><div class="deck-stat"><span>接近 Boss</span><strong>${context.bossSoon ? '是' : '否'}</strong></div><div class="deck-stat"><span>刚结束战斗</span><strong>${escapeHtml(defeatedType || '普通战斗')}</strong></div>${context.archetype ? `<div class="archetype-note"><span>当前流派</span><strong>${escapeHtml(context.archetype)}</strong></div>` : ''}<div class="data-empty draft-disclaimer">建议只辅助判断，不会替你点击卡牌。</div></section></div>`;
 }
 
 const MAP_TYPE_LABELS = {
@@ -231,8 +237,7 @@ function routeView() {
     const recommended = Boolean(rec && sameRoute(route, rec.primary.route));
     return `<div class="route-choice${recommended ? ' recommended' : ''}"><strong>${recommended ? '建议路线' : `路线 ${String(index + 1).padStart(2, '0')}`}</strong><span>${escapeHtml(labels)}</span></div>`;
   }).join('');
-  const targetPosition = rec?.primary?.targetPosition ? `${rec.primary.targetPosition}` : '';
-  const title = rec?.primary?.label ? `下一步：${escapeHtml(targetPosition)}${escapeHtml(rec.primary.label)}` : state.run.currentNode ? mapTypeLabel(state.run.currentNode) : '等待地图状态';
+  const title = rec?.primary?.label ? `下一步：${escapeHtml(rec.primary.label)}` : state.run.currentNode ? mapTypeLabel(state.run.currentNode) : '等待地图状态';
   const reason = rec?.reason ? escapeHtml(rec.reason) : (nodes.length
     ? `本层 ${nodes.length} 个节点，从当前位置出发有 ${routes.length} 条可达 Boss 的路线${map.routesTruncated ? '（已截断）' : ''}。`
     : '启动游戏并打开地图后，这里会显示真实位置和全部路线。');
@@ -240,58 +245,11 @@ function routeView() {
   return `<div class="route-layout"><section class="panel map-panel"><div class="panel-heading"><span class="panel-title">当前地图</span><span class="panel-meta">${map.current || state.run.currentCoord || '等待地图数据'}</span></div>${mapGrid}<div class="map-legend"><span>战斗</span><span class="legend-elite">精英</span><span>问号</span><span>商店</span><span class="legend-rest">休息处</span><span class="legend-current">当前位置</span><span class="legend-recommended">建议下一步</span></div></section><section class="panel route-advice"><div class="eyebrow">MAP / ${rec ? 'RECOMMENDATION' : 'LIVE STATE'}</div><h2>${title}</h2><p>${reason}</p>${routeList || `<div class="route-choice"><strong>已访问节点</strong><span>${visited || '--'}</span></div>`}<div class="score-row" style="margin-top:24px"><div class="score-number">${rec ? Math.round((rec.confidence || 0) * 100) : routes.length || '--'}</div><div class="score-copy"><strong>${rec ? `${sourceLabel}置信度` : '可达路线'}</strong><span>${rec ? `还有 ${rec.alternatives?.length || 0} 条备选 · 共 ${routes.length} 条可达 Boss` : Object.entries(typeCounts).map(([type, count]) => `${mapTypeLabel(type)} ${count}`).join(' · ') || '等待完整地图数据'}</span></div></div></section></div>`;
 }
 
-function evidenceList(decision) {
-  return (decision?.evidence || []).map(row => `
-    <li><strong>${escapeHtml(row.kind)}</strong><span>${escapeHtml(row.detail)}</span></li>`).join('');
-}
-
-function decisionPanel(decision, options = []) {
-  if (!decision) return `<section class="panel recommendation-panel"><div class="panel-heading"><span class="panel-title">决策状态</span><span class="confidence">—</span></div><div class="recommendation-body"><div class="recommendation-kicker">UNAVAILABLE</div><div class="recommendation-title">尚未生成决策</div><p class="recommendation-reason">等待第一个合法游戏快照。</p></div></section>`;
-  if (decision.status !== 'ready') {
-    const warnings = (decision.warnings || []).map(row => `<p class="recommendation-reason">${escapeHtml(row)}</p>`).join('');
-    return `<section class="panel recommendation-panel"><div class="panel-heading"><span class="panel-title">决策状态</span><span class="confidence">—</span></div><div class="recommendation-body"><div class="recommendation-kicker">UNAVAILABLE</div><div class="recommendation-title">${escapeHtml(decision.title || '暂无可靠建议')}</div><p class="recommendation-reason">${escapeHtml(decision.summary || '当前证据不足。')}</p>${warnings}</div></section>`;
-  }
-  const list = options.length ? `
-    <div class="sequence"><div class="sequence-label">可选方案</div><div class="sequence-list">${options.map((row, index) => `
-      <div class="sequence-item"><span class="sequence-number">${index + 1}</span><strong>${escapeHtml(row.title || row.name || `选项 ${index + 1}`)}</strong><span>${escapeHtml(row.reason || row.detail || row.description || '')}</span></div>`).join('')}</div></div>` : '';
-  const confidence = Number.isFinite(decision.confidence) ? `${Math.round(decision.confidence * 100)}%` : '—';
-  return `
-    <section class="panel recommendation-panel">
-      <div class="panel-heading"><span class="panel-title">${escapeHtml(decision.agent)} 决策</span><span class="confidence">置信度 ${confidence}</span></div>
-      <div class="recommendation-body">
-        <div class="recommendation-kicker">${escapeHtml(decision.source)}</div>
-        <div class="recommendation-title">${escapeHtml(decision.title)}</div>
-        <p class="recommendation-reason">${escapeHtml(decision.summary)}</p>
-        ${list}
-        <div class="why-body"><div class="panel-title">决策证据</div><ul class="why-list">${evidenceList(decision)}</ul></div>
-        <div class="decision-footer"><button class="primary-button" id="accept-decision">采纳这条建议</button><button class="outline-button" id="dismiss-decision">暂不采纳</button></div>
-      </div>
-    </section>`;
-}
-
-function codexOptionsView(kind, heading) {
-  const decision = state.decision;
-  const rows = decision?.payload?.options || [];
-  return `
-    <div class="view-grid">
-      <section class="panel">
-        <div class="panel-heading"><span class="panel-title">${heading}</span><span class="panel-meta">${escapeHtml(decision?.agent || kind)}</span></div>
-        <div class="recommendation-body">
-          <div class="recommendation-kicker">${escapeHtml(decision?.status || 'UNAVAILABLE')}</div>
-          <h2 class="recommendation-title">${escapeHtml(decision?.title || heading)}</h2>
-          <p class="recommendation-reason">${escapeHtml(decision?.summary || '当前没有可识别的选项。')}</p>
-        </div>
-      </section>
-      ${decisionPanel(decision, rows)}
-    </div>`;
-}
-
 function render() {
   document.querySelectorAll('.nav-item').forEach(button => button.classList.toggle('active', button.dataset.mode === state.mode));
   const copy = {
     combat: ['COMBAT / LIVE STATE', '战斗数据在同步', '出牌顺序先不做。这里只显示真实手牌和敌人，路线建议在地图页。'],
     draft: ['REWARD / CARD REWARD', '这张牌值得拿吗？', '把卡组当前缺口、未来路线和战斗表现放在一起判断。'],
-    event: ['EVENT / LIVE CHOICE', '这个事件怎么选？', 'Agent 会比较每个选项的即时收益、代价与对当前卡组的长期影响。'],
     route: showingRest()
       ? ['REST / CAMPFIRE', '回血还是升级？', '根据生命缺口、后续精英和未升级的牌，给出休息处选择。']
       : ['MAP / ACT ' + String(state.run.act || 1).padStart(2, '0'), '下一步往哪里走？', '把战斗风险、卡组成长和遗物收益，压缩成一条可执行的路线。']
@@ -299,14 +257,9 @@ function render() {
   document.querySelector('#page-eyebrow').textContent = copy[0];
   document.querySelector('#page-title').textContent = copy[1];
   document.querySelector('#page-description').textContent = copy[2];
-  viewContainer.innerHTML = showingEvent()
-    ? eventView()
-    : showingRest()
+  viewContainer.innerHTML = showingRest()
     ? restView()
-    : state.mode === 'combat' ? combatView()
-    : state.mode === 'draft' ? (state.decision ? codexOptionsView('reward', COPY.draft[1]) : draftView())
-    : state.mode === 'event' ? codexOptionsView('event', '这个事件选什么？')
-    : routeView();
+    : state.mode === 'combat' ? combatView() : state.mode === 'draft' ? draftView() : routeView();
   updateRunSummary();
   document.querySelector('#pause-button').classList.toggle('paused', state.paused);
   bindViewActions();
@@ -326,15 +279,8 @@ function updateRunSummary() {
 }
 
 function bindViewActions() {
-  document.querySelectorAll('[data-card]').forEach(button => button.addEventListener('click', () => { state.selectedCard = button.dataset.card; render(); showToast(`已查看「${button.dataset.card}」，出牌建议稍后接入`); }));
+  document.querySelectorAll('[data-card]').forEach(button => button.addEventListener('click', () => { state.selectedCard = button.dataset.card; render(); showToast(state.mode === 'draft' ? `正在查看「${button.dataset.card}」的拿取分析` : `已查看「${button.dataset.card}」，出牌建议稍后接入`); }));
   document.querySelector('#open-route-view')?.addEventListener('click', () => { state.mode = 'route'; render(); });
-  document.querySelector('#accept-decision')?.addEventListener('click', () => {
-    const decision = state.decision;
-    if (!decision) return;
-    window.gamebuddyBridge?.acceptDecision?.(decision);
-    showToast('已记录采纳结果');
-  });
-  document.querySelector('#dismiss-decision')?.addEventListener('click', () => showToast('已忽略当前建议'));
   document.querySelector('#confirm-action')?.addEventListener('click', () => showToast('建议已记录，GameBuddy 不会自动操作游戏'));
   document.querySelector('#more-actions')?.addEventListener('click', () => showToast('其他方案将在决策引擎接入后显示'));
   document.querySelectorAll('[data-node]').forEach(button => button.addEventListener('click', () => showToast(`节点 ${button.dataset.node}`)));
@@ -369,6 +315,7 @@ function setBridgeStatus(status) {
     state.combat = null;
     state.enemy = null;
     state.hand = [];
+    state.reward = null;
     state.selectedCard = '';
     state.recommendation = null;
     state.syncedAt = 0;
@@ -399,8 +346,7 @@ function applyBridgeState(next) {
   if (next.run) state.run = { ...state.run, ...next.run };
   if (next.player) state.player = { ...state.player, ...next.player };
   state.map = next.map || { visited: [] };
-  state.event = next.event || null;
-  state.cardReward = next.cardReward || null;
+  if (Object.prototype.hasOwnProperty.call(next, 'reward')) state.reward = next.reward;
   const incomingCombat = next.combat;
   state.combat = incomingCombat ? {
     ...incomingCombat,
@@ -426,15 +372,10 @@ function applyBridgeState(next) {
     }));
   }
   state.selectedCard = '';
+  if (next.combat) state.reward = null;
   state.syncedAt = Date.now();
-  if (showingEvent()) {
-    state.mode = 'event';
-    if (state.recommendation?.task !== 'event_choice') state.recommendation = null;
-  } else if (state.cardReward?.options?.length) {
-    state.mode = 'draft';
-    if (state.recommendation?.task !== 'card_reward') state.recommendation = null;
-  } else if (atRestSite(next.run, state.combat)) state.mode = 'route';
-  if (state.mode === 'combat' || state.mode === 'route' || state.mode === 'event' || state.mode === 'draft') render();
+  if (atRestSite(next.run, state.combat)) state.mode = 'route';
+  if (state.mode === 'combat' || state.mode === 'route' || state.mode === 'draft') render();
 }
 
 setInterval(() => {
@@ -448,12 +389,14 @@ setBridgeStatus({ status: 'waiting' });
 window.gamebuddyBridge?.onState(applyBridgeState);
 window.gamebuddyBridge?.onEvent(event => {
   if (event.name === 'card.reward.opened') {
+    state.reward = event.data || null;
     state.mode = 'draft';
-    state.recommendation = null;
     render();
     showToast('发现新的卡牌奖励');
   }
   if (event.name === 'map.opened') {
+    state.reward = null;
+    if (state.recommendation?.task === 'card_reward') state.recommendation = null;
     state.mode = 'route';
     render();
     showToast('地图已打开，路线建议已准备');
@@ -463,37 +406,13 @@ window.gamebuddyBridge?.onEvent(event => {
     render();
     showToast('休息处：回血还是升级');
   }
-  if (event.name === 'event.opened') {
-    state.mode = 'event';
-    state.recommendation = null;
-    render();
-    showToast('发现事件选项，Agent 正在分析');
-  }
-});
-window.gamebuddyBridge?.onObservation(observation => {
-  if (!observation || !observation.decision) return;
-  state.decision = observation.decision;
-  if (state.mode === 'draft' || state.mode === 'event') render();
 });
 window.gamebuddyBridge?.onRecommendation(recommendation => {
-  if (!recommendation || !['map_route', 'rest_site', 'event_choice', 'card_reward'].includes(recommendation.task)) return;
+  if (!recommendation || (recommendation.task !== 'map_route' && recommendation.task !== 'rest_site' && recommendation.task !== 'card_reward')) return;
   state.recommendation = recommendation;
   if (recommendation.task === 'rest_site') state.mode = 'route';
-  if (recommendation.task === 'event_choice') state.mode = 'event';
   if (recommendation.task === 'card_reward') state.mode = 'draft';
-  if (state.mode === 'route' || state.mode === 'event' || state.mode === 'draft') render();
-});
-window.gamebuddyBridge?.onAgentStatus(status => {
-  state.agentStatus = status || { status: 'idle', task: null };
-  if (status?.status === 'thinking' && status.task === 'event_choice') {
-    state.mode = 'event';
-    state.recommendation = null;
-  }
-  if (status?.status === 'thinking' && status.task === 'card_reward') {
-    state.mode = 'draft';
-    state.recommendation = null;
-  }
-  if (state.mode === 'event' || state.mode === 'draft') render();
+  if (state.mode === 'route' || state.mode === 'draft') render();
 });
 window.gamebuddyBridge?.onStatus(status => {
   setBridgeStatus(status);

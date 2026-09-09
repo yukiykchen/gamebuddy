@@ -18,7 +18,13 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
     "character": "ironclad",
     "totalFloor": 52,
     "currentNode": "Monster",
-    "currentCoord": "3,2"
+    "currentCoord": "3,2",
+    "actId": "HIVE",
+    "actName": "巢穴",
+    "nextBossId": "KAISER_CRAB_BOSS",
+    "nextBoss": "帝皇蟹",
+    "secondBossId": null,
+    "secondBoss": null
   },
   "player": {
     "hp": 43,
@@ -28,21 +34,22 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
     "energy": 2,
     "maxEnergy": 3,
     "cards": [
-      { "id": "STRIKE_IRONCLAD", "name": "打击", "type": "Attack", "cost": 1, "upgraded": false }
+      { "id": "Strike_R", "name": "打击", "type": "Attack", "cost": 1, "upgraded": false }
     ],
-    "relics": [],
-    "potions": []
+    "relics": [{ "id": "BURNING_BLOOD", "name": "燃烧之血" }],
+    "potions": [{ "id": "FIRE_POTION", "name": "火焰药水" }]
   },
   "combat": {
     "turn": 7,
     "hand": [
-      { "id": "STRIKE_IRONCLAD", "name": "打击", "type": "Attack", "cost": 1, "upgraded": false }
+      { "id": "Strike_R", "name": "打击", "type": "Attack", "cost": 1, "upgraded": false }
     ],
     "drawPile": [],
     "discardPile": [],
     "exhaustPile": [],
     "enemies": [
       {
+        "id": "SNAKE_PLANT",
         "name": "蛇花",
         "hp": 78,
         "maxHp": 96,
@@ -66,7 +73,7 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
       { "id": "1,1", "row": 1, "col": 1, "type": "Unknown", "children": ["2,1"] },
       { "id": "1,2", "row": 1, "col": 2, "type": "Elite", "children": ["2,2"] },
       { "id": "2,1", "row": 2, "col": 1, "type": "Shop", "children": ["3,1"] },
-      { "id": "6,2", "row": 6, "col": 2, "type": "Boss", "children": [] }
+      { "id": "6,2", "row": 6, "col": 2, "type": "Boss", "children": [], "encounterId": "KAISER_CRAB_BOSS", "encounterName": "帝皇蟹" }
     ],
     "routes": [
       ["1,1", "2,1", "3,1", "4,2", "5,2", "6,2"]
@@ -78,19 +85,24 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
 
 `combat` 在非战斗房间可以为 `null`；在战斗中必须包含手牌、三类牌堆和敌人数组。
 
-卡牌奖励界面打开时，`cardReward` 为非空，候选牌的 `index` 是奖励界面中的零基数组下标。桌面端展示时会转换为用户可见的“第 N 张”，推荐只指出应选哪一张，不会自动点击。
+`map.nodes` 是当前 Act 的完整 DAG。节点 `id` 为 `"row,col"`，`children` 是下一层可走节点。`type` 取值：`Monster`、`Elite`、`Unknown`、`Shop`、`Treasure`、`RestSite`、`Boss`、`Ancient`、`Unassigned`。`Unknown` 就是问号，走进去之前不会揭示具体事件。`map.routes` 是从 `current`（没有当前位置时从 `start`）沿 `children` 走到 Boss 的全部路径，最多 256 条；超出时 `routesTruncated` 为 `true`。后续路线推荐应消费这份图，而不是再去读游戏内存。
+
+`run.actId` / `actName` 用来区分同一幕数下的不同区域，敌人候选池优先按 `actId` 筛选。`player.relics` 和 `player.potions` 由 Bridge 提供稳定 ID 与本地化名称，Agent 再从 Spire Codex 补全效果文本、稀有度和池。地图节点的 `encounterId` / `encounterName` 是可选字段：Boss 节点使用本局已经抽取的确定遭遇；其他节点只有当前游戏版本确实暴露遭遇身份时才填写。Boss 身份也写入 `run.nextBoss`。普通精英通常在进入节点前没有确定身份，因此候选精英必须标为“可能”，不能表述成已确定敌人。
+
+卡牌奖励也可以临时出现在状态的可选 `reward` 字段中。常规 Mod 通过下方事件发送，状态字段主要供其他适配器和回放使用：
 
 ```json
 {
-  "cardReward": {
-    "options": [
-      { "index": 0, "id": "Bash", "name": "痛击", "type": "Attack", "cost": 2, "upgraded": false, "description": "造成伤害。" }
-    ]
+  "reward": {
+    "cards": [
+      { "id": "ANGER", "name": "愤怒", "type": "Attack", "cost": 0, "upgraded": false }
+    ],
+    "canSkip": true,
+    "source": "combat",
+    "context": { "act": 1, "actId": "OVERGROWTH", "floor": 6, "defeatedType": "Elite", "defeatedEnemies": ["劫掠者"], "nextBossId": "CEREMONIAL_BEAST_BOSS", "nextBoss": "仪式兽" }
   }
 }
 ```
-
-`map.nodes` 是当前 Act 的完整 DAG。节点 `id` 为 `"row,col"`，`children` 是下一层可走节点。`type` 取值：`Monster`、`Elite`、`Unknown`、`Shop`、`Treasure`、`RestSite`、`Boss`、`Ancient`、`Unassigned`。`Unknown` 就是问号，走进去之前不会揭示具体事件。`map.routes` 是从 `current`（没有当前位置时从 `start`）沿 `children` 走到 Boss 的全部路径，最多 256 条；超出时 `routesTruncated` 为 `true`。后续路线推荐应消费这份图，而不是再去读游戏内存。
 
 ## 事件消息
 
@@ -108,7 +120,27 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
 - `rest.opened`
 - `combat.ended`
 
-`card.played` 和 `card.reward.opened` 会在对应 STS2 界面或生命周期出现时加入；`card.reward.opened` 的完整候选牌仍以同一时刻的 `state.cardReward.options` 为准。
+`card.reward.opened` 在 `NCardRewardSelectionScreen` 打开或刷新时发送，`data.cards` 为当前可见候选牌；桌面端据此触发 `card_reward` Agent：
+
+```json
+{
+  "type": "event",
+  "name": "card.reward.opened",
+  "timestamp": 1723370000000,
+  "data": {
+    "cards": [
+      { "id": "ANGER", "name": "愤怒", "type": "Attack", "cost": 0, "upgraded": false },
+      { "id": "IRON_WAVE", "name": "铁斩波", "type": "Attack", "cost": 1, "upgraded": false },
+      { "id": "SHRUG_IT_OFF", "name": "耸肩无视", "type": "Skill", "cost": 1, "upgraded": false }
+    ],
+    "canSkip": true,
+    "source": "combat",
+    "context": { "act": 1, "actId": "OVERGROWTH", "floor": 6, "defeatedType": "Elite", "defeatedEnemies": ["劫掠者"], "nextBossId": "CEREMONIAL_BEAST_BOSS", "nextBoss": "仪式兽" }
+  }
+}
+```
+
+`card.played` 仍待接入对应 STS2 生命周期 Hook。
 
 ## Bridge 状态
 
@@ -143,7 +175,19 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
 
 ## Agent 建议
 
-主进程里的 `agent/` 消费 `gamebuddy.observation.v1`，产出 `gamebuddy.recommendation.v1`。当前实现路线任务 `map_route`、休息处任务 `rest_site`、事件任务 `event_choice` 和战斗后选牌任务 `card_reward`；战斗出牌 `combat_play` 暂缓。路线推荐采用简单、可解释的规则：优先选择可达路线上的**精英数量**，再比较**火堆数量**，完全相同时才用生命、金币和卡组等上下文分数处理平局。路线任务固定由规则引擎决定，不交给 LLM 改选。进入休息处后会单独建议 **回血还是升级哪一张牌**；卡牌奖励会把真实牌面候选传给 Agent，推荐具体的候选下标和理由。
+主进程里的 `agent/` 消费 `gamebuddy.observation.v1`，产出 `gamebuddy.recommendation.v1`。当前实现卡牌奖励 `card_reward`、路线 `map_route` 和休息处 `rest_site`；战斗出牌 `combat_play` 暂缓。
+
+卡牌奖励 Agent 会读取 Spire Codex 公共 API 的简体中文卡牌、遗物、药水、怪物和遭遇数据，并调用 `/api/runs/pick-coach` 取得当前牌组/遗物对应的流派、相似胜局支持度和 offer-conditioned 拿取率。送给模型的实时上下文包括：完整牌组与升级状态、每件遗物和药水的完整效果、金币/生命/能量、当前 Act 的全部地图节点与路线、已确定 Boss 的完整招式和机制，以及本章可能精英池。规则层也会针对多目标、多段攻击、成长、爆发和状态牌污染等机制加权。三张都不能改善牌组时可以建议 `SKIP`。API 超时或不可用时自动退回 Bridge 数据和本地规则，不阻塞选牌界面。
+
+Spire Codex API 默认地址为 `https://spire-codex.com/api`，可用 `GAMEBUDDY_SPIRE_CODEX_URL` 覆盖。GameBuddy 不复制 Spire Codex 的源码或整库数据。
+
+进入 `Elite` / `Boss` 房间且 `combat` 非空时，主进程还会生成独立的 `gamebuddy.encounter-guide.v1` 攻略消息并发送给桌面宠物。该消息不占用 recommendation 槽位，因此不会覆盖路线、休息处或卡牌奖励建议。攻略按楼层和地图坐标去重，每场只自动弹出一次，战斗结束后自动收起。
+
+`strategy` 来自 `agent/knowledge/encounter-strategies.json`，以遭遇稳定 ID 匹配，覆盖 stable `v0.107.1` 的 12 个 Boss 和 12 个精英。字段包括 `summary`、`dangerWindows`、`deckChecks`、`priorityTargets`、`tips`、`avoid`、`confidence`、`reviewStatus` 和可追溯的 `sources`。社区攻略不覆盖 Spire Codex 的机制事实；如果版本或遭遇无法匹配，则不显示推测性打法。
+
+同一份 `strategy` 也会挂到卡牌奖励 Agent 的 `threats.knownBoss`、`possibleElites` 和 `knownUpcomingElites` 上，并随完整遭遇上下文送入 LLM。这样模型评判奖励牌时能针对具体遭遇的牌组检查和常见失误，而不是只看到笼统的 Boss / Elite 标签。
+
+路线任务在没有配置 LLM 时用规则打分：每个节点拆成**收益**和**风险**。精英按遗物缺口和生命评估；火堆同时计算回血和未升级牌的敲升级价值；商店按金币、卡组厚度和打击/防御数量计算删牌与购物。同一条路上精英后面有火堆时会加协同分。进入休息处后会单独建议 **回血还是升级哪一张牌**。有 OpenAI 兼容接口时，模型只在规则生成的候选中复核选择和解释。
 
 ```json
 {
@@ -165,25 +209,7 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
 
 `fresh=false` 时不发新建议。应用只展示建议，不会替玩家点地图。
 
-卡牌奖励建议格式：
-
-```json
-{
-  "schema": "gamebuddy.recommendation.v1",
-  "task": "card_reward",
-  "source": "rules",
-  "confidence": 0.65,
-  "reason": "当前卡组缺少稳定防御，建议选择这张牌。",
-  "primary": {
-    "action": "CHOOSE_CARD",
-    "cardIndex": 1,
-    "cardId": "ExampleCard",
-    "cardName": "示例牌"
-  }
-}
-```
-
-LLM 只读取项目 `.env` 中的环境变量：`GAMEBUDDY_LLM_BASE_URL`、`GAMEBUDDY_LLM_API_KEY`、`GAMEBUDDY_LLM_MODEL`、`GAMEBUDDY_LLM_WIRE_API` 和 `GAMEBUDDY_LLM_REASONING_EFFORT`。`GAMEBUDDY_LLM_WIRE_API=responses` 时请求 `/v1/responses`。
+LLM 默认读取本机 Codex CLI 配置（`~/.codex/config.toml`、`~/.codex/auth.json`）。环境变量 `GAMEBUDDY_LLM_BASE_URL`、`GAMEBUDDY_LLM_API_KEY`、`GAMEBUDDY_LLM_MODEL`、`GAMEBUDDY_LLM_WIRE_API` 可以覆盖。`wire_api = "responses"` 时请求 `/v1/responses`。
 
 ## 接入边界
 

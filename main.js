@@ -7,6 +7,7 @@ const { createOpenAiClient, readLlmConfig } = require('./agent/llm/openai');
 const { ensureMapRoutes } = require('./agent/tasks/route');
 const { decide } = require('./agent/router');
 const { recordDecision } = require('./agent/recorder');
+const { encounterGuideSignature, buildEncounterGuide } = require('./agent/tasks/encounter-guide');
 const fs = require('node:fs');
 
 const BRIDGE_URL = process.env.GAMEBUDDY_BRIDGE_URL || 'ws://127.0.0.1:27182';
@@ -20,6 +21,9 @@ let isQuitting = false;
 let petHiddenByUser = false;
 let petTopmostTimer;
 let petDragState;
+let encounterGuideKey = '';
+let dismissedEncounterGuideKey = '';
+let activeEncounterGuide = null;
 const observationStore = createObservationStore({ staleAfterMs: 5000 });
 const llmConfig = readLlmConfig();
 if (llmConfig.enabled) {
@@ -80,6 +84,50 @@ function keepPetVisible() {
   petWindow.showInactive();
 }
 
+function resizePetWindow(expanded) {
+  if (!petWindow || petWindow.isDestroyed()) return;
+  const target = expanded ? { width: 570, height: 520 } : { width: 214, height: 242 };
+  const bounds = petWindow.getBounds();
+  const display = screen.getDisplayMatching(bounds).workArea;
+  const right = bounds.x + bounds.width;
+  const bottom = bounds.y + bounds.height;
+  const x = Math.max(display.x, Math.min(right - target.width, display.x + display.width - target.width));
+  const y = Math.max(display.y, Math.min(bottom - target.height, display.y + display.height - target.height));
+  petWindow.setBounds({ x, y, ...target }, false);
+}
+
+function dismissEncounterGuide() {
+  dismissedEncounterGuideKey = encounterGuideKey;
+  activeEncounterGuide = null;
+  petWindow?.webContents.send('bridge-encounter-guide', null);
+  resizePetWindow(false);
+}
+
+function clearEncounterGuide() {
+  encounterGuideKey = '';
+  dismissedEncounterGuideKey = '';
+  if (!activeEncounterGuide) return;
+  activeEncounterGuide = null;
+  petWindow?.webContents.send('bridge-encounter-guide', null);
+  resizePetWindow(false);
+}
+
+async function considerEncounterGuide(state) {
+  const key = encounterGuideSignature(state);
+  if (!key) {
+    clearEncounterGuide();
+    return;
+  }
+  if (key === encounterGuideKey || key === dismissedEncounterGuideKey) return;
+  encounterGuideKey = key;
+  const guide = await buildEncounterGuide(state);
+  if (encounterGuideKey !== key || dismissedEncounterGuideKey === key || !guide) return;
+  activeEncounterGuide = guide;
+  resizePetWindow(true);
+  keepPetVisible();
+  petWindow?.webContents.send('bridge-encounter-guide', guide);
+}
+
 function hidePet() {
   petHiddenByUser = true;
   petWindow?.hide();
@@ -130,15 +178,19 @@ function connectBridge() {
           recordDecision({ runId: agentRunId, observation: { ...observation, state: routableState }, decision: observation.decision });
           broadcast('bridge-state', routableState);
           sendHighlightRoute(observation.decision, routableState);
+          void considerEncounterGuide(routableState);
         }
       }
-      if (result.kind === 'event' && result.accepted) broadcast('bridge-event', result.event);
+      if (result.kind === 'event' && result.accepted) {
+        broadcast('bridge-event', result.event);
+        if (result.event?.name === 'combat.ended') clearEncounterGuide();
+      }
       if (result.accepted || (result.kind === 'duplicate' && !orchestrator.getRecommendation())) {
         const observation = observationStore.getObservation();
         if (result.accepted) broadcast('bridge-observation', observation);
         void considerObservation(observation, {
           force: result.kind === 'duplicate'
-            || (result.kind === 'event' && (result.event?.name === 'map.opened' || result.event?.name === 'rest.opened' || result.event?.name === 'event.opened'))
+            || (result.kind === 'event' && (result.event?.name === 'map.opened' || result.event?.name === 'rest.opened' || result.event?.name === 'event.opened' || result.event?.name === 'card.reward.opened'))
         });
       }
     } catch (error) {
@@ -150,6 +202,7 @@ function connectBridge() {
     if (disconnected) return;
     disconnected = true;
     if (bridgeSocket === socket) bridgeSocket = null;
+    clearEncounterGuide();
     broadcastBridgeStatus('waiting', '等待本地 Mod Bridge');
     clearTimeout(bridgeReconnectTimer);
     bridgeReconnectTimer = setTimeout(connectBridge, 2500);
@@ -214,8 +267,8 @@ function createPetWindow() {
     height: 242,
     minWidth: 214,
     minHeight: 242,
-    maxWidth: 214,
-    maxHeight: 242,
+    maxWidth: 570,
+    maxHeight: 520,
     frame: false,
     transparent: true,
     resizable: false,
@@ -234,6 +287,7 @@ function createPetWindow() {
 
   const { workArea } = screen.getPrimaryDisplay();
   petWindow.setPosition(workArea.x + workArea.width - 238, workArea.y + workArea.height - 270);
+  petWindow.setMaximumSize(570, 520);
   petWindow.setAlwaysOnTop(true, 'screen-saver');
   petWindow.loadFile(path.join(__dirname, 'src', 'pet.html'));
   petWindow.webContents.on('did-finish-load', () => {
@@ -244,6 +298,10 @@ function createPetWindow() {
     petWindow.webContents.send('bridge-observation', observation);
     const recommendation = orchestrator.getRecommendation();
     if (recommendation) petWindow.webContents.send('bridge-recommendation', recommendation);
+    if (activeEncounterGuide) {
+      resizePetWindow(true);
+      petWindow.webContents.send('bridge-encounter-guide', activeEncounterGuide);
+    }
   });
   petWindow.once('ready-to-show', () => petWindow.showInactive());
 }
@@ -295,6 +353,7 @@ ipcMain.on('pet-drag-move', (_event, point) => {
   petWindow.setPosition(Math.round(x), Math.round(y), false);
 });
 ipcMain.on('pet-drag-end', () => { petDragState = undefined; });
+ipcMain.on('dismiss-encounter-guide', dismissEncounterGuide);
 ipcMain.on('accept-decision', (_event, decision) => {
   if (agentRunId && decision) recordDecision({ runId: agentRunId, observation: currentObservation(), decision, accepted: true });
 });
@@ -303,7 +362,7 @@ ipcMain.handle('refresh-recommendation', async () => {
   if (bridgeSocket?.readyState === WebSocket.OPEN) {
     bridgeSocket.send(JSON.stringify({ type: 'request_snapshot' }));
   }
-  const observation = observationStore.getObservation();
+  const observation = currentObservation();
   if (observation?.state) broadcast('bridge-state', withRoutableState(observation.state));
   const recommendation = await considerObservation(observation, { force: true });
   if (recommendation) broadcast('bridge-recommendation', recommendation);

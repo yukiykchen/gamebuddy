@@ -2,7 +2,7 @@ const { validateRecommendation } = require('./recommendation');
 const { recommendRoute, routeSignature, ensureMapRoutes } = require('./tasks/route');
 const { isRestSite, recommendRest, restSignature } = require('./tasks/rest');
 const { recommendEvent, eventSignature } = require('./tasks/event');
-const { recommendCardReward, cardRewardSignature } = require('./tasks/card-reward');
+const { findCardReward, recommendCardReward, cardRewardSignature } = require('./tasks/card-reward');
 const { createOpenAiClient, readLlmConfig } = require('./llm/openai');
 
 function hasRoutableMap(state) {
@@ -16,6 +16,7 @@ function selectTask(observation) {
   if (Array.isArray(state.cardReward?.options) && state.cardReward.options.length > 0) return 'card_reward';
   if (Array.isArray(state.event?.options) && state.event.options.length > 0) return 'event_choice';
   if (!state.combat) {
+    if (findCardReward(observation)) return 'card_reward';
     const recent = observation.recentEvents || [];
     for (let i = recent.length - 1; i >= 0; i -= 1) {
       const name = recent[i]?.name;
@@ -28,11 +29,11 @@ function selectTask(observation) {
   return null;
 }
 
-function signatureFor(task, state) {
+function signatureFor(task, observation, state) {
+  if (task === 'card_reward') return cardRewardSignature(observation);
   if (task === 'rest_site') return restSignature(state);
   if (task === 'map_route') return routeSignature(state);
   if (task === 'event_choice') return eventSignature(state);
-  if (task === 'card_reward') return cardRewardSignature(state);
   return '';
 }
 
@@ -52,19 +53,19 @@ function createOrchestrator({
     if (!task) return lastRecommendation;
     if (!observation?.fresh && !force && lastRecommendation) return lastRecommendation;
 
-    const signature = `${task}:${signatureFor(task, observation.state)}`;
+    const signature = `${task}:${signatureFor(task, observation, observation.state)}`;
     if (!force && signature === lastSignature && lastRecommendation) return lastRecommendation;
 
     const current = ++generation;
     onAgentStatus?.({ status: 'thinking', task, timestamp: now() });
     try {
-      const recommendation = task === 'event_choice'
-        ? await recommendEvent(observation.state, { llm: client, now: now() })
-        : task === 'card_reward'
-        ? await recommendCardReward(observation.state, { llm: client, now: now() })
-        : task === 'rest_site'
-        ? await recommendRest(observation.state, { llm: client, now: now() })
-        : await recommendRoute(observation.state, { llm: client, now: now() });
+      const recommendation = task === 'card_reward'
+        ? await recommendCardReward(observation, { llm: client, now: now() })
+        : task === 'event_choice'
+          ? await recommendEvent(observation.state, { llm: client, now: now() })
+          : task === 'rest_site'
+            ? await recommendRest(observation.state, { llm: client, now: now() })
+            : await recommendRoute(observation.state, { llm: client, now: now() });
       if (current !== generation) return lastRecommendation;
       const validation = recommendation ? validateRecommendation(recommendation) : { ok: false };
       if (!validation.ok) return lastRecommendation;

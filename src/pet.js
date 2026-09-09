@@ -2,6 +2,53 @@ const stage = document.querySelector('#pet-stage');
 const speech = document.querySelector('#speech');
 const statusDot = document.querySelector('.status-dot');
 const statusLabel = document.querySelector('#pet-status-label');
+const guidePanel = document.querySelector('#encounter-guide');
+const guideKicker = document.querySelector('#guide-kicker');
+const guideTitle = document.querySelector('#guide-title');
+const guideContent = document.querySelector('#guide-content');
+const guideSource = document.querySelector('#guide-source');
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function guideList(title, items, className = '') {
+  if (!items?.length) return '';
+  return `<section class="guide-section"><div class="guide-section-title">${escapeHtml(title)}</div><ul class="guide-list ${className}">${items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>`;
+}
+
+function setEncounterGuide(guide) {
+  if (!guide) {
+    guidePanel.classList.remove('visible');
+    guideContent.innerHTML = '';
+    return;
+  }
+  guideKicker.textContent = guide.kind === 'boss' ? 'BOSS 攻略' : '精英攻略';
+  guideTitle.textContent = guide.title || '敌人机制';
+  const monsters = (guide.monsters || []).map(monster => `
+    <article class="guide-monster">
+      <div class="guide-monster-head"><strong>${escapeHtml(monster.name)}</strong><span>${escapeHtml(monster.hp)}</span></div>
+      ${(monster.innate || []).length ? `<div class="guide-innate">固有机制：${monster.innate.map(escapeHtml).join('；')}</div>` : ''}
+      <div class="guide-cycle">行动循环：${escapeHtml(monster.cycle)}</div>
+      ${guideList('招式', monster.moves || [])}
+    </article>`).join('');
+  const strategy = guide.strategy;
+  const summary = strategy?.summary
+    ? `<p class="guide-summary strategy">${escapeHtml(strategy.summary)}</p>`
+    : '<p class="guide-summary">本场只有机制数据，暂无匹配的社区打法档案。</p>';
+  guideContent.innerHTML = `${summary}${guideList('先检查你的牌组', strategy?.deckChecks, 'check')}${guideList('目标优先级', strategy?.priorityTargets, 'target')}${monsters}${guideList('主要危险', guide.dangers, 'danger')}${guideList('应对建议', guide.tips, 'tip')}${guideList('常见失误', strategy?.avoid, 'avoid')}`;
+  const sourceCount = strategy?.sources?.length || 0;
+  const confidence = strategy?.confidence === 'high' ? '高可信' : strategy?.confidence === 'medium' ? '中可信' : '';
+  guideSource.textContent = guide.source === 'spire-codex'
+    ? `机制：Spire Codex · 攻略：${sourceCount} 个社区来源${confidence ? ` · ${confidence}` : ''} · stable ${guide.gameVersion || '当前版本'}`
+    : '数据来源：游戏 Bridge · 未匹配到完整资料';
+  guidePanel.classList.add('visible');
+  say(`${guide.kind === 'boss' ? 'Boss' : '精英'}攻略来了`, 'alert');
+}
 
 function say(message, mood = '') {
   speech.textContent = message;
@@ -29,15 +76,7 @@ function setStatus(status) {
 }
 
 function setState(next) {
-  if (Array.isArray(next.event?.options) && next.event.options.length) {
-    say('事件出现了，我来想想怎么选', 'thinking');
-    return;
-  }
-  if (Array.isArray(next.cardReward?.options) && next.cardReward.options.length) {
-    say('我在分析这几张牌', 'thinking');
-    return;
-  }
-  const enemy = next.combat?.enemies?.find(item => item?.alive !== false) || next.combat?.enemies?.[0];
+  const enemy = next.combat?.enemies?.[0];
   const intent = String(enemy?.intent || '').toLowerCase();
   if (intent.includes('attack') || Number(enemy?.damage) > 0) {
     say(`小心，预计 ${enemy.damage || 0} 伤害`, 'alert');
@@ -51,22 +90,12 @@ function setState(next) {
 }
 
 function setRecommendation(recommendation) {
-  if (recommendation?.task === 'event_choice' && recommendation.primary?.label) {
-    say(`事件建议选${recommendation.primary.label}`, 'thinking');
-    return;
-  }
   if (recommendation?.task === 'rest_site' && recommendation.primary?.label) {
     say(`休息处建议${recommendation.primary.label}`, 'thinking');
     return;
   }
-  if (recommendation?.task === 'card_reward' && recommendation.primary?.cardName) {
-    say(`建议选第${Number(recommendation.primary.cardIndex) + 1}张${recommendation.primary.cardName}`, 'thinking');
-    return;
-  }
   if (recommendation?.task !== 'map_route' || !recommendation.primary?.label) return;
-  const target = recommendation.primary.targetPosition
-    || (recommendation.primary.targetId ? `节点 ${recommendation.primary.targetId}` : '该节点');
-  say(`下一步点${target}${recommendation.primary.label}`, 'thinking');
+  say(`下一路点建议走${recommendation.primary.label}`, 'thinking');
 }
 
 const petButton = document.querySelector('#pet-button');
@@ -102,10 +131,11 @@ petButton.addEventListener('contextmenu', event => {
   event.preventDefault();
   window.windowControls?.showPetMenu({ x: event.clientX, y: event.clientY });
 });
+document.querySelector('#guide-close').addEventListener('click', () => {
+  setEncounterGuide(null);
+  window.windowControls?.dismissEncounterGuide();
+});
 window.gamebuddyBridge?.onStatus(setStatus);
 window.gamebuddyBridge?.onState(setState);
 window.gamebuddyBridge?.onRecommendation(setRecommendation);
-window.gamebuddyBridge?.onAgentStatus(status => {
-  if (status?.status === 'thinking' && status.task === 'event_choice') say('我在分析事件选项', 'thinking');
-  if (status?.status === 'thinking' && status.task === 'card_reward') say('我在分析这几张牌', 'thinking');
-});
+window.gamebuddyBridge?.onEncounterGuide(setEncounterGuide);

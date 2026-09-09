@@ -1,6 +1,24 @@
 const SUPPORTED_SCHEMA = 'gamebuddy.state.v1';
 const SUPPORTED_EVENTS = new Set(['combat.started', 'turn.started', 'combat.ended', 'map.opened', 'rest.opened', 'event.opened', 'card.played', 'card.reward.opened']);
 
+function validateReward(reward, prefix = 'reward') {
+  if (!reward || typeof reward !== 'object') return { ok: false, reason: `${prefix} must be an object` };
+  const cards = reward.cards || reward.offered || reward.options;
+  if (!Array.isArray(cards) || cards.length < 1 || cards.length > 6) {
+    return { ok: false, reason: `${prefix} cards must contain 1 to 6 entries` };
+  }
+  for (const card of cards) {
+    if (typeof card === 'string' && card) continue;
+    if (!card || typeof card !== 'object' || (!card.id && !card.name)) {
+      return { ok: false, reason: `${prefix} card entries need an id or name` };
+    }
+  }
+  if (reward.canSkip !== undefined && typeof reward.canSkip !== 'boolean') {
+    return { ok: false, reason: `${prefix}.canSkip must be a boolean` };
+  }
+  return { ok: true };
+}
+
 function validateState(state) {
   if (!state || typeof state !== 'object') return { ok: false, reason: 'state must be an object' };
   for (const field of ['schema', 'timestamp', 'source', 'run', 'player']) {
@@ -37,6 +55,11 @@ function validateState(state) {
       if (!node || typeof node !== 'object') return { ok: false, reason: 'map.nodes entries must be objects' };
       if (typeof node.id !== 'string' || typeof node.type !== 'string') return { ok: false, reason: 'map node needs id and type' };
       if (!Array.isArray(node.children)) return { ok: false, reason: 'map node children must be an array' };
+      for (const field of ['encounterId', 'encounterName']) {
+        if (node[field] !== undefined && node[field] !== null && typeof node[field] !== 'string') {
+          return { ok: false, reason: `map node ${field} must be a string or null` };
+        }
+      }
     }
   }
   if (state.map.routes !== undefined) {
@@ -73,6 +96,10 @@ function validateState(state) {
       }
     }
   }
+  if (state.reward !== undefined && state.reward !== null) {
+    const validation = validateReward(state.reward, 'state.reward');
+    if (!validation.ok) return validation;
+  }
   for (const field of ['hp', 'maxHp', 'block', 'gold', 'energy', 'maxEnergy']) {
     if (!Number.isFinite(state.player[field])) return { ok: false, reason: `player.${field} is invalid` };
   }
@@ -87,6 +114,7 @@ function stateSignature(state) {
     map: state.map,
     event: state.event,
     cardReward: state.cardReward,
+    reward: state.reward ?? null,
     rewards: state.rewards ?? null,
     eventId: state.run?.eventId ?? null
   });
@@ -98,6 +126,10 @@ function validateMessage(message) {
   if (message.type !== 'event') return { ok: false, reason: `unsupported message type ${message.type || 'missing'}` };
   if (typeof message.name !== 'string' || !SUPPORTED_EVENTS.has(message.name)) return { ok: false, reason: `unsupported event ${message.name || 'missing'}` };
   if (!Number.isFinite(message.timestamp)) return { ok: false, reason: 'event timestamp must be a number' };
+  if (message.name === 'card.reward.opened' && message.data !== undefined && message.data !== null) {
+    const validation = validateReward(message.data, 'card.reward.opened data');
+    if (!validation.ok) return validation;
+  }
   return { ok: true };
 }
 

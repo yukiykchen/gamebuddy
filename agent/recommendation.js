@@ -32,13 +32,23 @@ function validateRecommendation(recommendation) {
     if (typeof primary.label !== 'string' || !primary.label.trim()) return { ok: false, reason: 'event_choice needs label' };
   }
   if (recommendation.task === 'card_reward') {
-    if (primary.action !== 'CHOOSE_CARD') return { ok: false, reason: 'card_reward action must be CHOOSE_CARD' };
-    if (!Number.isInteger(primary.cardIndex) || primary.cardIndex < 0) return { ok: false, reason: 'card_reward needs cardIndex' };
-    if (typeof primary.cardName !== 'string' || !primary.cardName.trim()) return { ok: false, reason: 'card_reward needs cardName' };
-    if (typeof primary.cardId !== 'string' || !primary.cardId.trim()) return { ok: false, reason: 'card_reward needs cardId' };
+    if (primary.action === 'CHOOSE_CARD') {
+      if (!Number.isInteger(primary.cardIndex) || primary.cardIndex < 0) return { ok: false, reason: 'card_reward CHOOSE_CARD needs cardIndex' };
+      if (typeof primary.cardName !== 'string' || !primary.cardName.trim()) return { ok: false, reason: 'card_reward CHOOSE_CARD needs cardName' };
+      if (typeof primary.cardId !== 'string' || !primary.cardId.trim()) return { ok: false, reason: 'card_reward CHOOSE_CARD needs cardId' };
+    } else if (primary.action === 'TAKE_CARD') {
+      if (typeof primary.cardId !== 'string' || !primary.cardId) return { ok: false, reason: 'card_reward TAKE_CARD needs cardId' };
+      if (typeof primary.cardName !== 'string' || !primary.cardName) return { ok: false, reason: 'card_reward TAKE_CARD needs cardName' };
+    } else if (primary.action !== 'SKIP') {
+      return { ok: false, reason: 'card_reward action must be CHOOSE_CARD, TAKE_CARD, or SKIP' };
+    }
+    const options = Array.isArray(recommendation.options) ? recommendation.options : recommendation.alternatives;
+    if (recommendation.action !== 'SKIP' && !Array.isArray(options)) {
+      return { ok: false, reason: 'card_reward needs candidate options' };
+    }
   }
-  if (recommendation.alternatives !== undefined) {
-    if (!Array.isArray(recommendation.alternatives)) return { ok: false, reason: 'alternatives must be an array' };
+  if (recommendation.alternatives !== undefined && !Array.isArray(recommendation.alternatives)) {
+    return { ok: false, reason: 'alternatives must be an array' };
   }
   return { ok: true };
 }

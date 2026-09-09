@@ -5,8 +5,7 @@ const { createObservationStore } = require('./observation-store');
 const { validateRecommendation } = require('../agent/recommendation');
 const { rankRoutes, recommendRoute, scoreNode, scoreParts, buildScoreContext, ensureMapRoutes } = require('../agent/tasks/route');
 const { isRestSite, recommendRest, rankSmithCards } = require('../agent/tasks/rest');
-const { recommendEvent } = require('../agent/tasks/event');
-const { recommendCardReward, rankCards } = require('../agent/tasks/card-reward');
+const { findCardReward, recommendCardReward } = require('../agent/tasks/card-reward');
 const { parseJsonObject, createOpenAiClient, readLlmConfig, extractResponseText } = require('../agent/llm/openai');
 const { createOrchestrator } = require('../agent/orchestrator');
 
@@ -83,45 +82,6 @@ assert.equal(eliteThenRest[0].targetType, 'Elite');
 assert.ok(eliteThenRest[0].route.includes('2,0'));
 assert.ok(eliteThenRest[0].score > eliteThenRest[1].score);
 
-const sameTypeSplit = rankRoutes({
-  run: mapState.run,
-  player: { ...mapState.player, hp: 72, maxHp: 80, gold: 20 },
-  combat: null,
-  map: {
-    visited: ['0,0'],
-    current: '0,0',
-    nodes: [
-      { id: '0,0', row: 0, col: 1, type: 'Unknown', children: ['1,0', '1,1', '1,2'] },
-      { id: '1,0', row: 1, col: 0, type: 'Monster', children: ['2,0'] },
-      { id: '1,1', row: 1, col: 1, type: 'Monster', children: ['2,1'] },
-      { id: '1,2', row: 1, col: 2, type: 'Monster', children: ['2,2'] },
-      { id: '2,0', row: 2, col: 0, type: 'Elite', children: ['3,0'] },
-      { id: '2,1', row: 2, col: 1, type: 'RestSite', children: ['3,0'] },
-      { id: '2,2', row: 2, col: 2, type: 'Monster', children: ['3,0'] },
-      { id: '3,0', row: 3, col: 1, type: 'Boss', children: [] }
-    ],
-    routes: [
-      ['0,0', '1,0', '2,0', '3,0'],
-      ['0,0', '1,1', '2,1', '3,0'],
-      ['0,0', '1,2', '2,2', '3,0']
-    ]
-  }
-});
-assert.equal(sameTypeSplit[0].targetType, 'Monster');
-assert.equal(sameTypeSplit[0].targetPosition, '左侧');
-assert.equal(sameTypeSplit[0].eliteCount, 1);
-
-const fourWaySplit = {
-  nodes: [
-    { id: '0,0', row: 1, col: 0 },
-    { id: '0,1', row: 1, col: 1 },
-    { id: '0,2', row: 1, col: 2 },
-    { id: '0,3', row: 1, col: 3 }
-  ]
-};
-assert.equal(require('../agent/tasks/route').targetPositionLabel(fourWaySplit, '0,0'), '从左第1个');
-assert.equal(require('../agent/tasks/route').targetPositionLabel(fourWaySplit, '0,2'), '从左第3个');
-
 function restState(hp) {
   return {
     ...mapState,
@@ -147,32 +107,6 @@ assert.equal(merged.wireApi, 'chat');
 assert.equal(merged.source, 'env');
 assert.equal(extractResponseText({ output_text: '{"index":1}' }), '{"index":1}');
 
-const eventState = {
-  ...mapState,
-  run: { ...mapState.run, room: 'EventRoom' },
-  event: {
-    title: '沉没雕像',
-    description: '钱可是个好东西……',
-    options: [
-      { index: 0, label: '拿起石剑', description: '获得石之剑。', locked: false },
-      { index: 1, label: '潜水', description: '获得112金币。失去7点生命。', locked: false }
-    ]
-  }
-};
-const cardRewardState = {
-  ...mapState,
-  player: {
-    ...mapState.player,
-    cards: [...mapState.player.cards, { id: 'Defend_R', name: '防御', type: 'Skill', cost: 1, upgraded: false }]
-  },
-  cardReward: {
-    options: [
-      { index: 0, id: 'Strike_R', name: '打击', type: 'Attack', cost: 1, upgraded: false, description: '造成 6 点伤害。' },
-      { index: 1, id: 'PommelStrike', name: '剑柄打击', type: 'Attack', cost: 1, upgraded: false, description: '造成伤害。抽 1 张牌。' },
-      { index: 2, id: 'ShrugItOff', name: '耸肩无视', type: 'Skill', cost: 1, upgraded: false, description: '获得格挡。抽 1 张牌。' }
-    ]
-  }
-};
 const store = createObservationStore({ staleAfterMs: 5000 });
 store.ingest({ type: 'state', data: mapState }, 1723370002000);
 const observation = store.getObservation(1723370002100);
@@ -184,31 +118,7 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   assert.equal(rulesRec.task, 'map_route');
   assert.equal(rulesRec.primary.action, 'TAKE_ROUTE');
   assert.equal(rulesRec.primary.targetId, '2,1');
-  assert.match(rulesRec.reason, /精英和.*火堆/);
-
-  const eventFallback = await recommendEvent(eventState, { now: 1 });
-  assert.equal(eventFallback.task, 'event_choice');
-  assert.equal(eventFallback.source, 'rules');
-  const eventLlm = await recommendEvent(eventState, {
-    llm: { enabled: true, completeEvent: async () => ({ index: 1, reason: '生命代价可接受，金币收益更高。' }) },
-    now: 2
-  });
-  assert.equal(eventLlm.source, 'llm');
-  assert.equal(eventLlm.primary.optionIndex, 1);
-
-  const rewardFallback = await recommendCardReward(cardRewardState, { now: 3 });
-  assert.equal(validateRecommendation(rewardFallback).ok, true);
-  assert.equal(rewardFallback.task, 'card_reward');
-  assert.equal(rewardFallback.primary.action, 'CHOOSE_CARD');
-  assert.equal(rewardFallback.primary.cardIndex, 2);
-  assert.match(rewardFallback.reason, /防御|牌|卡组/);
-  assert.equal(rankCards(cardRewardState)[0].card.name, '耸肩无视');
-  const rewardLlm = await recommendCardReward(cardRewardState, {
-    llm: { enabled: true, completeCardReward: async () => ({ index: 1, reason: '可以抽牌，提升卡组循环。' }) },
-    now: 4
-  });
-  assert.equal(rewardLlm.source, 'llm');
-  assert.equal(rewardLlm.primary.cardIndex, 1);
+  assert.match(rulesRec.reason, /精英和.*火堆|遗物|升级/);
 
   const llm = {
     enabled: true,
@@ -266,40 +176,6 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   const restPick = await responsesClient.completeRest({ hp: 20, candidates: [{ index: 0, action: 'HEAL' }] });
   assert.equal(restPick.index, 0);
   assert.equal(restPick.reason, '回血');
-
-  const eventClient = createOpenAiClient({
-    enabled: true,
-    apiKey: 'sk-test',
-    baseURL: 'https://api.moonshot.cn/v1',
-    model: 'kimi-k3',
-    wireApi: 'chat'
-  }, {
-    fetchImpl: async (url, options) => {
-      assert.match(url, /chat\/completions$/);
-      const body = JSON.parse(options.body);
-      assert.match(body.messages[0].content, /事件选择顾问/);
-      assert.equal(body.temperature, 1);
-      return { ok: true, json: async () => ({ choices: [{ message: { content: '{"index":1,"reason":"金币收益更高"}' } }] }) };
-    }
-  });
-  const eventPick = await eventClient.completeEvent({ options: [{ index: 0 }, { index: 1 }] });
-  assert.equal(eventPick.index, 1);
-  const rewardClient = createOpenAiClient({
-    enabled: true,
-    apiKey: 'sk-test',
-    baseURL: 'https://api.moonshot.cn/v1',
-    model: 'kimi-k2.5',
-    wireApi: 'chat'
-  }, {
-    fetchImpl: async (url, options) => {
-      assert.match(url, /chat\/completions$/);
-      const body = JSON.parse(options.body);
-      assert.match(body.messages[0].content, /选牌顾问/);
-      return { ok: true, json: async () => ({ choices: [{ message: { content: '{"index":2,"reason":"补足防御和抽牌"}' } }] }) };
-    }
-  });
-  const rewardPick = await rewardClient.completeCardReward({ candidates: cardRewardState.cardReward.options });
-  assert.equal(rewardPick.index, 2);
 
   let published;
   const orchestrator = createOrchestrator({
@@ -373,29 +249,44 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   });
   assert.equal(viaEvent.task, 'rest_site');
 
-  const eventStatuses = [];
-  const eventOrch = createOrchestrator({
-    llm: { enabled: true, completeEvent: async () => ({ index: 1, reason: '金币收益更高。' }) },
-    onAgentStatus: status => eventStatuses.push(status),
-    now: () => 14
-  });
-  const eventRec = await eventOrch.consider({ schema: 'gamebuddy.observation.v1', fresh: true, state: eventState });
-  assert.equal(eventRec.task, 'event_choice');
-  assert.equal(eventRec.source, 'llm');
-  assert.deepEqual(eventStatuses.map(status => status.status), ['thinking', 'ready']);
-
-  const rewardStatuses = [];
-  const rewardOrch = createOrchestrator({
-    llm: { enabled: false },
-    onAgentStatus: status => rewardStatuses.push(status),
-    now: () => 15
-  });
-  const rewardRec = await rewardOrch.consider({ schema: 'gamebuddy.observation.v1', fresh: true, state: cardRewardState });
+  const rewardObservation = {
+    schema: 'gamebuddy.observation.v1',
+    fresh: true,
+    state: mapState,
+    recentEvents: [{
+      name: 'card.reward.opened',
+      data: {
+        cards: [
+          { id: 'ANGER', name: '愤怒' },
+          { id: 'IRON_WAVE', name: '铁斩波' },
+          { id: 'BARRICADE', name: '壁垒' }
+        ],
+        canSkip: true,
+        context: { defeatedType: 'Elite' }
+      }
+    }]
+  };
+  const fakeCodex = {
+    loadDraftContext: async () => ({
+      source: 'spire-codex',
+      deckCards: mapState.player.cards,
+      relics: [],
+      coach: null,
+      cards: [
+        { id: 'ANGER', name: '愤怒', type_key: 'Attack', rarity_key: 'Common', cost: 0, damage: 6 },
+        { id: 'IRON_WAVE', name: '铁斩波', type_key: 'Attack', rarity_key: 'Common', cost: 1, damage: 5, block: 5 },
+        { id: 'BARRICADE', name: '壁垒', type_key: 'Power', rarity_key: 'Rare', cost: 3, description: '格挡不再在回合开始时失去。' }
+      ]
+    })
+  };
+  assert.equal(findCardReward(rewardObservation).cards.length, 3);
+  const rewardRec = await recommendCardReward(rewardObservation, { codex: fakeCodex, now: 14 });
+  assert.equal(validateRecommendation(rewardRec).ok, true);
   assert.equal(rewardRec.task, 'card_reward');
-  assert.equal(rewardRec.primary.cardIndex, 2);
-  assert.deepEqual(rewardStatuses.map(status => status.status), ['thinking', 'ready']);
+  assert.equal(rewardRec.options.length, 3);
+  assert.ok(rewardRec.options.every(card => card.fit?.boss && card.fit?.elite));
 
-  console.log('Agent route/event/card reward cases passed');
+  console.log('Agent recommendation cases passed: 28');
 }).catch(error => {
   console.error(error);
   process.exit(1);

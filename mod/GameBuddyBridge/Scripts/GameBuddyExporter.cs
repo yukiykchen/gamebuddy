@@ -5,7 +5,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Reflection;
 using Godot;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Context;
@@ -13,17 +12,11 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Logging;
-using MegaCrit.Sts2.Core.Map;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.MonsterMoves.Intents;
-using MegaCrit.Sts2.Core.Nodes.Screens;
+using MegaCrit.Sts2.Core.Map;
+using MegaCrit.Sts2.Core.Nodes.Cards.Holders;
 using MegaCrit.Sts2.Core.Nodes.Screens.Map;
-using MegaCrit.Sts2.Core.Nodes.Rewards;
-using MegaCrit.Sts2.Core.Nodes.Rooms;
-using MegaCrit.Sts2.Core.Nodes.Screens.CardSelection;
-using MegaCrit.Sts2.Core.Nodes.Screens.Overlays;
-using MegaCrit.Sts2.Core.Rooms;
-using MegaCrit.Sts2.Core.Rewards;
 using MegaCrit.Sts2.Core.Runs;
 
 namespace GameBuddyBridge.Scripts;
@@ -33,8 +26,7 @@ public static class GameBuddyExporter
     private const int Port = 27182;
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        DefaultIgnoreCondition = JsonIgnoreCondition.Never
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 
     private static readonly object Gate = new();
@@ -45,10 +37,10 @@ public static class GameBuddyExporter
     private static int _lastTurn = -1;
     private static bool _wasMapVisible;
     private static bool _wasAtRest;
-    private static bool _wasEventVisible;
-    private static bool _wasCardRewardVisible;
-    private static readonly FieldInfo? CardRewardOptionsField = typeof(NCardRewardSelectionScreen)
-        .GetField("_options", BindingFlags.Instance | BindingFlags.NonPublic);
+    private static Node? _activeCardRewardScreen;
+    private static string _lastCardRewardSignature = string.Empty;
+    private static List<string> _lastCombatEnemies = new();
+    private static string? _lastCombatNodeType;
 
     public static void Initialize(string modDirectory)
     {
@@ -106,6 +98,12 @@ public static class GameBuddyExporter
                 _server?.BroadcastState(json);
             }
 
+            if (snapshot.Combat is not null)
+            {
+                _lastCombatEnemies = snapshot.Combat.Enemies.Select(enemy => enemy.Name).ToList();
+                _lastCombatNodeType = snapshot.Run.CurrentNode ?? snapshot.Run.Room;
+            }
+            PublishCardRewardIfReady(snapshot);
             PublishTransitions(snapshot);
         }
         catch (Exception ex)
@@ -133,29 +131,100 @@ public static class GameBuddyExporter
             && !mapVisible;
         if (atRest && !_wasAtRest) PublishEvent("rest.opened");
 
-        var eventVisible = snapshot.Event is not null;
-        if (eventVisible && !_wasEventVisible)
-        {
-            PublishEvent("event.opened", new { title = snapshot.Event!.Title });
-        }
-
-        var cardRewardVisible = snapshot.CardReward is not null;
-        if (cardRewardVisible && !_wasCardRewardVisible)
-        {
-            PublishEvent("card.reward.opened", new { options = snapshot.CardReward!.Options });
-        }
-
         _wasInCombat = inCombat;
         _wasMapVisible = mapVisible;
         _wasAtRest = atRest;
-        _wasEventVisible = eventVisible;
-        _wasCardRewardVisible = cardRewardVisible;
     }
 
     private static void PublishEvent(string name, object? data = null)
     {
         var message = JsonSerializer.Serialize(new BridgeEvent("event", name, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), data), JsonOptions);
         _server?.BroadcastEvent(message);
+    }
+
+    public static void TrackCardRewardScreen(Node screen)
+    {
+        _activeCardRewardScreen = screen;
+        _lastCardRewardSignature = string.Empty;
+    }
+
+    public static void ClearCardRewardScreen(Node screen)
+    {
+        if (ReferenceEquals(_activeCardRewardScreen, screen))
+        {
+            _activeCardRewardScreen = null;
+            _lastCardRewardSignature = string.Empty;
+        }
+    }
+
+    private static void PublishCardRewardIfReady(GameBuddyState snapshot)
+    {
+        var screen = _activeCardRewardScreen;
+        if (screen is null || !GodotObject.IsInstanceValid(screen))
+        {
+            _activeCardRewardScreen = null;
+            return;
+        }
+
+        var cards = new List<CardModel>();
+        CollectRewardCards(screen, cards, 0);
+        var unique = cards
+            .Where(card => card is not null && !string.IsNullOrWhiteSpace(card.Id.Entry))
+            .GroupBy(card => card.Id.Entry, StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.First())
+            .Take(6)
+            .ToList();
+        if (unique.Count == 0)
+        {
+            return;
+        }
+
+        var mapped = MapCards(unique);
+        var signature = string.Join("|", mapped.Select(card => $"{card.Id}:{card.Upgraded}"));
+        if (string.Equals(signature, _lastCardRewardSignature, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        _lastCardRewardSignature = signature;
+        PublishEvent("card.reward.opened", new
+        {
+            cards = mapped,
+            canSkip = true,
+            source = "combat",
+            context = new
+            {
+                act = snapshot.Run.Act,
+                actId = snapshot.Run.ActId,
+                actName = snapshot.Run.ActName,
+                floor = snapshot.Run.Floor,
+                defeatedType = _lastCombatNodeType,
+                defeatedEnemies = _lastCombatEnemies,
+                nextBossId = snapshot.Run.NextBossId,
+                nextBoss = snapshot.Run.NextBoss
+            }
+        });
+    }
+
+    private static void CollectRewardCards(Node node, List<CardModel> cards, int depth)
+    {
+        if (depth > 15)
+        {
+            return;
+        }
+
+        foreach (var child in node.GetChildren())
+        {
+            if (child is NCardHolder holder && holder.CardModel is not null)
+            {
+                cards.Add(holder.CardModel);
+                continue;
+            }
+            if (child is Node childNode)
+            {
+                CollectRewardCards(childNode, cards, depth + 1);
+            }
+        }
     }
 
     private static GameBuddyState BuildSnapshot(RunState runState, Player player)
@@ -173,8 +242,11 @@ public static class GameBuddyExporter
 
         var currentPoint = runState.CurrentMapPoint;
         var coord = runState.CurrentMapCoord;
-        var eventId = ExtractEventId(runState);
-        var rewards = ExtractVisibleRewards();
+        var mapSnapshot = BuildMapSnapshot(runState);
+        var nextBossId = runState.Act.BossEncounter.Id.Entry;
+        var nextBoss = runState.Act.BossEncounter.Title.GetFormattedText();
+        var secondBossId = runState.Act.SecondBossEncounter?.Id.Entry;
+        var secondBoss = runState.Act.SecondBossEncounter?.Title.GetFormattedText();
         return new GameBuddyState(
             "gamebuddy.state.v1",
             DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
@@ -187,7 +259,12 @@ public static class GameBuddyExporter
                 runState.TotalFloor,
                 currentPoint?.PointType.ToString(),
                 coord.HasValue ? $"{coord.Value.row},{coord.Value.col}" : null,
-                eventId),
+                runState.Act.Id.Entry,
+                runState.Act.Title.GetFormattedText(),
+                nextBossId,
+                nextBoss,
+                secondBossId,
+                secondBoss),
             new PlayerSnapshot(
                 player.Creature.CurrentHp,
                 player.Creature.MaxHp,
@@ -196,203 +273,10 @@ public static class GameBuddyExporter
                 combat?.Energy ?? 0,
                 combat?.MaxEnergy ?? 0,
                 MapCards(player.Deck.Cards),
-                player.Relics.Select(relic => relic.Title?.ToString()).Where(v => v != null).Select(v => v!).ToList(),
-                player.Potions.Select(potion => potion.Title?.ToString()).Where(v => v != null).Select(v => v!).ToList()),
+                player.Relics.Select(relic => new OwnedItemSnapshot(relic.Id.Entry, relic.Title.GetFormattedText())).ToList(),
+                player.Potions.Select(potion => new OwnedItemSnapshot(potion.Id.Entry, potion.Title.GetFormattedText())).ToList()),
             combatState,
-            BuildMapSnapshot(runState),
-            BuildEventSnapshot(),
-            BuildCardRewardSnapshot());
-    }
-
-    private static CardRewardSnapshot? BuildCardRewardSnapshot()
-    {
-        try
-        {
-            var overlayStack = NOverlayStack.Instance;
-            var screen = overlayStack?.Peek() as NCardRewardSelectionScreen
-                ?? overlayStack?.GetChildren()
-                    .OfType<NCardRewardSelectionScreen>()
-                    .LastOrDefault(candidate => candidate.IsVisibleInTree());
-            if (screen is null || !screen.IsVisibleInTree() || CardRewardOptionsField is null)
-            {
-                return null;
-            }
-
-            var results = CardRewardOptionsField.GetValue(screen) as IReadOnlyList<CardCreationResult>;
-            if (results is null || results.Count == 0)
-            {
-                return null;
-            }
-
-            var options = results
-                .Select((result, index) => MapCardRewardOption(result.Card, index))
-                .Where(option => option is not null)
-                .Select(option => option!)
-                .ToList();
-            return options.Count == 0 ? null : new CardRewardSnapshot(options);
-        }
-        catch (Exception ex)
-        {
-            Log.Warn($"[GameBuddyBridge] card reward capture failed: {ex.Message}");
-            return null;
-        }
-    }
-
-    private static CardRewardOptionSnapshot? MapCardRewardOption(CardModel card, int index)
-    {
-        try
-        {
-            return new CardRewardOptionSnapshot(
-                index,
-                card.Id.Entry,
-                card.Title,
-                card.Type.ToString(),
-                card.EnergyCost.CostsX ? null : card.EnergyCost.GetAmountToSpend(),
-                card.IsUpgraded,
-                card.GetDescriptionForPile(PileType.None));
-        }
-        catch (Exception ex)
-        {
-            Log.Warn($"[GameBuddyBridge] card reward option {index} capture failed: {ex.Message}");
-            return null;
-        }
-    }
-
-    private static EventSnapshot? BuildEventSnapshot()
-    {
-        try
-        {
-            var room = NEventRoom.Instance;
-            var layout = room?.Layout;
-            if (room is null || layout is null || !room.IsVisibleInTree()) return null;
-
-            var buttons = layout.OptionButtons?.ToList() ?? new List<MegaCrit.Sts2.Core.Nodes.Events.NEventOptionButton>();
-            var active = buttons
-                .Where(button => button?.Option is not null && button.IsVisibleInTree() && button.IsEnabled)
-                .Select((button, index) => new { button, index })
-                .ToList();
-            if (active.Count == 0) return null;
-
-            var eventModel = active[0].button.Event;
-            if (eventModel is null) return null;
-            var options = active.Select(item =>
-            {
-                var option = item.button.Option!;
-                var title = option.Title.GetFormattedText();
-                var description = option.Description.GetFormattedText();
-                return new EventOptionSnapshot(item.index, title, description, option.IsLocked);
-            }).ToList();
-
-            return new EventSnapshot(
-                eventModel.Title.GetFormattedText(),
-                eventModel.Description?.GetFormattedText() ?? string.Empty,
-                options);
-        }
-        catch (Exception ex)
-        {
-            Log.Warn($"[GameBuddyBridge] event capture failed: {ex.Message}");
-            return null;
-        }
-    }
-
-    private static string? ExtractEventId(RunState runState)
-    {
-        try
-        {
-            var room = runState.CurrentRoom;
-            if (room is not EventRoom eventRoom) return null;
-            return eventRoom.CanonicalEvent?.Id?.Entry;
-        }
-        catch { return null; }
-    }
-
-    private static T? FindScreen<T>() where T : Godot.GodotObject
-    {
-        var tree = Godot.Engine.GetMainLoop() as Godot.SceneTree;
-        var root = tree?.Root;
-        if (root is null) return null;
-        return root.FindChildren("*", nameof(T), true, false).OfType<T>().FirstOrDefault();
-    }
-
-    private static object? GetLinkedReward(NLinkedRewardSet setNode)
-    {
-        var method = setNode.GetType().GetMethod("GetReward", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        return method?.Invoke(setNode, null);
-    }
-
-    private static List<RewardSnapshot> ExtractVisibleRewards()
-    {
-        var list = new List<RewardSnapshot>();
-        try
-        {
-            var screen = FindScreen<NRewardsScreen>();
-            if (screen is null || !screen.IsVisibleInTree()) return list;
-            foreach (var setNode in screen.GetChildren().OfType<NLinkedRewardSet>())
-            {
-                var reward = GetLinkedReward(setNode);
-                if (reward is null) continue;
-                var typeName = reward.GetType().Name;
-                var kind = typeName.Replace("Reward", "").ToLowerInvariant();
-                string? id = null;
-                string? name = null;
-                switch (reward)
-                {
-                    case CardReward:
-                        kind = "card";
-                        (id, name) = DescribeCardReward(reward);
-                        break;
-                    case RelicReward:
-                        kind = "relic";
-                        (id, name) = DescribeRelicReward(reward);
-                        break;
-                }
-                list.Add(new RewardSnapshot(id, name, kind));
-            }
-        }
-        catch { }
-        return list;
-    }
-
-    private static (string? Id, string? Name) DescribeCardReward(object reward)
-    {
-        try
-        {
-            var prop = reward.GetType().GetProperty("Cards")
-                ?? reward.GetType().GetProperty("CardsList")
-                ?? reward.GetType().GetProperty("Options");
-            if (prop?.GetValue(reward) is not System.Collections.IEnumerable cards) return (null, null);
-            var ids = new List<string>();
-            foreach (var card in cards)
-            {
-                if (card is null) continue;
-                var idProp = card.GetType().GetProperty("Id");
-                var idValue = idProp?.GetValue(card);
-                var entry = idValue?.GetType().GetProperty("Entry")?.GetValue(idValue) as string;
-                if (!string.IsNullOrEmpty(entry)) ids.Add(entry);
-            }
-            if (ids.Count == 0) return (null, null);
-            return (ids[0], string.Join("|", ids));
-        }
-        catch { return (null, null); }
-    }
-
-    private static (string? Id, string? Name) DescribeRelicReward(object reward)
-    {
-        try
-        {
-            foreach (var fieldName in new[] { "_relic", "_predeterminedRelic", "_relicModel" })
-            {
-                var field = reward.GetType().GetField(fieldName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
-                var relic = field?.GetValue(reward);
-                if (relic is null) continue;
-                var idProp = relic.GetType().GetProperty("Id");
-                var idValue = idProp?.GetValue(relic);
-                var entry = idValue?.GetType().GetProperty("Entry")?.GetValue(idValue) as string;
-                if (!string.IsNullOrEmpty(entry)) return (entry, entry);
-            }
-            return (null, null);
-        }
-        catch { return (null, null); }
+            mapSnapshot);
     }
 
     private static MapSnapshot BuildMapSnapshot(RunState runState)
@@ -419,12 +303,19 @@ public static class GameBuddyExporter
                     }
                 }
 
+                var encounter = ReadMember(point, "Encounter", "EncounterModel", "BossEncounter", "RoomModel");
+                var encounterId = ReadTextMember(point, "EncounterId", "EncounterModelId")
+                    ?? ReadTextMember(encounter, "Id", "Entry");
+                var encounterName = ReadTextMember(point, "EncounterName")
+                    ?? ReadTextMember(encounter, "Title", "Name");
                 nodes.Add(new MapNodeSnapshot(
                     CoordId(point.coord),
                     point.coord.row,
                     point.coord.col,
                     MapTypeName(point.PointType),
-                    children));
+                    children,
+                    encounterId,
+                    encounterName));
             }
 
             var byId = new Dictionary<string, MapNodeSnapshot>(StringComparer.Ordinal);
@@ -436,6 +327,19 @@ public static class GameBuddyExporter
             var start = map.StartingMapPoint is { } startPoint ? CoordId(startPoint.coord) : null;
             var boss = map.BossMapPoint is { } bossPoint ? CoordId(bossPoint.coord) : null;
             var secondBoss = map.SecondBossMapPoint is { } secondBossPoint ? CoordId(secondBossPoint.coord) : null;
+            if (boss is not null && byId.TryGetValue(boss, out var bossNode))
+            {
+                var encounter = runState.Act.BossEncounter;
+                var enriched = bossNode with { EncounterId = encounter.Id.Entry, EncounterName = encounter.Title.GetFormattedText() };
+                byId[boss] = enriched;
+                nodes[nodes.FindIndex(node => node.Id == boss)] = enriched;
+            }
+            if (secondBoss is not null && byId.TryGetValue(secondBoss, out var secondBossNode) && runState.Act.SecondBossEncounter is { } secondEncounter)
+            {
+                var enriched = secondBossNode with { EncounterId = secondEncounter.Id.Entry, EncounterName = secondEncounter.Title.GetFormattedText() };
+                byId[secondBoss] = enriched;
+                nodes[nodes.FindIndex(node => node.Id == secondBoss)] = enriched;
+            }
             var originCandidates = ResolveOriginIds(byId, current, start);
             var routes = new List<List<string>>();
             var truncated = false;
@@ -603,6 +507,56 @@ public static class GameBuddyExporter
 
     private static string MapTypeName(MapPointType type) => type.ToString();
 
+    private static object? ReadMember(object? source, params string[] names)
+    {
+        if (source is null) return null;
+        var type = source.GetType();
+        const System.Reflection.BindingFlags flags = System.Reflection.BindingFlags.Instance
+            | System.Reflection.BindingFlags.Public
+            | System.Reflection.BindingFlags.NonPublic
+            | System.Reflection.BindingFlags.IgnoreCase;
+        foreach (var name in names)
+        {
+            try
+            {
+                var property = type.GetProperty(name, flags);
+                if (property is not null && property.GetIndexParameters().Length == 0)
+                {
+                    var value = property.GetValue(source);
+                    if (value is not null) return value;
+                }
+                var field = type.GetField(name, flags);
+                if (field?.GetValue(source) is { } fieldValue) return fieldValue;
+            }
+            catch
+            {
+                // Optional early-access metadata can move between game patches.
+            }
+        }
+        return null;
+    }
+
+    private static string? ReadTextMember(object? source, params string[] names)
+    {
+        var value = ReadMember(source, names);
+        if (value is null) return null;
+        if (value is string text) return string.IsNullOrWhiteSpace(text) ? null : text;
+
+        try
+        {
+            var formatted = value.GetType().GetMethod("GetFormattedText", Type.EmptyTypes)?.Invoke(value, null)?.ToString();
+            if (!string.IsNullOrWhiteSpace(formatted)) return formatted;
+        }
+        catch
+        {
+            // Fall through to nested identifier/text properties.
+        }
+
+        var nested = ReadMember(value, "Entry", "Value", "Name");
+        var result = nested?.ToString();
+        return string.IsNullOrWhiteSpace(result) ? null : result;
+    }
+
     private static List<CardSnapshot> MapCards(IEnumerable<CardModel> cards)
     {
         return cards.Select(card => new CardSnapshot(
@@ -631,19 +585,20 @@ public static class GameBuddyExporter
             }
         }
 
-        return new EnemySnapshot(enemy.Name, enemy.CurrentHp, enemy.MaxHp, enemy.Block, intent, damage, enemy.IsAlive);
+        return new EnemySnapshot(enemy.Monster?.Id.Entry, enemy.Name, enemy.CurrentHp, enemy.MaxHp, enemy.Block, intent, damage, enemy.IsAlive);
     }
 }
 
 public sealed record BridgeMessage<T>(string Type, T Data);
 public sealed record BridgeEvent(string Type, string Name, long Timestamp, object? Data);
 
-public sealed record GameBuddyState(string Schema, long Timestamp, string Source, RunSnapshot Run, PlayerSnapshot Player, CombatSnapshot? Combat, MapSnapshot Map, EventSnapshot? Event, CardRewardSnapshot? CardReward);
-public sealed record RunSnapshot(int Act, int Floor, string? Room, string Character, int TotalFloor, string? CurrentNode, string? CurrentCoord, string? EventId);
-public sealed record PlayerSnapshot(int Hp, int MaxHp, int Block, int Gold, int Energy, int MaxEnergy, List<CardSnapshot> Cards, List<string> Relics, List<string> Potions);
+public sealed record GameBuddyState(string Schema, long Timestamp, string Source, RunSnapshot Run, PlayerSnapshot Player, CombatSnapshot? Combat, MapSnapshot Map);
+public sealed record RunSnapshot(int Act, int Floor, string? Room, string Character, int TotalFloor, string? CurrentNode, string? CurrentCoord, string ActId, string ActName, string? NextBossId, string? NextBoss, string? SecondBossId, string? SecondBoss);
+public sealed record PlayerSnapshot(int Hp, int MaxHp, int Block, int Gold, int Energy, int MaxEnergy, List<CardSnapshot> Cards, List<OwnedItemSnapshot> Relics, List<OwnedItemSnapshot> Potions);
 public sealed record CombatSnapshot(int Turn, List<CardSnapshot> Hand, List<CardSnapshot> DrawPile, List<CardSnapshot> DiscardPile, List<CardSnapshot> ExhaustPile, List<EnemySnapshot> Enemies);
-public sealed record EnemySnapshot(string Name, int Hp, int MaxHp, int Block, string? Intent, int Damage, bool Alive);
+public sealed record EnemySnapshot(string? Id, string Name, int Hp, int MaxHp, int Block, string? Intent, int Damage, bool Alive);
 public sealed record CardSnapshot(string Id, string Name, string Type, int? Cost, bool Upgraded);
+public sealed record OwnedItemSnapshot(string Id, string Name);
 public sealed record MapSnapshot(
     List<string> Visited,
     string? Current,
@@ -655,12 +610,7 @@ public sealed record MapSnapshot(
     List<MapNodeSnapshot> Nodes,
     List<List<string>> Routes,
     bool RoutesTruncated);
-public sealed record MapNodeSnapshot(string Id, int Row, int Col, string Type, List<string> Children);
-public sealed record RewardSnapshot(string? Id, string? Name, string Kind);
-public sealed record EventSnapshot(string Title, string Description, List<EventOptionSnapshot> Options);
-public sealed record EventOptionSnapshot(int Index, string Label, string Description, bool Locked);
-public sealed record CardRewardSnapshot(List<CardRewardOptionSnapshot> Options);
-public sealed record CardRewardOptionSnapshot(int Index, string Id, string Name, string Type, int? Cost, bool Upgraded, string Description);
+public sealed record MapNodeSnapshot(string Id, int Row, int Col, string Type, List<string> Children, string? EncounterId, string? EncounterName);
 
 internal sealed class GameBuddyWebSocketServer
 {
@@ -715,111 +665,6 @@ internal sealed class GameBuddyWebSocketServer
         }
     }
 
-    private static void HandleHighlightMapNodes(string json)
-    {
-        try
-        {
-            var doc = System.Text.Json.JsonDocument.Parse(json);
-            var coords = doc.RootElement.GetProperty("coords").EnumerateArray()
-                .Select(v => v.GetString())
-                .Where(v => !string.IsNullOrEmpty(v))
-                .Select(v =>
-                {
-                    var parts = v!.Split(',');
-                    return (row: int.Parse(parts[0]), col: int.Parse(parts[1]));
-                })
-                .ToHashSet();
-            HighlightMapCoords(coords);
-        }
-        catch (Exception ex)
-        {
-            Log.Warn($"[RunmateBridge] highlight failed: {ex.Message}");
-        }
-    }
-
-    private static void HighlightMapCoords(HashSet<(int row, int col)> coords)
-    {
-        if (!coords.Any()) return;
-        var screen = FindMapScreen();
-        if (screen is null) return;
-        // The NMapScreen stores map point nodes in a private dictionary keyed by MapCoord.
-        // We reflect over all instance fields to find one whose key type matches MapCoord.
-        var fields = screen.GetType().GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
-        foreach (var field in fields)
-        {
-            var fieldType = field.FieldType;
-            if (!fieldType.IsGenericType || fieldType.GetGenericTypeDefinition() != typeof(System.Collections.Generic.Dictionary<,>)) continue;
-            var args = fieldType.GetGenericArguments();
-            if (args[0] != typeof(MapCoord)) continue;
-            var dict = field.GetValue(screen);
-            if (dict is null) continue;
-            var keysProp = fieldType.GetProperty("Keys");
-            var indexer = fieldType.GetProperty("Item");
-            if (keysProp?.GetValue(dict) is not System.Collections.IEnumerable keys || indexer is null) continue;
-            foreach (var key in keys)
-            {
-                var rowField = key.GetType().GetField("row");
-                var rowProperty = key.GetType().GetProperty("row");
-                var colField = key.GetType().GetField("col");
-                var colProperty = key.GetType().GetProperty("col");
-                var rowObj = rowField?.GetValue(key) ?? rowProperty?.GetValue(key);
-                var colObj = colField?.GetValue(key) ?? colProperty?.GetValue(key);
-                if (rowObj is null || colObj is null) continue;
-                var row = Convert.ToInt32(rowObj);
-                var col = Convert.ToInt32(colObj);
-                if (!coords.Contains((row, col))) continue;
-                var point = indexer.GetValue(dict, new object[] { key });
-                if (point is null) continue;
-                TryHighlightPoint(point);
-            }
-            return;
-        }
-        Log.Info("[RunmateBridge] no map point dictionary field found on NMapScreen");
-    }
-
-    private static void TryHighlightPoint(object point)
-    {
-        // Prefer the game's own highlight mechanism, then fall back to the State property.
-        try
-        {
-            var screen = FindMapScreen();
-            if (screen is not null)
-            {
-                var highlightMethod = screen.GetType().GetMethod("HighlightPointType", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                // HighlightPointType highlights by type, not coord, so only use it when we cannot set State.
-            }
-        }
-        catch { }
-        try
-        {
-            var stateProp = point.GetType().GetProperty("State");
-            if (stateProp is null || !stateProp.CanWrite) return;
-            var enumType = stateProp.PropertyType;
-            if (!enumType.IsEnum) return;
-            var names = System.Enum.GetNames(enumType);
-            var preferred = new[] { "Highlighted", "Travelable", "Selectable", "Recommended", "Available" };
-            foreach (var name in preferred)
-            {
-                if (!names.Contains(name, StringComparer.OrdinalIgnoreCase)) continue;
-                var value = System.Enum.Parse(enumType, name);
-                stateProp.SetValue(point, value);
-                return;
-            }
-        }
-        catch (Exception ex)
-        {
-            Log.Warn($"[RunmateBridge] point highlight failed: {ex.Message}");
-        }
-    }
-
-    private static NMapScreen? FindMapScreen()
-    {
-        var tree = Engine.GetMainLoop() as SceneTree;
-        var root = tree?.Root;
-        if (root is null) return null;
-        return root.FindChildren("*", nameof(NMapScreen), true, false).OfType<NMapScreen>().FirstOrDefault();
-    }
-
     private async Task HandleClientAsync(TcpClient client, CancellationToken cancellationToken)
     {
         try
@@ -846,10 +691,6 @@ internal sealed class GameBuddyWebSocketServer
                 if (message.Contains("request_snapshot", StringComparison.Ordinal))
                 {
                     if (_lastStateFrame is not null) await SendAsync(client, _lastStateFrame, cancellationToken);
-                }
-                else if (message.Contains("highlight_map_nodes", StringComparison.Ordinal))
-                {
-                    HandleHighlightMapNodes(message);
                 }
             }
         }
