@@ -11,12 +11,11 @@ function decide(state) {
   const enemies = (Array.isArray(combat.enemies) ? combat.enemies : []).filter(enemy => enemy.alive !== false);
   if (!enemies.length) return ['combat', null];
   const energy = numberOr(player.energy, 0);
-  const incomingDamage = enemies.reduce((sum, enemy) => sum + numberOr(enemy.damage, 0), 0);
   const threats = enemies.map(enemy => ({
     name: enemy.name,
     hp: enemy.hp,
     intent: enemy.intent,
-    damage: numberOr(enemy.damage, 0),
+    attacking: /attack/i.test(String(enemy.intent || '')),
     codex: lookupMonster(enemy.id || enemy.name)
   }));
   const handModels = hand.map((card, index) => {
@@ -28,8 +27,6 @@ function decide(state) {
       cost: Number.isFinite(card.cost) ? card.cost : meta.cost ?? null,
       type: card.type || meta.type_key || meta.type,
       meta,
-      damage: numberOr(card.damage ?? meta.damage, 0),
-      hitCount: numberOr(card.hit_count ?? meta.hit_count, 1),
       block: numberOr(card.block ?? meta.block, 0)
     };
   });
@@ -37,40 +34,25 @@ function decide(state) {
   const attacks = affordable.filter(card => card.type === 'Attack' || card.meta.type_key === 'Attack');
   const blockers = affordable.filter(card => card.type === 'Skill' || card.meta.type_key === 'Skill');
   const powers = affordable.filter(card => card.type === 'Power' || card.meta.type_key === 'Power');
-  const blockSources = blockers.reduce((sum, card) => sum + card.block, 0);
-  const neededBlock = Math.max(0, incomingDamage - numberOr(player.block, 0));
-  const highPressure = incomingDamage >= Math.max(18, Math.ceil(player.hp * 0.32));
   const sequence = [];
   const reasons = [];
-  const danger = incomingDamage > 0 && blockSources < neededBlock;
-  const lethalCards = attacks.filter(card => card.damage * card.hitCount >= Math.max(...enemies.map(enemy => numberOr(enemy.hp, 0))) && card.damage > 0);
-  if (lethalCards.length) {
-    const lethal = lethalCards.reduce((best, card) => (card.cost < best.cost ? card : best));
-    sequence.push(`${cardLabel(lethal)}`);
-    reasons.push(`这一手存在直接斩杀选项。`);
-  } else {
-    const blocker = [...blockers].sort((a, b) => b.block - a.block)[0];
-    if (incomingDamage > 0 && neededBlock > 0 && (highPressure || danger || !attacks.some(card => card.damage * card.hitCount >= enemies[0].hp / 2))) {
-      if (blocker) {
-        sequence.push(cardLabel(blocker));
-        reasons.push(`敌方总威胁 ${incomingDamage}，当前缺口 ${neededBlock}，先补足格挡。`);
-      }
-    }
+  const hasAttackIntent = threats.some(threat => threat.attacking);
+  const blocker = [...blockers].sort((a, b) => b.block - a.block)[0];
+  if (hasAttackIntent && blocker) {
+    sequence.push(cardLabel(blocker));
+    reasons.push('敌人显示攻击意图，优先考虑防御；不推算具体承伤数值。');
+  }
+  const scaling = powers.filter(card => /力量|敏捷|获得\s*\d+\s*层/.test(stripMarkup(card.meta.description || '')));
+  if (sequence.length < 2 && scaling.length) {
+    const chosen = scaling.reduce((best, card) => (card.cost > best.cost ? card : best));
+    sequence.push(cardLabel(chosen));
+    reasons.push(`当前能量允许投入成长，优先考虑 ${chosen.name}。`);
+  }
+  if (sequence.length < 2 && attacks.length) {
     const selectedEnemy = enemies.reduce((best, enemy) => (numberOr(enemy.hp, 0) < numberOr(best.hp, 0) ? enemy : best));
-    const singleTarget = attacks
-      .filter(card => card.damage > 0)
-      .map(card => ({ card, output: card.damage * card.hitCount }))
-      .sort((a, b) => b.output - a.output)[0];
-    if (singleTarget && (!blocker || sequence.length < 2)) {
-      sequence.push(`${cardLabel(singleTarget.card)} → ${selectedEnemy.name}`);
-      reasons.push(`${singleTarget.card.name} 单卡期望伤害最高（${singleTarget.output}）。`);
-    }
-    const scaling = powers.filter(card => /力量|敏捷|获得\s*\d+\s*层/.test(stripMarkup(card.meta.description || '')));
-    if (sequence.length < 2 && scaling.length) {
-      const chosen = scaling.reduce((best, card) => (card.cost > best.cost ? card : best));
-      sequence.push(cardLabel(chosen));
-      reasons.push(`当前剩余能量可以投入成长，${chosen.name} 优先于只造成低额伤害。`);
-    }
+    const attack = attacks[0];
+    sequence.push(`${cardLabel(attack)} → ${selectedEnemy.name}`);
+    reasons.push('这是当前可支付的攻击牌；未进行伤害或斩杀计算。');
   }
   const deficits = [];
   if (!sequence.length) deficits.push('当前状态缺少完整手牌或敌人意图数据。');
@@ -82,18 +64,15 @@ function decide(state) {
   const decision = createDecision('combat', state);
   decision.title = sequence.length > 1 ? `建议顺序：${sequence.join(' → ')}` : `建议先打出：${sequence[0]}`;
   decision.summary = reasons.join(' ');
-  decision.confidence = 0.55 + Math.min(0.25, (hand.length ? 0.08 : 0) + (incomingDamage ? 0.08 : 0) + (lookupCoverage(handModels) ? 0.09 : 0));
+  decision.confidence = 0.5 + Math.min(0.2, (hand.length ? 0.08 : 0) + (hasAttackIntent ? 0.04 : 0) + (lookupCoverage(handModels) ? 0.08 : 0));
   decision.payload = {
     action: 'combat-turn',
     sequence,
-    incomingDamage,
-    blockNeeded: neededBlock,
-    blockAvailable: numberOr(player.block, 0) + blockSources,
     enemyTargets: threats
   };
   decision.evidence = [
     { kind: 'player', detail: `HP ${player.hp}/${player.maxHp}，格挡 ${player.block}，能量 ${energy}/${player.maxEnergy}` },
-    { kind: 'intent', detail: threats.map(threat => `${threat.name}：${threat.intent} ${threat.damage || 0}`).join('；') },
+    { kind: 'intent', detail: threats.map(threat => `${threat.name}：${threat.intent || '未知意图'}`).join('；') },
     { kind: 'hand', detail: handModels.map(card => `${card.name}(${numberOr(card.cost, 'X')})`).join('、') },
     ...threats.flatMap(threat => threat.codex ? [{ kind: 'codex-monster', detail: `${threat.name}：${threat.codex.attack_pattern?.description || '攻击模式未收录'}` }] : [])
   ];

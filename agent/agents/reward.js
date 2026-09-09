@@ -91,7 +91,7 @@ function cardScore(card, state) {
   const attackCount = deck.filter(row => lookupCard(row.id || row.name)?.type_key === 'Attack').length;
   const skillCount = deck.filter(row => lookupCard(row.id || row.name)?.type_key === 'Skill').length;
   const drawScore = Number.isFinite(card.cards_draw) ? card.cards_draw * 8 : 0;
-  const damageScore = Number.isFinite(card.damage) ? card.damage * (card.hit_count || 1) * 2 : 0;
+  const attackRole = card.type_key === 'Attack' ? 6 : 0;
   const blockScore = Number.isFinite(card.block) ? card.block * 1.8 : 0;
   const scaling = /力量|敏捷|再生|每回合开始/.test(text) ? 18 : 0;
   const status = /状态|诅咒|失去\d+点生命|抽牌堆/.test(text) ? -9 : 0;
@@ -99,7 +99,7 @@ function cardScore(card, state) {
   const role = attackCount >= 14 ? (card.type_key === 'Attack' ? -5 : 5) : skillCount >= 15 ? (card.type_key === 'Skill' ? -4 : 4) : 0;
   const rarity = rarityBonus(card.rarity_key);
   const colorPenalty = !card.color || card.color === 'event' ? -18 : 0;
-  return damageScore + blockScore + drawScore + scaling + status + dilution + role + rarity + colorPenalty;
+  return attackRole + blockScore + drawScore + scaling + status + dilution + role + rarity + colorPenalty;
 }
 
 function rarityBonus(rarity) {

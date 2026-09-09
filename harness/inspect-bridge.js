@@ -41,7 +41,7 @@ function inspectState(state) {
   line(`  player hp=${state.player.hp}/${state.player.maxHp} block=${state.player.block} energy=${state.player.energy}/${state.player.maxEnergy} gold=${state.player.gold}`);
   line(`  ${combatSummary}`);
   for (const enemy of combat?.enemies || []) {
-    line(`  enemy ${enemy.name} hp=${enemy.hp}/${enemy.maxHp} block=${enemy.block} intent=${enemy.intent} damage=${enemy.damage} alive=${enemy.alive}`);
+    line(`  enemy ${enemy.name} hp=${enemy.hp}/${enemy.maxHp} block=${enemy.block} intent=${enemy.intent} alive=${enemy.alive}`);
   }
   if (once) finish(0);
 }

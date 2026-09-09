@@ -79,7 +79,6 @@ function numeric(value) {
 function cardFacts(card) {
   const description = stripMarkup((card.upgraded && card.upgrade_description) || card.description || card.text || '');
   const cost = card.is_x_cost || card.isXCost ? null : (Number.isFinite(Number(card.cost)) ? Number(card.cost) : null);
-  const damage = numeric(card.damage) * Math.max(1, numeric(card.hit_count || card.hitCount) || 1);
   const block = numeric(card.block);
   const draw = numeric(card.cards_draw || card.cardsDraw);
   const energy = numeric(card.energy_gain || card.energyGain);
@@ -89,10 +88,10 @@ function cardFacts(card) {
   const powerNames = (card.powers_applied || card.powersApplied || []).map(power => String(power.power_key || power.power || '')).filter(Boolean);
   const keywords = (card.keywords_key || card.keywords || []).map(String);
   const searchable = `${description} ${powerNames.join(' ')} ${keywords.join(' ')}`.toLowerCase();
+  const isAttack = typeKey.includes('attack') || typeKey.includes('攻击');
   return {
     description,
     cost,
-    damage,
     block,
     draw,
     energy,
@@ -101,7 +100,8 @@ function cardFacts(card) {
     target,
     powerNames,
     keywords,
-    isAttack: typeKey.includes('attack') || typeKey.includes('攻击'),
+    isAttack,
+    hasDirectDamage: isAttack || /deal.*damage|造成.*伤害/.test(searchable),
     isSkill: typeKey.includes('skill') || typeKey.includes('技能'),
     isPower: typeKey.includes('power') || typeKey.includes('能力'),
     isRare: rarityKey.includes('rare') || rarityKey.includes('稀有'),
@@ -162,9 +162,9 @@ function fitAnalysis(facts, threats) {
 
   let elitePoints = 0;
   const eliteReasons = [];
-  if (facts.damage >= 10 || facts.isAoE) {
-    elitePoints += 2;
-    eliteReasons.push(facts.isAoE ? '群体伤害适合多目标精英' : '前置伤害足，能缩短高压战斗');
+  if (facts.isAoE || facts.hasDirectDamage) {
+    elitePoints += facts.isAoE ? 2 : 1;
+    eliteReasons.push(facts.isAoE ? '群体攻击适合多目标精英' : '攻击牌能补充前置输出');
   }
   if (facts.block >= 8 || facts.isControl) {
     elitePoints += 1;
@@ -174,7 +174,7 @@ function fitAnalysis(facts, threats) {
     elitePoints += 1;
     eliteReasons.push('即时节奏好，不容易卡手');
   }
-  if (facts.isPower && facts.damage === 0 && facts.block === 0) elitePoints -= 1;
+  if (facts.isPower && facts.block === 0) elitePoints -= 1;
 
   function result(points, reasons, soon) {
     const level = points >= 3 ? '强' : points >= 1 ? '中' : '弱';
@@ -223,10 +223,9 @@ function analyzeCard(card, state, context, threats, coachItem, enemyTags = new S
     pros.push(`与牌组已有的 ${best.count} 张「${best.tag}」相关牌形成协同`);
   }
 
-  if (facts.damage) {
-    const efficiency = facts.cost === null ? facts.damage / 2 : facts.damage / Math.max(1, facts.cost);
-    score += Math.min(12, efficiency * 0.8);
-    pros.push(`${facts.damage} 点总伤害，${efficiency >= 9 ? '即时输出效率高' : '能补充输出'}`);
+  if (facts.hasDirectDamage) {
+    score += 4;
+    pros.push('具有直接攻击能力；不对实际伤害或斩杀线作数值推算');
   }
   if (facts.block) {
     const efficiency = facts.cost === null ? facts.block / 2 : facts.block / Math.max(1, facts.cost);
@@ -304,7 +303,7 @@ function analyzeCard(card, state, context, threats, coachItem, enemyTags = new S
     score -= 2;
     cons.push('收益依赖触发条件，并非每场战斗都稳定');
   }
-  if (facts.isPower && facts.damage === 0 && facts.block === 0) {
+  if (facts.isPower && facts.block === 0) {
     cons.push('打出当回合通常没有直接伤害或格挡，短战偏慢');
     scenarios.push('Boss 与持续战');
   }
@@ -320,7 +319,7 @@ function analyzeCard(card, state, context, threats, coachItem, enemyTags = new S
 
   if (fit.elite.level === '强') scenarios.push('精英战');
   if (fit.boss.level === '强') scenarios.push('Boss 战');
-  if (!scenarios.length) scenarios.push(facts.damage || facts.block ? '常规战斗' : '特定流派成型后');
+  if (!scenarios.length) scenarios.push(facts.hasDirectDamage || facts.block ? '常规战斗' : '特定流派成型后');
   if (!pros.length) pros.push('保留了候选牌的基础功能，可在对应流派中发挥作用');
   if (!cons.length) cons.push('没有明显硬伤，但仍要衡量它是否比跳过更能改善当前牌组');
 

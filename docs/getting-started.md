@@ -163,7 +163,7 @@ npm run harness:inspect -- --once
 
 - 数据源为 `sts2-mod-bridge`；
 - 当前角色、章节、楼层和生命；
-- 战斗中可看到手牌、敌人意图和预估伤害。
+- 战斗中可看到手牌和敌人意图；GameBuddy 不推算实际伤害。
 
 如果探针无法取得合法状态，先排查 Mod；如果探针正常但 UI 不刷新，再排查 Electron。
 

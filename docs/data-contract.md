@@ -55,7 +55,6 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
         "maxHp": 96,
         "block": 0,
         "intent": "AttackIntent",
-        "damage": 18,
         "alive": true
       }
     ]

@@ -104,7 +104,7 @@ npm run harness:inspect -- --once
 npm run harness:inspect -- --duration=30000
 ```
 
-它会输出连接状态、角色、楼层、生命、能量、手牌数量、敌人意图和预计伤害。若这里没有合法状态，问题在 Mod 或 WebSocket；若这里正常而桌面端不更新，再查 Electron 层。
+它会输出连接状态、角色、楼层、生命、能量、手牌数量和敌人意图。若这里没有合法状态，问题在 Mod 或 WebSocket；若这里正常而桌面端不更新，再查 Electron 层。
 
 Replay Bridge 会根据连续快照自动发出 `combat.started`、`turn.started`、`combat.ended` 和 `map.opened` 事件。可以用生命周期夹具验证：
 

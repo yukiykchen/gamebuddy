@@ -128,8 +128,8 @@ function setStatus(status) {
 function setState(next) {
   const enemy = next.combat?.enemies?.[0];
   const intent = String(enemy?.intent || '').toLowerCase();
-  if (intent.includes('attack') || Number(enemy?.damage) > 0) {
-    say(`小心，预计 ${enemy.damage || 0} 伤害`, 'alert');
+  if (intent.includes('attack')) {
+    say('小心，敌人显示攻击意图', 'alert');
   } else if (/rest|camp/i.test(String(next.run?.room || '')) || /rest/i.test(String(next.run?.currentNode || ''))) {
     say('休息处，想想回血还是升级', 'thinking');
   } else if (next.run?.room === 'map') {

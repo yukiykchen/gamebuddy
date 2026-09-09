@@ -13,7 +13,6 @@ using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Logging;
 using MegaCrit.Sts2.Core.Models;
-using MegaCrit.Sts2.Core.MonsterMoves.Intents;
 using MegaCrit.Sts2.Core.Map;
 using MegaCrit.Sts2.Core.Nodes.Cards.Holders;
 using MegaCrit.Sts2.Core.Nodes.Screens.Map;
@@ -571,22 +570,12 @@ public static class GameBuddyExporter
     private static EnemySnapshot MapEnemy(Creature enemy)
     {
         var intent = "none";
-        var damage = 0;
         if (enemy.IsMonster && enemy.Monster?.NextMove is not null)
         {
             intent = string.Join(" | ", enemy.Monster.NextMove.Intents.Select(item => item.GetType().Name));
-            var allies = enemy.CombatState?.Allies;
-            if (allies is not null)
-            {
-                foreach (var item in enemy.Monster.NextMove.Intents.OfType<AttackIntent>())
-                {
-                    try { damage += item.GetTotalDamage(allies, enemy); }
-                    catch { /* The game may not have finished applying modifiers yet. */ }
-                }
-            }
         }
 
-        return new EnemySnapshot(enemy.Monster?.Id.Entry, enemy.Name, enemy.CurrentHp, enemy.MaxHp, enemy.Block, intent, damage, enemy.IsAlive);
+        return new EnemySnapshot(enemy.Monster?.Id.Entry, enemy.Name, enemy.CurrentHp, enemy.MaxHp, enemy.Block, intent, enemy.IsAlive);
     }
 }
 
@@ -597,7 +586,7 @@ public sealed record GameBuddyState(string Schema, long Timestamp, string Source
 public sealed record RunSnapshot(int Act, int Floor, string? Room, string Character, int TotalFloor, string? CurrentNode, string? CurrentCoord, string ActId, string ActName, string? NextBossId, string? NextBoss, string? SecondBossId, string? SecondBoss);
 public sealed record PlayerSnapshot(int Hp, int MaxHp, int Block, int Gold, int Energy, int MaxEnergy, List<CardSnapshot> Cards, List<OwnedItemSnapshot> Relics, List<OwnedItemSnapshot> Potions);
 public sealed record CombatSnapshot(int Turn, List<CardSnapshot> Hand, List<CardSnapshot> DrawPile, List<CardSnapshot> DiscardPile, List<CardSnapshot> ExhaustPile, List<EnemySnapshot> Enemies);
-public sealed record EnemySnapshot(string? Id, string Name, int Hp, int MaxHp, int Block, string? Intent, int Damage, bool Alive);
+public sealed record EnemySnapshot(string? Id, string Name, int Hp, int MaxHp, int Block, string? Intent, bool Alive);
 public sealed record CardSnapshot(string Id, string Name, string Type, int? Cost, bool Upgraded);
 public sealed record OwnedItemSnapshot(string Id, string Name);
 public sealed record MapSnapshot(

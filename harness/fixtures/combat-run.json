@@ -106,7 +106,6 @@
           "maxHp": 96,
           "block": 0,
           "intent": "AttackIntent",
-          "damage": 18,
           "alive": true
         }
       ]
@@ -215,7 +214,6 @@
           "maxHp": 96,
           "block": 0,
           "intent": "AttackIntent",
-          "damage": 18,
           "alive": true
         }
       ]
@@ -324,7 +322,6 @@
           "maxHp": 96,
           "block": 8,
           "intent": "DefendIntent",
-          "damage": 0,
           "alive": true
         }
       ]

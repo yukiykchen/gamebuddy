@@ -33,7 +33,6 @@
           "maxHp": 20,
           "block": 0,
           "intent": "AttackIntent",
-          "damage": 8,
           "alive": true
         }
       ]
@@ -76,7 +75,6 @@
           "maxHp": 20,
           "block": 0,
           "intent": "none",
-          "damage": 0,
           "alive": false
         }
       ]

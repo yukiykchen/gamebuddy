@@ -43,7 +43,7 @@ function characterName(character) {
 function combatView() {
   const hasCombat = Boolean(state.combat);
   const enemy = state.enemy;
-  const enemyIntent = enemy?.damage > 0 ? `攻击 ${enemy.damage}` : enemy?.subtitle || '意图未知';
+  const enemyIntent = enemy?.subtitle || '意图未知';
   const liveRecommendation = hasCombat && enemy
     ? { title: '战斗出牌暂缓', card: '', reason: `已收到 ${enemy.name} 的生命、格挡和意图，手牌也会同步。出牌顺序先不做，打开地图后会给路线建议。`, sequence: [] }
     : { title: '战斗出牌暂缓', card: '', reason: '当前先做路线规划。进入战斗后这里仍会显示真实手牌和敌人，但暂时不给出牌顺序。', sequence: [] };
@@ -61,7 +61,7 @@ function combatView() {
           <div class="unit-card enemy-card">
             <div class="unit-label enemy-label"><span class="mini-status"></span>敌方</div><div class="unit-name">${enemy?.name || '暂无敌人'}</div><div class="unit-subtitle">${enemy?.subtitle || '进入战斗后显示'}</div>
             <div class="vitals"><div class="vital danger"><strong>${enemy?.hp ?? '--'}</strong><span>${enemy ? `生命 / ${enemy.maxHp}` : '生命'}</span></div></div>
-            <div class="unit-meter"><span style="width:${enemy ? hpPercent(enemy) : 0}%"></span></div><div class="intent"><strong>${enemy ? enemyIntent : '等待战斗数据'}</strong>　${enemy ? (enemy.damage > 0 ? '未减伤前的预估伤害' : '敌方下一步行动') : '本区域暂无敌人'}</div>
+            <div class="unit-meter"><span style="width:${enemy ? hpPercent(enemy) : 0}%"></span></div><div class="intent"><strong>${enemy ? enemyIntent : '等待战斗数据'}</strong>　${enemy ? '仅显示游戏上报的行动意图' : '本区域暂无敌人'}</div>
           </div>
         </div>
         <div class="energy-row"><div class="energy">${hasCombat ? state.player.energy : '--'}<small>/ ${hasCombat ? state.player.maxEnergy : '--'} 能量</small></div><div class="turn-status">${state.paused ? '建议已暂停 · 数据仍在同步' : hasCombat ? '等待你的操作' : '等待进入战斗'}</div><div class="panel-meta">抽牌堆 ${hasCombat ? state.combat.drawPile.length : '--'}　弃牌堆 ${hasCombat ? state.combat.discardPile.length : '--'}</div></div>
@@ -367,8 +367,7 @@ function applyBridgeState(next) {
     state.enemy = {
       ...state.enemy,
       ...enemy,
-      subtitle: enemy.intent === 'AttackIntent' ? '意图：攻击' : enemy.intent === 'DefendIntent' ? '意图：防御' : enemy.intent ? `意图：${enemy.intent}` : '意图未知',
-      damage: Number.isFinite(enemy.damage) ? enemy.damage : 0
+      subtitle: enemy.intent === 'AttackIntent' ? '意图：攻击' : enemy.intent === 'DefendIntent' ? '意图：防御' : enemy.intent ? `意图：${enemy.intent}` : '意图未知'
     };
   }
   if (Array.isArray(next.combat?.hand)) {

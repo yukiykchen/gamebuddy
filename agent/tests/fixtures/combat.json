@@ -15,7 +15,7 @@
       "discardPile": [],
       "exhaustPile": [],
       "enemies": [
-        { "name": "小史莱姆", "hp": 24, "maxHp": 30, "block": 0, "intent": "AttackIntent", "damage": 12, "alive": true }
+        { "name": "小史莱姆", "hp": 24, "maxHp": 30, "block": 0, "intent": "AttackIntent", "alive": true }
       ]
     },
     "map": { "visited": [] }

@@ -17,10 +17,9 @@ fixture.forEach((state, index) => {
     }
   }
   for (const enemy of state.combat?.enemies || []) {
-    for (const field of ['name', 'hp', 'maxHp', 'block', 'intent', 'damage', 'alive']) {
+    for (const field of ['name', 'hp', 'maxHp', 'block', 'intent', 'alive']) {
       if (!(field in enemy)) throw new Error(`Snapshot ${index} enemy missing ${field}`);
     }
-    if (enemy.damage !== undefined && !Number.isFinite(enemy.damage)) throw new Error(`Snapshot ${index} enemy damage is invalid`);
   }
 });
 

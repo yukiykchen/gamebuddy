@@ -50,7 +50,7 @@ GameBuddy version:
 WebSocket connected: yes / no
 Combat snapshot: yes / no
 Hand updates: yes / no
-Enemy intent and damage: yes / no
+Enemy intent (no damage estimate): yes / no
 Card reward and recommendation: yes / no
 Rest recommendation: yes / no
 Elite guide popup: yes / no
