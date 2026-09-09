@@ -4,7 +4,7 @@ const WebSocket = require('ws');
 const { createObservationStore } = require('./harness/observation-store');
 const { createOrchestrator } = require('./agent/orchestrator');
 const { createOpenAiClient, readLlmConfig } = require('./agent/llm/openai');
-const { ensureMapRoutes } = require('./agent/tasks/route');
+const { ensureMapRoutes, routeChoiceCount } = require('./agent/tasks/route');
 const { decide } = require('./agent/router');
 const { recordDecision } = require('./agent/recorder');
 const { encounterGuideSignature, buildEncounterGuide } = require('./agent/tasks/encounter-guide');
@@ -235,6 +235,7 @@ function connectBridge() {
           if (!agentRunId) startAgentRun();
           const observation = currentObservation();
           const routableState = withRoutableState(observation.state);
+          if (!routableState.combat && routeChoiceCount(routableState) <= 1) clearAgentThinking('map_route');
           recordDecision({ runId: agentRunId, observation: { ...observation, state: routableState }, decision: observation.decision });
           broadcast('bridge-state', routableState);
           sendHighlightRoute(observation.decision, routableState);
@@ -282,6 +283,7 @@ function connectBridge() {
 
 function sendHighlightRoute(decision, routableState) {
   if (!bridgeSocket || bridgeSocket.readyState !== WebSocket.OPEN) return;
+  if (routeChoiceCount(routableState) <= 1) return;
   let coords = [];
   if (decision?.agent === 'route' && decision?.status === 'ready') {
     coords = Array.isArray(decision.payload?.routeCoords) ? decision.payload.routeCoords : [];

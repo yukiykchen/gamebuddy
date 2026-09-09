@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { createObservationStore } = require('./observation-store');
 const { validateRecommendation } = require('../agent/recommendation');
-const { rankRoutes, recommendRoute, scoreNode, scoreParts, buildScoreContext, ensureMapRoutes } = require('../agent/tasks/route');
+const { rankRoutes, recommendRoute, scoreNode, scoreParts, buildScoreContext, ensureMapRoutes, routeChoiceCount } = require('../agent/tasks/route');
 const { isRestSite, recommendRest, rankSmithCards } = require('../agent/tasks/rest');
 const { findCardReward, recommendCardReward } = require('../agent/tasks/card-reward');
 const { parseJsonObject, createOpenAiClient, readLlmConfig, extractResponseText } = require('../agent/llm/openai');
@@ -179,6 +179,28 @@ const combatObservation = {
 };
 assert.equal(selectTask(combatObservation), null);
 
+const singleChoiceState = {
+  ...mapState,
+  map: {
+    visited: ['1,1'],
+    current: '1,1',
+    nodes: [
+      { id: '1,1', row: 1, col: 1, type: 'RestSite', children: ['2,1'] },
+      { id: '2,1', row: 2, col: 1, type: 'Monster', children: ['3,0', '3,2'] },
+      { id: '3,0', row: 3, col: 0, type: 'Elite', children: ['4,1'] },
+      { id: '3,2', row: 3, col: 2, type: 'RestSite', children: ['4,1'] },
+      { id: '4,1', row: 4, col: 1, type: 'Boss', children: [] }
+    ],
+    routes: [
+      ['1,1', '2,1', '3,0', '4,1'],
+      ['1,1', '2,1', '3,2', '4,1']
+    ]
+  }
+};
+const singleChoiceObservation = { ...observation, state: singleChoiceState };
+assert.equal(routeChoiceCount(singleChoiceState), 1);
+assert.equal(selectTask(singleChoiceObservation), null);
+
 recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   assert.equal(validateRecommendation(rulesRec).ok, true);
   assert.equal(rulesRec.source, 'rules');
@@ -282,7 +304,8 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
     fresh: true,
     state: { ...mapState, map: { visited: [], routes: [] } }
   });
-  assert.equal(empty, first);
+  assert.equal(empty, null);
+  assert.equal(published, null);
   orchestrator.clearRecommendation();
   assert.equal(orchestrator.getRecommendation(), null);
   assert.equal(published, null);
@@ -405,7 +428,7 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   assert.equal(rewardRec.options.length, 3);
   assert.ok(rewardRec.options.every(card => card.fit?.boss && card.fit?.elite));
 
-  console.log('Agent recommendation cases passed: 30');
+  console.log('Agent recommendation cases passed: 32');
 }).catch(error => {
   console.error(error);
   process.exit(1);

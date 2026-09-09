@@ -404,7 +404,7 @@ window.gamebuddyBridge?.onEvent(event => {
     if (state.recommendation?.task === 'card_reward') state.recommendation = null;
     state.mode = 'route';
     render();
-    showToast('地图已打开，路线建议已准备');
+    showToast('地图已打开；出现分叉时会生成路线建议');
   }
   if (event.name === 'rest.opened') {
     state.mode = 'route';

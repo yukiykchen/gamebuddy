@@ -1,14 +1,9 @@
 const { validateRecommendation } = require('./recommendation');
-const { recommendRoute, routeSignature, ensureMapRoutes } = require('./tasks/route');
+const { recommendRoute, routeSignature, routeChoiceCount } = require('./tasks/route');
 const { isRestSite, recommendRest, restSignature } = require('./tasks/rest');
 const { recommendEvent, eventSignature } = require('./tasks/event');
 const { findCardReward, recommendCardReward, cardRewardSignature } = require('./tasks/card-reward');
 const { createOpenAiClient, readLlmConfig } = require('./llm/openai');
-
-function hasRoutableMap(state) {
-  const map = ensureMapRoutes(state?.map || {});
-  return Array.isArray(map.routes) && map.routes.length > 0;
-}
 
 const SCENE_EVENTS = new Set([
   'combat.started',
@@ -47,7 +42,7 @@ function selectTask(observation) {
     if (name === 'rest.opened') return 'rest_site';
   }
   if (isRestSite(state)) return 'rest_site';
-  if (isMapScene(observation) && hasRoutableMap(state)) return 'map_route';
+  if (isMapScene(observation) && routeChoiceCount(state) > 1) return 'map_route';
   return null;
 }
 
@@ -73,7 +68,8 @@ function createOrchestrator({
   async function consider(observation, { force = false } = {}) {
     const task = selectTask(observation);
     if (!task) {
-      if (observation?.state?.combat || latestSceneEvent(observation) === 'card.reward.closed') {
+      const mapWithoutFork = isMapScene(observation) && routeChoiceCount(observation?.state) <= 1;
+      if (observation?.state?.combat || latestSceneEvent(observation) === 'card.reward.closed' || mapWithoutFork) {
         generation += 1;
         lastSignature = '';
         if (lastRecommendation) {

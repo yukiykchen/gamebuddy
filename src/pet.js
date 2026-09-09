@@ -133,7 +133,7 @@ function setState(next) {
   } else if (/rest|camp/i.test(String(next.run?.room || '')) || /rest/i.test(String(next.run?.currentNode || ''))) {
     say('休息处，想想回血还是升级', 'thinking');
   } else if (next.run?.room === 'map') {
-    say('地图开了，看看走哪条');
+    say('地图已打开');
   } else {
     say('我在看着这局');
   }
@@ -141,7 +141,7 @@ function setState(next) {
 
 function setRecommendation(recommendation) {
   if (!recommendation) {
-    say('地图已打开，正在重新规划');
+    say('我在看着这局');
     return;
   }
   if (recommendation?.task === 'card_reward' && recommendation.primary?.label) {

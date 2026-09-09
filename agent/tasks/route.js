@@ -204,6 +204,19 @@ function nextStep(route, current, visited) {
   return route.find(id => !seen.has(id)) || route[0];
 }
 
+function routeChoiceTargets(state) {
+  const map = ensureMapRoutes(state?.map || {});
+  const routes = Array.isArray(map.routes) ? map.routes : [];
+  const targets = routes
+    .map(route => nextStep(route, map.current || null, map.visited || []))
+    .filter(Boolean);
+  return [...new Set(targets)];
+}
+
+function routeChoiceCount(state) {
+  return routeChoiceTargets(state).length;
+}
+
 function targetDirections(items) {
   const targets = [...new Map(items
     .filter(item => item.targetId)
@@ -498,6 +511,8 @@ module.exports = {
   scoreNode,
   ensureMapRoutes,
   resolveMapOrigins,
+  routeChoiceTargets,
+  routeChoiceCount,
   rankRoutes,
   targetPositionLabel,
   recommendRoute,
