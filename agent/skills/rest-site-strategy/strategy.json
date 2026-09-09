@@ -1,0 +1,72 @@
+{
+  "schemaVersion": 1,
+  "game": {
+    "version": "v0.107.1",
+    "channel": "stable",
+    "reviewedAt": "2026-09-10"
+  },
+  "principles": [
+    "先保证能安全通过下一次已知威胁，再比较升级的长期收益",
+    "优先降费、抽牌、能量、保留、移除消耗、倍率成长等质变升级",
+    "优先实际牌组会频繁打出或能让核心引擎启动的牌",
+    "升级应补当前伤害、格挡、控制或循环缺口，并匹配牌组与遗物协同",
+    "纯小幅数值升级和起手打击防御通常靠后，但允许为近期阈值破例",
+    "同分时保留不确定性，不依据稀有度或单卡 Tier 强行制造唯一答案"
+  ],
+  "weights": {
+    "costOrEnergyChange": 16,
+    "drawOrEnergyGain": 14,
+    "qualitativeChange": 13,
+    "scalingOrMultiplier": 11,
+    "multiTargetOrControl": 8,
+    "strongNumericGain": 8,
+    "moderateNumericGain": 5,
+    "frequentUse": 6,
+    "deckSynergy": 6,
+    "immediateThreatFit": 5,
+    "highTierPrior": 3,
+    "starterPenalty": -10,
+    "lowImpactPenalty": -5
+  },
+  "healthPolicy": {
+    "criticalRatio": 0.4,
+    "cautionRatio": 0.55,
+    "comfortableRatio": 0.75,
+    "restFraction": 0.3,
+    "criticalSmithPenalty": 18,
+    "threatenedCautionSmithPenalty": 12,
+    "cautionSmithPenalty": 5
+  },
+  "sources": [
+    {
+      "name": "Reddit: Upgrading cards in STS2",
+      "url": "https://www.reddit.com/r/slaythespire/comments/1sebdhy/upgrading_cards_in_sts2/",
+      "published": "2026-04-06",
+      "usedFor": ["质变升级优先", "高难度生命压力"]
+    },
+    {
+      "name": "Reddit: Defect upgrade priorities",
+      "url": "https://www.reddit.com/r/slaythespire/comments/1t7h3p6/sts2_what_are_your_personal_defect_upgrade/",
+      "published": "2026-05-08",
+      "usedFor": ["按牌组缺口和近期遭遇调整", "抽牌与能量互补", "使用频率"]
+    },
+    {
+      "name": "Steam Community: Tips and tricks",
+      "url": "https://steamcommunity.com/app/2868840/discussions/0/798964766335963776/",
+      "published": "2026",
+      "usedFor": ["常打出的牌优先", "比较实际边际收益"]
+    },
+    {
+      "name": "Reddit: A9/A10 strategy changes",
+      "url": "https://www.reddit.com/r/slaythespire/comments/1s5lare/strategy_changes_for_a9_and_a10/",
+      "published": "2026-03",
+      "usedFor": ["关键升级与回血的动态权衡"]
+    },
+    {
+      "name": "Spire Codex tier list",
+      "url": "https://spire-codex.com/tier-list",
+      "published": "rolling",
+      "usedFor": ["v0.107.1 单卡社区数据先验"]
+    }
+  ]
+}

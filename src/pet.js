@@ -146,7 +146,8 @@ function setRecommendation(recommendation) {
     return;
   }
   if (recommendation?.task === 'rest_site' && recommendation.primary?.label) {
-    say(`休息处建议${recommendation.primary.label}`, 'thinking');
+    const shortReason = String(recommendation.reason || '').split(/[。！？]/)[0];
+    say(`休息处建议${recommendation.primary.label}${shortReason ? `：${shortReason}` : ''}`);
     return;
   }
   if (recommendation?.task !== 'map_route' || !recommendation.primary?.label) return;

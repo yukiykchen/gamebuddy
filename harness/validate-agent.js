@@ -57,6 +57,14 @@ const fullHpSmith = rankRoutes({
 assert.equal(fullHpSmith[0].targetType, 'RestSite');
 assert.ok(scoreParts('RestSite', buildScoreContext({ player: { ...mapState.player, hp: 80, maxHp: 80 } })).payoff >= 9);
 
+const upgradePriorities = rankSmithCards([
+  { id: 'TEST_DRAW', name: '测试过牌', type: 'Skill', cost: 1, upgraded: false, description: '抽1张牌。', upgradeDescription: '抽2张牌。' },
+  { id: 'TEST_DAMAGE', name: '测试攻击', type: 'Attack', cost: 1, upgraded: false, description: '造成8点伤害。', upgradeDescription: '造成10点伤害。' }
+], { hpRatio: 0.8, act: 2, threats: {} });
+assert.equal(upgradePriorities[0].card.id, 'TEST_DRAW');
+assert.equal(upgradePriorities[0].analysis.signals.drawOrEnergy, true);
+assert.equal(upgradePriorities[0].analysis.gameVersion, 'v0.107.1');
+
 const eliteThenRest = rankRoutes({
   run: mapState.run,
   player: { ...mapState.player, hp: 40, maxHp: 80, gold: 20 },

@@ -155,7 +155,7 @@ function createOpenAiClient(config = readLlmConfig(), { fetchImpl = globalThis.f
       'map_route'
     ),
     completeRest: payload => completeJson(
-      '你是杀戮尖塔 2 的休息处顾问。在回血和升级之间权衡：残血或后面有精英时优先回血；生命健康时升级核心牌，不要优先升打击和防御。只从给定候选里选一条。用 JSON 回答：{"index":0,"reason":"两句中文解释"}。',
+      '你是杀戮尖塔 2 的休息处顾问。严格使用 payload.strategy 的社区复核原则，并结合当前生命、完整牌组、遗物、药水、地图和近期精英/Boss，在回血与真实升级候选之间权衡。先确保玩家能活过近期已知威胁；升级时优先能产生降费、抽牌/能量、保留/消耗变化、倍率成长等质变且会在当前牌组中频繁兑现的牌。单卡 Tier 只是弱先验，不能覆盖升级前后差值、牌组协同和生存风险。不要默认升级稀有牌，也不要默认永不升级起手牌。只从给定 candidates 中选择，不得发明卡牌、遗物、机制或数值。用 JSON 回答：{"index":0,"reason":"两句中文解释，说明为什么回血更安全，或该升级如何改善当前牌组与近期战斗"}。',
       payload,
       'rest_site'
     ),

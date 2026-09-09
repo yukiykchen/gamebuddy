@@ -102,6 +102,9 @@ function restView() {
   const healAmount = primary?.healAmount ?? (rec?.alternatives || []).find(item => item.action === 'HEAL')?.healAmount;
   const healTo = primary?.healTo ?? (hp.hp || 0) + (healAmount || 0);
   const smithAlts = (rec?.alternatives || []).filter(item => item.action === 'SMITH');
+  const displayedSmith = smithPick ? primary : smithAlts[0];
+  const smithAnalysis = displayedSmith?.upgradeAnalysis;
+  const smithReasons = (smithAnalysis?.reasons || []).slice(0, 3).map(item => `<li class="positive">${escapeHtml(item)}</li>`).join('');
   const unupgraded = (hp.cards || []).filter(card => card && card.upgraded !== true);
   const title = primary?.label ? escapeHtml(primary.label) : '回血还是升级？';
   const reason = rec?.reason
@@ -116,14 +119,15 @@ function restView() {
   const smithCard = smithPick || smithAlts[0]
     ? `<article class="draft-card ${smithPick ? 'top-pick' : ''}">
         <span class="pick-tag">${smithPick ? '建议升级' : '可升级'}</span>
-        <div class="card-name">${escapeHtml(primary?.cardName || smithAlts[0]?.cardName || '')}</div>
+        <div class="card-name">${escapeHtml(displayedSmith?.cardName || '')}</div>
         <p>${smithPick ? escapeHtml(rec.reason) : '生命还够时，升级这张牌通常比回一点血更能提高战斗力。'}</p>
+        ${smithReasons ? `<ul class="draft-notes">${smithReasons}</ul>` : ''}
       </article>`
     : `<article class="draft-card"><span class="pick-tag">没有可升级牌</span><div class="card-name">卡组已升满</div><p>没有未升级的牌时，只能选择回血。</p></article>`;
   const otherSmiths = smithAlts.slice(smithPick ? 0 : 1).slice(0, 3).map(item => `
-    <div class="route-choice"><strong>备选升级</strong><span>${escapeHtml(item.cardName || item.label)}</span></div>`).join('');
-  const sourceLabel = rec ? (rec.source === 'llm' ? '模型' : '规则') : '等待分析';
-  return `<div class="draft-layout rest-layout"><section class="panel draft-offer"><div class="draft-kicker">REST / CAMPFIRE</div><h2 class="draft-title">${title}</h2><p class="recommendation-reason">${reason}</p><div class="draft-cards">${healCard}${smithCard}</div>${otherSmiths}</section><section class="panel draft-side"><div class="panel-heading"><span class="panel-title">休息处状态</span><span class="panel-meta">${sourceLabel}</span></div><div class="deck-stat"><span>生命</span><strong>${hp.hp || 0} / ${hp.maxHp || 0}</strong></div><div class="deck-stat"><span>缺口</span><strong>${missing || 0}</strong></div><div class="deck-stat"><span>未升级</span><strong>${unupgraded.length || 0}</strong></div><div class="deck-stat"><span>卡组</span><strong>${hp.cards?.length || 0}</strong></div><div class="data-empty" style="margin-top:18px">GameBuddy 只给建议，不会替你点回血或升级。</div></section></div>`;
+    <div class="route-choice"><strong>备选升级 · ${escapeHtml(item.cardName || item.label)}</strong><span>${escapeHtml(item.reason || '升级收益低于当前首选')}</span></div>`).join('');
+  const sourceLabel = rec ? (rec.source === 'llm' ? '模型 + 社区 Skill' : '社区 Skill') : '等待分析';
+  return `<div class="draft-layout rest-layout"><section class="panel draft-offer"><div class="draft-kicker">REST / CAMPFIRE</div><h2 class="draft-title">${title}</h2><p class="recommendation-reason">${reason}</p><div class="draft-cards">${healCard}${smithCard}</div>${otherSmiths}</section><section class="panel draft-side"><div class="panel-heading"><span class="panel-title">休息处状态</span><span class="panel-meta">${sourceLabel}</span></div><div class="deck-stat"><span>生命</span><strong>${hp.hp || 0} / ${hp.maxHp || 0}</strong></div><div class="deck-stat"><span>缺口</span><strong>${missing || 0}</strong></div><div class="deck-stat"><span>未升级</span><strong>${unupgraded.length || 0}</strong></div><div class="deck-stat"><span>卡组</span><strong>${hp.cards?.length || 0}</strong></div><div class="deck-stat"><span>策略版本</span><strong>${escapeHtml(rec?.strategy?.gameVersion || 'v0.107.1')}</strong></div><div class="data-empty" style="margin-top:18px">社区策略是局面先验，不是固定升级榜。GameBuddy 不会替你点击。</div></section></div>`;
 }
 
 function draftView() {
