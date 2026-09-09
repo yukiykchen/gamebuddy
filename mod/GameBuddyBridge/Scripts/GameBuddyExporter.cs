@@ -154,6 +154,7 @@ public static class GameBuddyExporter
         {
             _activeCardRewardScreen = null;
             _lastCardRewardSignature = string.Empty;
+            PublishEvent("card.reward.closed");
         }
     }
 

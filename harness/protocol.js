@@ -1,5 +1,5 @@
 const SUPPORTED_SCHEMA = 'gamebuddy.state.v1';
-const SUPPORTED_EVENTS = new Set(['combat.started', 'turn.started', 'combat.ended', 'map.opened', 'rest.opened', 'event.opened', 'card.played', 'card.reward.opened']);
+const SUPPORTED_EVENTS = new Set(['combat.started', 'turn.started', 'combat.ended', 'map.opened', 'rest.opened', 'event.opened', 'card.played', 'card.reward.opened', 'card.reward.closed']);
 
 function validateReward(reward, prefix = 'reward') {
   if (!reward || typeof reward !== 'object') return { ok: false, reason: `${prefix} must be an object` };

@@ -10,13 +10,36 @@ function hasRoutableMap(state) {
   return Array.isArray(map.routes) && map.routes.length > 0;
 }
 
+const SCENE_EVENTS = new Set([
+  'combat.started',
+  'combat.ended',
+  'card.reward.opened',
+  'card.reward.closed',
+  'rest.opened',
+  'event.opened',
+  'map.opened'
+]);
+
+function latestSceneEvent(observation) {
+  const events = observation?.recentEvents || [];
+  for (let index = events.length - 1; index >= 0; index -= 1) {
+    if (SCENE_EVENTS.has(events[index]?.name)) return events[index].name;
+  }
+  return '';
+}
+
+function isMapScene(observation) {
+  const latest = latestSceneEvent(observation);
+  if (latest) return latest === 'map.opened';
+  return /map/i.test(String(observation?.state?.run?.room || ''));
+}
+
 function selectTask(observation) {
   const state = observation?.state;
   if (!state) return null;
   if (state.combat) return null;
-  if (Array.isArray(state.cardReward?.options) && state.cardReward.options.length > 0) return 'card_reward';
-  if (Array.isArray(state.event?.options) && state.event.options.length > 0) return 'event_choice';
   if (findCardReward(observation)) return 'card_reward';
+  if (Array.isArray(state.event?.options) && state.event.options.length > 0) return 'event_choice';
   const recent = observation.recentEvents || [];
   for (let i = recent.length - 1; i >= 0; i -= 1) {
     const name = recent[i]?.name;
@@ -24,7 +47,7 @@ function selectTask(observation) {
     if (name === 'rest.opened') return 'rest_site';
   }
   if (isRestSite(state)) return 'rest_site';
-  if (hasRoutableMap(state)) return 'map_route';
+  if (isMapScene(observation) && hasRoutableMap(state)) return 'map_route';
   return null;
 }
 
@@ -50,7 +73,7 @@ function createOrchestrator({
   async function consider(observation, { force = false } = {}) {
     const task = selectTask(observation);
     if (!task) {
-      if (observation?.state?.combat) {
+      if (observation?.state?.combat || latestSceneEvent(observation) === 'card.reward.closed') {
         generation += 1;
         lastSignature = '';
         if (lastRecommendation) {

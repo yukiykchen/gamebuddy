@@ -385,13 +385,27 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
     })
   };
   assert.equal(findCardReward(rewardObservation).cards.length, 3);
+  const closedRewardObservation = {
+    ...rewardObservation,
+    state: {
+      ...mapState,
+      run: { ...mapState.run, room: 'Monster' },
+      cardReward: { options: rewardObservation.recentEvents[0].data.cards }
+    },
+    recentEvents: [
+      ...rewardObservation.recentEvents,
+      { name: 'card.reward.closed' }
+    ]
+  };
+  assert.equal(findCardReward(closedRewardObservation), null);
+  assert.equal(selectTask(closedRewardObservation), null);
   const rewardRec = await recommendCardReward(rewardObservation, { codex: fakeCodex, now: 14 });
   assert.equal(validateRecommendation(rewardRec).ok, true);
   assert.equal(rewardRec.task, 'card_reward');
   assert.equal(rewardRec.options.length, 3);
   assert.ok(rewardRec.options.every(card => card.fit?.boss && card.fit?.elite));
 
-  console.log('Agent recommendation cases passed: 28');
+  console.log('Agent recommendation cases passed: 30');
 }).catch(error => {
   console.error(error);
   process.exit(1);

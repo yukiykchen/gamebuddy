@@ -119,6 +119,8 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
 - `map.opened`
 - `rest.opened`
 - `combat.ended`
+- `card.reward.opened`
+- `card.reward.closed`
 
 `card.reward.opened` 在 `NCardRewardSelectionScreen` 打开或刷新时发送，`data.cards` 为当前可见候选牌；桌面端据此触发 `card_reward` Agent：
 
@@ -139,6 +141,8 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
   }
 }
 ```
+
+玩家选牌、跳过奖励或以其他方式关闭奖励层时，Mod 发送 `card.reward.closed`。桌面端收到后会立即取消尚未完成的卡牌 LLM 请求、停止思考动画并清除旧建议；后续只有新的 `card.reward.opened` 才能再次触发选牌 Agent。
 
 `card.played` 仍待接入对应 STS2 生命周期 Hook。
 

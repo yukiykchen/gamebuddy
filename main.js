@@ -94,6 +94,19 @@ function updateAgentThinking(thinking, detail = {}) {
   broadcast('bridge-agent-thinking', lastAgentThinking);
 }
 
+function clearAgentThinking(task) {
+  for (const [requestId, request] of activeLlmRequests) {
+    if (!task || request.task === task) activeLlmRequests.delete(requestId);
+  }
+  const requests = [...activeLlmRequests.values()];
+  lastAgentThinking = {
+    thinking: requests.length > 0,
+    tasks: [...new Set(requests.map(request => request.task).filter(Boolean))],
+    model: requests[0]?.model || null
+  };
+  broadcast('bridge-agent-thinking', lastAgentThinking);
+}
+
 function publishRecommendation(recommendation) {
   broadcast('bridge-recommendation', recommendation);
   if (recommendation?.task === 'card_reward') {
@@ -231,7 +244,13 @@ function connectBridge() {
       if (result.kind === 'event' && result.accepted) {
         broadcast('bridge-event', result.event);
         if (result.event?.name === 'combat.ended') clearEncounterGuide();
-        if (result.event?.name === 'combat.started') clearCardRecommendation();
+        if (['card.reward.closed', 'map.opened', 'combat.started', 'rest.opened'].includes(result.event?.name)) {
+          clearCardRecommendation();
+          clearAgentThinking('card_reward');
+        }
+        if (result.event?.name === 'card.reward.closed') {
+          orchestrator.clearRecommendation();
+        }
         if (result.event?.name === 'map.opened') orchestrator.clearRecommendation();
       }
       if (result.accepted || (result.kind === 'duplicate' && !orchestrator.getRecommendation())) {

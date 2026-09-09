@@ -58,7 +58,10 @@ function setCardRecommendation(recommendation) {
 function setAgentThinking(state) {
   const thinking = Boolean(state?.thinking);
   stage.classList.toggle('llm-thinking', thinking);
-  if (!thinking) return;
+  if (!thinking) {
+    stage.classList.remove('thinking');
+    return;
+  }
   const task = state.tasks?.[0];
   const labels = {
     card_reward: '正在比较三张奖励牌',

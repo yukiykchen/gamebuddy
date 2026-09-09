@@ -38,9 +38,9 @@ function findCardReward(observation) {
   for (let index = events.length - 1; index >= 0; index -= 1) {
     const event = events[index];
     if (event?.name === 'card.reward.opened') return normalizeReward(event.data, state);
-    if (event?.name === 'map.opened' || event?.name === 'combat.started' || event?.name === 'rest.opened') return null;
+    if (event?.name === 'card.reward.closed' || event?.name === 'map.opened' || event?.name === 'combat.started' || event?.name === 'rest.opened') return null;
   }
-  return normalizeReward(state?.reward, state);
+  return normalizeReward(state?.cardReward || state?.reward, state);
 }
 
 function mapNodes(state) {

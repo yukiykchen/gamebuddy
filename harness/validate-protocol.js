@@ -17,6 +17,7 @@ assert.equal(validateMessage({ type: 'state', data: validState }).ok, true);
 assert.equal(validateMessage({ type: 'event', name: 'turn.started', timestamp: Date.now(), data: { turn: 1 } }).ok, true);
 assert.equal(validateMessage({ type: 'event', name: 'rest.opened', timestamp: Date.now() }).ok, true);
 assert.equal(validateMessage({ type: 'event', name: 'event.opened', timestamp: Date.now() }).ok, true);
+assert.equal(validateMessage({ type: 'event', name: 'card.reward.closed', timestamp: Date.now() }).ok, true);
 assert.equal(validateMessage({
   type: 'event',
   name: 'card.reward.opened',
@@ -75,4 +76,4 @@ assert.equal(validateState({
   reward: { cards: [] }
 }).ok, false);
 
-console.log('Protocol validation cases passed: 16');
+console.log('Protocol validation cases passed: 17');
