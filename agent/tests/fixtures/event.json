@@ -1,0 +1,11 @@
+[
+  {
+    "schema": "runmate.state.v1",
+    "timestamp": 1723370300000,
+    "source": "agent-test",
+    "run": { "act": 1, "floor": 8, "room": "event", "character": "ironclad", "eventId": "ABYSSAL_BATHS" },
+    "player": { "hp": 28, "maxHp": 72, "block": 0, "gold": 52, "energy": 3, "maxEnergy": 3, "cards": [], "relics": [], "potions": [] },
+    "combat": null,
+    "map": { "visited": [] }
+  }
+]

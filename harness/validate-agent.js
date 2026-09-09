@@ -7,15 +7,15 @@ const { rankRoutes, recommendRoute, scoreNode, scoreParts, buildScoreContext, en
 const { isRestSite, recommendRest, rankSmithCards } = require('../agent/tasks/rest');
 const { findCardReward, recommendCardReward } = require('../agent/tasks/card-reward');
 const { parseJsonObject, createOpenAiClient, readLlmConfig, extractResponseText } = require('../agent/llm/openai');
-const { loadCodexLlmConfig } = require('../agent/llm/codex-config');
 const { createOrchestrator } = require('../agent/orchestrator');
 
 const lifecycle = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'lifecycle.json'), 'utf8'));
 const mapState = lifecycle[2];
 
 const shopOverElite = rankRoutes(mapState);
-assert.equal(shopOverElite[0].targetType, 'Shop');
-assert.ok(shopOverElite[0].score > shopOverElite[1].score);
+assert.equal(shopOverElite[0].targetType, 'Elite');
+assert.equal(shopOverElite[0].eliteCount, 1);
+assert.equal(shopOverElite[1].eliteCount, 0);
 
 const shopCtx = buildScoreContext(mapState);
 assert.ok(scoreParts('Shop', shopCtx).payoff > scoreParts('Elite', shopCtx).payoff);
@@ -26,7 +26,7 @@ const lowHpState = {
   player: { ...mapState.player, hp: 20, maxHp: 80, gold: 109 }
 };
 const lowHp = rankRoutes(lowHpState);
-assert.equal(lowHp[0].targetType, 'Shop');
+assert.equal(lowHp[0].targetType, 'Elite');
 assert.ok(scoreNode('Elite', buildScoreContext(lowHpState)) < 0);
 
 const healthyElite = rankRoutes({
@@ -126,19 +126,17 @@ assert.equal(isRestSite(mapState), false);
 assert.equal(isRestSite(restState(72)), true);
 assert.equal(rankSmithCards(mapState.player.cards)[0].card.name, '痛击');
 
-const codexHome = path.join(__dirname, 'fixtures', 'codex-home');
-const fromCodex = loadCodexLlmConfig({ env: { GAMEBUDDY_CODEX_HOME: codexHome } });
-assert.equal(fromCodex.model, 'gpt-5.5');
-assert.equal(fromCodex.wireApi, 'responses');
-assert.equal(fromCodex.apiKey, 'sk-test-codex');
-assert.equal(fromCodex.baseURL, 'https://ai.gs88.shop/v1');
-assert.equal(fromCodex.reasoningEffort, 'xhigh');
-
-const merged = readLlmConfig({ GAMEBUDDY_CODEX_HOME: codexHome });
+const merged = readLlmConfig({
+  GAMEBUDDY_LLM_API_KEY: 'sk-test-kimi',
+  GAMEBUDDY_LLM_BASE_URL: 'https://api.moonshot.cn/v1',
+  GAMEBUDDY_LLM_MODEL: 'kimi-k2.5',
+  GAMEBUDDY_LLM_WIRE_API: 'chat',
+  GAMEBUDDY_LLM_REASONING_EFFORT: 'high'
+});
 assert.equal(merged.enabled, true);
-assert.equal(merged.model, 'gpt-5.5');
-assert.equal(merged.wireApi, 'responses');
-assert.equal(merged.source, 'codex');
+assert.equal(merged.model, 'kimi-k2.5');
+assert.equal(merged.wireApi, 'chat');
+assert.equal(merged.source, 'env');
 assert.equal(extractResponseText({ output_text: '{"index":1}' }), '{"index":1}');
 
 const store = createObservationStore({ staleAfterMs: 5000 });
@@ -151,15 +149,15 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   assert.equal(rulesRec.source, 'rules');
   assert.equal(rulesRec.task, 'map_route');
   assert.equal(rulesRec.primary.action, 'TAKE_ROUTE');
-  assert.equal(rulesRec.primary.targetId, '2,0');
-  assert.match(rulesRec.reason, /删起手牌|遗物|升级/);
+  assert.equal(rulesRec.primary.targetId, '2,1');
+  assert.match(rulesRec.reason, /精英和.*火堆|遗物|升级/);
 
   const llm = {
     enabled: true,
     completeRoute: async () => ({ index: 1, reason: '生命够用，去打精英换遗物。' })
   };
   const llmRec = await recommendRoute(mapState, { llm, now: 2 });
-  assert.equal(llmRec.source, 'llm');
+  assert.equal(llmRec.source, 'rules');
   assert.equal(llmRec.primary.label, '精英');
   assert.match(llmRec.reason, /精英/);
 
@@ -239,8 +237,8 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
     now: () => 3
   });
   const first = await orchestrator.consider(observation);
-  assert.equal(first.primary.targetId, '2,0');
-  assert.equal(published.primary.targetId, '2,0');
+  assert.equal(first.primary.targetId, '2,1');
+  assert.equal(published.primary.targetId, '2,1');
   const second = await orchestrator.consider(observation);
   assert.equal(second, first);
 

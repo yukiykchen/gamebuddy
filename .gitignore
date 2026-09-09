@@ -8,6 +8,12 @@ release/
 .env
 .env.*
 !.env.example
-.codex-cli/*
-!.codex-cli/config.toml
 hatch-runs/
+runs/
+
+mod/RunmateBridge/.godot/
+.runtime/
+
+# local source checkouts
+/spire-agent/
+/spire-codex/

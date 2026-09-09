@@ -220,6 +220,19 @@ function targetDirections(items) {
   ]));
 }
 
+function targetPositionLabel(map, targetId) {
+  const nodes = Array.isArray(map?.nodes) ? map.nodes : [];
+  const target = nodes.find(node => node?.id === targetId);
+  if (!target) return '';
+  const sameRow = nodes
+    .filter(node => Number(node?.row) === Number(target.row))
+    .sort((a, b) => (Number(a.col) || 0) - (Number(b.col) || 0));
+  const position = sameRow.findIndex(node => node.id === targetId);
+  if (sameRow.length === 3) return ['左侧', '中间', '右侧'][position] || '';
+  if (sameRow.length === 2) return ['左侧', '右侧'][position] || '';
+  return sameRow.length > 1 ? `从左第${position + 1}个` : '';
+}
+
 function rankRoutes(state) {
   const map = ensureMapRoutes(state?.map || {});
   const routes = Array.isArray(map.routes) ? map.routes : [];
@@ -256,23 +269,33 @@ function rankRoutes(state) {
     score += restAfterEliteBonus(upcoming, ctx);
     if (ctx.hpRatio < 0.45) score += Math.max(0, 8 - route.length);
     const target = nodesById.get(targetId);
+    const eliteCount = upcoming.filter(node => node.type === 'Elite').length;
+    const restSiteCount = upcoming.filter(node => node.type === 'RestSite').length;
     return {
       index,
       route,
       score,
       upcoming,
+      eliteCount,
+      restSiteCount,
       targetId: targetId || route[route.length - 1] || '',
       targetType: target?.type || '',
       target: target ? { row: target.row, col: target.col } : null,
+      targetPosition: targetPositionLabel(map, targetId),
       label: mapTypeLabel(target?.type)
     };
   });
   const directions = targetDirections(ranked);
   for (const item of ranked) {
-    item.direction = directions.get(item.targetId) || '';
+    item.direction = directions.get(item.targetId) || item.targetPosition || '';
     item.displayLabel = `${item.direction}${item.label}`;
   }
-  return ranked.sort((a, b) => b.score - a.score || a.index - b.index);
+  return ranked.sort((a, b) =>
+    b.eliteCount - a.eliteCount
+    || b.restSiteCount - a.restSiteCount
+    || b.score - a.score
+    || a.index - b.index
+  );
 }
 
 function explainRoute(ranked, state) {
@@ -280,6 +303,10 @@ function explainRoute(ranked, state) {
   const types = new Set(ranked.upcoming.map(node => node.type));
   const nextLabel = ranked.displayLabel || ranked.label || '下一节点';
   const clauses = [];
+
+  clauses.push(`这条路线后续有 ${ranked.eliteCount} 个精英和 ${ranked.restSiteCount} 个火堆`);
+  const followUp = ranked.upcoming.slice(1, 4).map(node => mapTypeLabel(node.type));
+  if (followUp.length) clauses.push(`通过后续是 ${followUp.join(' → ')}`);
 
   if (ranked.targetType === 'Elite' || types.has('Elite')) {
     if (ctx.hpRatio < 0.45) clauses.push('精英有遗物和更好的卡牌奖励，但当前生命偏危险');
@@ -295,9 +322,6 @@ function explainRoute(ranked, state) {
     else clauses.push('商店收益一般，金币不太够删牌或购物');
   }
   if (ranked.targetType === 'Treasure') clauses.push('宝箱几乎总是正收益');
-  if (!clauses.length) {
-    return `下一步走${nextLabel}。综合遗物、升级、删牌和生命风险，这条路更划算。`;
-  }
   return `下一步走${nextLabel}。${clauses.join('；')}。`;
 }
 
@@ -317,14 +341,22 @@ function toAlternative(item) {
     displayLabel: item.displayLabel,
     direction: item.direction,
     target: item.target,
+    targetPosition: item.targetPosition,
     route: item.route,
     score: item.score
   };
 }
 
+function sameRouteRank(left, right) {
+  return Boolean(left && right
+    && left.eliteCount === right.eliteCount
+    && left.restSiteCount === right.restSiteCount
+    && left.score === right.score);
+}
+
 function buildRecommendation(chosen, ranked, { source, reason, now }) {
-  const equalBest = chosen.score === ranked[0]?.score
-    ? ranked.filter(item => item.score === chosen.score && item.targetId !== chosen.targetId)
+  const equalBest = sameRouteRank(chosen, ranked[0])
+    ? ranked.filter(item => sameRouteRank(item, chosen) && item.targetId !== chosen.targetId)
     : [];
   const equivalentItems = equalBest.length
     ? [...new Map([chosen, ...equalBest].map(item => [item.targetId, item])).values()]
@@ -356,6 +388,7 @@ function buildRecommendation(chosen, ranked, { source, reason, now }) {
       displayLabel: chosen.displayLabel,
       direction: chosen.direction,
       target: chosen.target,
+      targetPosition: chosen.targetPosition,
       route: chosen.route,
       routeIndex: chosen.index,
       score: chosen.score
@@ -388,6 +421,8 @@ function promptPayload(state, ranked) {
       row: item.target?.row ?? null,
       col: item.target?.col ?? null,
       direction: item.direction || null,
+      eliteCount: item.eliteCount,
+      restSiteCount: item.restSiteCount,
       path: item.upcoming.map(node => mapTypeLabel(node.type)).join(' → '),
       payoff: item.upcoming.reduce((sum, node) => sum + (node.payoff || 0), 0),
       risk: item.upcoming.reduce((sum, node) => sum + (node.risk || 0), 0),
@@ -420,8 +455,8 @@ async function recommendRoute(state, { llm, now = Date.now() } = {}) {
     }
   }
 
-  const equalBest = chosen.score === ranked[0]?.score
-    ? ranked.filter(item => item.score === chosen.score && item.targetId !== chosen.targetId)
+  const equalBest = sameRouteRank(chosen, ranked[0])
+    ? ranked.filter(item => sameRouteRank(item, chosen) && item.targetId !== chosen.targetId)
     : [];
   if (equalBest.length) {
     const labels = [...new Set([chosen, ...equalBest]
@@ -460,6 +495,7 @@ module.exports = {
   ensureMapRoutes,
   resolveMapOrigins,
   rankRoutes,
+  targetPositionLabel,
   recommendRoute,
   routeSignature
 };

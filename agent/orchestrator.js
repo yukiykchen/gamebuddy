@@ -1,6 +1,7 @@
 const { validateRecommendation } = require('./recommendation');
 const { recommendRoute, routeSignature, ensureMapRoutes } = require('./tasks/route');
 const { isRestSite, recommendRest, restSignature } = require('./tasks/rest');
+const { recommendEvent, eventSignature } = require('./tasks/event');
 const { findCardReward, recommendCardReward, cardRewardSignature } = require('./tasks/card-reward');
 const { createOpenAiClient, readLlmConfig } = require('./llm/openai');
 
@@ -12,6 +13,8 @@ function hasRoutableMap(state) {
 function selectTask(observation) {
   const state = observation?.state;
   if (!state) return null;
+  if (Array.isArray(state.cardReward?.options) && state.cardReward.options.length > 0) return 'card_reward';
+  if (Array.isArray(state.event?.options) && state.event.options.length > 0) return 'event_choice';
   if (!state.combat) {
     if (findCardReward(observation)) return 'card_reward';
     const recent = observation.recentEvents || [];
@@ -26,16 +29,18 @@ function selectTask(observation) {
   return null;
 }
 
-function signatureFor(task, state) {
-  if (task === 'card_reward') return '';
+function signatureFor(task, observation, state) {
+  if (task === 'card_reward') return cardRewardSignature(observation);
   if (task === 'rest_site') return restSignature(state);
   if (task === 'map_route') return routeSignature(state);
+  if (task === 'event_choice') return eventSignature(state);
   return '';
 }
 
 function createOrchestrator({
   llm,
   onRecommendation,
+  onAgentStatus,
   now = () => Date.now()
 } = {}) {
   const client = llm || createOpenAiClient(readLlmConfig());
@@ -48,26 +53,31 @@ function createOrchestrator({
     if (!task) return lastRecommendation;
     if (!observation?.fresh && !force && lastRecommendation) return lastRecommendation;
 
-    const signature = `${task}:${task === 'card_reward' ? cardRewardSignature(observation) : signatureFor(task, observation.state)}`;
+    const signature = `${task}:${signatureFor(task, observation, observation.state)}`;
     if (!force && signature === lastSignature && lastRecommendation) return lastRecommendation;
 
     const current = ++generation;
+    onAgentStatus?.({ status: 'thinking', task, timestamp: now() });
     try {
       const recommendation = task === 'card_reward'
         ? await recommendCardReward(observation, { llm: client, now: now() })
-        : task === 'rest_site'
-          ? await recommendRest(observation.state, { llm: client, now: now() })
-          : await recommendRoute(observation.state, { llm: client, now: now() });
+        : task === 'event_choice'
+          ? await recommendEvent(observation.state, { llm: client, now: now() })
+          : task === 'rest_site'
+            ? await recommendRest(observation.state, { llm: client, now: now() })
+            : await recommendRoute(observation.state, { llm: client, now: now() });
       if (current !== generation) return lastRecommendation;
       const validation = recommendation ? validateRecommendation(recommendation) : { ok: false };
       if (!validation.ok) return lastRecommendation;
       lastSignature = signature;
       lastRecommendation = recommendation;
       onRecommendation?.(recommendation);
+      onAgentStatus?.({ status: 'ready', task, timestamp: now() });
       return recommendation;
     } catch (error) {
       if (current === generation) {
         console.error('GameBuddy agent failed:', error.message);
+        onAgentStatus?.({ status: 'error', task, detail: error.message, timestamp: now() });
       }
       return lastRecommendation;
     }

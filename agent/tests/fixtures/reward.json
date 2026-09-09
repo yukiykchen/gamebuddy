@@ -1,0 +1,18 @@
+[
+  {
+    "schema": "runmate.state.v1",
+    "timestamp": 1723370100000,
+    "source": "agent-test",
+    "run": { "act": 1, "floor": 6, "room": "reward", "character": "ironclad" },
+    "player": { "hp": 62, "maxHp": 72, "block": 0, "gold": 99, "energy": 3, "maxEnergy": 3, "cards": [
+      { "id": "STRIKE_IRONCLAD", "name": "打击", "type": "Attack", "cost": 1, "upgraded": false },
+      { "id": "DEFEND_IRONCLAD", "name": "防御", "type": "Skill", "cost": 1, "upgraded": false }
+    ], "relics": [], "potions": [] },
+    "combat": null,
+    "map": { "visited": [] },
+    "rewards": [
+      { "id": "SHRUG_IT_OFF", "name": "耸肩无视", "kind": "card", "type": "Skill" },
+      { "id": "POMMEL_STRIKE", "name": "剑柄打击", "kind": "card", "type": "Attack" }
+    ]
+  }
+]

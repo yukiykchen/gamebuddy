@@ -1,0 +1,23 @@
+[
+  {
+    "schema": "runmate.state.v1",
+    "timestamp": 1723370400000,
+    "source": "agent-test",
+    "run": { "act": 1, "floor": 4, "room": "combat", "character": "ironclad" },
+    "player": { "hp": 50, "maxHp": 72, "block": 2, "gold": 99, "energy": 3, "maxEnergy": 3, "cards": [], "relics": [], "potions": [] },
+    "combat": {
+      "turn": 2,
+      "hand": [
+        { "id": "DEFEND_IRONCLAD", "name": "防御", "type": "Skill", "cost": 1, "upgraded": false },
+        { "id": "BASH", "name": "痛击", "type": "Attack", "cost": 2, "upgraded": false }
+      ],
+      "drawPile": [],
+      "discardPile": [],
+      "exhaustPile": [],
+      "enemies": [
+        { "name": "小史莱姆", "hp": 24, "maxHp": 30, "block": 0, "intent": "AttackIntent", "damage": 12, "alive": true }
+      ]
+    },
+    "map": { "visited": [] }
+  }
+]

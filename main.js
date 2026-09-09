@@ -5,7 +5,10 @@ const { createObservationStore } = require('./harness/observation-store');
 const { createOrchestrator } = require('./agent/orchestrator');
 const { createOpenAiClient, readLlmConfig } = require('./agent/llm/openai');
 const { ensureMapRoutes } = require('./agent/tasks/route');
+const { decide } = require('./agent/router');
+const { recordDecision } = require('./agent/recorder');
 const { encounterGuideSignature, buildEncounterGuide } = require('./agent/tasks/encounter-guide');
+const fs = require('node:fs');
 
 const BRIDGE_URL = process.env.GAMEBUDDY_BRIDGE_URL || 'ws://127.0.0.1:27182';
 const BRIDGE_MODE = process.env.GAMEBUDDY_BRIDGE_MODE === 'replay' ? 'replay' : 'game';
@@ -33,7 +36,8 @@ if (llmConfig.enabled) {
 }
 const orchestrator = createOrchestrator({
   llm: createOpenAiClient(llmConfig, { onThinkingChange: updateAgentThinking }),
-  onRecommendation: publishRecommendation
+  onRecommendation: publishRecommendation,
+  onAgentStatus: status => broadcast('agent-status', status)
 });
 
 function withRoutableState(state) {
@@ -53,6 +57,18 @@ function considerObservation(observation, options) {
 }
 let bridgeHealthTimer;
 let lastBridgeStatus = { status: 'waiting', detail: '等待本地 Mod Bridge', url: BRIDGE_URL, mode: BRIDGE_MODE };
+let agentRunId = null;
+
+function currentObservation(now = Date.now()) {
+  const observation = observationStore.getObservation(now);
+  return { ...observation, decision: decide(observation) };
+}
+
+function startAgentRun() {
+  const state = observationStore.getState();
+  agentRunId = String(state?.run?.seed || state?.run?.id || new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 14));
+  fs.mkdirSync(path.join(__dirname, 'runs', agentRunId), { recursive: true });
+}
 
 function broadcast(channel, payload) {
   for (const window of [mainWindow, petWindow]) {
@@ -195,14 +211,21 @@ function connectBridge() {
       const message = JSON.parse(raw.toString());
       const result = observationStore.ingest(message);
       if (result.kind === 'invalid') {
+        console.error('[Runmate DEBUG] invalid state reason:', result.reason);
+        console.error('[Runmate DEBUG] raw message:', JSON.stringify(message, null, 2).slice(0, 4000));
         broadcastBridgeStatus('invalid', result.reason);
         return;
       }
       if (result.kind === 'state') {
         broadcastBridgeStatus('live');
         if (result.accepted) {
-          broadcast('bridge-state', withRoutableState(result.state));
-          void considerEncounterGuide(result.state);
+          if (!agentRunId) startAgentRun();
+          const observation = currentObservation();
+          const routableState = withRoutableState(observation.state);
+          recordDecision({ runId: agentRunId, observation: { ...observation, state: routableState }, decision: observation.decision });
+          broadcast('bridge-state', routableState);
+          sendHighlightRoute(observation.decision, routableState);
+          void considerEncounterGuide(routableState);
         }
       }
       if (result.kind === 'event' && result.accepted) {
@@ -216,7 +239,7 @@ function connectBridge() {
         if (result.accepted) broadcast('bridge-observation', observation);
         void considerObservation(observation, {
           force: result.kind === 'duplicate'
-            || (result.kind === 'event' && (result.event?.name === 'map.opened' || result.event?.name === 'rest.opened' || result.event?.name === 'card.reward.opened'))
+            || (result.kind === 'event' && (result.event?.name === 'map.opened' || result.event?.name === 'rest.opened' || result.event?.name === 'event.opened' || result.event?.name === 'card.reward.opened'))
         });
       }
     } catch (error) {
@@ -236,6 +259,19 @@ function connectBridge() {
   };
   socket.on('error', disconnect);
   socket.on('close', disconnect);
+}
+
+function sendHighlightRoute(decision, routableState) {
+  if (!bridgeSocket || bridgeSocket.readyState !== WebSocket.OPEN) return;
+  let coords = [];
+  if (decision?.agent === 'route' && decision?.status === 'ready') {
+    coords = Array.isArray(decision.payload?.routeCoords) ? decision.payload.routeCoords : [];
+  }
+  if (!coords.length && routableState?.map?.routes?.length) {
+    coords = routableState.map.routes[0];
+  }
+  if (!Array.isArray(coords) || !coords.length) return;
+  bridgeSocket.send(JSON.stringify({ type: 'highlight_map_nodes', coords }));
 }
 
 function createMainWindow() {
@@ -259,12 +295,13 @@ function createMainWindow() {
   mainWindow.loadFile(path.join(__dirname, 'src', 'index.html'));
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow.webContents.send('bridge-status', lastBridgeStatus);
-    const state = observationStore.getState();
+    const observation = currentObservation();
+    const state = observation.state;
     if (state) mainWindow.webContents.send('bridge-state', withRoutableState(state));
-    mainWindow.webContents.send('bridge-observation', observationStore.getObservation());
+    mainWindow.webContents.send('bridge-observation', observation);
     const recommendation = orchestrator.getRecommendation();
     if (recommendation) mainWindow.webContents.send('bridge-recommendation', recommendation);
-    else void considerObservation(observationStore.getObservation(), { force: true });
+    else void considerObservation(observation, { force: true });
   });
   mainWindow.on('close', event => {
     if (!isQuitting) {
@@ -305,9 +342,10 @@ function createPetWindow() {
   petWindow.loadFile(path.join(__dirname, 'src', 'pet.html'));
   petWindow.webContents.on('did-finish-load', () => {
     petWindow.webContents.send('bridge-status', lastBridgeStatus);
-    const state = observationStore.getState();
+    const observation = currentObservation();
+    const state = observation.state;
     if (state) petWindow.webContents.send('bridge-state', withRoutableState(state));
-    petWindow.webContents.send('bridge-observation', observationStore.getObservation());
+    petWindow.webContents.send('bridge-observation', observation);
     const recommendation = orchestrator.getRecommendation();
     if (recommendation) petWindow.webContents.send('bridge-recommendation', recommendation);
     petWindow.webContents.send('bridge-agent-thinking', lastAgentThinking);
@@ -369,12 +407,15 @@ ipcMain.on('pet-drag-move', (_event, point) => {
 ipcMain.on('pet-drag-end', () => { petDragState = undefined; });
 ipcMain.on('dismiss-encounter-guide', dismissEncounterGuide);
 ipcMain.on('dismiss-card-recommendation', dismissCardRecommendation);
-ipcMain.handle('get-observation', () => observationStore.getObservation());
+ipcMain.on('accept-decision', (_event, decision) => {
+  if (agentRunId && decision) recordDecision({ runId: agentRunId, observation: currentObservation(), decision, accepted: true });
+});
+ipcMain.handle('get-observation', () => currentObservation());
 ipcMain.handle('refresh-recommendation', async () => {
   if (bridgeSocket?.readyState === WebSocket.OPEN) {
     bridgeSocket.send(JSON.stringify({ type: 'request_snapshot' }));
   }
-  const observation = observationStore.getObservation();
+  const observation = currentObservation();
   if (observation?.state) broadcast('bridge-state', withRoutableState(observation.state));
   const recommendation = await considerObservation(observation, { force: true });
   if (recommendation) broadcast('bridge-recommendation', recommendation);

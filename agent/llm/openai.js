@@ -1,22 +1,25 @@
-const { loadCodexLlmConfig, normalizeApiRoot } = require('./codex-config');
 const { loadProjectEnv } = require('./load-env');
 
 const DEFAULT_BASE_URL = 'https://ai.gs88.shop';
 const DEFAULT_MODEL = 'gpt-5.5';
 
-function readLlmConfig(env = process.env, options = {}) {
+function normalizeApiRoot(baseURL) {
+  const trimmed = String(baseURL || '').trim().replace(/\/+$/, '');
+  if (!trimmed) return '';
+  return /\/v\d+$/i.test(trimmed) ? trimmed : `${trimmed}/v1`;
+}
+
+function readLlmConfig(env = process.env) {
   if (env === process.env) loadProjectEnv(env);
-  const fromCodex = loadCodexLlmConfig({ env, ...options });
-  const apiKey = String(env.GAMEBUDDY_LLM_API_KEY || env.OPENAI_API_KEY || fromCodex.apiKey || '').trim();
-  const baseURL = normalizeApiRoot(env.GAMEBUDDY_LLM_BASE_URL || fromCodex.baseURL || DEFAULT_BASE_URL);
-  const model = String(env.GAMEBUDDY_LLM_MODEL || fromCodex.model || DEFAULT_MODEL).trim();
+  const apiKey = String(env.GAMEBUDDY_LLM_API_KEY || env.OPENAI_API_KEY || '').trim();
+  const baseURL = normalizeApiRoot(env.GAMEBUDDY_LLM_BASE_URL || DEFAULT_BASE_URL);
+  const model = String(env.GAMEBUDDY_LLM_MODEL || DEFAULT_MODEL).trim();
   const wireEnv = String(env.GAMEBUDDY_LLM_WIRE_API || '').trim().toLowerCase();
   let wireApi = 'responses';
   if (wireEnv === 'chat' || wireEnv === 'completions') wireApi = 'chat';
   else if (wireEnv === 'responses' || wireEnv === 'response') wireApi = 'responses';
-  else if (fromCodex.wireApi === 'chat') wireApi = 'chat';
-  const reasoningEffort = String(env.GAMEBUDDY_LLM_REASONING_EFFORT || fromCodex.reasoningEffort || 'xhigh').trim();
-  const source = env.GAMEBUDDY_LLM_API_KEY || env.GAMEBUDDY_LLM_BASE_URL || env.OPENAI_API_KEY ? 'env' : fromCodex.source || '';
+  const reasoningEffort = String(env.GAMEBUDDY_LLM_REASONING_EFFORT || 'xhigh').trim();
+  const source = apiKey ? 'env' : '';
   return {
     enabled: Boolean(apiKey),
     apiKey,
@@ -24,9 +27,9 @@ function readLlmConfig(env = process.env, options = {}) {
     model,
     wireApi,
     reasoningEffort,
-    store: fromCodex.store,
+    store: false,
     source: apiKey ? (source || 'env') : '',
-    providerName: fromCodex.providerName || ''
+    providerName: env.GAMEBUDDY_LLM_PROVIDER || ''
   };
 }
 
@@ -119,7 +122,7 @@ function createOpenAiClient(config = readLlmConfig(), { fetchImpl = globalThis.f
           if (error.status !== 404 && error.status !== 405) throw error;
           body = await request(`${config.baseURL}/chat/completions`, {
             model: config.model,
-            temperature: 0.2,
+            temperature: 1,
             messages: [
               { role: 'system', content: system },
               { role: 'user', content: user }
@@ -129,7 +132,7 @@ function createOpenAiClient(config = readLlmConfig(), { fetchImpl = globalThis.f
       } else {
         body = await request(`${config.baseURL}/chat/completions`, {
           model: config.model,
-          temperature: 0.2,
+          temperature: 1,
           messages: [
             { role: 'system', content: system },
             { role: 'user', content: user }
@@ -158,6 +161,11 @@ function createOpenAiClient(config = readLlmConfig(), { fetchImpl = globalThis.f
       '你是杀戮尖塔 2 的休息处顾问。严格使用 payload.strategy 的社区复核原则，并结合当前生命、完整牌组、遗物、药水、地图和近期精英/Boss，在回血与真实升级候选之间权衡。先确保玩家能活过近期已知威胁；升级时优先能产生降费、抽牌/能量、保留/消耗变化、倍率成长等质变且会在当前牌组中频繁兑现的牌。单卡 Tier 只是弱先验，不能覆盖升级前后差值、牌组协同和生存风险。不要默认升级稀有牌，也不要默认永不升级起手牌。只从给定 candidates 中选择，不得发明卡牌、遗物、机制或数值。用 JSON 回答：{"index":0,"reason":"两句中文解释，说明为什么回血更安全，或该升级如何改善当前牌组与近期战斗"}。',
       payload,
       'rest_site'
+    ),
+    completeEvent: payload => completeJson(
+      '你是杀戮尖塔 2 的事件选择顾问。阅读事件背景和所有选项，结合当前生命、金币、遗物和卡组，选择长期收益更高且风险可接受的选项。只从给定选项里选，不要发明选项。用 JSON 回答：{"index":0,"reason":"两句中文解释"}。',
+      payload,
+      'event_choice'
     ),
     completeCardReward: payload => completeJson(
       '你是杀戮尖塔 2 的选牌顾问。逐张核对候选牌的知识库 rank、expertSummary、goodWhen、badWhen，再与实际完整牌组、升级状态、完整遗物效果、药水效果、金币、章节、生命、完整地图和敌人机制对照。knownBoss 和 knownUpcomingElites 中 exact=true 的遭遇才是已确定身份；possibleBosses 和 possibleElites 只是当前区域的可能池，绝不能说成下一战确定会遇到。地图节点没有 encounterId/encounterName 时也不得猜测具体敌人。知识库评价只是单卡先验；条件不满足时必须降低价值，已有核心协同或能针对确定机制时应提高价值。允许选择 SKIP，避免为了拿牌而拿牌。只能从候选列表中选择，不能发明卡牌、遗物、药水、敌人、机制或数值。用 JSON 回答：{"index":0,"reason":"两句中文解释，说明当前局面满足或不满足哪些拿取条件，以及相对其他选项的优势"}。',

@@ -35,6 +35,9 @@ foreach ($file in @('sts2.dll', '0Harmony.dll')) {
 $copy = if ($SkipCopy) { 'false' } else { 'true' }
 dotnet build (Join-Path $PSScriptRoot 'GameBuddyBridge.csproj') -c Release `
   "-p:Sts2Dir=$Sts2Dir" "-p:CopyModAfterBuild=$copy"
+if ($LASTEXITCODE -ne 0) {
+  throw "GameBuddyBridge build failed with exit code $LASTEXITCODE."
+}
 
 Write-Host 'GameBuddyBridge build completed.'
 if (-not $SkipCopy) {
