@@ -1,0 +1,33 @@
+schema: spec-driven
+
+context: |
+  Language: zh
+  All artifacts must be written in zh.
+  Keep OpenSpec structural headings and SHALL/MUST keywords in English.
+
+  Product: GameBuddy is a read-only AI companion for Slay the Spire 2 (stable v0.107.1).
+  Stack: Electron desktop (main.js, preload.js, src/), Node.js agents (agent/), C# Harmony Mod (mod/GameBuddyBridge), local WebSocket protocol gamebuddy.state.v1.
+  Product boundary: advise only. Never click, play cards, or mutate game state.
+  Decision model: rules generate legal candidates first; LLM may only review within those candidates. Missing API keys MUST fall back to rules without blocking UI.
+  Commits: conventional commits such as `feat: ... --story=...`. Do not commit unless the user asks.
+  Verification: `npm run test:syntax`, `npm run test:agent`, `npm run harness:validate-all`. Prefer Replay fixtures over a live game. UI or layout changes need Electron/demo verification.
+  Brownfield: do not backfill specs for unchanged code. Specs grow from the current change only.
+  Capability domains as they appear: desktop-ui, pet-overlay, agent-decisions, game-bridge, protocol, harness, knowledge.
+
+rules:
+  proposal:
+    - Always include a Non-goals section. Explicitly exclude auto-play and mutating the game unless the user asked for it.
+    - Keep proposals under 500 words.
+  specs:
+    - Requirements MUST be observable from UI, protocol, or harness fixtures. Do not spec internal function names.
+  tasks:
+    - Include a verification task that uses existing npm scripts or Replay fixtures when behavior changes.
+
+operations:
+  apply:
+    guidance:
+      - Run the smallest relevant npm test script before marking a behavior task complete.
+      - Do not implement auto-play, mouse control, or game-mutating APIs.
+  archive:
+    guidance:
+      - Summarize what shipped and which spec domains were updated.

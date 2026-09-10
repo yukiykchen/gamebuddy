@@ -8,6 +8,7 @@ release/
 .env
 .env.*
 !.env.example
+.codex-cli/
 hatch-runs/
 runs/
 

@@ -1,0 +1,32 @@
+---
+description: 可观察行为改动必须先走 OpenSpec，没有 tasks.md 之前不准改业务代码
+alwaysApply: true
+---
+
+# OpenSpec 默认工作流
+
+改可观察行为时，先走 OpenSpec，不要直接改业务代码。
+
+可观察行为包括：主面板/桌宠 UI、`gamebuddy.state.v1` / 事件协议、`agent/` 建议与任务、`mod/GameBuddyBridge` 采集、Harness 协议与 Replay 语义。
+
+## 必须
+
+1. 先 `openspec list`。没有合适的 active change 时，用 `/opsx-propose` 生成计划（可先 `/opsx-explore`）。
+2. 已有 change 且 `tasks.md` 存在时，用 `/opsx-apply` 按任务实现。
+3. **`openspec/changes/<name>/tasks.md` 出现之前，禁止修改业务代码。** 提案阶段只写 `openspec/changes/` 下的计划文件。
+4. Cursor 命令用连字符：`/opsx-propose`、`/opsx-apply`、`/opsx-archive`，不要在终端里执行 `/opsx-*`。
+
+## 可以跳过 OpenSpec
+
+- 错别字、格式化、纯注释
+- 只改 `openspec/config.yaml`、`AGENTS.md`、`CLAUDE.md` 或本规则文件本身
+
+## 例子
+
+```text
+❌ 用户说「事件失败时不要默认第一选项」→ 直接改 agent/tasks/event.js
+✅ 先 /opsx-propose stop-event-first-option-fallback → 用户确认计划 → /opsx-apply → 再改代码
+
+❌ 为了「顺手」改协议字段，没有 change
+✅ 协议/UI/Agent/Mod 任一行为变化都先有 change 和 tasks.md
+```
