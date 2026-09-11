@@ -388,6 +388,46 @@ function confidenceFor(candidates, source) {
   return Math.max(0.42, Math.min(source === 'llm' ? 0.9 : 0.82, base + Math.abs(best - second) / 55));
 }
 
+function toCardRecommendation(chosen, candidates, options, context, threats, knowledge, state, source, reason, now) {
+  const primary = chosen.action === 'SKIP'
+    ? { action: 'SKIP', label: '跳过奖励', score: chosen.score }
+    : {
+        action: 'TAKE_CARD',
+        cardId: chosen.card.id || chosen.card.name,
+        cardName: chosen.card.name || chosen.card.id,
+        label: `拿取 ${chosen.card.name || chosen.card.id}`,
+        score: chosen.score,
+        analysis: chosen.card
+      };
+  return {
+    schema: SCHEMA,
+    task: 'card_reward',
+    timestamp: now,
+    source,
+    confidence: confidenceFor(candidates, source),
+    reason,
+    primary,
+    alternatives: candidates.filter(candidate => candidate !== chosen).map(candidate => candidate.action === 'SKIP'
+      ? { action: 'SKIP', label: '跳过奖励', score: candidate.score }
+      : { action: 'TAKE_CARD', cardId: candidate.card.id || candidate.card.name, cardName: candidate.card.name || candidate.card.id, label: candidate.card.name || candidate.card.id, score: candidate.score, analysis: candidate.card }),
+    options,
+    context: {
+      deckSize: context.size,
+      eliteSoon: threats.eliteSoon,
+      bossSoon: threats.bossSoon,
+      defeatedElite: threats.defeatedElite,
+      defeatedBoss: threats.defeatedBoss,
+      archetype: knowledge.coach?.target?.name || null,
+      gold: state.player?.gold ?? null,
+      potions: (knowledge.potions || []).map(potion => potion.name || potion.id),
+      knownBoss: knowledge.threats?.knownBoss?.name || null,
+      knownUpcomingElites: (knowledge.threats?.knownUpcomingElites || []).map(item => item.name),
+      possibleElites: (knowledge.threats?.possibleElites || []).map(item => item.name)
+    },
+    knowledgeSource: knowledge.source
+  };
+}
+
 async function recommendCardReward(observation, { llm, now = Date.now(), codex = codexClient } = {}) {
   const state = observation?.state;
   const reward = findCardReward(observation);
@@ -466,70 +506,25 @@ async function recommendCardReward(observation, { llm, now = Date.now(), codex =
               eliteFit: candidate.card.fit.elite
             })
       });
-      if (Number.isInteger(pick?.index) && candidates[pick.index]) {
-        chosen = candidates[pick.index];
-        source = 'llm';
-        reason = pick.reason?.trim() || explanation(chosen, threats, knowledge);
-      }
+      if (!Number.isInteger(pick?.index) || !candidates[pick.index]) return null;
+      chosen = candidates[pick.index];
+      source = 'llm';
+      reason = pick.reason?.trim() || explanation(chosen, threats, knowledge);
     } catch {
-      source = 'rules';
-      reason = explanation(chosen, threats, knowledge);
+      return null;
     }
   }
 
-  const primary = chosen.action === 'SKIP'
-    ? { action: 'SKIP', label: '跳过奖励', score: chosen.score }
-    : {
-        action: 'TAKE_CARD',
-        cardId: chosen.card.id,
-        cardName: chosen.card.name,
-        label: `拿取 ${chosen.card.name}`,
-        score: chosen.score,
-        analysis: chosen.card
-      };
-  return {
-    schema: SCHEMA,
-    task: 'card_reward',
-    timestamp: now,
-    source,
-    confidence: confidenceFor(candidates, source),
-    reason,
-    primary,
-    alternatives: candidates.filter(candidate => candidate !== chosen).map(candidate => candidate.action === 'SKIP'
-      ? { action: 'SKIP', label: '跳过奖励', score: candidate.score }
-      : { action: 'TAKE_CARD', cardId: candidate.card.id, cardName: candidate.card.name, label: candidate.card.name, score: candidate.score, analysis: candidate.card }),
-    options,
-    context: {
-      deckSize: context.size,
-      eliteSoon: threats.eliteSoon,
-      bossSoon: threats.bossSoon,
-      defeatedElite: threats.defeatedElite,
-      defeatedBoss: threats.defeatedBoss,
-      archetype: knowledge.coach?.target?.name || null,
-      gold: state.player?.gold ?? null,
-      potions: (knowledge.potions || []).map(potion => potion.name || potion.id),
-      knownBoss: knowledge.threats?.knownBoss?.name || null,
-      knownUpcomingElites: (knowledge.threats?.knownUpcomingElites || []).map(item => item.name),
-      possibleElites: (knowledge.threats?.possibleElites || []).map(item => item.name)
-    },
-    knowledgeSource: knowledge.source
-  };
+  return toCardRecommendation(chosen, candidates, options, context, threats, knowledge, state, source, reason, now);
 }
 
 function cardRewardSignature(observation) {
   const reward = findCardReward(observation);
   if (!reward) return '';
   return JSON.stringify({
-    cards: reward.cards.map(card => [card.id || null, card.name || null, Boolean(card.upgraded)]),
-    canSkip: reward.canSkip,
-    context: reward.context,
-    deck: (observation?.state?.player?.cards || []).map(card => [card.id || card, Boolean(card.upgraded)]),
-    relics: observation?.state?.player?.relics || [],
-    potions: observation?.state?.player?.potions || [],
-    gold: observation?.state?.player?.gold ?? null,
-    map: observation?.state?.map || null,
-    act: observation?.state?.run?.act ?? null,
-    floor: observation?.state?.run?.floor ?? null
+    cards: (reward.cards || []).map(card => [card.id || null, card.name || null, Boolean(card.upgraded)]),
+    canSkip: Boolean(reward.canSkip),
+    floor: observation?.state?.run?.floor ?? reward.context?.floor ?? null
   });
 }
 

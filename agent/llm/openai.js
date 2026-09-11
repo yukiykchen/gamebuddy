@@ -9,6 +9,26 @@ function normalizeApiRoot(baseURL) {
   return /\/v\d+$/i.test(trimmed) ? trimmed : `${trimmed}/v1`;
 }
 
+function parseThinking(value) {
+  const raw = String(value || '').trim().toLowerCase();
+  if (['disabled', 'off', 'none', 'false', '0'].includes(raw)) return 'disabled';
+  if (['enabled', 'on', 'true', '1'].includes(raw)) return 'enabled';
+  return '';
+}
+
+function chatCompletionsBody(config, system, user) {
+  const body = {
+    model: config.model,
+    temperature: 1,
+    messages: [
+      { role: 'system', content: system },
+      { role: 'user', content: user }
+    ]
+  };
+  if (config.thinking) body.thinking = { type: config.thinking };
+  return body;
+}
+
 function readLlmConfig(env = process.env) {
   if (env === process.env) loadProjectEnv(env);
   const apiKey = String(env.GAMEBUDDY_LLM_API_KEY || env.OPENAI_API_KEY || '').trim();
@@ -19,6 +39,7 @@ function readLlmConfig(env = process.env) {
   if (wireEnv === 'chat' || wireEnv === 'completions') wireApi = 'chat';
   else if (wireEnv === 'responses' || wireEnv === 'response') wireApi = 'responses';
   const reasoningEffort = String(env.GAMEBUDDY_LLM_REASONING_EFFORT || 'xhigh').trim();
+  const thinking = parseThinking(env.GAMEBUDDY_LLM_THINKING);
   const source = apiKey ? 'env' : '';
   return {
     enabled: Boolean(apiKey),
@@ -27,6 +48,7 @@ function readLlmConfig(env = process.env) {
     model,
     wireApi,
     reasoningEffort,
+    thinking,
     store: false,
     source: apiKey ? (source || 'env') : '',
     providerName: env.GAMEBUDDY_LLM_PROVIDER || ''
@@ -61,12 +83,16 @@ function extractResponseText(body) {
   return String(body?.choices?.[0]?.message?.content || '');
 }
 
+function logLlm(label, extra) {
+  console.log(`[GameBuddy LLM] ${label}`);
+  if (extra === undefined) return;
+  console.log(typeof extra === 'string' ? extra : JSON.stringify(extra, null, 2));
+}
+
 function createOpenAiClient(config = readLlmConfig(), { fetchImpl = globalThis.fetch, timeoutMs, onThinkingChange } = {}) {
   const enabled = Boolean(config?.enabled && config.apiKey);
   let requestSequence = 0;
-  const waitMs = Number.isFinite(timeoutMs)
-    ? timeoutMs
-    : (config.wireApi === 'responses' ? 120000 : 8000);
+  const waitMs = Number.isFinite(timeoutMs) ? timeoutMs : 120000;
 
   async function request(url, body) {
     if (typeof fetchImpl !== 'function') throw new Error('fetch is not available');
@@ -83,7 +109,8 @@ function createOpenAiClient(config = readLlmConfig(), { fetchImpl = globalThis.f
         signal: controller.signal
       });
       if (!response.ok) {
-        const error = new Error(`llm http ${response.status}`);
+        const detail = typeof response.text === 'function' ? await response.text().catch(() => '') : '';
+        const error = new Error(`llm http ${response.status}${detail ? `: ${detail.slice(0, 500)}` : ''}`);
         error.status = response.status;
         throw error;
       }
@@ -104,7 +131,16 @@ function createOpenAiClient(config = readLlmConfig(), { fetchImpl = globalThis.f
   async function completeJson(system, payload, task) {
     if (!enabled) return null;
     const detail = { task, model: config.model, requestId: `${task}-${++requestSequence}` };
+    const started = Date.now();
     notifyThinking(true, detail);
+    logLlm(`${detail.requestId} 开始`, {
+      model: config.model,
+      wireApi: config.wireApi,
+      thinking: config.thinking || null,
+      timeoutMs: waitMs
+    });
+    logLlm(`${detail.requestId} 系统提示`, system);
+    logLlm(`${detail.requestId} 输入`, payload);
     try {
       const user = JSON.stringify(payload);
       let body;
@@ -120,33 +156,29 @@ function createOpenAiClient(config = readLlmConfig(), { fetchImpl = globalThis.f
           body = await request(`${config.baseURL}/responses`, requestBody);
         } catch (error) {
           if (error.status !== 404 && error.status !== 405) throw error;
-          body = await request(`${config.baseURL}/chat/completions`, {
-            model: config.model,
-            temperature: 1,
-            messages: [
-              { role: 'system', content: system },
-              { role: 'user', content: user }
-            ]
-          });
+          logLlm(`${detail.requestId} Responses 不可用，改走 Chat Completions`);
+          body = await request(`${config.baseURL}/chat/completions`, chatCompletionsBody(config, system, user));
         }
       } else {
-        body = await request(`${config.baseURL}/chat/completions`, {
-          model: config.model,
-          temperature: 1,
-          messages: [
-            { role: 'system', content: system },
-            { role: 'user', content: user }
-          ]
-        });
+        body = await request(`${config.baseURL}/chat/completions`, chatCompletionsBody(config, system, user));
       }
-      const parsed = parseJsonObject(extractResponseText(body));
-      if (!parsed) return null;
+      const text = extractResponseText(body);
+      logLlm(`${detail.requestId} 原始输出 ${Date.now() - started}ms`, text || JSON.stringify(body, null, 2));
+      const parsed = parseJsonObject(text);
+      if (!parsed) {
+        logLlm(`${detail.requestId} 解析失败，未得到 JSON`);
+        return null;
+      }
+      logLlm(`${detail.requestId} 解析结果`, parsed);
       return {
         index: Number(parsed.index),
         reason: typeof parsed.reason === 'string' ? parsed.reason : ''
       };
+    } catch (error) {
+      logLlm(`${detail.requestId} 失败 ${Date.now() - started}ms`, error.message);
+      throw error;
     } finally {
-      notifyThinking(false, detail);
+      setTimeout(() => notifyThinking(false, detail), 0);
     }
   }
 

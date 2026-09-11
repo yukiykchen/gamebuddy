@@ -13,6 +13,30 @@ const cardReason = document.querySelector('#card-reason');
 const cardPoints = document.querySelector('#card-points');
 const cardMeta = document.querySelector('#card-meta');
 
+const ADVICE_TASKS = new Set(['card_reward', 'rest_site', 'map_route', 'event_choice']);
+const POSES = new Set(['waiting', 'watching', 'thinking', 'advising']);
+const POSE_LABELS = { waiting: '等待', watching: '旁观', thinking: '思考', advising: '建议' };
+const POSE_TOUR = ['waiting', 'watching', 'thinking', 'advising'];
+const POSE_TOUR_LINES = {
+  waiting: '姿态演示：等开局',
+  watching: '姿态演示：侧身旁观',
+  thinking: '姿态演示：正在分析',
+  advising: '姿态演示：伸爪给建议'
+};
+
+const petState = {
+  live: false,
+  thinking: false,
+  cardVisible: false,
+  guideVisible: false,
+  recommendation: null,
+  cardRecommendation: null
+};
+let connectionLabel = '等待游戏';
+let tourPose = null;
+let tourTimer = 0;
+let tourStarted = false;
+
 function escapeHtml(value) {
   return String(value ?? '')
     .replace(/&/g, '&amp;')
@@ -31,11 +55,69 @@ function cardPointList(title, items, className) {
   return `<section class="card-point ${className}"><strong>${escapeHtml(title)}</strong><ul>${items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>`;
 }
 
+function hasAdvice() {
+  if (petState.cardVisible || petState.guideVisible) return true;
+  return ADVICE_TASKS.has(petState.recommendation?.task);
+}
+
+function currentPose() {
+  if (tourPose) return tourPose;
+  if (hasAdvice()) return 'advising';
+  if (petState.thinking) return 'thinking';
+  if (!petState.live) return 'waiting';
+  return 'watching';
+}
+
+function advanceReplayTour() {
+  tourPose = POSE_TOUR[POSE_TOUR.indexOf(tourPose) + 1] || POSE_TOUR[0];
+  applyPose();
+  say(POSE_TOUR_LINES[tourPose], true);
+  window.clearTimeout(tourTimer);
+  tourTimer = window.setTimeout(advanceReplayTour, 3200);
+}
+
+function startReplayPoseTour() {
+  if (tourStarted) return;
+  tourStarted = true;
+  tourPose = POSE_TOUR[POSE_TOUR.length - 1];
+  advanceReplayTour();
+}
+
+function cardSourceLabel(recommendation, confidence, version) {
+  const source = recommendation.source === 'llm' ? 'LLM 复核' : '规则评分';
+  return `${source} · 置信度 ${confidence}%${version ? ` · ${version}` : ''}`;
+}
+
+function refreshCardMeta() {
+  const recommendation = petState.cardRecommendation;
+  if (!recommendation || !petState.cardVisible) return;
+  const confidence = Math.round((Number(recommendation.confidence) || 0) * 100);
+  const version = recommendation.primary?.analysis?.stats?.knowledgeVersion;
+  cardMeta.textContent = cardSourceLabel(recommendation, confidence, version);
+}
+
+function applyPose() {
+  const pose = currentPose();
+  if (!POSES.has(pose)) return;
+  stage.dataset.pose = pose;
+  statusLabel.textContent = `${connectionLabel} · ${POSE_LABELS[pose]}`;
+  refreshCardMeta();
+}
+
+function say(message, fromTour = false) {
+  if (tourPose && !fromTour) return;
+  speech.textContent = message;
+  speech.classList.add('visible');
+}
+
 function setCardRecommendation(recommendation) {
   if (!recommendation) {
     cardPanel.classList.remove('visible');
     cardReason.textContent = '';
     cardPoints.innerHTML = '';
+    petState.cardVisible = false;
+    petState.cardRecommendation = null;
+    applyPose();
     return;
   }
   const primary = recommendation.primary || {};
@@ -48,33 +130,35 @@ function setCardRecommendation(recommendation) {
     ? `${cardPointList('为什么适合', analysis.pros?.slice(0, 3), 'positive')}${cardPointList('需要留意', analysis.cons?.slice(0, 2), 'negative')}`
     : cardPointList('为什么跳过', ['保持牌组精简，提高核心牌的抽取稳定性'], 'neutral');
   const confidence = Math.round((Number(recommendation.confidence) || 0) * 100);
-  const source = recommendation.source === 'llm' ? 'LLM 复核' : '规则评分';
   const version = analysis?.stats?.knowledgeVersion;
-  cardMeta.textContent = `${source} · 置信度 ${confidence}%${version ? ` · ${version}` : ''}`;
+  cardMeta.textContent = cardSourceLabel(recommendation, confidence, version);
   cardPanel.classList.add('visible');
-  say(primary.action === 'SKIP' ? '这次建议跳过，理由在左边' : `建议拿 ${primary.cardName || primary.label}`, '');
+  petState.cardVisible = true;
+  petState.cardRecommendation = recommendation;
+  applyPose();
+  say(primary.action === 'SKIP' ? '这次建议跳过，理由在左边' : `建议拿 ${primary.cardName || primary.label}`);
 }
 
 function setAgentThinking(state) {
-  const thinking = Boolean(state?.thinking);
-  stage.classList.toggle('llm-thinking', thinking);
-  if (!thinking) {
-    stage.classList.remove('thinking');
-    return;
-  }
+  petState.thinking = Boolean(state?.thinking);
+  applyPose();
+  if (!petState.thinking || hasAdvice()) return;
   const task = state.tasks?.[0];
   const labels = {
     card_reward: '正在比较三张奖励牌',
     map_route: '正在推演后续路线',
-    rest_site: '正在权衡回血和升级'
+    rest_site: '正在权衡回血和升级',
+    event_choice: '正在分析事件选项'
   };
-  say(labels[task] || '正在结合这局思考', 'thinking');
+  say(labels[task] || '正在结合这局思考');
 }
 
 function setEncounterGuide(guide) {
   if (!guide) {
     guidePanel.classList.remove('visible');
     guideContent.innerHTML = '';
+    petState.guideVisible = false;
+    applyPose();
     return;
   }
   guideKicker.textContent = guide.kind === 'boss' ? 'BOSS 攻略' : '精英攻略';
@@ -97,41 +181,41 @@ function setEncounterGuide(guide) {
     ? `机制：Spire Codex · 攻略：${sourceCount} 个社区来源${confidence ? ` · ${confidence}` : ''} · stable ${guide.gameVersion || '当前版本'}`
     : '数据来源：游戏 Bridge · 未匹配到完整资料';
   guidePanel.classList.add('visible');
-  say(`${guide.kind === 'boss' ? 'Boss' : '精英'}攻略来了`, 'alert');
-}
-
-function say(message, mood = '') {
-  speech.textContent = message;
-  speech.classList.add('visible');
-  stage.classList.remove('thinking', 'alert');
-  if (mood) stage.classList.add(mood);
+  petState.guideVisible = true;
+  applyPose();
+  say(`${guide.kind === 'boss' ? 'Boss' : '精英'}攻略来了`);
 }
 
 function setStatus(status) {
   const replay = status.status === 'live' && status.mode === 'replay';
+  petState.live = status.status === 'live';
   statusDot.classList.remove('live', 'alert');
   if (replay) {
-    statusLabel.textContent = '回放 DEMO';
+    connectionLabel = '回放 DEMO';
+    statusDot.classList.add('live');
+    startReplayPoseTour();
   } else if (status.status === 'live') {
     statusDot.classList.add('live');
-    statusLabel.textContent = '游戏 LIVE';
+    connectionLabel = '游戏 LIVE';
   } else if (status.status === 'invalid' || status.status === 'stale') {
     statusDot.classList.add('alert');
-    statusLabel.textContent = status.status === 'stale' ? '数据停滞' : '数据异常';
-    say(status.status === 'stale' ? '游戏状态停住了' : '数据格式需要检查', 'alert');
+    connectionLabel = status.status === 'stale' ? '数据停滞' : '数据异常';
+    say(status.status === 'stale' ? '游戏状态停住了' : '数据格式需要检查');
   } else {
-    statusLabel.textContent = status.status === 'connected' ? '等待游戏' : status.status === 'demo' ? '回放数据' : '等待游戏';
-    if (status.status === 'connecting') say('正在找游戏', 'thinking');
+    connectionLabel = status.status === 'connected' ? '等待游戏' : status.status === 'demo' ? '回放数据' : '等待游戏';
+    if (status.status === 'connecting') say('正在找游戏');
   }
+  applyPose();
 }
 
 function setState(next) {
+  if (petState.thinking || hasAdvice()) return;
   const enemy = next.combat?.enemies?.[0];
   const intent = String(enemy?.intent || '').toLowerCase();
   if (intent.includes('attack')) {
-    say('小心，敌人显示攻击意图', 'alert');
+    say('小心，敌人显示攻击意图');
   } else if (/rest|camp/i.test(String(next.run?.room || '')) || /rest/i.test(String(next.run?.currentNode || ''))) {
-    say('休息处，想想回血还是升级', 'thinking');
+    say('休息处，想想回血还是升级');
   } else if (next.run?.room === 'map') {
     say('地图已打开');
   } else {
@@ -140,26 +224,34 @@ function setState(next) {
 }
 
 function setRecommendation(recommendation) {
+  petState.recommendation = recommendation && ADVICE_TASKS.has(recommendation.task) ? recommendation : null;
+  applyPose();
   if (!recommendation) {
-    say('我在看着这局');
+    if (petState.live && !petState.thinking && !hasAdvice()) say('我在看着这局');
     return;
   }
-  if (recommendation?.task === 'card_reward' && recommendation.primary?.label) {
-    say(recommendation.primary.action === 'SKIP' ? '这次建议跳过' : `建议${recommendation.primary.label}`, '');
+  if (recommendation.task === 'card_reward' && recommendation.primary?.label) {
+    say(recommendation.primary.action === 'SKIP' ? '这次建议跳过' : `建议${recommendation.primary.label}`);
     return;
   }
-  if (recommendation?.task === 'rest_site' && recommendation.primary?.label) {
+  if (recommendation.task === 'rest_site' && recommendation.primary?.label) {
     const shortReason = String(recommendation.reason || '').split(/[。！？]/)[0];
     say(`休息处建议${recommendation.primary.label}${shortReason ? `：${shortReason}` : ''}`);
     return;
   }
-  if (recommendation?.task !== 'map_route' || !recommendation.primary?.label) return;
+  if (recommendation.task === 'event_choice' && recommendation.primary?.label) {
+    say(`建议选择「${recommendation.primary.label}」`);
+    return;
+  }
+  if (recommendation.task !== 'map_route' || !recommendation.primary?.label) return;
   if (recommendation.tie?.isTie) {
     say(`${recommendation.tie.label}，任选其一`);
     return;
   }
-  say(`下一步建议走${recommendation.primary.displayLabel || recommendation.primary.label}`, 'thinking');
+  say(`下一步建议走${recommendation.primary.displayLabel || recommendation.primary.label}`);
 }
+
+applyPose();
 
 const petButton = document.querySelector('#pet-button');
 let dragState;

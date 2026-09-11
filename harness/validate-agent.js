@@ -163,6 +163,16 @@ assert.equal(merged.enabled, true);
 assert.equal(merged.model, 'kimi-k2.5');
 assert.equal(merged.wireApi, 'chat');
 assert.equal(merged.source, 'env');
+assert.equal(merged.thinking, '');
+const k26 = readLlmConfig({
+  GAMEBUDDY_LLM_API_KEY: 'sk-test-kimi',
+  GAMEBUDDY_LLM_BASE_URL: 'https://api.moonshot.cn/v1',
+  GAMEBUDDY_LLM_MODEL: 'kimi-k2.6',
+  GAMEBUDDY_LLM_WIRE_API: 'chat',
+  GAMEBUDDY_LLM_THINKING: 'disabled'
+});
+assert.equal(k26.model, 'kimi-k2.6');
+assert.equal(k26.thinking, 'disabled');
 assert.equal(extractResponseText({ output_text: '{"index":1}' }), '{"index":1}');
 
 const store = createObservationStore({ staleAfterMs: 5000 });
@@ -214,8 +224,8 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
     completeRoute: async () => ({ index: 1, reason: '生命够用，去打精英换遗物。' })
   };
   const llmRec = await recommendRoute(mapState, { llm, now: 2 });
-  assert.equal(llmRec.source, 'rules');
-  assert.equal(llmRec.primary.label, '精英');
+  assert.equal(llmRec.source, 'llm');
+  assert.equal(llmRec.primary.label, '商店');
   assert.match(llmRec.reason, /精英/);
 
   const tiedTreasureRec = await recommendRoute(twoTreasureState, { now: 2 });
@@ -262,6 +272,28 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   const llmPick = await client.completeRoute({ candidates: [{ index: 0 }, { index: 1 }], state: mapState });
   assert.equal(llmPick.index, 1);
   assert.equal(llmPick.reason, '打精英');
+
+  let capturedChatBody;
+  const thinkingOffClient = createOpenAiClient({
+    enabled: true,
+    apiKey: 'test-key',
+    baseURL: 'https://api.moonshot.cn/v1',
+    model: 'kimi-k2.6',
+    wireApi: 'chat',
+    thinking: 'disabled'
+  }, {
+    fetchImpl: async (_url, options) => {
+      capturedChatBody = JSON.parse(options.body);
+      return {
+        ok: true,
+        json: async () => ({ choices: [{ message: { content: '{"index":0,"reason":"这张"}' } }] })
+      };
+    }
+  });
+  const thinkingOffPick = await thinkingOffClient.completeCardReward({ candidates: [{ index: 0 }] });
+  assert.equal(capturedChatBody.model, 'kimi-k2.6');
+  assert.equal(capturedChatBody.thinking.type, 'disabled');
+  assert.equal(thinkingOffPick.index, 0);
 
   const responsesClient = createOpenAiClient({
     enabled: true,
@@ -428,7 +460,108 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   assert.equal(rewardRec.options.length, 3);
   assert.ok(rewardRec.options.every(card => card.fit?.boss && card.fit?.elite));
 
-  console.log('Agent recommendation cases passed: 32');
+  const llmCardRec = await recommendCardReward(rewardObservation, {
+    codex: fakeCodex,
+    now: 15,
+    llm: {
+      enabled: true,
+      completeCardReward: async () => ({ index: 0, reason: 'LLM确认这张' })
+    }
+  });
+  assert.equal(llmCardRec.source, 'llm');
+  assert.equal(llmCardRec.reason, 'LLM确认这张');
+  const failedLlmCard = await recommendCardReward(rewardObservation, {
+    codex: fakeCodex,
+    now: 16,
+    llm: {
+      enabled: true,
+      completeCardReward: async () => {
+        throw new Error('llm down');
+      }
+    }
+  });
+  assert.equal(failedLlmCard, null);
+
+  let routeCalls = 0;
+  let releaseRoute;
+  const holdRoute = new Promise(resolve => { releaseRoute = resolve; });
+  const overlapping = createOrchestrator({
+    llm: {
+      enabled: true,
+      completeRoute: async () => {
+        routeCalls += 1;
+        await holdRoute;
+        return { index: 0, reason: '走这条' };
+      }
+    },
+    now: () => 30
+  });
+  const firstPending = overlapping.consider(observation);
+  const secondPending = overlapping.consider(observation, { force: true });
+  const thirdPending = overlapping.consider(observation);
+  releaseRoute();
+  const [firstOverlap, secondOverlap, thirdOverlap] = await Promise.all([firstPending, secondPending, thirdPending]);
+  assert.equal(routeCalls, 1);
+  assert.equal(firstOverlap.task, 'map_route');
+  assert.equal(secondOverlap, firstOverlap);
+  assert.equal(thirdOverlap, firstOverlap);
+
+  let cardCalls = 0;
+  let releaseCard;
+  const holdCard = new Promise(resolve => { releaseCard = resolve; });
+  let publishedCard;
+  const overlappingCards = createOrchestrator({
+    llm: {
+      enabled: true,
+      completeCardReward: async () => {
+        cardCalls += 1;
+        await holdCard;
+        return { index: 0, reason: 'LLM确认这张' };
+      }
+    },
+    onRecommendation: rec => { publishedCard = rec; },
+    now: () => 40
+  });
+  const noisyReward = {
+    ...rewardObservation,
+    state: {
+      ...rewardObservation.state,
+      player: { ...rewardObservation.state.player, gold: 99 }
+    }
+  };
+  const cardFirst = overlappingCards.consider(rewardObservation);
+  const cardSecond = overlappingCards.consider(noisyReward, { force: true });
+  releaseCard();
+  const [firstCardOverlap, secondCardOverlap] = await Promise.all([cardFirst, cardSecond]);
+  assert.equal(cardCalls, 1);
+  assert.equal(firstCardOverlap.task, 'card_reward');
+  assert.equal(firstCardOverlap.source, 'llm');
+  assert.equal(secondCardOverlap, firstCardOverlap);
+  assert.equal(publishedCard.source, 'llm');
+
+  let failNextCard = false;
+  let publishedKeep;
+  const keepCard = createOrchestrator({
+    llm: {
+      enabled: true,
+      completeCardReward: async () => {
+        if (failNextCard) throw new Error('timeout');
+        return { index: 0, reason: '先给这张' };
+      }
+    },
+    onRecommendation: rec => { publishedKeep = rec; },
+    now: () => 41
+  });
+  const keptCard = await keepCard.consider(rewardObservation);
+  assert.equal(keptCard.source, 'llm');
+  failNextCard = true;
+  const afterFail = await keepCard.consider(rewardObservation, { force: true });
+  assert.equal(afterFail.source, 'llm');
+  assert.equal(afterFail.reason, '先给这张');
+  assert.equal(publishedKeep.source, 'llm');
+  assert.equal(publishedKeep.reason, '先给这张');
+
+  console.log('Agent recommendation cases passed: 37');
 }).catch(error => {
   console.error(error);
   process.exit(1);

@@ -30,7 +30,8 @@ let lastAgentThinking = { thinking: false, tasks: [], model: null };
 const observationStore = createObservationStore({ staleAfterMs: 5000 });
 const llmConfig = readLlmConfig();
 if (llmConfig.enabled) {
-  console.log(`GameBuddy LLM: ${llmConfig.model} · ${llmConfig.wireApi} · ${llmConfig.source}${llmConfig.providerName ? `/${llmConfig.providerName}` : ''}`);
+  const thinkingLabel = llmConfig.thinking === 'disabled' ? ' · thinking off' : llmConfig.thinking === 'enabled' ? ' · thinking on' : '';
+  console.log(`GameBuddy LLM: ${llmConfig.model} · ${llmConfig.wireApi} · ${llmConfig.source}${llmConfig.providerName ? `/${llmConfig.providerName}` : ''}${thinkingLabel}`);
 } else {
   console.log('GameBuddy LLM: rules only');
 }
@@ -114,7 +115,9 @@ function publishRecommendation(recommendation) {
     syncPetWindowSize();
     keepPetVisible();
     petWindow?.webContents.send('bridge-card-recommendation', recommendation);
-  } else if (activeCardRecommendation) {
+    return;
+  }
+  if (recommendation && activeCardRecommendation) {
     clearCardRecommendation();
   }
 }
@@ -258,8 +261,7 @@ function connectBridge() {
         const observation = observationStore.getObservation();
         if (result.accepted) broadcast('bridge-observation', observation);
         void considerObservation(observation, {
-          force: result.kind === 'duplicate'
-            || (result.kind === 'event' && (result.event?.name === 'map.opened' || result.event?.name === 'rest.opened' || result.event?.name === 'event.opened' || result.event?.name === 'card.reward.opened'))
+          force: result.kind === 'event' && ['map.opened', 'rest.opened', 'event.opened', 'card.reward.opened'].includes(result.event?.name)
         });
       }
     } catch (error) {
