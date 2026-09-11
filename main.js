@@ -8,6 +8,7 @@ const { ensureMapRoutes, routeChoiceCount } = require('./agent/tasks/route');
 const { decide } = require('./agent/router');
 const { recordDecision } = require('./agent/recorder');
 const { encounterGuideSignature, buildEncounterGuide } = require('./agent/tasks/encounter-guide');
+const { createSlTracker } = require('./harness/sl-stats');
 const fs = require('node:fs');
 
 const BRIDGE_URL = process.env.GAMEBUDDY_BRIDGE_URL || 'ws://127.0.0.1:27182';
@@ -28,6 +29,8 @@ let activeCardRecommendation = null;
 const activeLlmRequests = new Map();
 let lastAgentThinking = { thinking: false, tasks: [], model: null };
 const observationStore = createObservationStore({ staleAfterMs: 5000 });
+let slTracker = createSlTracker();
+let lastSlStats = slTracker.snapshot();
 const llmConfig = readLlmConfig();
 if (llmConfig.enabled) {
   const thinkingLabel = llmConfig.thinking === 'disabled' ? ' · thinking off' : llmConfig.thinking === 'enabled' ? ' · thinking on' : '';
@@ -80,6 +83,15 @@ function broadcast(channel, payload) {
 function broadcastBridgeStatus(status, detail = '') {
   lastBridgeStatus = { status, detail, url: BRIDGE_URL, mode: BRIDGE_MODE };
   broadcast('bridge-status', lastBridgeStatus);
+}
+
+function publishSlStats(stats) {
+  lastSlStats = stats;
+  broadcast('bridge-sl-stats', stats);
+}
+
+function noteLiveRun(hasLiveRun, state) {
+  publishSlStats(slTracker.observe({ hasLiveRun, state }));
 }
 
 function updateAgentThinking(thinking, detail = {}) {
@@ -230,10 +242,17 @@ function connectBridge() {
         console.error('[Runmate DEBUG] invalid state reason:', result.reason);
         console.error('[Runmate DEBUG] raw message:', JSON.stringify(message, null, 2).slice(0, 4000));
         broadcastBridgeStatus('invalid', result.reason);
+        noteLiveRun(false);
         return;
       }
+      if (result.kind === 'state' || result.kind === 'duplicate') {
+        const liveState = withRoutableState(result.state || observationStore.getState());
+        if (liveState) {
+          broadcastBridgeStatus('live');
+          noteLiveRun(true, liveState);
+        }
+      }
       if (result.kind === 'state') {
-        broadcastBridgeStatus('live');
         if (result.accepted) {
           if (!agentRunId) startAgentRun();
           const observation = currentObservation();
@@ -275,6 +294,7 @@ function connectBridge() {
     if (bridgeSocket === socket) bridgeSocket = null;
     clearEncounterGuide();
     clearCardRecommendation();
+    noteLiveRun(false);
     broadcastBridgeStatus('waiting', '等待本地 Mod Bridge');
     clearTimeout(bridgeReconnectTimer);
     bridgeReconnectTimer = setTimeout(connectBridge, 2500);
@@ -325,6 +345,7 @@ function createMainWindow() {
     const recommendation = orchestrator.getRecommendation();
     if (recommendation) mainWindow.webContents.send('bridge-recommendation', recommendation);
     else void considerObservation(observation, { force: true });
+    mainWindow.webContents.send('bridge-sl-stats', lastSlStats);
   });
   mainWindow.on('close', event => {
     if (!isQuitting) {
@@ -372,6 +393,7 @@ function createPetWindow() {
     const recommendation = orchestrator.getRecommendation();
     if (recommendation) petWindow.webContents.send('bridge-recommendation', recommendation);
     petWindow.webContents.send('bridge-agent-thinking', lastAgentThinking);
+    petWindow.webContents.send('bridge-sl-stats', lastSlStats);
     if (activeCardRecommendation) petWindow.webContents.send('bridge-card-recommendation', activeCardRecommendation);
     if (activeEncounterGuide) {
       syncPetWindowSize();
@@ -446,6 +468,10 @@ ipcMain.handle('refresh-recommendation', async () => {
 });
 
 app.whenReady().then(() => {
+  slTracker = createSlTracker({
+    persistPath: BRIDGE_MODE === 'replay' ? null : path.join(app.getPath('userData'), 'sl-stats.json')
+  });
+  lastSlStats = slTracker.snapshot();
   createMainWindow();
   createPetWindow();
   createTray();
@@ -453,6 +479,7 @@ app.whenReady().then(() => {
   petTopmostTimer = setInterval(keepPetVisible, 1000);
   bridgeHealthTimer = setInterval(() => {
     if (lastBridgeStatus.status === 'live' && !observationStore.getObservation().fresh) {
+      noteLiveRun(false);
       broadcastBridgeStatus('stale', '已连接，但超过 5 秒没有新的游戏状态');
     }
   }, 1000);

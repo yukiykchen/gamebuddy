@@ -24,6 +24,7 @@ contextBridge.exposeInMainWorld('gamebuddyBridge', {
   onEncounterGuide: callback => ipcRenderer.on('bridge-encounter-guide', (_event, guide) => callback(guide)),
   onCardRecommendation: callback => ipcRenderer.on('bridge-card-recommendation', (_event, recommendation) => callback(recommendation)),
   onAgentThinking: callback => ipcRenderer.on('bridge-agent-thinking', (_event, state) => callback(state)),
+  onSlStats: callback => ipcRenderer.on('bridge-sl-stats', (_event, stats) => callback(stats)),
   getObservation: () => ipcRenderer.invoke('get-observation'),
   refreshRecommendation: () => ipcRenderer.invoke('refresh-recommendation'),
   acceptDecision: decision => ipcRenderer.send('accept-decision', decision)

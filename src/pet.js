@@ -36,6 +36,26 @@ let connectionLabel = '等待游戏';
 let tourPose = null;
 let tourTimer = 0;
 let tourStarted = false;
+let pendingSlSpeech = null;
+
+function canSpeakSl() {
+  return !tourPose && !petState.thinking && !hasAdvice();
+}
+
+function flushPendingSlSpeech() {
+  if (!pendingSlSpeech || !canSpeakSl()) return;
+  say(pendingSlSpeech);
+  pendingSlSpeech = null;
+}
+
+function setSlStats(stats) {
+  if (!stats?.incremented || !stats.speech) return;
+  if (!canSpeakSl()) {
+    pendingSlSpeech = stats.speech;
+    return;
+  }
+  say(stats.speech);
+}
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -118,6 +138,7 @@ function setCardRecommendation(recommendation) {
     petState.cardVisible = false;
     petState.cardRecommendation = null;
     applyPose();
+    flushPendingSlSpeech();
     return;
   }
   const primary = recommendation.primary || {};
@@ -142,6 +163,7 @@ function setCardRecommendation(recommendation) {
 function setAgentThinking(state) {
   petState.thinking = Boolean(state?.thinking);
   applyPose();
+  if (!petState.thinking) flushPendingSlSpeech();
   if (!petState.thinking || hasAdvice()) return;
   const task = state.tasks?.[0];
   const labels = {
@@ -159,6 +181,7 @@ function setEncounterGuide(guide) {
     guideContent.innerHTML = '';
     petState.guideVisible = false;
     applyPose();
+    flushPendingSlSpeech();
     return;
   }
   guideKicker.textContent = guide.kind === 'boss' ? 'BOSS 攻略' : '精英攻略';
@@ -228,6 +251,7 @@ function setRecommendation(recommendation) {
   applyPose();
   if (!recommendation) {
     if (petState.live && !petState.thinking && !hasAdvice()) say('我在看着这局');
+    flushPendingSlSpeech();
     return;
   }
   if (recommendation.task === 'card_reward' && recommendation.primary?.label) {
@@ -300,3 +324,4 @@ window.gamebuddyBridge?.onRecommendation(setRecommendation);
 window.gamebuddyBridge?.onEncounterGuide(setEncounterGuide);
 window.gamebuddyBridge?.onCardRecommendation(setCardRecommendation);
 window.gamebuddyBridge?.onAgentThinking(setAgentThinking);
+window.gamebuddyBridge?.onSlStats(setSlStats);

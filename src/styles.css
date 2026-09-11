@@ -59,7 +59,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .progress-meta strong { color: var(--cream); font-weight: 500; }
 .progress-track { height: 4px; margin-top: 8px; background: #303537; }
 .progress-track span { display: block; width: 35%; height: 100%; background: var(--amber); }
-.run-stats { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 18px; }
+.run-stats { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 18px; }
 .run-stats div + div { border-left: 1px solid var(--line); padding-left: 10px; }
 .run-stats span, .run-stats strong { display: block; }
 .run-stats span { color: #697375; font-size: 10px; }

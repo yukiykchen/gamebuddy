@@ -11,7 +11,8 @@ const state = {
   hand: [],
   map: { visited: [] },
   reward: null,
-  recommendation: null
+  recommendation: null,
+  thisRunSl: null
 };
 
 const viewContainer = document.querySelector('#view-container');
@@ -282,6 +283,7 @@ function updateRunSummary() {
   document.querySelector('#deck-count').textContent = state.player.cards?.length || '--';
   document.querySelector('#relic-count').textContent = state.player.relics?.length || '--';
   document.querySelector('#gold-count').textContent = state.run.act ? (state.player.gold ?? 0) : '--';
+  document.querySelector('#sl-count').textContent = Number.isInteger(state.thisRunSl) ? String(state.thisRunSl) : '--';
 }
 
 function bindViewActions() {
@@ -427,4 +429,9 @@ window.gamebuddyBridge?.onRecommendation(recommendation => {
 window.gamebuddyBridge?.onStatus(status => {
   setBridgeStatus(status);
   if (status.status === 'connected') showToast('已连接《杀戮尖塔 2》实时数据');
+});
+window.gamebuddyBridge?.onSlStats(stats => {
+  if (!Number.isInteger(stats?.thisRun)) return;
+  state.thisRunSl = stats.thisRun;
+  document.querySelector('#sl-count').textContent = String(stats.thisRun);
 });
