@@ -1,6 +1,7 @@
 const DEFAULT_BASE_URL = 'https://spire-codex.com/api';
 const cardEvaluations = require('./card-evaluations.json');
 const encounterStrategies = require('./encounter-strategies.json');
+const { deriveMechanicTags } = require('./mechanic-tags');
 const evaluationIndex = new Map();
 const encounterStrategyIndex = new Map((encounterStrategies.encounters || []).map(item => [normalizeKey(item.id), item]));
 for (const card of cardEvaluations.cards || []) {
@@ -36,10 +37,32 @@ function makeIndex(items) {
   return index;
 }
 
+function inferUpgraded(card) {
+  if (!card || typeof card === 'string') return /\+$/.test(String(card || '').trim());
+  if (card.upgraded === true || card.isUpgraded === true || card.IsUpgraded === true) return true;
+  return /\+$/.test(String(card.name || '').trim());
+}
+
 function resolveItem(ref, index) {
   const raw = typeof ref === 'string' ? { id: ref, name: ref } : (ref || {});
   const match = index.get(normalizeKey(raw.id)) || index.get(normalizeKey(raw.name));
-  return match ? { ...raw, ...match, originalId: raw.id || raw.name } : { ...raw };
+  if (!match) {
+    return { ...raw, upgraded: inferUpgraded(raw) };
+  }
+  const upgraded = inferUpgraded(raw) || inferUpgraded(match);
+  return {
+    ...match,
+    ...raw,
+    originalId: raw.id || match.id || raw.name,
+    name: raw.name || match.name,
+    cost: raw.cost !== undefined && raw.cost !== ''
+      ? (Number.isFinite(Number(raw.cost)) ? Number(raw.cost) : raw.cost)
+      : match.cost,
+    upgraded,
+    description: raw.description || match.description,
+    upgrade_description: raw.upgrade_description || raw.upgradeDescription || match.upgradeDescription || match.upgrade_description,
+    upgradeDescription: raw.upgradeDescription || raw.upgrade_description || match.upgradeDescription || match.upgrade_description
+  };
 }
 
 function actMatches(value, act, actId) {
@@ -157,7 +180,10 @@ function attachEvaluation(card) {
       prior: evaluation.prior,
       community: evaluation.community,
       expertConsensus: evaluation.expertConsensus,
-      mechanicTags: evaluation.mechanicTags,
+      mechanicTags: deriveMechanicTags({
+        ...card,
+        description: card.description || evaluation.description
+      }, evaluation.mechanicTags),
       advice: evaluation.evaluation || null
     }
   };
@@ -403,4 +429,4 @@ function createSpireCodexClient({
   return { loadDraftContext, loadEncounterContext };
 }
 
-module.exports = { DEFAULT_BASE_URL, normalizeKey, stripMarkup, mechanicTags, createSpireCodexClient };
+module.exports = { DEFAULT_BASE_URL, normalizeKey, stripMarkup, mechanicTags, inferUpgraded, resolveItem, createSpireCodexClient };

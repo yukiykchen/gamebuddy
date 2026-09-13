@@ -1,7 +1,7 @@
 const { validateRecommendation } = require('./recommendation');
 const { recommendRoute, routeSignature, routeChoiceCount } = require('./tasks/route');
 const { isRestSite, recommendRest, restSignature } = require('./tasks/rest');
-const { recommendEvent, eventSignature } = require('./tasks/event');
+const { recommendEvent, eventSignature, choosableEventOptions, eventChoicePending } = require('./tasks/event');
 const { findCardReward, recommendCardReward, cardRewardSignature } = require('./tasks/card-reward');
 const { createOpenAiClient, readLlmConfig } = require('./llm/openai');
 
@@ -11,9 +11,12 @@ const SCENE_EVENTS = new Set([
   'card.reward.opened',
   'card.reward.closed',
   'rest.opened',
+  'rest.closed',
   'event.opened',
   'map.opened'
 ]);
+
+const REST_CHOICE_DONE = new Set(['rest.closed', 'map.opened', 'combat.started', 'card.reward.opened']);
 
 function latestSceneEvent(observation) {
   const events = observation?.recentEvents || [];
@@ -29,20 +32,49 @@ function isMapScene(observation) {
   return /map/i.test(String(observation?.state?.run?.room || ''));
 }
 
+function restChoicePending(observation) {
+  const events = observation?.recentEvents || [];
+  for (let index = events.length - 1; index >= 0; index -= 1) {
+    const name = events[index]?.name;
+    if (REST_CHOICE_DONE.has(name)) return false;
+    if (name === 'rest.opened') return true;
+  }
+  return isRestSite(observation?.state);
+}
+
+function restChoiceFinished(observation) {
+  const events = observation?.recentEvents || [];
+  for (let index = events.length - 1; index >= 0; index -= 1) {
+    const name = events[index]?.name;
+    if (name === 'rest.closed') return true;
+    if (name === 'rest.opened' || name === 'combat.started' || name === 'card.reward.opened' || name === 'event.opened') {
+      return false;
+    }
+  }
+  return false;
+}
+
+function eventChoiceFinished(observation) {
+  const events = observation?.recentEvents || [];
+  for (let index = events.length - 1; index >= 0; index -= 1) {
+    const name = events[index]?.name;
+    if (name === 'event.closed') return true;
+    if (name === 'event.opened' || name === 'combat.started' || name === 'card.reward.opened') return false;
+  }
+  return false;
+}
+
 function selectTask(observation) {
   const state = observation?.state;
   if (!state) return null;
   if (state.combat) return null;
   if (findCardReward(observation)) return 'card_reward';
-  if (Array.isArray(state.event?.options) && state.event.options.length > 0) return 'event_choice';
-  const recent = observation.recentEvents || [];
-  for (let i = recent.length - 1; i >= 0; i -= 1) {
-    const name = recent[i]?.name;
-    if (name === 'map.opened') break;
-    if (name === 'rest.opened') return 'rest_site';
+  if (choosableEventOptions(state).length > 0) return 'event_choice';
+  if (eventChoicePending(observation)) return null;
+  if (restChoicePending(observation)) return 'rest_site';
+  if (routeChoiceCount(state) > 1 && (isMapScene(observation) || isRestSite(state) || restChoiceFinished(observation) || eventChoiceFinished(observation))) {
+    return 'map_route';
   }
-  if (isRestSite(state)) return 'rest_site';
-  if (isMapScene(observation) && routeChoiceCount(state) > 1) return 'map_route';
   return null;
 }
 
@@ -66,17 +98,36 @@ function createOrchestrator({
   let inFlight = null;
   let generation = 0;
 
-  async function consider(observation, { force = false } = {}) {
+  async function consider(observation, { force = false, reason } = {}) {
     const task = selectTask(observation);
     if (!task) {
+      if (eventChoicePending(observation)) {
+        const dropMap = lastRecommendation?.task === 'map_route' || inFlight?.task === 'map_route';
+        if (dropMap || lastRecommendation) {
+          generation += 1;
+          lastSignature = '';
+          inFlight = null;
+          if (lastRecommendation) {
+            lastRecommendation = null;
+            onRecommendation?.(null);
+          }
+          onAgentStatus?.({ status: 'idle', task: null, timestamp: now() });
+        }
+        return null;
+      }
       const scene = latestSceneEvent(observation);
       const cardStillRunning = inFlight?.task === 'card_reward'
         && scene !== 'card.reward.closed'
         && !observation?.state?.combat;
       const mapWithoutFork = isMapScene(observation) && routeChoiceCount(observation?.state) <= 1;
+      const restFinishedIdle = !restChoicePending(observation)
+        && isRestSite(observation?.state)
+        && routeChoiceCount(observation?.state) <= 1;
       const leaveScene = observation?.state?.combat
         || scene === 'card.reward.closed'
-        || mapWithoutFork;
+        || scene === 'rest.closed'
+        || mapWithoutFork
+        || restFinishedIdle;
       if (leaveScene && !cardStillRunning) {
         generation += 1;
         lastSignature = '';
@@ -93,10 +144,13 @@ function createOrchestrator({
     }
 
     const signature = `${task}:${signatureFor(task, observation, observation.state)}`;
-    if (inFlight && inFlight.signature === signature) return inFlight.promise;
-    if (inFlight && inFlight.task === task && task === 'card_reward') return inFlight.promise;
-    if (!observation?.fresh && !force && lastRecommendation) return lastRecommendation;
-    if (!force && signature === lastSignature && lastRecommendation) return lastRecommendation;
+    const refresh = reason === 'refresh';
+    if (inFlight && inFlight.signature === signature && !refresh) return inFlight.promise;
+    if (inFlight && inFlight.task === task && task === 'card_reward' && !refresh) return inFlight.promise;
+    if (!observation?.fresh && !force && !refresh && lastRecommendation) return lastRecommendation;
+    if (signature === lastSignature && lastRecommendation) {
+      if (!refresh && (task === 'card_reward' || !force)) return lastRecommendation;
+    }
 
     const current = ++generation;
     const promise = (async () => {
@@ -170,12 +224,19 @@ function createOrchestrator({
     onRecommendation?.(null);
   }
 
+  function hasPublishedFor(observation) {
+    const task = selectTask(observation);
+    if (!task || !lastRecommendation) return false;
+    return lastSignature === `${task}:${signatureFor(task, observation, observation.state)}`;
+  }
+
   return {
     consider,
     getRecommendation: () => lastRecommendation,
+    hasPublishedFor,
     clearRecommendation,
     selectTask
   };
 }
 
-module.exports = { createOrchestrator, selectTask };
+module.exports = { createOrchestrator, selectTask, restChoicePending, eventChoicePending };

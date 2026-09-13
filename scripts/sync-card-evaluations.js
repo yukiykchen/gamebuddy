@@ -9,6 +9,7 @@ const EXPERT_SITE = 'https://sts2tierlists.com';
 const DATA_CHANNEL = String(process.env.GAMEBUDDY_CARD_DATA_CHANNEL || 'stable').toLowerCase();
 const VERSION_OVERRIDE = String(process.env.GAMEBUDDY_CARD_DATA_VERSION || '').trim();
 const CARD_GUIDES = new Set(['ironclad', 'silent', 'defect', 'necrobinder', 'regent', 'colorless']);
+const { deriveMechanicTags, isStatusGenerationTrigger, cardSearchText } = require('../agent/knowledge/mechanic-tags');
 
 async function fetchJson(url) {
   const controller = new AbortController();
@@ -78,7 +79,7 @@ function mechanicTags(card) {
   if (/重放|replay/.test(text)) tags.push('replay');
   if (/所有.*卡牌.*伤害增加|all .*cards.*damage/.test(text)) tags.push('repeat_copy');
   if (/如果|若|每当|只能|if |when |whenever|only/.test(text)) tags.push('conditional');
-  return [...new Set(tags)];
+  return deriveMechanicTags(card, tags);
 }
 
 function formatTimestamp(url) {
@@ -147,7 +148,10 @@ function buildEvaluation(card, prior, community, expertConsensus, gameVersion) {
   if (tags.includes('discard')) goodWhen.push('已有弃牌、灵巧或相关触发体系时');
   if (tags.includes('poison')) goodWhen.push('已有中毒叠层与持续伤害支持时');
   if (tags.includes('shiv')) goodWhen.push('已有小刀增伤、连击或出牌次数收益时');
-  if (tags.includes('orb')) goodWhen.push('当前充能球类型和槽位支持该效果时');
+  const statusTrigger = isStatusGenerationTrigger(cardSearchText(card));
+  if (statusTrigger) goodWhen.push('牌组能稳定生成状态牌（伤口、灼伤等）时');
+  if (tags.includes('status_generate')) goodWhen.push('已有伤口、灼伤或其他状态牌生成时');
+  if (tags.includes('orb') && !statusTrigger) goodWhen.push('当前充能球类型和槽位支持该效果时');
   if (tags.includes('doom') || tags.includes('summon')) goodWhen.push('已有厄运或召唤体系，能够放大联动时');
   if (tags.includes('stars')) goodWhen.push('星能产出足以稳定支付或触发相关效果时');
   if (tags.includes('forge') || tags.includes('replay')) goodWhen.push('已有锻造或重放体系并缺少关键组件时');
@@ -165,7 +169,8 @@ function buildEvaluation(card, prior, community, expertConsensus, gameVersion) {
   if (tags.includes('exhaust')) badWhen.push('长战需要重复使用它且没有回收手段时');
   if (tags.includes('discard')) badWhen.push('缺少弃牌出口或相关触发组件时');
   if (tags.includes('poison')) badWhen.push('下一场敌人克制持续伤害或当前缺少中毒支持时');
-  if (tags.includes('orb')) badWhen.push('球槽、集中或目标球类型与它不匹配时');
+  if (statusTrigger) badWhen.push('牌组无法稳定生成状态牌时');
+  if (tags.includes('orb') && !statusTrigger) badWhen.push('球槽、集中或目标球类型与它不匹配时');
   if (tags.includes('repeat_copy')) badWhen.push('牌组没有同名牌支持，也不准备围绕它持续拿牌时');
   if (card.type_key === 'Power' && !damage && !block) badWhen.push('短战压力高、打出当回合必须立刻攻防时');
   if (draw && !energy && Number.isFinite(cost) && cost > 0) badWhen.push('抽牌已经充足但能量无法支持额外手牌时');

@@ -6,17 +6,35 @@ function eventOptions(state) {
     : [];
 }
 
+function choosableEventOptions(state) {
+  return eventOptions(state).filter(option => option.locked !== true);
+}
+
+function namedList(items) {
+  return (Array.isArray(items) ? items : [])
+    .map(item => {
+      if (!item) return '';
+      if (typeof item === 'string') return item;
+      const name = item.name || item.label || item.id || '';
+      return item.upgraded ? `${name}+` : name;
+    })
+    .filter(Boolean);
+}
+
 function buildEventRecommendation(state, { source = 'rules', reason, now = Date.now(), index = 0 } = {}) {
-  const options = eventOptions(state);
+  const options = choosableEventOptions(state);
   if (!options.length) return null;
   const safeIndex = Math.max(0, Math.min(options.length - 1, Number(index) || 0));
   const chosen = options[safeIndex];
+  const eventKind = state?.event?.kind === 'ancient' ? 'ancient' : 'event';
   return {
     schema: SCHEMA,
     task: 'event_choice',
     timestamp: now,
     source,
     confidence: source === 'llm' ? 0.74 : 0.45,
+    eventKind,
+    eventTitle: state?.event?.title || '',
     reason: reason || `建议选择「${chosen.label}」。这是当前事件中可执行的选项。`,
     primary: {
       action: 'CHOOSE_EVENT',
@@ -36,15 +54,18 @@ function buildEventRecommendation(state, { source = 'rules', reason, now = Date.
 }
 
 function eventPromptPayload(state) {
+  const options = choosableEventOptions(state);
   return {
+    kind: state?.event?.kind === 'ancient' ? 'ancient' : 'event',
     title: state?.event?.title || '',
     description: state?.event?.description || '',
     hp: state?.player?.hp,
     maxHp: state?.player?.maxHp,
     gold: state?.player?.gold,
-    relics: state?.player?.relics || [],
-    deck: state?.player?.cards || [],
-    options: eventOptions(state).map((option, index) => ({
+    energyPerTurn: state?.player?.maxEnergy,
+    relics: namedList(state?.player?.relics),
+    deck: namedList(state?.player?.cards),
+    options: options.map((option, index) => ({
       index: Number(option.index ?? index),
       label: option.label,
       description: option.description || ''
@@ -53,7 +74,7 @@ function eventPromptPayload(state) {
 }
 
 async function recommendEvent(state, { llm, now = Date.now() } = {}) {
-  const options = eventOptions(state);
+  const options = choosableEventOptions(state);
   if (!options.length) return null;
   if (llm?.enabled && typeof llm.completeEvent === 'function') {
     try {
@@ -77,10 +98,34 @@ async function recommendEvent(state, { llm, now = Date.now() } = {}) {
 function eventSignature(state) {
   return JSON.stringify({
     room: state?.run?.room || null,
+    kind: state?.event?.kind || null,
     title: state?.event?.title || null,
     description: state?.event?.description || null,
-    options: eventOptions(state).map(option => [option.index, option.label, option.description])
+    options: choosableEventOptions(state).map(option => [option.index, option.label, option.description])
   });
 }
 
-module.exports = { eventOptions, eventPromptPayload, recommendEvent, eventSignature };
+function eventChoicePending(observation) {
+  const state = observation?.state;
+  if (!state || state.combat) return false;
+  if (choosableEventOptions(state).length > 0) return true;
+  const events = observation?.recentEvents || [];
+  for (let index = events.length - 1; index >= 0; index -= 1) {
+    const name = events[index]?.name;
+    if (name === 'event.closed' || name === 'combat.started' || name === 'card.reward.opened') return false;
+    if (name === 'event.opened') return true;
+  }
+  if (state.event && typeof state.event === 'object') return true;
+  const node = String(state.run?.currentNode || '');
+  const room = String(state.run?.room || '');
+  return /ancient/i.test(node) || /^event$/i.test(room);
+}
+
+module.exports = {
+  eventOptions,
+  choosableEventOptions,
+  eventPromptPayload,
+  recommendEvent,
+  eventSignature,
+  eventChoicePending
+};

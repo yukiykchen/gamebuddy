@@ -5,9 +5,12 @@ const { createObservationStore } = require('./observation-store');
 const { validateRecommendation } = require('../agent/recommendation');
 const { rankRoutes, recommendRoute, scoreNode, scoreParts, buildScoreContext, ensureMapRoutes, routeChoiceCount } = require('../agent/tasks/route');
 const { isRestSite, recommendRest, rankSmithCards } = require('../agent/tasks/rest');
-const { findCardReward, recommendCardReward } = require('../agent/tasks/card-reward');
-const { parseJsonObject, createOpenAiClient, readLlmConfig, extractResponseText } = require('../agent/llm/openai');
-const { createOrchestrator, selectTask } = require('../agent/orchestrator');
+const { findCardReward, recommendCardReward, analyzeCard, cardRewardSignature } = require('../agent/tasks/card-reward');
+const { resolveItem, inferUpgraded } = require('../agent/knowledge/spire-codex');
+const { parseJsonObject, createOpenAiClient, readLlmConfig, extractResponseText, resolveChatTemperature, parseAllowedTemperature } = require('../agent/llm/openai');
+const { createOrchestrator, selectTask, restChoicePending, eventChoicePending } = require('../agent/orchestrator');
+const { recommendEvent, eventPromptPayload } = require('../agent/tasks/event');
+const { deriveMechanicTags, generatesNamedStatus, isStatusGenerationTrigger } = require('../agent/knowledge/mechanic-tags');
 
 const lifecycle = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'lifecycle.json'), 'utf8'));
 const mapState = lifecycle[2];
@@ -173,6 +176,16 @@ const k26 = readLlmConfig({
 });
 assert.equal(k26.model, 'kimi-k2.6');
 assert.equal(k26.thinking, 'disabled');
+assert.equal(k26.temperature, undefined);
+assert.equal(resolveChatTemperature(k26), 0.6);
+assert.equal(resolveChatTemperature({ model: 'demo' }), undefined);
+assert.equal(parseAllowedTemperature('invalid temperature: only 0.6 is allowed for this model'), 0.6);
+const withTemp = readLlmConfig({
+  GAMEBUDDY_LLM_API_KEY: 'sk-test',
+  GAMEBUDDY_LLM_MODEL: 'demo',
+  GAMEBUDDY_LLM_TEMPERATURE: '0.2'
+});
+assert.equal(withTemp.temperature, 0.2);
 assert.equal(extractResponseText({ output_text: '{"index":1}' }), '{"index":1}');
 
 const store = createObservationStore({ staleAfterMs: 5000 });
@@ -263,6 +276,8 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
     fetchImpl: async (url, options) => {
       assert.match(url, /chat\/completions$/);
       assert.match(options.headers.Authorization, /Bearer test-key/);
+      const body = JSON.parse(options.body);
+      assert.equal(body.temperature, undefined);
       return {
         ok: true,
         json: async () => ({ choices: [{ message: { content: '{"index":1,"reason":"打精英"}' } }] })
@@ -272,6 +287,29 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   const llmPick = await client.completeRoute({ candidates: [{ index: 0 }, { index: 1 }], state: mapState });
   assert.equal(llmPick.index, 1);
   assert.equal(llmPick.reason, '打精英');
+
+  const llmLogs = [];
+  const loggingClient = createOpenAiClient({
+    enabled: true,
+    apiKey: 'test-key-secret',
+    baseURL: 'https://example.test/v1',
+    model: 'demo',
+    wireApi: 'chat'
+  }, {
+    onLog: entry => llmLogs.push(entry),
+    fetchImpl: async () => ({
+      ok: true,
+      json: async () => ({ choices: [{ message: { content: '{"index":1,"reason":"打精英"}' } }] })
+    })
+  });
+  await loggingClient.completeRoute({ candidates: [{ index: 0, label: '商店' }, { index: 1, label: '精英' }] });
+  const phases = llmLogs.map(entry => entry.phase);
+  assert.deepEqual(phases.slice(0, 4), ['start', 'system', 'input', 'output']);
+  assert.equal(phases.includes('parsed'), true);
+  assert.match(llmLogs.find(entry => entry.phase === 'system').text, /路线顾问/);
+  assert.match(llmLogs.find(entry => entry.phase === 'input').text, /"label": "商店"/);
+  assert.match(llmLogs.find(entry => entry.phase === 'output').text, /打精英/);
+  assert.equal(llmLogs.some(entry => `${entry.label}\n${entry.text}`.includes('test-key-secret')), false);
 
   let capturedChatBody;
   const thinkingOffClient = createOpenAiClient({
@@ -292,8 +330,42 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   });
   const thinkingOffPick = await thinkingOffClient.completeCardReward({ candidates: [{ index: 0 }] });
   assert.equal(capturedChatBody.model, 'kimi-k2.6');
+  assert.equal(capturedChatBody.temperature, 0.6);
   assert.equal(capturedChatBody.thinking.type, 'disabled');
   assert.equal(thinkingOffPick.index, 0);
+  assert.match(capturedChatBody.messages[0].content, /升级后效果/);
+  assert.match(capturedChatBody.messages[0].content, /不得单独作为 SKIP/);
+
+  let temperatureCalls = 0;
+  const retryClient = createOpenAiClient({
+    enabled: true,
+    apiKey: 'test-key',
+    baseURL: 'https://example.test/v1',
+    model: 'demo',
+    wireApi: 'chat',
+    temperature: 1
+  }, {
+    fetchImpl: async (_url, options) => {
+      temperatureCalls += 1;
+      const body = JSON.parse(options.body);
+      if (body.temperature === 1) {
+        return {
+          ok: false,
+          status: 400,
+          text: async () => '{"error":{"message":"invalid temperature: only 0.6 is allowed for this model","type":"invalid_request_error"}}',
+          json: async () => ({})
+        };
+      }
+      assert.equal(body.temperature, 0.6);
+      return {
+        ok: true,
+        json: async () => ({ choices: [{ message: { content: '{"index":2,"reason":"跳过"}' } }] })
+      };
+    }
+  });
+  const retried = await retryClient.completeCardReward({ candidates: [{ index: 0 }, { index: 1 }, { index: 2 }] });
+  assert.equal(temperatureCalls, 2);
+  assert.equal(retried.index, 2);
 
   const responsesClient = createOpenAiClient({
     enabled: true,
@@ -409,6 +481,120 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   });
   assert.equal(viaEvent.task, 'rest_site');
 
+  const restForkObservation = {
+    schema: 'gamebuddy.observation.v1',
+    fresh: true,
+    state: {
+      ...twoTreasureState,
+      player: { ...twoTreasureState.player, hp: 40, maxHp: 80 }
+    },
+    recentEvents: [{ name: 'rest.opened' }]
+  };
+  assert.equal(restChoicePending(restForkObservation), true);
+  assert.equal(selectTask(restForkObservation), 'rest_site');
+
+  const restHealedObservation = {
+    schema: 'gamebuddy.observation.v1',
+    fresh: true,
+    state: {
+      ...twoTreasureState,
+      player: { ...twoTreasureState.player, hp: 68, maxHp: 80 }
+    },
+    recentEvents: [
+      { name: 'rest.opened' },
+      { name: 'rest.closed', data: { action: 'HEAL', hpBefore: 40, hpAfter: 68 } }
+    ]
+  };
+  assert.equal(restChoicePending(restHealedObservation), false);
+  assert.equal(selectTask(restHealedObservation), 'map_route');
+
+  const restThenRouteOrch = createOrchestrator({ llm: { enabled: false }, now: () => 14 });
+  const restThenOpened = await restThenRouteOrch.consider(restForkObservation);
+  assert.equal(restThenOpened.task, 'rest_site');
+  const restThenRoute = await restThenRouteOrch.consider(restHealedObservation, { force: true });
+  assert.equal(restThenRoute.task, 'map_route');
+
+  const paelEvent = {
+    title: '佩尔',
+    description: '有傀儡来了？能帮我去看看父亲的状况么？我太累了……',
+    kind: 'ancient',
+    options: [
+      { index: 0, label: '佩尔之角', description: '将2张放松加入你的牌组。' },
+      { index: 1, label: '佩尔之牙', description: '从你的牌组中选择5张牌移除。在每场战斗结束时，将其中随机1牌升级然后返还。' },
+      { index: 2, label: '佩尔之眼', description: '你在每场战斗中第一次没有打出任何牌就结束回合时，消耗所有手牌然后进行一个额外回合。' }
+    ]
+  };
+  const paelObservation = {
+    schema: 'gamebuddy.observation.v1',
+    fresh: true,
+    state: {
+      ...twoTreasureState,
+      run: { ...twoTreasureState.run, room: 'Event', currentNode: 'Ancient' },
+      event: paelEvent
+    },
+    recentEvents: [{ name: 'map.opened' }, { name: 'event.opened' }]
+  };
+  assert.equal(selectTask(paelObservation), 'event_choice');
+
+  const ancientDialogue = {
+    ...paelObservation,
+    state: {
+      ...paelObservation.state,
+      event: { title: '佩尔', description: paelEvent.description, kind: 'ancient', options: [] }
+    },
+    recentEvents: [{ name: 'map.opened' }]
+  };
+  assert.equal(eventChoicePending(ancientDialogue), true);
+  assert.equal(selectTask(ancientDialogue), null);
+
+  const ancientWithoutEvent = {
+    schema: 'gamebuddy.observation.v1',
+    fresh: true,
+    state: {
+      ...twoTreasureState,
+      run: { ...twoTreasureState.run, room: 'Event', currentNode: 'Ancient' }
+    },
+    recentEvents: [{ name: 'map.opened' }]
+  };
+  assert.equal(selectTask(ancientWithoutEvent), null);
+
+  const afterAncientClosed = {
+    schema: 'gamebuddy.observation.v1',
+    fresh: true,
+    state: {
+      ...twoTreasureState,
+      run: { ...twoTreasureState.run, room: 'Event', currentNode: 'Ancient' }
+    },
+    recentEvents: [{ name: 'map.opened' }, { name: 'event.opened' }, { name: 'event.closed' }]
+  };
+  assert.equal(selectTask(afterAncientClosed), 'map_route');
+
+  const eventPayload = eventPromptPayload(paelObservation.state);
+  assert.equal(eventPayload.kind, 'ancient');
+  assert.equal(eventPayload.energyPerTurn, paelObservation.state.player.maxEnergy);
+  assert.equal(eventPayload.options.length, 3);
+
+  const llmEventRec = await recommendEvent(paelObservation.state, {
+    now: 20,
+    llm: {
+      enabled: true,
+      completeEvent: async payload => {
+        assert.equal(payload.kind, 'ancient');
+        assert.ok(Array.isArray(payload.deck));
+        assert.ok(Array.isArray(payload.relics));
+        return { index: 1, reason: '删牌并升级更适合当前牌组。' };
+      }
+    }
+  });
+  assert.equal(validateRecommendation(llmEventRec).ok, true);
+  assert.equal(llmEventRec.source, 'llm');
+  assert.equal(llmEventRec.primary.label, '佩尔之牙');
+  assert.match(llmEventRec.reason, /删牌/);
+
+  const rulesEventRec = await recommendEvent(paelObservation.state, { now: 21 });
+  assert.equal(rulesEventRec.source, 'rules');
+  assert.equal(rulesEventRec.primary.label, '佩尔之角');
+
   const rewardObservation = {
     schema: 'gamebuddy.observation.v1',
     fresh: true,
@@ -470,6 +656,282 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   });
   assert.equal(llmCardRec.source, 'llm');
   assert.equal(llmCardRec.reason, 'LLM确认这张');
+
+  let cardEnergyPrompt;
+  const leftoverEnergyObservation = {
+    ...rewardObservation,
+    state: {
+      ...rewardObservation.state,
+      player: { ...rewardObservation.state.player, energy: 2, maxEnergy: 3 }
+    }
+  };
+  await recommendCardReward(leftoverEnergyObservation, {
+    codex: fakeCodex,
+    now: 15,
+    llm: {
+      enabled: true,
+      completeCardReward: async payload => {
+        cardEnergyPrompt = payload;
+        return { index: 0, reason: '按每回合能量判断' };
+      }
+    }
+  });
+  assert.equal(cardEnergyPrompt.player.energy, undefined);
+  assert.equal(cardEnergyPrompt.player.energyPerTurn, 3);
+  assert.equal(cardEnergyPrompt.player.maxEnergy, 3);
+
+  const momentumCatalog = {
+    id: 'MOMENTUM_STRIKE',
+    name: '趁势打击',
+    cost: 1,
+    type: '攻击',
+    description: '造成10点伤害。这张牌的耗能降为0。',
+    upgradeDescription: '造成13点伤害。这张牌的耗能降为0。'
+  };
+  const momentumIndex = new Map([['MOMENTUMSTRIKE', momentumCatalog]]);
+  const momentumMerged = resolveItem({
+    id: 'MOMENTUM_STRIKE',
+    name: '趁势打击+',
+    cost: 1,
+    upgraded: true,
+    type: 'Attack'
+  }, momentumIndex);
+  assert.equal(inferUpgraded({ name: '趁势打击+' }), true);
+  assert.equal(momentumMerged.upgraded, true);
+  assert.equal(momentumMerged.name, '趁势打击+');
+  assert.equal(momentumMerged.cost, 1);
+  assert.match(momentumMerged.upgradeDescription, /13点伤害/);
+  const momentumAnalysis = analyzeCard({
+    ...momentumMerged,
+    evaluation: {
+      prior: { score: 30, tier: 'F' },
+      advice: {
+        rank: 'F',
+        expertSummary: '同版本社区数据给出的基础档位为 F。主要价值是10 点总伤害。',
+        badWhen: ['它不能改善当前牌组缺口，拿取只会降低核心牌抽取频率时']
+      }
+    }
+  }, mapState, {
+    size: 12,
+    attacks: 6,
+    skills: 5,
+    powers: 1,
+    draw: 1,
+    blockCards: 3,
+    counts: new Map(),
+    tagCounts: new Map(),
+    act: 1
+  }, { eliteSoon: false, bossSoon: false }, undefined, new Set());
+  assert.equal(momentumAnalysis.upgraded, true);
+  assert.match(momentumAnalysis.description, /13点伤害/);
+  assert.ok(!/10点/.test(momentumAnalysis.description));
+  assert.ok(!momentumAnalysis.cons.some(item => /基础数据表现偏低/.test(item)));
+  assert.match(momentumAnalysis.knowledgeEvaluation.note, /未升级/);
+
+  const upgradeFlickerBase = {
+    schema: 'gamebuddy.observation.v1',
+    fresh: true,
+    state: mapState,
+    recentEvents: [{
+      name: 'card.reward.opened',
+      data: {
+        cards: [
+          { id: 'MOMENTUM_STRIKE', name: '趁势打击', upgraded: false },
+          { id: 'GUNK_UP', name: '污秽攻击', upgraded: false },
+          { id: 'UPROAR', name: '骚动', upgraded: false }
+        ],
+        canSkip: true
+      }
+    }]
+  };
+  const upgradeFlickerLater = {
+    ...upgradeFlickerBase,
+    recentEvents: [{
+      name: 'card.reward.opened',
+      data: {
+        cards: [
+          { id: 'MOMENTUM_STRIKE', name: '趁势打击+', upgraded: true },
+          { id: 'GUNK_UP', name: '污秽攻击', upgraded: false },
+          { id: 'UPROAR', name: '骚动', upgraded: false }
+        ],
+        canSkip: true
+      }
+    }]
+  };
+  assert.equal(cardRewardSignature(upgradeFlickerBase), cardRewardSignature(upgradeFlickerLater));
+
+  let upgradedCardPayload;
+  const upgradedRewardObservation = {
+    ...upgradeFlickerLater,
+    recentEvents: [{
+      name: 'card.reward.opened',
+      data: {
+        cards: [
+          { id: 'MOMENTUM_STRIKE', name: '趁势打击+', cost: 1, upgraded: true },
+          { id: 'GUNK_UP', name: '污秽攻击', cost: 1, upgraded: false },
+          { id: 'UPROAR', name: '骚动', cost: 2, upgraded: false }
+        ],
+        canSkip: true
+      }
+    }]
+  };
+  await recommendCardReward(upgradedRewardObservation, {
+    now: 52,
+    llm: {
+      enabled: true,
+      completeCardReward: async payload => {
+        upgradedCardPayload = payload;
+        return { index: 0, reason: '升级后是13点伤害' };
+      }
+    },
+    codex: {
+      loadDraftContext: async (_state, reward) => ({
+        source: 'test',
+        deckCards: mapState.player.cards,
+        relics: [],
+        coach: null,
+        cards: (reward.cards || []).map(card => {
+          if (card.id === 'MOMENTUM_STRIKE') {
+            return {
+              ...resolveItem(card, momentumIndex),
+              evaluation: {
+                prior: { score: 30, tier: 'F' },
+                advice: {
+                  rank: 'F',
+                  expertSummary: '同版本社区数据给出的基础档位为 F。主要价值是10 点总伤害。',
+                  badWhen: ['它不能改善当前牌组缺口，拿取只会降低核心牌抽取频率时']
+                }
+              }
+            };
+          }
+          return {
+            ...card,
+            type_key: 'Attack',
+            description: card.id === 'GUNK_UP' ? '造成4点伤害3次。' : '造成6点伤害两次。',
+            evaluation: { prior: { score: 45, tier: 'D' } }
+          };
+        }),
+        threats: {}
+      })
+    }
+  });
+  const momentumCandidate = upgradedCardPayload.candidates.find(item => item.id === 'MOMENTUM_STRIKE');
+  assert.equal(momentumCandidate.upgraded, true);
+  assert.equal(momentumCandidate.cost, 1);
+  assert.match(momentumCandidate.description, /13点伤害/);
+  assert.match(momentumCandidate.knowledgeEvaluation.note, /未升级/);
+
+  let restEnergyPrompt;
+  await recommendRest({
+    ...restState(76),
+    player: { ...mapState.player, hp: 76, maxHp: 80, energy: 1, maxEnergy: 3 }
+  }, {
+    now: 12,
+    llm: {
+      enabled: true,
+      completeRest: async payload => {
+        restEnergyPrompt = payload;
+        return { index: 1, reason: '升级' };
+      }
+    }
+  });
+  assert.equal(restEnergyPrompt.energy, undefined);
+  assert.equal(restEnergyPrompt.energyPerTurn, 3);
+  assert.equal(restEnergyPrompt.maxEnergy, 3);
+
+  assert.equal(generatesNamedStatus('抽3张牌。将一张灼伤加入你的弃牌堆。'), true);
+  assert.equal(generatesNamedStatus('获得13点格挡。将2张伤口加入你的弃牌堆。'), true);
+  assert.equal(generatesNamedStatus('每当你生成状态牌的时候，随机生成一个充能球。'), false);
+  assert.equal(isStatusGenerationTrigger('每当你生成状态牌的时候，随机生成一个充能球。'), true);
+  assert.ok(deriveMechanicTags({ description: '抽3张牌。将一张灼伤加入你的弃牌堆。' }).includes('status_generate'));
+  assert.ok(!deriveMechanicTags({ description: '每当你生成状态牌的时候，随机生成一个充能球。' }).includes('status_generate'));
+
+  const statusDeck = [
+    { id: 'OVERCLOCK', name: '超频', type: '技能', cost: 0, description: '抽3张牌。将一张灼伤加入你的弃牌堆。' },
+    { id: 'FIGHT_THROUGH', name: '强撑', type: '技能', cost: 1, description: '获得13点格挡。将2张伤口加入你的弃牌堆。' },
+    { id: 'ITERATION', name: '迭代', type: '能力', cost: 1, description: '每回合你第一次抽到状态牌时，抽2张牌。' },
+    { id: 'ZAP', name: '电击', type: '技能', cost: 1, description: '生成1个闪电充能球。' },
+    { id: 'DUALCAST', name: '双重释放', type: '技能', cost: 1, description: '激发你最右侧的充能球两次。' }
+  ];
+  const trashCard = {
+    id: 'TRASH_TO_TREASURE',
+    name: '化废为宝',
+    type_key: 'Power',
+    rarity_key: 'Rare',
+    cost: 1,
+    description: '每当你生成状态牌的时候，随机生成一个充能球。',
+    evaluation: {
+      prior: { score: 82, tier: 'A' },
+      mechanicTags: ['generate', 'orb', 'conditional'],
+      advice: {
+        goodWhen: ['当前充能球类型和槽位支持该效果时'],
+        badWhen: ['球槽、集中或目标球类型与它不匹配时']
+      }
+    }
+  };
+  const statusRewardObservation = {
+    schema: 'gamebuddy.observation.v1',
+    fresh: true,
+    state: {
+      ...mapState,
+      combat: null,
+      player: { ...mapState.player, hp: 21, maxHp: 75, cards: statusDeck }
+    },
+    recentEvents: [{
+      name: 'card.reward.opened',
+      data: {
+        cards: [
+          trashCard,
+          { id: 'MACHINE_LEARNING', name: '机器学习', description: '在你的回合开始时，额外抽1张牌。' },
+          { id: 'SPINNER', name: '旋转工艺', description: '在你的回合开始时，生成1个玻璃充能球。' }
+        ],
+        canSkip: true
+      }
+    }]
+  };
+  const statusCodex = {
+    loadDraftContext: async (state, reward) => ({
+      source: 'test',
+      deckCards: statusDeck,
+      relics: [],
+      coach: null,
+      cards: (reward.cards || []).map(card => (card.id === 'TRASH_TO_TREASURE' ? trashCard : {
+        ...card,
+        type_key: 'Power',
+        rarity_key: card.id === 'SPINNER' ? 'Common' : 'Rare',
+        evaluation: { prior: { score: 70, tier: 'B' }, mechanicTags: card.id === 'SPINNER' ? ['orb'] : ['draw'] }
+      })),
+      threats: {}
+    })
+  };
+  const statusRec = await recommendCardReward(statusRewardObservation, { llm: { enabled: false }, now: 40, codex: statusCodex });
+  assert.equal(validateRecommendation(statusRec).ok, true);
+  assert.equal(statusRec.primary.action, 'TAKE_CARD');
+  assert.equal(statusRec.primary.cardId, 'TRASH_TO_TREASURE');
+  assert.match(statusRec.reason, /状态牌|伤口|灼伤|超频|强撑/);
+  const trashAnalysis = statusRec.primary.analysis || statusRec.options.find(card => card.id === 'TRASH_TO_TREASURE');
+  assert.ok(trashAnalysis.pros.some(item => /状态牌/.test(item)));
+  assert.ok(!trashAnalysis.pros.some(item => /「orb」/.test(item)));
+  assert.ok((trashAnalysis.knowledgeEvaluation?.goodWhen || []).some(item => /状态牌/.test(item)));
+  assert.ok(!(trashAnalysis.knowledgeEvaluation?.goodWhen || []).some(item => /充能球类型/.test(item)));
+
+  let statusPrompt;
+  await recommendCardReward(statusRewardObservation, {
+    codex: statusCodex,
+    now: 41,
+    llm: {
+      enabled: true,
+      completeCardReward: async payload => {
+        statusPrompt = payload;
+        return { index: 0, reason: '超频和强撑能生成状态牌，化废为宝可以兑现' };
+      }
+    }
+  });
+  assert.equal(statusPrompt.candidates[0].id, 'TRASH_TO_TREASURE');
+  assert.match(statusPrompt.candidates[0].trigger, /状态牌/);
+  assert.equal(statusPrompt.candidates[0].synergy.tag, 'status_generate');
+  assert.equal(statusPrompt.candidates[0].synergy.count, 2);
+
   const failedLlmCard = await recommendCardReward(rewardObservation, {
     codex: fakeCodex,
     now: 16,
@@ -561,7 +1023,62 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   assert.equal(publishedKeep.source, 'llm');
   assert.equal(publishedKeep.reason, '先给这张');
 
-  console.log('Agent recommendation cases passed: 37');
+  let lockedCalls = 0;
+  const publishedLocked = [];
+  const lockedCards = createOrchestrator({
+    llm: {
+      enabled: true,
+      completeCardReward: async () => {
+        lockedCalls += 1;
+        return { index: lockedCalls === 1 ? 0 : 1, reason: `pick-${lockedCalls}` };
+      }
+    },
+    onRecommendation: rec => { if (rec) publishedLocked.push(rec); },
+    now: () => 42
+  });
+  const firstLocked = await lockedCards.consider(rewardObservation);
+  const autoForceLocked = await lockedCards.consider(rewardObservation, { force: true });
+  const openedAgain = await lockedCards.consider(noisyReward, { force: true });
+  assert.equal(lockedCalls, 1);
+  assert.equal(publishedLocked.length, 1);
+  assert.equal(firstLocked.reason, 'pick-1');
+  assert.equal(autoForceLocked, firstLocked);
+  assert.equal(openedAgain, firstLocked);
+  assert.equal(publishedLocked[0].reason, 'pick-1');
+  assert.equal(lockedCards.hasPublishedFor(rewardObservation), true);
+
+  const refreshed = await lockedCards.consider(rewardObservation, { force: true, reason: 'refresh' });
+  assert.equal(lockedCalls, 2);
+  assert.equal(publishedLocked.length, 2);
+  assert.equal(refreshed.reason, 'pick-2');
+  assert.equal(publishedLocked[1].reason, 'pick-2');
+  const afterRefreshForce = await lockedCards.consider(rewardObservation, { force: true });
+  assert.equal(lockedCalls, 2);
+  assert.equal(publishedLocked.length, 2);
+  assert.equal(afterRefreshForce, refreshed);
+
+  let flickerCalls = 0;
+  const publishedFlicker = [];
+  const flickerCards = createOrchestrator({
+    llm: {
+      enabled: true,
+      completeCardReward: async () => {
+        flickerCalls += 1;
+        return { index: flickerCalls === 1 ? 0 : 1, reason: `flicker-${flickerCalls}` };
+      }
+    },
+    onRecommendation: rec => { if (rec) publishedFlicker.push(rec); },
+    now: () => 43
+  });
+  const firstFlicker = await flickerCards.consider(upgradeFlickerBase);
+  const laterFlicker = await flickerCards.consider(upgradeFlickerLater, { force: true });
+  assert.equal(flickerCalls, 1);
+  assert.equal(publishedFlicker.length, 1);
+  assert.equal(firstFlicker.reason, 'flicker-1');
+  assert.equal(laterFlicker, firstFlicker);
+  assert.equal(laterFlicker.reason, 'flicker-1');
+
+  console.log('Agent recommendation cases passed: 50');
 }).catch(error => {
   console.error(error);
   process.exit(1);

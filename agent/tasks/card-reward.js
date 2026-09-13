@@ -1,5 +1,6 @@
 const { SCHEMA } = require('../recommendation');
-const { createSpireCodexClient, normalizeKey, stripMarkup } = require('../knowledge/spire-codex');
+const { createSpireCodexClient, normalizeKey, stripMarkup, inferUpgraded } = require('../knowledge/spire-codex');
+const { cardSearchText, deriveMechanicTags, isStatusGenerationTrigger } = require('../knowledge/mechanic-tags');
 
 const codexClient = createSpireCodexClient();
 
@@ -77,7 +78,9 @@ function numeric(value) {
 }
 
 function cardFacts(card) {
-  const description = stripMarkup((card.upgraded && card.upgrade_description) || card.description || card.text || '');
+  const upgraded = inferUpgraded(card);
+  const upgradeText = card.upgrade_description || card.upgradeDescription;
+  const description = stripMarkup((upgraded && upgradeText) || card.description || card.text || '');
   const cost = card.is_x_cost || card.isXCost ? null : (Number.isFinite(Number(card.cost)) ? Number(card.cost) : null);
   const block = numeric(card.block);
   const draw = numeric(card.cards_draw || card.cardsDraw);
@@ -110,7 +113,37 @@ function cardFacts(card) {
     isControl: /weak|vulnerable|strength.*-|虚弱|易伤|失去.*力量|降低.*力量/.test(searchable),
     isConditional: /if |when |whenever|若|如果|每当|致命|fatal|只能|only/.test(searchable),
     exhausts: /exhaust|消耗/.test(searchable),
-    innate: /innate|固有/.test(searchable)
+    innate: /innate|固有/.test(searchable),
+    upgraded
+  };
+}
+
+function tagsFor(card) {
+  return deriveMechanicTags(card, card.evaluation?.mechanicTags || card.mechanicTags || []);
+}
+
+function overlayStatusAdvice(advice, text) {
+  if (!isStatusGenerationTrigger(text)) return advice || null;
+  const base = advice || { goodWhen: [], badWhen: [] };
+  return {
+    ...base,
+    goodWhen: [...new Set([
+      '牌组能稳定生成状态牌（伤口、灼伤等）时',
+      ...(base.goodWhen || []).filter(item => !/充能球类型|球槽|集中/.test(item))
+    ])].slice(0, 4),
+    badWhen: [...new Set([
+      ...(base.badWhen || []).filter(item => !/球槽|集中|目标球/.test(item)),
+      '牌组无法稳定生成状态牌时'
+    ])].slice(0, 3)
+  };
+}
+
+function overlayUpgradedAdvice(advice, upgraded) {
+  if (!upgraded) return advice || null;
+  return {
+    ...(advice || {}),
+    rankAppliesTo: 'unupgraded',
+    note: '知识库档位针对未升级版本；本候选已升级，请按升级后卡面评价，不得仅因未升级档位选择 SKIP'
   };
 }
 
@@ -122,7 +155,7 @@ function deckContext(state, knowledge) {
   for (const card of cards) {
     const key = normalizeKey(card.id || card.name);
     if (key) counts.set(key, (counts.get(key) || 0) + 1);
-    for (const tag of card.evaluation?.mechanicTags || []) {
+    for (const tag of tagsFor(card)) {
       tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
     }
   }
@@ -206,21 +239,38 @@ function analyzeCard(card, state, context, threats, coachItem, enemyTags = new S
     if (knowledgePrior >= 78) {
       const version = card.evaluation.gameVersion ? `（${card.evaluation.gameVersion}）` : '';
       pros.push(`基础评价${version}为 ${card.evaluation.prior.tier} 级，多来源先验表现较好`);
-    } else if (knowledgePrior < 35) {
+    } else if (knowledgePrior < 35 && !facts.upgraded) {
       cons.push('基础数据表现偏低，需要明确的牌组协同才能发挥');
     }
   }
 
-  const synergyTags = ['poison', 'shiv', 'discard', 'exhaust', 'strength', 'self_damage', 'vulnerable', 'orb', 'doom', 'summon', 'stars', 'forge', 'replay', 'retain'];
-  const matchedSynergies = (card.evaluation?.mechanicTags || [])
-    .filter(tag => synergyTags.includes(tag))
-    .map(tag => ({ tag, count: context.tagCounts.get(tag) || 0 }))
-    .filter(item => item.count > 0)
-    .sort((left, right) => right.count - left.count);
+  const synergyTags = ['poison', 'shiv', 'discard', 'exhaust', 'strength', 'self_damage', 'vulnerable', 'orb', 'doom', 'summon', 'stars', 'forge', 'replay', 'retain', 'status', 'status_generate'];
+  const text = cardSearchText(card);
+  const statusTrigger = isStatusGenerationTrigger(text);
+  const generateCount = context.tagCounts.get('status_generate') || 0;
+  let statusSynergy = null;
+  if (statusTrigger) {
+    if (generateCount > 0) {
+      statusSynergy = { tag: 'status_generate', count: generateCount, label: '状态牌生成' };
+      score += Math.min(10, 3 + generateCount * 2);
+      pros.unshift(`牌组有 ${generateCount} 张牌会生成伤口、灼伤等状态牌，能触发这张牌`);
+    } else {
+      score -= 8;
+      cons.push('牌组缺少伤口、灼伤等状态牌生成，触发条件难以兑现');
+    }
+  }
+  const matchedSynergies = statusTrigger
+    ? []
+    : tagsFor(card)
+      .filter(tag => synergyTags.includes(tag))
+      .map(tag => ({ tag, count: context.tagCounts.get(tag) || 0 }))
+      .filter(item => item.count > 0)
+      .sort((left, right) => right.count - left.count);
   if (matchedSynergies.length) {
     const best = matchedSynergies[0];
     score += Math.min(8, 2 + best.count * 1.5);
-    pros.push(`与牌组已有的 ${best.count} 张「${best.tag}」相关牌形成协同`);
+    const label = best.tag === 'status_generate' ? '状态牌生成' : best.tag === 'status' ? '状态牌' : best.tag;
+    pros.push(`与牌组已有的 ${best.count} 张「${label}」相关牌形成协同`);
   }
 
   if (facts.hasDirectDamage) {
@@ -254,9 +304,9 @@ function analyzeCard(card, state, context, threats, coachItem, enemyTags = new S
     scenarios.push('多目标战斗');
   }
   if (facts.isRare) score += 2;
-  if (card.upgraded) {
-    score += 5;
-    pros.push('奖励牌已升级，拿取后立即成型');
+  if (facts.upgraded) {
+    score += 8;
+    pros.push('奖励是升级版，按升级后效果拿取，不当未升级牌');
   }
 
   if (context.act === 1 && context.attacks <= Math.max(5, Math.round(context.size * 0.45)) && facts.isAttack) {
@@ -329,14 +379,18 @@ function analyzeCard(card, state, context, threats, coachItem, enemyTags = new S
     type: card.type || card.type_key || '未知',
     rarity: card.rarity || card.rarity_key || '未知',
     cost: facts.cost,
-    upgraded: Boolean(card.upgraded),
-    description: facts.description || stripMarkup(card.upgrade_description) || '暂未取得卡牌描述',
+    upgraded: facts.upgraded,
+    description: facts.description || stripMarkup(card.upgrade_description || card.upgradeDescription) || '暂未取得卡牌描述',
     score: Math.max(0, Math.min(100, Math.round(score))),
     pros: pros.slice(0, 4),
     cons: cons.slice(0, 3),
     scenarios: [...new Set(scenarios)].slice(0, 4),
     fit: { boss: fit.boss, elite: fit.elite },
-    knowledgeEvaluation: card.evaluation?.advice || null,
+    trigger: statusTrigger ? '每当生成状态牌（伤口、灼伤等）' : null,
+    synergy: statusSynergy || (matchedSynergies[0]
+      ? { tag: matchedSynergies[0].tag, count: matchedSynergies[0].count, label: matchedSynergies[0].tag }
+      : null),
+    knowledgeEvaluation: overlayUpgradedAdvice(overlayStatusAdvice(card.evaluation?.advice, text), facts.upgraded),
     stats: coachItem ? {
       archetypeDelta: coachItem.commitment_delta ?? null,
       winnerSupport: coachItem.winner_support ?? null,
@@ -458,10 +512,9 @@ async function recommendCardReward(observation, { llm, now = Date.now(), codex =
           floor: state.run?.floor,
           hp: state.player?.hp,
           maxHp: state.player?.maxHp,
-          block: state.player?.block,
           gold: state.player?.gold,
-          energy: state.player?.energy,
-          maxEnergy: state.player?.maxEnergy
+          energyPerTurn: Number.isFinite(Number(state.player?.maxEnergy)) ? Number(state.player.maxEnergy) : null,
+          maxEnergy: Number.isFinite(Number(state.player?.maxEnergy)) ? Number(state.player.maxEnergy) : null
         },
         deckSize: context.size,
         eliteSoon: threats.eliteSoon,
@@ -473,8 +526,8 @@ async function recommendCardReward(observation, { llm, now = Date.now(), codex =
           name: card.name || card.id,
           type: card.type || card.type_key || null,
           cost: card.cost ?? null,
-          upgraded: Boolean(card.upgraded),
-          description: stripMarkup((card.upgraded && card.upgrade_description) || card.description || card.text || '') || null,
+          upgraded: inferUpgraded(card),
+          description: stripMarkup((inferUpgraded(card) && (card.upgrade_description || card.upgradeDescription)) || card.description || card.text || '') || null,
           mechanicTags: card.evaluation?.mechanicTags || []
         })),
         relics: (knowledge.relics || []).map(relic => ({
@@ -498,10 +551,15 @@ async function recommendCardReward(observation, { llm, now = Date.now(), codex =
               action: 'TAKE_CARD',
               id: candidate.card.id,
               name: candidate.card.name,
+              cost: candidate.card.cost,
+              upgraded: Boolean(candidate.card.upgraded),
+              description: candidate.card.description || null,
               score: candidate.score,
               pros: candidate.card.pros,
               cons: candidate.card.cons,
               knowledgeEvaluation: candidate.card.knowledgeEvaluation,
+              trigger: candidate.card.trigger || null,
+              synergy: candidate.card.synergy || null,
               bossFit: candidate.card.fit.boss,
               eliteFit: candidate.card.fit.elite
             })
@@ -521,8 +579,12 @@ async function recommendCardReward(observation, { llm, now = Date.now(), codex =
 function cardRewardSignature(observation) {
   const reward = findCardReward(observation);
   if (!reward) return '';
+  const cards = (reward.cards || [])
+    .map(card => normalizeKey(card.id || card.name))
+    .filter(Boolean)
+    .sort();
   return JSON.stringify({
-    cards: (reward.cards || []).map(card => [card.id || null, card.name || null, Boolean(card.upgraded)]),
+    cards,
     canSkip: Boolean(reward.canSkip),
     floor: observation?.state?.run?.floor ?? reward.context?.floor ?? null
   });

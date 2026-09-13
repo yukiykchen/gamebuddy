@@ -16,15 +16,36 @@ function parseThinking(value) {
   return '';
 }
 
-function chatCompletionsBody(config, system, user) {
+function parseTemperature(value) {
+  if (value == null) return undefined;
+  const raw = String(value).trim();
+  if (!raw) return undefined;
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
+function parseAllowedTemperature(message) {
+  const match = String(message || '').match(/only\s+([0-9]*\.?[0-9]+)\s+is allowed/i);
+  if (!match) return null;
+  const parsed = Number(match[1]);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function resolveChatTemperature(config) {
+  if (Number.isFinite(config?.temperature)) return config.temperature;
+  if (/kimi[-_]?k2/i.test(String(config?.model || ''))) return 0.6;
+  return undefined;
+}
+
+function chatCompletionsBody(config, system, user, temperature = resolveChatTemperature(config)) {
   const body = {
     model: config.model,
-    temperature: 1,
     messages: [
       { role: 'system', content: system },
       { role: 'user', content: user }
     ]
   };
+  if (Number.isFinite(temperature)) body.temperature = temperature;
   if (config.thinking) body.thinking = { type: config.thinking };
   return body;
 }
@@ -40,6 +61,7 @@ function readLlmConfig(env = process.env) {
   else if (wireEnv === 'responses' || wireEnv === 'response') wireApi = 'responses';
   const reasoningEffort = String(env.GAMEBUDDY_LLM_REASONING_EFFORT || 'xhigh').trim();
   const thinking = parseThinking(env.GAMEBUDDY_LLM_THINKING);
+  const temperature = parseTemperature(env.GAMEBUDDY_LLM_TEMPERATURE);
   const source = apiKey ? 'env' : '';
   return {
     enabled: Boolean(apiKey),
@@ -49,6 +71,7 @@ function readLlmConfig(env = process.env) {
     wireApi,
     reasoningEffort,
     thinking,
+    temperature,
     store: false,
     source: apiKey ? (source || 'env') : '',
     providerName: env.GAMEBUDDY_LLM_PROVIDER || ''
@@ -83,13 +106,24 @@ function extractResponseText(body) {
   return String(body?.choices?.[0]?.message?.content || '');
 }
 
+function stringifyLog(extra) {
+  if (extra === undefined) return '';
+  return typeof extra === 'string' ? extra : JSON.stringify(extra, null, 2);
+}
+
+function redactSecrets(text, apiKey) {
+  const key = String(apiKey || '').trim();
+  const raw = String(text ?? '');
+  return key ? raw.split(key).join('***') : raw;
+}
+
 function logLlm(label, extra) {
   console.log(`[GameBuddy LLM] ${label}`);
   if (extra === undefined) return;
   console.log(typeof extra === 'string' ? extra : JSON.stringify(extra, null, 2));
 }
 
-function createOpenAiClient(config = readLlmConfig(), { fetchImpl = globalThis.fetch, timeoutMs, onThinkingChange } = {}) {
+function createOpenAiClient(config = readLlmConfig(), { fetchImpl = globalThis.fetch, timeoutMs, onThinkingChange, onLog } = {}) {
   const enabled = Boolean(config?.enabled && config.apiKey);
   let requestSequence = 0;
   const waitMs = Number.isFinite(timeoutMs) ? timeoutMs : 120000;
@@ -128,22 +162,57 @@ function createOpenAiClient(config = readLlmConfig(), { fetchImpl = globalThis.f
     }
   }
 
+  function emitLog(requestId, task, phase, suffix, extra) {
+    const label = `${requestId} ${suffix}`;
+    logLlm(label, extra);
+    try {
+      onLog?.({
+        requestId,
+        task,
+        phase,
+        label,
+        text: redactSecrets(stringifyLog(extra), config.apiKey),
+        at: Date.now()
+      });
+    } catch {
+      // UI logging must never interrupt the recommendation request.
+    }
+  }
+
   async function completeJson(system, payload, task) {
     if (!enabled) return null;
     const detail = { task, model: config.model, requestId: `${task}-${++requestSequence}` };
     const started = Date.now();
     notifyThinking(true, detail);
-    logLlm(`${detail.requestId} 开始`, {
+    emitLog(detail.requestId, task, 'start', '开始', {
       model: config.model,
       wireApi: config.wireApi,
       thinking: config.thinking || null,
       timeoutMs: waitMs
     });
-    logLlm(`${detail.requestId} 系统提示`, system);
-    logLlm(`${detail.requestId} 输入`, payload);
+    emitLog(detail.requestId, task, 'system', '系统提示', system);
+    emitLog(detail.requestId, task, 'input', '输入', payload);
     try {
       const user = JSON.stringify(payload);
       let body;
+      const requestChat = async temperature => {
+        try {
+          return await request(
+            `${config.baseURL}/chat/completions`,
+            chatCompletionsBody(config, system, user, temperature)
+          );
+        } catch (error) {
+          const allowed = parseAllowedTemperature(error.message);
+          if (error.status === 400 && Number.isFinite(allowed) && allowed !== temperature) {
+            emitLog(detail.requestId, task, 'note', `temperature 不被接受，改用 ${allowed}`);
+            return request(
+              `${config.baseURL}/chat/completions`,
+              chatCompletionsBody(config, system, user, allowed)
+            );
+          }
+          throw error;
+        }
+      };
       if (config.wireApi === 'responses') {
         const requestBody = {
           model: config.model,
@@ -156,26 +225,26 @@ function createOpenAiClient(config = readLlmConfig(), { fetchImpl = globalThis.f
           body = await request(`${config.baseURL}/responses`, requestBody);
         } catch (error) {
           if (error.status !== 404 && error.status !== 405) throw error;
-          logLlm(`${detail.requestId} Responses 不可用，改走 Chat Completions`);
-          body = await request(`${config.baseURL}/chat/completions`, chatCompletionsBody(config, system, user));
+          emitLog(detail.requestId, task, 'note', 'Responses 不可用，改走 Chat Completions');
+          body = await requestChat(resolveChatTemperature(config));
         }
       } else {
-        body = await request(`${config.baseURL}/chat/completions`, chatCompletionsBody(config, system, user));
+        body = await requestChat(resolveChatTemperature(config));
       }
       const text = extractResponseText(body);
-      logLlm(`${detail.requestId} 原始输出 ${Date.now() - started}ms`, text || JSON.stringify(body, null, 2));
+      emitLog(detail.requestId, task, 'output', `原始输出 ${Date.now() - started}ms`, text || JSON.stringify(body, null, 2));
       const parsed = parseJsonObject(text);
       if (!parsed) {
-        logLlm(`${detail.requestId} 解析失败，未得到 JSON`);
+        emitLog(detail.requestId, task, 'error', '解析失败，未得到 JSON');
         return null;
       }
-      logLlm(`${detail.requestId} 解析结果`, parsed);
+      emitLog(detail.requestId, task, 'parsed', '解析结果', parsed);
       return {
         index: Number(parsed.index),
         reason: typeof parsed.reason === 'string' ? parsed.reason : ''
       };
     } catch (error) {
-      logLlm(`${detail.requestId} 失败 ${Date.now() - started}ms`, error.message);
+      emitLog(detail.requestId, task, 'error', `失败 ${Date.now() - started}ms`, error.message);
       throw error;
     } finally {
       setTimeout(() => notifyThinking(false, detail), 0);
@@ -190,21 +259,30 @@ function createOpenAiClient(config = readLlmConfig(), { fetchImpl = globalThis.f
       'map_route'
     ),
     completeRest: payload => completeJson(
-      '你是杀戮尖塔 2 的休息处顾问。严格使用 payload.strategy 的社区复核原则，并结合当前生命、完整牌组、遗物、药水、地图和近期精英/Boss，在回血与真实升级候选之间权衡。先确保玩家能活过近期已知威胁；升级时优先能产生降费、抽牌/能量、保留/消耗变化、倍率成长等质变且会在当前牌组中频繁兑现的牌。单卡 Tier 只是弱先验，不能覆盖升级前后差值、牌组协同和生存风险。不要默认升级稀有牌，也不要默认永不升级起手牌。只从给定 candidates 中选择，不得发明卡牌、遗物、机制或数值。用 JSON 回答：{"index":0,"reason":"两句中文解释，说明为什么回血更安全，或该升级如何改善当前牌组与近期战斗"}。',
+      '你是杀戮尖塔 2 的休息处顾问。严格使用 payload.strategy 的社区复核原则，并结合当前生命、完整牌组、遗物、药水、地图和近期精英/Boss，在回血与真实升级候选之间权衡。先确保玩家能活过近期已知威胁；升级时优先能产生降费、抽牌/能量、保留/消耗变化、倍率成长等质变且会在当前牌组中频繁兑现的牌。单卡 Tier 只是弱先验，不能覆盖升级前后差值、牌组协同和生存风险。判断卡费时只用 energyPerTurn / maxEnergy，不要把战斗残留能量当成这局费用。不要默认升级稀有牌，也不要默认永不升级起手牌。只从给定 candidates 中选择，不得发明卡牌、遗物、机制或数值。用 JSON 回答：{"index":0,"reason":"两句中文解释，说明为什么回血更安全，或该升级如何改善当前牌组与近期战斗"}。',
       payload,
       'rest_site'
     ),
     completeEvent: payload => completeJson(
-      '你是杀戮尖塔 2 的事件选择顾问。阅读事件背景和所有选项，结合当前生命、金币、遗物和卡组，选择长期收益更高且风险可接受的选项。只从给定选项里选，不要发明选项。用 JSON 回答：{"index":0,"reason":"两句中文解释"}。',
+      '你是杀戮尖塔 2 的事件与开局祝福顾问。payload.kind 为 ancient 时，这是本层开局远古三选一（通常是遗物），不是地图路线。阅读标题、描述和每个选项的效果文本，结合生命、每回合能量 energyPerTurn、完整牌组和已有遗物，选择长期更稳或更能兑现当前牌组的一项。只从给定 options 里选 index，不要发明选项、遗物或数值，也不要改去建议走哪条路。用 JSON 回答：{"index":0,"reason":"两句中文解释"}。',
       payload,
       'event_choice'
     ),
     completeCardReward: payload => completeJson(
-      '你是杀戮尖塔 2 的选牌顾问。逐张核对候选牌的知识库 rank、expertSummary、goodWhen、badWhen，再与实际完整牌组、升级状态、完整遗物效果、药水效果、金币、章节、生命、完整地图和敌人机制对照。knownBoss 和 knownUpcomingElites 中 exact=true 的遭遇才是已确定身份；possibleBosses 和 possibleElites 只是当前区域的可能池，绝不能说成下一战确定会遇到。地图节点没有 encounterId/encounterName 时也不得猜测具体敌人。知识库评价只是单卡先验；条件不满足时必须降低价值，已有核心协同或能针对确定机制时应提高价值。允许选择 SKIP，避免为了拿牌而拿牌。只能从候选列表中选择，不能发明卡牌、遗物、药水、敌人、机制或数值。用 JSON 回答：{"index":0,"reason":"两句中文解释，说明当前局面满足或不满足哪些拿取条件，以及相对其他选项的优势"}。',
+      '你是杀戮尖塔 2 的选牌顾问。逐张核对候选牌的知识库 rank、expertSummary、goodWhen、badWhen，再与实际完整牌组、升级状态、完整遗物效果、药水效果、金币、章节、生命、完整地图和敌人机制对照。判断卡费和能否打出时只用 energyPerTurn / maxEnergy（每回合能量）；选牌发生在战斗外，不得把上一场残留能量说成这局费用，也不得因此把 3 费牌判成打不出。knownBoss 和 knownUpcomingElites 中 exact=true 的遭遇才是已确定身份；possibleBosses 和 possibleElites 只是当前区域的可能池，绝不能说成下一战确定会遇到。地图节点没有 encounterId/encounterName 时也不得猜测具体敌人。知识库评价只是单卡先验；条件不满足时必须降低价值，已有核心协同或能针对确定机制时应提高价值。候选 upgraded 为 true 或名称以 + 结尾时，必须按升级后效果（description 为升级文本）评价；knowledgeEvaluation 的 rank/expertSummary 针对未升级版本，不得单独作为 SKIP 的充分理由。候选上的 trigger 是卡面触发条件，优先于 knowledgeEvaluation.goodWhen。若 trigger 是生成状态牌，必须按牌组里实际会生成伤口/灼伤等状态牌的能力判断（见 synergy 与 deck 描述），不得因为效果会生成充能球、或牌组充能球/集中偏少而否定。允许选择 SKIP，避免为了拿牌而拿牌。只能从候选列表中选择，不能发明卡牌、遗物、药水、敌人、机制或数值。用 JSON 回答：{"index":0,"reason":"两句中文解释，说明当前局面满足或不满足哪些拿取条件，以及相对其他选项的优势"}。',
       payload,
       'card_reward'
     )
   };
 }
 
-module.exports = { readLlmConfig, parseJsonObject, extractResponseText, createOpenAiClient };
+module.exports = {
+  readLlmConfig,
+  parseJsonObject,
+  extractResponseText,
+  createOpenAiClient,
+  resolveChatTemperature,
+  parseAllowedTemperature,
+  stringifyLog,
+  redactSecrets
+};
