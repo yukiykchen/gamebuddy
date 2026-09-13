@@ -9,7 +9,8 @@ function isAtRunStart(state) {
   const visited = Array.isArray(state.map?.visited) ? state.map.visited : [];
   if (start && current === start) return true;
   if (start && visited.length === 1 && visited[0] === start) return true;
-  return false;
+  const floor = Number(state.run.totalFloor ?? state.run.floor);
+  return Number.isFinite(floor) && floor <= 1 && visited.length <= 1 && !current;
 }
 
 function speechForThisRun(count) {
@@ -25,11 +26,13 @@ function applyRunEntry(prev, { hasLiveRun, state } = {}) {
   if (!hasLiveRun) {
     return { inSession: false, thisRun, incremented: false };
   }
-  if (inSession) {
-    return { inSession: true, thisRun, incremented: false };
-  }
+  // A new run can begin without the Bridge disconnecting. Reset before the
+  // in-session fast path so the previous run's reload count cannot leak into it.
   if (isAtRunStart(state)) {
     return { inSession: true, thisRun: 0, incremented: false };
+  }
+  if (inSession) {
+    return { inSession: true, thisRun, incremented: false };
   }
   return { inSession: true, thisRun: thisRun + 1, incremented: true };
 }

@@ -24,6 +24,7 @@ const midState = {
 assert.equal(isAtRunStart(startState), true);
 assert.equal(isAtRunStart(midState), false);
 assert.equal(isAtRunStart({ run: { act: 2 }, map: { start: '0,0', current: '0,0', visited: ['0,0'] } }), false);
+assert.equal(isAtRunStart({ run: { act: 1, floor: 1 }, map: { start: null, current: null, visited: [] } }), true);
 
 let session = { inSession: false, thisRun: 0 };
 session = applyRunEntry(session, { hasLiveRun: true, state: startState });
@@ -45,6 +46,17 @@ assert.equal(session.incremented, true);
 session = applyRunEntry(session, { hasLiveRun: true, state: midState });
 assert.equal(session.thisRun, 1);
 assert.equal(session.incremented, false);
+
+// Starting another run in the same Bridge session must clear the previous
+// run's count even though no disconnect was observed.
+session = applyRunEntry(session, { hasLiveRun: true, state: startState });
+assert.equal(session.inSession, true);
+assert.equal(session.thisRun, 0);
+assert.equal(session.incremented, false);
+
+session = applyRunEntry(session, { hasLiveRun: false });
+session = applyRunEntry(session, { hasLiveRun: true, state: midState });
+assert.equal(session.thisRun, 1);
 
 session = applyRunEntry(session, { hasLiveRun: false });
 session = applyRunEntry(session, { hasLiveRun: true, state: midState });

@@ -5,7 +5,7 @@
 ## ADDED Requirements
 
 ### Requirement: A run that begins at the start has zero this-run SL
-When live (non-replay) observation first shows a run that is at that run's start, this-run SL MUST be 0. The start of a run MUST mean Act 1 and the current map node is the map start (or the visit list contains only that start). Ordinary HP or gold changes MUST NOT count.
+When live (non-replay) observation shows a run that is at that run's start, this-run SL MUST be 0 even when the previous run remained in the same Bridge session. The start of a run MUST mean Act 1 and the current map node is the map start, the visit list contains only that start, or the first-floor map is still initializing with no current/visited node. Ordinary HP or gold changes MUST NOT count.
 
 #### Scenario: Fresh run from the start
 - **WHEN** GameBuddy gets a live run after having no live run
@@ -27,6 +27,11 @@ When live observation goes from no live run to a run that is not at that run's s
 
 #### Scenario: New run after abandon
 - **WHEN** the next live snapshot is Act 1 at the map start
+- **AND** the Bridge may still be in the same live session as the abandoned run
+- **THEN** this-run SL becomes 0
+
+#### Scenario: New run while the map is initializing
+- **WHEN** the next live snapshot is on Act 1 floor 1 before current and visited map nodes are available
 - **THEN** this-run SL becomes 0
 
 ### Requirement: This-run count persists across GameBuddy restarts
