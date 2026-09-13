@@ -13,9 +13,13 @@ using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Logging;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Events;
 using MegaCrit.Sts2.Core.Map;
 using MegaCrit.Sts2.Core.Nodes.Cards.Holders;
+using MegaCrit.Sts2.Core.Nodes.Events;
+using MegaCrit.Sts2.Core.Nodes.Rooms;
 using MegaCrit.Sts2.Core.Nodes.Screens.Map;
+using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.Runs;
 
 namespace GameBuddyBridge.Scripts;
@@ -36,10 +40,13 @@ public static class GameBuddyExporter
     private static int _lastTurn = -1;
     private static bool _wasMapVisible;
     private static bool _wasAtRest;
+    private static GameBuddyState? _restOpenSnapshot;
     private static Node? _activeCardRewardScreen;
     private static string _lastCardRewardSignature = string.Empty;
     private static List<string> _lastCombatEnemies = new();
     private static string? _lastCombatNodeType;
+    private static string _lastEventSignature = string.Empty;
+    private static bool _eventChoiceOpen;
 
     public static void Initialize(string modDirectory)
     {
@@ -104,6 +111,7 @@ public static class GameBuddyExporter
             }
             PublishCardRewardIfReady(snapshot);
             PublishTransitions(snapshot);
+            PublishEventLifecycle(snapshot);
         }
         catch (Exception ex)
         {
@@ -128,17 +136,186 @@ public static class GameBuddyExporter
         var atRest = !inCombat
             && string.Equals(snapshot.Run.CurrentNode, "RestSite", StringComparison.OrdinalIgnoreCase)
             && !mapVisible;
-        if (atRest && !_wasAtRest) PublishEvent("rest.opened");
+        if (atRest && !_wasAtRest)
+        {
+            _restOpenSnapshot = snapshot;
+            PublishEvent("rest.opened");
+        }
+        if (!atRest && _wasAtRest)
+        {
+            PublishEvent("rest.closed", InferRestClosed(_restOpenSnapshot, snapshot));
+            _restOpenSnapshot = null;
+        }
 
         _wasInCombat = inCombat;
         _wasMapVisible = mapVisible;
         _wasAtRest = atRest;
     }
 
+    private static object InferRestClosed(GameBuddyState? before, GameBuddyState after)
+    {
+        if (before is null) return new { action = (string?)null };
+        if (after.Player.Hp > before.Player.Hp)
+        {
+            return new { action = "HEAL", hpBefore = before.Player.Hp, hpAfter = after.Player.Hp };
+        }
+
+        var beforeUpgraded = new HashSet<string>(
+            before.Player.Cards.Where(card => card.Upgraded).Select(card => $"{card.Id}\0{card.Name}"));
+        foreach (var card in after.Player.Cards)
+        {
+            if (!card.Upgraded) continue;
+            if (beforeUpgraded.Contains($"{card.Id}\0{card.Name}")) continue;
+            return new { action = "SMITH", cardId = card.Id, cardName = card.Name };
+        }
+
+        return new { action = (string?)null };
+    }
+
     private static void PublishEvent(string name, object? data = null)
     {
         var message = JsonSerializer.Serialize(new BridgeEvent("event", name, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), data), JsonOptions);
         _server?.BroadcastEvent(message);
+    }
+
+    private static void PublishEventLifecycle(GameBuddyState snapshot)
+    {
+        var options = snapshot.Event?.Options ?? new List<EventOptionSnapshot>();
+        var choosable = options.Where(option => !option.Locked).ToList();
+        var signature = snapshot.Event is null || choosable.Count == 0
+            ? string.Empty
+            : $"{snapshot.Event.Kind}|{snapshot.Event.Title}|{string.Join("|", choosable.Select(option => $"{option.Index}:{option.Label}:{option.Description}"))}";
+        if (choosable.Count > 0 && !string.Equals(signature, _lastEventSignature, StringComparison.Ordinal))
+        {
+            _lastEventSignature = signature;
+            _eventChoiceOpen = true;
+            PublishEvent("event.opened", new
+            {
+                title = snapshot.Event!.Title,
+                kind = snapshot.Event.Kind,
+                description = snapshot.Event.Description,
+                options = choosable
+            });
+            return;
+        }
+
+        if (_eventChoiceOpen && choosable.Count == 0)
+        {
+            _eventChoiceOpen = false;
+            _lastEventSignature = string.Empty;
+            PublishEvent("event.closed");
+        }
+    }
+
+    private static EventSnapshot? BuildEventSnapshot(RunState runState)
+    {
+        try
+        {
+            if (runState.CurrentRoom is not EventRoom eventRoom)
+            {
+                return null;
+            }
+
+            var model = eventRoom.CanonicalEvent;
+            var kind = model is AncientEventModel ? "ancient" : "event";
+            var title = FormatLoc(model?.Title);
+            var description = FormatLoc(model?.Description);
+            var options = new List<EventOptionSnapshot>();
+            var uiRoom = NEventRoom.Instance;
+            if (uiRoom is not null && GodotObject.IsInstanceValid(uiRoom))
+            {
+                var buttons = FindNodes<NEventOptionButton>(uiRoom);
+                buttons.Sort((left, right) =>
+                {
+                    if (left is Control leftControl && right is Control rightControl)
+                    {
+                        var row = leftControl.GlobalPosition.Y.CompareTo(rightControl.GlobalPosition.Y);
+                        return row != 0 ? row : leftControl.GlobalPosition.X.CompareTo(rightControl.GlobalPosition.X);
+                    }
+                    return 0;
+                });
+                var index = 0;
+                foreach (var button in buttons)
+                {
+                    if (!button.IsVisibleInTree())
+                    {
+                        continue;
+                    }
+
+                    var option = button.Option;
+                    if (option is null || option.IsProceed || option.WasChosen)
+                    {
+                        continue;
+                    }
+
+                    var relicName = option.Relic is null ? string.Empty : FormatLoc(option.Relic.Title);
+                    var relicDescription = option.Relic is null
+                        ? string.Empty
+                        : FormatLoc(ReadMember(option.Relic, "DynamicDescription", "Description"));
+                    var label = relicName.Length > 0 ? relicName : FormatLoc(option.Title);
+                    if (string.IsNullOrWhiteSpace(label))
+                    {
+                        continue;
+                    }
+
+                    var text = relicDescription.Length > 0 ? relicDescription : FormatLoc(option.Description);
+                    options.Add(new EventOptionSnapshot(index, label, text, option.IsLocked));
+                    index += 1;
+                }
+            }
+
+            return new EventSnapshot(title, description, kind, options);
+        }
+        catch (Exception ex)
+        {
+            Log.Warn($"[GameBuddyBridge] event capture failed: {ex.Message}");
+            return null;
+        }
+    }
+
+    private static List<T> FindNodes<T>(Node start, int depth = 0) where T : Node
+    {
+        var found = new List<T>();
+        CollectNodes(start, found, depth);
+        return found;
+    }
+
+    private static void CollectNodes<T>(Node? node, List<T> found, int depth) where T : Node
+    {
+        if (node is null || depth > 24 || !GodotObject.IsInstanceValid(node))
+        {
+            return;
+        }
+
+        if (node is T match)
+        {
+            found.Add(match);
+        }
+
+        foreach (var child in node.GetChildren())
+        {
+            if (child is Node childNode)
+            {
+                CollectNodes(childNode, found, depth + 1);
+            }
+        }
+    }
+
+    private static string FormatLoc(object? value)
+    {
+        if (value is null) return string.Empty;
+        if (value is string text) return text.Trim();
+        try
+        {
+            var formatted = value.GetType().GetMethod("GetFormattedText", Type.EmptyTypes)?.Invoke(value, null)?.ToString();
+            if (!string.IsNullOrWhiteSpace(formatted)) return formatted.Trim();
+        }
+        catch
+        {
+            // LocString layout can move between game patches.
+        }
+
+        return value.ToString()?.Trim() ?? string.Empty;
     }
 
     public static void TrackCardRewardScreen(Node screen)
@@ -171,7 +348,7 @@ public static class GameBuddyExporter
         var unique = cards
             .Where(card => card is not null && !string.IsNullOrWhiteSpace(card.Id.Entry))
             .GroupBy(card => card.Id.Entry, StringComparer.OrdinalIgnoreCase)
-            .Select(group => group.First())
+            .Select(group => group.OrderByDescending(card => card.IsUpgraded).First())
             .Take(6)
             .ToList();
         if (unique.Count == 0)
@@ -276,7 +453,8 @@ public static class GameBuddyExporter
                 player.Relics.Select(relic => new OwnedItemSnapshot(relic.Id.Entry, relic.Title.GetFormattedText())).ToList(),
                 player.Potions.Select(potion => new OwnedItemSnapshot(potion.Id.Entry, potion.Title.GetFormattedText())).ToList()),
             combatState,
-            mapSnapshot);
+            mapSnapshot,
+            BuildEventSnapshot(runState));
     }
 
     private static MapSnapshot BuildMapSnapshot(RunState runState)
@@ -582,7 +760,9 @@ public static class GameBuddyExporter
 public sealed record BridgeMessage<T>(string Type, T Data);
 public sealed record BridgeEvent(string Type, string Name, long Timestamp, object? Data);
 
-public sealed record GameBuddyState(string Schema, long Timestamp, string Source, RunSnapshot Run, PlayerSnapshot Player, CombatSnapshot? Combat, MapSnapshot Map);
+public sealed record GameBuddyState(string Schema, long Timestamp, string Source, RunSnapshot Run, PlayerSnapshot Player, CombatSnapshot? Combat, MapSnapshot Map, EventSnapshot? Event);
+public sealed record EventSnapshot(string Title, string Description, string Kind, List<EventOptionSnapshot> Options);
+public sealed record EventOptionSnapshot(int Index, string Label, string Description, bool Locked);
 public sealed record RunSnapshot(int Act, int Floor, string? Room, string Character, int TotalFloor, string? CurrentNode, string? CurrentCoord, string ActId, string ActName, string? NextBossId, string? NextBoss, string? SecondBossId, string? SecondBoss);
 public sealed record PlayerSnapshot(int Hp, int MaxHp, int Block, int Gold, int Energy, int MaxEnergy, List<CardSnapshot> Cards, List<OwnedItemSnapshot> Relics, List<OwnedItemSnapshot> Potions);
 public sealed record CombatSnapshot(int Turn, List<CardSnapshot> Hand, List<CardSnapshot> DrawPile, List<CardSnapshot> DiscardPile, List<CardSnapshot> ExhaustPile, List<EnemySnapshot> Enemies);

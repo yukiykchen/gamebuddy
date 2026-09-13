@@ -21,4 +21,45 @@ assert.equal(store.getObservation(5102).recentEvents.length, 1);
 assert.equal(store.getObservation(5102).schema, 'gamebuddy.observation.v1');
 assert.equal(store.ingest({ type: 'unknown' }, 103).accepted, false);
 
-console.log('Observation store cases passed: 6');
+const restOpen = {
+  schema: 'gamebuddy.state.v1',
+  timestamp: 10,
+  source: 'observation-test',
+  run: { act: 1, floor: 6, room: 'RestSite', character: 'ironclad', currentNode: 'RestSite' },
+  player: {
+    hp: 40,
+    maxHp: 80,
+    block: 0,
+    gold: 0,
+    energy: 0,
+    maxEnergy: 3,
+    cards: [{ id: 'Bash', name: '痛击', upgraded: false }],
+    relics: [],
+    potions: []
+  },
+  combat: null,
+  map: { visited: ['1,1'], current: '1,1' }
+};
+const restStore = createObservationStore();
+assert.equal(restStore.ingest({ type: 'state', data: restOpen }, 200).accepted, true);
+const healed = restStore.ingest({
+  type: 'state',
+  data: { ...restOpen, timestamp: 11, player: { ...restOpen.player, hp: 64 } }
+}, 201);
+assert.equal(healed.accepted, true);
+assert.equal(healed.derivedEvents[0].name, 'rest.closed');
+assert.equal(healed.derivedEvents[0].data.action, 'HEAL');
+assert.equal(healed.derivedEvents[0].data.hpBefore, 40);
+assert.equal(healed.derivedEvents[0].data.hpAfter, 64);
+const goldTick = restStore.ingest({
+  type: 'state',
+  data: {
+    ...restOpen,
+    timestamp: 12,
+    player: { ...restOpen.player, hp: 64, gold: 12 }
+  }
+}, 202);
+assert.equal(goldTick.accepted, true);
+assert.equal((goldTick.derivedEvents || []).length, 0);
+
+console.log('Observation store cases passed: 8');

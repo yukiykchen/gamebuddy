@@ -16,7 +16,14 @@ assert.equal(validateState({ ...validState, combat: null }).ok, true);
 assert.equal(validateMessage({ type: 'state', data: validState }).ok, true);
 assert.equal(validateMessage({ type: 'event', name: 'turn.started', timestamp: Date.now(), data: { turn: 1 } }).ok, true);
 assert.equal(validateMessage({ type: 'event', name: 'rest.opened', timestamp: Date.now() }).ok, true);
+assert.equal(validateMessage({
+  type: 'event',
+  name: 'rest.closed',
+  timestamp: Date.now(),
+  data: { action: 'HEAL', hpBefore: 40, hpAfter: 64 }
+}).ok, true);
 assert.equal(validateMessage({ type: 'event', name: 'event.opened', timestamp: Date.now() }).ok, true);
+assert.equal(validateMessage({ type: 'event', name: 'event.closed', timestamp: Date.now() }).ok, true);
 assert.equal(validateMessage({ type: 'event', name: 'card.reward.closed', timestamp: Date.now() }).ok, true);
 assert.equal(validateMessage({
   type: 'event',
@@ -57,6 +64,20 @@ assert.equal(validateState({
 assert.equal(validateState({
   ...validState,
   combat: null,
+  event: {
+    title: '佩尔',
+    description: '有傀儡来了？能帮我去看看父亲的状况么？我太累了……',
+    kind: 'ancient',
+    options: [
+      { index: 0, label: '佩尔之角', description: '将2张放松加入你的牌组。' },
+      { index: 1, label: '佩尔之牙', description: '从你的牌组中选择5张牌移除。在每场战斗结束时，将其中随机1牌升级然后返还。' },
+      { index: 2, label: '佩尔之眼', description: '你在每场战斗中第一次没有打出任何牌就结束回合时，消耗所有手牌然后进行一个额外回合。' }
+    ]
+  }
+}).ok, true);
+assert.equal(validateState({
+  ...validState,
+  combat: null,
   cardReward: {
     options: [{ index: 0, id: 'Bash', name: '痛击', type: 'Attack', cost: 2, upgraded: false, description: '造成伤害。' }]
   }
@@ -76,4 +97,4 @@ assert.equal(validateState({
   reward: { cards: [] }
 }).ok, false);
 
-console.log('Protocol validation cases passed: 17');
+console.log('Protocol validation cases passed: 20');

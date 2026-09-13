@@ -88,6 +88,23 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
 
 `run.actId` / `actName` 用来区分同一幕数下的不同区域，敌人候选池优先按 `actId` 筛选。`player.relics` 和 `player.potions` 由 Bridge 提供稳定 ID 与本地化名称，Agent 再从 Spire Codex 补全效果文本、稀有度和池。地图节点的 `encounterId` / `encounterName` 是可选字段：Boss 节点使用本局已经抽取的确定遭遇；其他节点只有当前游戏版本确实暴露遭遇身份时才填写。Boss 身份也写入 `run.nextBoss`。普通精英通常在进入节点前没有确定身份，因此候选精英必须标为“可能”，不能表述成已确定敌人。
 
+事件房（含各幕开局远古祝福）通过可选 `event` 字段上报当前可见选项。`kind` 为 `ancient` 或 `event`。对话尚未出按钮时 `options` 可以为空；遗物祝福的 `label` / `description` 是游戏里显示的遗物名和效果：
+
+```json
+{
+  "event": {
+    "title": "佩尔",
+    "description": "有傀儡来了？能帮我去看看父亲的状况么？我太累了……",
+    "kind": "ancient",
+    "options": [
+      { "index": 0, "label": "佩尔之角", "description": "将2张放松加入你的牌组。", "locked": false },
+      { "index": 1, "label": "佩尔之牙", "description": "从你的牌组中选择5张牌移除。", "locked": false },
+      { "index": 2, "label": "佩尔之眼", "description": "第一次空过结束回合时，消耗手牌并获得额外回合。", "locked": false }
+    ]
+  }
+}
+```
+
 卡牌奖励也可以临时出现在状态的可选 `reward` 字段中。常规 Mod 通过下方事件发送，状态字段主要供其他适配器和回放使用：
 
 ```json
@@ -117,6 +134,9 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
 - `turn.started`
 - `map.opened`
 - `rest.opened`
+- `rest.closed`（休息处选择完成：回血、升级，或离开休息 UI。`data.action` 为 `HEAL` / `SMITH` / `null`）
+- `event.opened`（事件房或开局祝福出现可选项；`data` 含 `title`、`kind`、`options`）
+- `event.closed`（可选项消失或离开事件房）
 - `combat.ended`
 - `card.reward.opened`
 - `card.reward.closed`
@@ -142,6 +162,8 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
 ```
 
 玩家选牌、跳过奖励或以其他方式关闭奖励层时，Mod 发送 `card.reward.closed`。桌面端收到后会立即取消尚未完成的卡牌 LLM 请求、停止思考动画并清除旧建议；后续只有新的 `card.reward.opened` 才能再次触发选牌 Agent。
+
+`event.opened` 在事件房可见可选项变化时发送。开局远古祝福（如佩尔三选一遗物）与途中事件共用这条路径。选完或离开后发送 `event.closed`；桌面端据此结束 `event_choice` 建议卡。各幕开局常先发过 `map.opened`，因此不能靠再发一次地图事件来收起开局建议。
 
 `card.played` 仍待接入对应 STS2 生命周期 Hook。
 

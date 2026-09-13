@@ -1,4 +1,5 @@
 const { validateMessage, stateSignature } = require('./protocol');
+const { inferRestClosed, hasRestClosedSinceOpen } = require('./rest-lifecycle');
 
 function createObservationStore({ historyLimit = 100, staleAfterMs = 5000 } = {}) {
   let state;
@@ -17,11 +18,27 @@ function createObservationStore({ historyLimit = 100, staleAfterMs = 5000 } = {}
         receivedAt = now;
         return { accepted: false, kind: 'duplicate', state };
       }
+      const previous = state;
       state = message.data;
       stateSignatureValue = signature;
       receivedAt = now;
       sequence += 1;
-      return { accepted: true, kind: 'state', state, sequence, receivedAt };
+      const derivedEvents = [];
+      const closed = !hasRestClosedSinceOpen(events) && inferRestClosed(previous, state);
+      if (closed) {
+        const event = {
+          type: 'event',
+          name: 'rest.closed',
+          timestamp: now,
+          data: closed,
+          sequence: sequence + events.length + 1,
+          receivedAt: now
+        };
+        events.push(event);
+        derivedEvents.push(event);
+        while (events.length > historyLimit) events.shift();
+      }
+      return { accepted: true, kind: 'state', state, sequence, receivedAt, derivedEvents };
     }
 
     const event = { ...message, sequence: sequence + events.length + 1, receivedAt: now };

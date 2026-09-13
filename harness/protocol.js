@@ -1,5 +1,5 @@
 const SUPPORTED_SCHEMA = 'gamebuddy.state.v1';
-const SUPPORTED_EVENTS = new Set(['combat.started', 'turn.started', 'combat.ended', 'map.opened', 'rest.opened', 'event.opened', 'card.played', 'card.reward.opened', 'card.reward.closed']);
+const SUPPORTED_EVENTS = new Set(['combat.started', 'turn.started', 'combat.ended', 'map.opened', 'rest.opened', 'rest.closed', 'event.opened', 'event.closed', 'card.played', 'card.reward.opened', 'card.reward.closed']);
 
 function validateReward(reward, prefix = 'reward') {
   if (!reward || typeof reward !== 'object') return { ok: false, reason: `${prefix} must be an object` };
@@ -74,6 +74,9 @@ function validateState(state) {
       if (!(field in state.event)) return { ok: false, reason: `event missing ${field}` };
     }
     if (!Array.isArray(state.event.options)) return { ok: false, reason: 'event.options must be an array' };
+    if (state.event.kind !== undefined && state.event.kind !== null && typeof state.event.kind !== 'string') {
+      return { ok: false, reason: 'event.kind must be a string' };
+    }
     for (const option of state.event.options) {
       if (!option || typeof option !== 'object' || !Number.isInteger(option.index) || typeof option.label !== 'string') {
         return { ok: false, reason: 'event option needs integer index and label' };
