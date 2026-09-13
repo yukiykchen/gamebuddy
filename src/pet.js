@@ -2,12 +2,14 @@ const stage = document.querySelector('#pet-stage');
 const speech = document.querySelector('#speech');
 const statusDot = document.querySelector('.status-dot');
 const statusLabel = document.querySelector('#pet-status-label');
+const slLabel = document.querySelector('#pet-sl');
 const guidePanel = document.querySelector('#encounter-guide');
 const guideKicker = document.querySelector('#guide-kicker');
 const guideTitle = document.querySelector('#guide-title');
 const guideContent = document.querySelector('#guide-content');
 const guideSource = document.querySelector('#guide-source');
 const cardPanel = document.querySelector('#card-recommendation');
+const cardKicker = document.querySelector('#card-kicker');
 const cardTitle = document.querySelector('#card-title');
 const cardReason = document.querySelector('#card-reason');
 const cardPoints = document.querySelector('#card-points');
@@ -30,7 +32,8 @@ const petState = {
   cardVisible: false,
   guideVisible: false,
   recommendation: null,
-  cardRecommendation: null
+  cardRecommendation: null,
+  thisRunSl: null
 };
 let connectionLabel = '等待游戏';
 let tourPose = null;
@@ -49,6 +52,7 @@ function flushPendingSlSpeech() {
 }
 
 function setSlStats(stats) {
+  applyThisRunSl(stats?.thisRun);
   if (!stats?.incremented || !stats.speech) return;
   if (!canSpeakSl()) {
     pendingSlSpeech = stats.speech;
@@ -112,8 +116,16 @@ function refreshCardMeta() {
   const recommendation = petState.cardRecommendation;
   if (!recommendation || !petState.cardVisible) return;
   const confidence = Math.round((Number(recommendation.confidence) || 0) * 100);
-  const version = recommendation.primary?.analysis?.stats?.knowledgeVersion;
+  const version = recommendation.primary?.analysis?.stats?.knowledgeVersion
+    || recommendation.strategy?.gameVersion;
   cardMeta.textContent = cardSourceLabel(recommendation, confidence, version);
+}
+
+function applyThisRunSl(count) {
+  if (!Number.isInteger(count)) return;
+  petState.thisRunSl = count;
+  slLabel.hidden = false;
+  slLabel.textContent = `SL ${count}`;
 }
 
 function applyPose() {
@@ -130,6 +142,21 @@ function say(message, fromTour = false) {
   speech.classList.add('visible');
 }
 
+function restAdvicePoints(recommendation) {
+  const primary = recommendation.primary || {};
+  if (primary.action === 'HEAL') {
+    const alt = (recommendation.alternatives || []).find(item => item.action === 'SMITH');
+    return `${cardPointList('为什么回血', [
+      `当前生命 ${primary.healTo ? `可回到 ${primary.healTo}` : '缺口较大'}`,
+      primary.healAmount ? `这次大约回复 ${primary.healAmount}` : '优先保证活过接下来的高压战斗'
+    ].filter(Boolean), 'positive')}${alt ? cardPointList('备选', [`也可以升级「${alt.cardName}」`], 'neutral') : ''}`;
+  }
+  const analysis = primary.upgradeAnalysis || {};
+  const reasons = analysis.reasons?.length ? analysis.reasons.slice(0, 3) : [analysis.summary || '升级收益高于这次回血'].filter(Boolean);
+  const altHeal = (recommendation.alternatives || []).find(item => item.action === 'HEAL');
+  return `${cardPointList('为什么升级', reasons, 'positive')}${altHeal ? cardPointList('需要留意', [altHeal.label || '生命偏低时仍可考虑回血'], 'negative') : ''}`;
+}
+
 function setCardRecommendation(recommendation) {
   if (!recommendation) {
     cardPanel.classList.remove('visible');
@@ -142,11 +169,46 @@ function setCardRecommendation(recommendation) {
     return;
   }
   const primary = recommendation.primary || {};
-  const analysis = primary.analysis;
+  if (recommendation.task === 'rest_site') {
+    cardKicker.textContent = '休息处建议';
+    cardTitle.textContent = primary.action === 'HEAL'
+      ? (primary.label || '建议回血')
+      : (primary.label || `升级「${primary.cardName || '这张牌'}」`);
+    cardReason.textContent = recommendation.reason || '当前局面下，这是休息处更稳妥的选择。';
+    cardPoints.innerHTML = restAdvicePoints(recommendation);
+    const confidence = Math.round((Number(recommendation.confidence) || 0) * 100);
+    const version = recommendation.strategy?.gameVersion;
+    cardMeta.textContent = cardSourceLabel(recommendation, confidence, version);
+    cardPanel.classList.add('visible');
+    petState.cardVisible = true;
+    petState.cardRecommendation = recommendation;
+    applyPose();
+    say(primary.action === 'HEAL' ? '建议回血' : `建议升级${primary.cardName || ''}`);
+    return;
+  }
+  if (recommendation.task === 'event_choice') {
+    const alts = (recommendation.alternatives || []).slice(0, 2).map(item => item.label).filter(Boolean);
+    cardKicker.textContent = recommendation.eventKind === 'ancient' ? '开局祝福建议' : '事件建议';
+    cardTitle.textContent = `建议选择「${primary.label || '这个选项'}」`;
+    cardReason.textContent = recommendation.reason || '当前局面下，这是更稳妥的选项。';
+    cardPoints.innerHTML = `${cardPointList('为什么选它', [
+      primary.description || recommendation.reason || '结合当前牌组和生命，这项更划算'
+    ].filter(Boolean), 'positive')}${alts.length ? cardPointList('其他选项', alts, 'neutral') : ''}`;
+    const confidence = Math.round((Number(recommendation.confidence) || 0) * 100);
+    cardMeta.textContent = cardSourceLabel(recommendation, confidence);
+    cardPanel.classList.add('visible');
+    petState.cardVisible = true;
+    petState.cardRecommendation = recommendation;
+    applyPose();
+    say(`建议选择「${primary.label}」`);
+    return;
+  }
+  cardKicker.textContent = '卡牌奖励建议';
   cardTitle.textContent = primary.action === 'SKIP'
     ? '建议跳过这次奖励'
     : `推荐「${primary.cardName || primary.label || '这张牌'}」`;
   cardReason.textContent = recommendation.reason || '当前局面下，这是规则评分最高的选择。';
+  const analysis = primary.analysis;
   cardPoints.innerHTML = analysis
     ? `${cardPointList('为什么适合', analysis.pros?.slice(0, 3), 'positive')}${cardPointList('需要留意', analysis.cons?.slice(0, 2), 'negative')}`
     : cardPointList('为什么跳过', ['保持牌组精简，提高核心牌的抽取稳定性'], 'neutral');
@@ -157,7 +219,7 @@ function setCardRecommendation(recommendation) {
   petState.cardVisible = true;
   petState.cardRecommendation = recommendation;
   applyPose();
-  say(primary.action === 'SKIP' ? '这次建议跳过，理由在左边' : `建议拿 ${primary.cardName || primary.label}`);
+  say(primary.action === 'SKIP' ? '这次建议跳过' : `建议拿 ${primary.cardName || primary.label}`);
 }
 
 function setAgentThinking(state) {
@@ -255,16 +317,12 @@ function setRecommendation(recommendation) {
     return;
   }
   if (recommendation.task === 'card_reward' && recommendation.primary?.label) {
-    say(recommendation.primary.action === 'SKIP' ? '这次建议跳过' : `建议${recommendation.primary.label}`);
     return;
   }
   if (recommendation.task === 'rest_site' && recommendation.primary?.label) {
-    const shortReason = String(recommendation.reason || '').split(/[。！？]/)[0];
-    say(`休息处建议${recommendation.primary.label}${shortReason ? `：${shortReason}` : ''}`);
     return;
   }
   if (recommendation.task === 'event_choice' && recommendation.primary?.label) {
-    say(`建议选择「${recommendation.primary.label}」`);
     return;
   }
   if (recommendation.task !== 'map_route' || !recommendation.primary?.label) return;
@@ -320,6 +378,7 @@ document.querySelector('#card-close').addEventListener('click', () => {
 });
 window.gamebuddyBridge?.onStatus(setStatus);
 window.gamebuddyBridge?.onState(setState);
+window.gamebuddyBridge?.onObservation(observation => applyThisRunSl(observation?.slStats?.thisRun));
 window.gamebuddyBridge?.onRecommendation(setRecommendation);
 window.gamebuddyBridge?.onEncounterGuide(setEncounterGuide);
 window.gamebuddyBridge?.onCardRecommendation(setCardRecommendation);

@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GameBuddy · 杀戮尖塔 2 AI 搭子</title>
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./styles.css?v=llm-log" />
   </head>
   <body>
     <div class="app-shell">
@@ -46,7 +46,7 @@
           <div class="run-summary">
             <div class="run-character"><span class="character-badge" id="character-badge">?</span><div><strong id="run-character-name">等待游戏</strong><span id="run-location">启动《杀戮尖塔 2》后显示</span></div></div>
             <div class="run-progress"><div class="progress-meta"><span>本局进度</span><strong id="run-progress-label">-- / --</strong></div><div class="progress-track"><span id="run-progress-bar"></span></div></div>
-            <div class="run-stats"><div><span>卡组</span><strong id="deck-count">--</strong></div><div><span>遗物</span><strong id="relic-count">--</strong></div><div><span>金币</span><strong id="gold-count">--</strong></div><div><span>本局 SL</span><strong id="sl-count">--</strong></div></div>
+            <div class="run-stats"><div><span>卡组</span><strong id="deck-count">--</strong></div><div><span>遗物</span><strong id="relic-count">--</strong></div><div><span>金币</span><strong id="gold-count">--</strong></div><div class="sl-stat"><span>本局 SL</span><strong id="sl-count">--</strong></div></div>
           </div>
 
           <div class="sidebar-spacer"></div>
@@ -61,10 +61,19 @@
           </section>
 
           <div id="view-container"></div>
+          <section class="llm-log" id="llm-log-panel">
+            <div class="llm-log-head">
+              <strong>模型输入 / 输出</strong>
+              <span id="llm-log-status">还没有请求</span>
+              <button type="button" class="text-button" id="llm-log-copy">复制</button>
+              <button type="button" class="text-button" id="llm-log-clear">清空</button>
+            </div>
+            <pre id="llm-log-body">等待模型请求。系统提示、完整输入 JSON、原始输出会显示在这里。</pre>
+          </section>
         </main>
       </div>
       <div class="toast" id="toast" role="status"></div>
     </div>
-    <script src="./renderer.js"></script>
+    <script src="./renderer.js?v=llm-log"></script>
   </body>
 </html>

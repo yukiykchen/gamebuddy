@@ -39,7 +39,7 @@ if (llmConfig.enabled) {
   console.log('GameBuddy LLM: rules only');
 }
 const orchestrator = createOrchestrator({
-  llm: createOpenAiClient(llmConfig, { onThinkingChange: updateAgentThinking }),
+  llm: createOpenAiClient(llmConfig, { onThinkingChange: updateAgentThinking, onLog: publishLlmLog }),
   onRecommendation: publishRecommendation,
   onAgentStatus: status => broadcast('agent-status', status)
 });
@@ -65,7 +65,7 @@ let agentRunId = null;
 
 function currentObservation(now = Date.now()) {
   const observation = observationStore.getObservation(now);
-  return { ...observation, decision: decide(observation) };
+  return { ...observation, decision: decide(observation), slStats: lastSlStats };
 }
 
 function startAgentRun() {
@@ -88,6 +88,23 @@ function broadcastBridgeStatus(status, detail = '') {
 function publishSlStats(stats) {
   lastSlStats = stats;
   broadcast('bridge-sl-stats', stats);
+}
+
+const MAX_LLM_LOG_ENTRIES = 80;
+let llmLogEntries = [];
+
+function publishLlmLog(entry) {
+  llmLogEntries = [...llmLogEntries, entry].slice(-MAX_LLM_LOG_ENTRIES);
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('bridge-llm-log', { entries: llmLogEntries });
+  }
+}
+
+function clearLlmLog() {
+  llmLogEntries = [];
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('bridge-llm-log', { entries: [] });
+  }
 }
 
 function noteLiveRun(hasLiveRun, state) {
@@ -122,7 +139,7 @@ function clearAgentThinking(task) {
 
 function publishRecommendation(recommendation) {
   broadcast('bridge-recommendation', recommendation);
-  if (recommendation?.task === 'card_reward') {
+  if (recommendation?.task === 'card_reward' || recommendation?.task === 'rest_site' || recommendation?.task === 'event_choice') {
     activeCardRecommendation = recommendation;
     syncPetWindowSize();
     keepPetVisible();
@@ -169,6 +186,33 @@ function clearCardRecommendation() {
   activeCardRecommendation = null;
   petWindow?.webContents.send('bridge-card-recommendation', null);
   syncPetWindowSize();
+}
+
+function handleAcceptedEvent(event) {
+  if (!event) return;
+  broadcast('bridge-event', event);
+  if (event.name === 'combat.ended') clearEncounterGuide();
+  if (['card.reward.closed', 'map.opened', 'combat.started', 'rest.closed', 'event.closed'].includes(event.name)) {
+    clearCardRecommendation();
+    clearAgentThinking('card_reward');
+    if (event.name === 'rest.closed') clearAgentThinking('rest_site');
+    if (event.name === 'event.closed') clearAgentThinking('event_choice');
+  }
+  if (event.name === 'rest.opened' && activeCardRecommendation?.task === 'card_reward') {
+    clearCardRecommendation();
+    clearAgentThinking('card_reward');
+  }
+  if (event.name === 'event.opened' && (activeCardRecommendation?.task === 'card_reward' || activeCardRecommendation?.task === 'rest_site')) {
+    clearCardRecommendation();
+    clearAgentThinking('card_reward');
+    clearAgentThinking('rest_site');
+  }
+  if (event.name === 'event.opened') {
+    clearAgentThinking('map_route');
+  }
+  if (event.name === 'card.reward.closed' || event.name === 'map.opened' || event.name === 'rest.closed' || event.name === 'event.closed') {
+    orchestrator.clearRecommendation();
+  }
 }
 
 function dismissEncounterGuide() {
@@ -262,25 +306,24 @@ function connectBridge() {
           broadcast('bridge-state', routableState);
           sendHighlightRoute(observation.decision, routableState);
           void considerEncounterGuide(routableState);
+          for (const event of result.derivedEvents || []) handleAcceptedEvent(event);
         }
       }
       if (result.kind === 'event' && result.accepted) {
-        broadcast('bridge-event', result.event);
-        if (result.event?.name === 'combat.ended') clearEncounterGuide();
-        if (['card.reward.closed', 'map.opened', 'combat.started', 'rest.opened'].includes(result.event?.name)) {
-          clearCardRecommendation();
-          clearAgentThinking('card_reward');
-        }
-        if (result.event?.name === 'card.reward.closed') {
-          orchestrator.clearRecommendation();
-        }
-        if (result.event?.name === 'map.opened') orchestrator.clearRecommendation();
+        handleAcceptedEvent(result.event);
       }
       if (result.accepted || (result.kind === 'duplicate' && !orchestrator.getRecommendation())) {
         const observation = observationStore.getObservation();
         if (result.accepted) broadcast('bridge-observation', observation);
+        const agentObservation = observationForAgent(observation);
+        const reuseCardReward = result.event?.name === 'card.reward.opened'
+          && orchestrator.hasPublishedFor(agentObservation);
+        if (reuseCardReward) broadcast('bridge-recommendation', orchestrator.getRecommendation());
+        const forceEvents = new Set(['map.opened', 'rest.opened', 'rest.closed', 'event.opened', 'event.closed', 'card.reward.opened']);
+        const derivedRestClosed = (result.derivedEvents || []).some(event => event.name === 'rest.closed');
         void considerObservation(observation, {
-          force: result.kind === 'event' && ['map.opened', 'rest.opened', 'event.opened', 'card.reward.opened'].includes(result.event?.name)
+          force: ((result.kind === 'event' && forceEvents.has(result.event?.name)) || derivedRestClosed)
+            && !reuseCardReward
         });
       }
     } catch (error) {
@@ -346,6 +389,7 @@ function createMainWindow() {
     if (recommendation) mainWindow.webContents.send('bridge-recommendation', recommendation);
     else void considerObservation(observation, { force: true });
     mainWindow.webContents.send('bridge-sl-stats', lastSlStats);
+    mainWindow.webContents.send('bridge-llm-log', { entries: llmLogEntries });
   });
   mainWindow.on('close', event => {
     if (!isQuitting) {
@@ -455,6 +499,7 @@ ipcMain.on('dismiss-card-recommendation', dismissCardRecommendation);
 ipcMain.on('accept-decision', (_event, decision) => {
   if (agentRunId && decision) recordDecision({ runId: agentRunId, observation: currentObservation(), decision, accepted: true });
 });
+ipcMain.on('clear-llm-log', () => clearLlmLog());
 ipcMain.handle('get-observation', () => currentObservation());
 ipcMain.handle('refresh-recommendation', async () => {
   if (bridgeSocket?.readyState === WebSocket.OPEN) {
@@ -462,7 +507,7 @@ ipcMain.handle('refresh-recommendation', async () => {
   }
   const observation = currentObservation();
   if (observation?.state) broadcast('bridge-state', withRoutableState(observation.state));
-  const recommendation = await considerObservation(observation, { force: true });
+  const recommendation = await considerObservation(observation, { force: true, reason: 'refresh' });
   if (recommendation) broadcast('bridge-recommendation', recommendation);
   return { ok: Boolean(recommendation), recommendation };
 });

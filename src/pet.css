@@ -84,7 +84,9 @@ button { font: inherit; }
 .pet-scarf { position: absolute; left: 4px; right: 4px; top: 76px; height: 21px; border-radius: 0 0 40% 40%; background: var(--amber); transform: rotate(-3deg); }.pet-scarf::after { content: ""; position: absolute; right: 6px; top: 10px; width: 17px; height: 31px; background: #c98537; transform: rotate(-18deg); }
 .pet-foot { position: absolute; bottom: -8px; width: 34px; height: 18px; border: 2px solid #6a8f7e; border-radius: 50%; background: #9fb4a5; }.pet-foot.left { left: 22px; }.pet-foot.right { right: 22px; }
 .pet-shadow { position: absolute; left: 48px; bottom: 27px; width: 116px; height: 18px; border-radius: 50%; background: rgba(0, 0, 0, .24); filter: blur(4px); }
-.pet-status { position: absolute; left: 24px; bottom: 6px; display: flex; align-items: center; gap: 5px; padding: 4px 8px; border: 1px solid rgba(67, 83, 77, .9); background: rgba(20, 24, 24, .92); color: #aab5ae; font-size: 9px; white-space: nowrap; }
+.pet-status { position: absolute; left: 12px; right: 12px; bottom: 6px; display: flex; align-items: center; gap: 5px; padding: 4px 8px; border: 1px solid rgba(67, 83, 77, .9); background: rgba(20, 24, 24, .92); color: #aab5ae; font-size: 9px; }
+.pet-status #pet-status-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pet-sl { margin-left: auto; flex: 0 0 auto; color: var(--amber); font-weight: 700; letter-spacing: .04em; }
 .status-dot { width: 5px; height: 5px; flex: 0 0 auto; border-radius: 50%; background: var(--amber); }.status-dot.live { background: var(--mint); }.status-dot.alert { background: var(--red); }
 
 .pet-stage[data-pose="waiting"] .pet-body { animation: float 3s ease-in-out infinite; }

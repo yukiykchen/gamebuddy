@@ -11,6 +11,7 @@ const state = {
   hand: [],
   map: { visited: [] },
   reward: null,
+  event: null,
   recommendation: null,
   thisRunSl: null
 };
@@ -80,8 +81,12 @@ function combatView() {
 
 function showingRest() {
   if (state.mode === 'combat' || state.mode === 'draft' || state.combat) return false;
-  if (state.recommendation?.task === 'rest_site') return true;
-  return atRestSite();
+  return state.recommendation?.task === 'rest_site';
+}
+
+function showingEvent() {
+  if (state.mode === 'combat' || state.mode === 'draft' || state.combat) return false;
+  return state.recommendation?.task === 'event_choice';
 }
 
 function atRestSite(run = state.run, combat = state.combat) {
@@ -129,6 +134,40 @@ function restView() {
     <div class="route-choice"><strong>备选升级 · ${escapeHtml(item.cardName || item.label)}</strong><span>${escapeHtml(item.reason || '升级收益低于当前首选')}</span></div>`).join('');
   const sourceLabel = rec ? (rec.source === 'llm' ? '模型 + 社区 Skill' : '社区 Skill') : '等待分析';
   return `<div class="draft-layout rest-layout"><section class="panel draft-offer"><div class="draft-kicker">REST / CAMPFIRE</div><h2 class="draft-title">${title}</h2><p class="recommendation-reason">${reason}</p><div class="draft-cards">${healCard}${smithCard}</div>${otherSmiths}</section><section class="panel draft-side"><div class="panel-heading"><span class="panel-title">休息处状态</span><span class="panel-meta">${sourceLabel}</span></div><div class="deck-stat"><span>生命</span><strong>${hp.hp || 0} / ${hp.maxHp || 0}</strong></div><div class="deck-stat"><span>缺口</span><strong>${missing || 0}</strong></div><div class="deck-stat"><span>未升级</span><strong>${unupgraded.length || 0}</strong></div><div class="deck-stat"><span>卡组</span><strong>${hp.cards?.length || 0}</strong></div><div class="deck-stat"><span>策略版本</span><strong>${escapeHtml(rec?.strategy?.gameVersion || 'v0.107.1')}</strong></div><div class="data-empty" style="margin-top:18px">社区策略是局面先验，不是固定升级榜。GameBuddy 不会替你点击。</div></section></div>`;
+}
+
+function eventView() {
+  const rec = state.recommendation?.task === 'event_choice' ? state.recommendation : null;
+  const primary = rec?.primary;
+  const options = [];
+  if (primary?.label) {
+    options.push({ ...primary, recommended: true });
+  }
+  for (const item of rec?.alternatives || []) {
+    if (item?.label) options.push({ ...item, recommended: false });
+  }
+  const fromState = Array.isArray(state.event?.options) ? state.event.options : [];
+  if (!options.length && fromState.length) {
+    fromState.forEach(option => options.push({ ...option, recommended: false }));
+  }
+  const kind = rec?.eventKind || state.event?.kind;
+  const kicker = kind === 'ancient' ? 'ACT START / ANCIENT' : 'EVENT / CHOICE';
+  const title = primary?.label
+    ? `建议选择「${escapeHtml(primary.label)}」`
+    : escapeHtml(rec?.eventTitle || state.event?.title || '事件选项');
+  const reason = rec?.reason
+    ? escapeHtml(rec.reason)
+    : '出现可选项后，这里会结合牌组、遗物和生命给出推荐。';
+  const cards = options.length
+    ? options.map(option => `
+      <article class="draft-card ${option.recommended ? 'top-pick' : ''}">
+        <span class="pick-tag">${option.recommended ? '建议' : '备选'}</span>
+        <div class="card-name">${escapeHtml(option.label)}</div>
+        <p>${escapeHtml(option.description || '游戏内选项效果。')}</p>
+      </article>`).join('')
+    : '<div class="data-empty large-empty">等待事件选项同步。开局祝福和途中事件的按钮文案会显示在这里。</div>';
+  const sourceLabel = rec ? (rec.source === 'llm' ? '模型复核' : '规则评分') : '等待分析';
+  return `<div class="draft-layout rest-layout"><section class="panel draft-offer"><div class="draft-kicker">${kicker}</div><h2 class="draft-title">${title}</h2><p class="recommendation-reason">${reason}</p><div class="draft-cards">${cards}</div></section><section class="panel draft-side"><div class="panel-heading"><span class="panel-title">当前局面</span><span class="panel-meta">${sourceLabel}</span></div><div class="deck-stat"><span>生命</span><strong>${state.player.hp || 0} / ${state.player.maxHp || 0}</strong></div><div class="deck-stat"><span>金币</span><strong>${state.player.gold ?? '--'}</strong></div><div class="deck-stat"><span>卡组</span><strong>${state.player.cards?.length || 0}</strong></div><div class="deck-stat"><span>遗物</span><strong>${state.player.relics?.length || 0}</strong></div><div class="data-empty" style="margin-top:18px">GameBuddy 不会替你点击选项。</div></section></div>`;
 }
 
 function draftView() {
@@ -257,14 +296,18 @@ function render() {
   const copy = {
     combat: ['COMBAT / LIVE STATE', '战斗数据在同步', '出牌顺序先不做。这里只显示真实手牌和敌人，路线建议在地图页。'],
     draft: ['REWARD / CARD REWARD', '这张牌值得拿吗？', '把卡组当前缺口、未来路线和战斗表现放在一起判断。'],
-    route: showingRest()
+    route: showingEvent()
+      ? ['EVENT / CHOICE', state.recommendation?.eventKind === 'ancient' ? '开局选哪个祝福？' : '这个事件选哪项？', '根据牌组、遗物和生命，在可见选项里给出推荐。']
+      : showingRest()
       ? ['REST / CAMPFIRE', '回血还是升级？', '根据生命缺口、后续精英和未升级的牌，给出休息处选择。']
       : ['MAP / ACT ' + String(state.run.act || 1).padStart(2, '0'), '下一步往哪里走？', '把战斗风险、卡组成长和遗物收益，压缩成一条可执行的路线。']
   }[state.mode];
   document.querySelector('#page-eyebrow').textContent = copy[0];
   document.querySelector('#page-title').textContent = copy[1];
   document.querySelector('#page-description').textContent = copy[2];
-  viewContainer.innerHTML = showingRest()
+  viewContainer.innerHTML = showingEvent()
+    ? eventView()
+    : showingRest()
     ? restView()
     : state.mode === 'combat' ? combatView() : state.mode === 'draft' ? draftView() : routeView();
   updateRunSummary();
@@ -354,6 +397,7 @@ function applyBridgeState(next) {
   if (next.run) state.run = { ...state.run, ...next.run };
   if (next.player) state.player = { ...state.player, ...next.player };
   state.map = next.map || { visited: [] };
+  state.event = next.event || null;
   if (Object.prototype.hasOwnProperty.call(next, 'reward')) state.reward = next.reward;
   const incomingCombat = next.combat;
   state.combat = incomingCombat ? {
@@ -393,7 +437,15 @@ setInterval(() => {
 
 render();
 setBridgeStatus({ status: 'waiting' });
+function applySlStats(stats) {
+  if (!Number.isInteger(stats?.thisRun)) return;
+  state.thisRunSl = stats.thisRun;
+  const el = document.querySelector('#sl-count');
+  if (el) el.textContent = String(stats.thisRun);
+}
+
 window.gamebuddyBridge?.onState(applyBridgeState);
+window.gamebuddyBridge?.onObservation(observation => applySlStats(observation?.slStats));
 window.gamebuddyBridge?.onEvent(event => {
   if (event.name === 'card.reward.opened') {
     state.reward = event.data || null;
@@ -403,7 +455,7 @@ window.gamebuddyBridge?.onEvent(event => {
   }
   if (event.name === 'map.opened') {
     state.reward = null;
-    if (state.recommendation?.task === 'card_reward') state.recommendation = null;
+    if (state.recommendation?.task === 'card_reward' || state.recommendation?.task === 'event_choice') state.recommendation = null;
     state.mode = 'route';
     render();
     showToast('地图已打开；出现分叉时会生成路线建议');
@@ -413,6 +465,33 @@ window.gamebuddyBridge?.onEvent(event => {
     render();
     showToast('休息处：回血还是升级');
   }
+  if (event.name === 'rest.closed') {
+    if (state.recommendation?.task === 'rest_site') state.recommendation = null;
+    state.mode = 'route';
+    render();
+    const action = event.data?.action;
+    showToast(action === 'HEAL' ? '已回血，开始看下一步' : action === 'SMITH' ? '已升级，开始看下一步' : '休息处已选完，开始看下一步');
+  }
+  if (event.name === 'event.opened') {
+    state.mode = 'route';
+    if (event.data?.title || event.data?.options) {
+      state.event = {
+        title: event.data.title || state.event?.title || '',
+        description: event.data.description || state.event?.description || '',
+        kind: event.data.kind || state.event?.kind || 'event',
+        options: event.data.options || state.event?.options || []
+      };
+    }
+    render();
+    showToast(event.data?.kind === 'ancient' ? '开局祝福：看看选哪个' : '事件选项已出现');
+  }
+  if (event.name === 'event.closed') {
+    if (state.recommendation?.task === 'event_choice') state.recommendation = null;
+    state.event = null;
+    state.mode = 'route';
+    render();
+    showToast('事件已选完，开始看下一步');
+  }
 });
 window.gamebuddyBridge?.onRecommendation(recommendation => {
   if (!recommendation) {
@@ -420,9 +499,9 @@ window.gamebuddyBridge?.onRecommendation(recommendation => {
     if (state.mode === 'route' || state.mode === 'draft') render();
     return;
   }
-  if (recommendation.task !== 'map_route' && recommendation.task !== 'rest_site' && recommendation.task !== 'card_reward') return;
+  if (recommendation.task !== 'map_route' && recommendation.task !== 'rest_site' && recommendation.task !== 'card_reward' && recommendation.task !== 'event_choice') return;
   state.recommendation = recommendation;
-  if (recommendation.task === 'rest_site') state.mode = 'route';
+  if (recommendation.task === 'rest_site' || recommendation.task === 'event_choice') state.mode = 'route';
   if (recommendation.task === 'card_reward') state.mode = 'draft';
   if (state.mode === 'route' || state.mode === 'draft') render();
 });
@@ -430,8 +509,36 @@ window.gamebuddyBridge?.onStatus(status => {
   setBridgeStatus(status);
   if (status.status === 'connected') showToast('已连接《杀戮尖塔 2》实时数据');
 });
-window.gamebuddyBridge?.onSlStats(stats => {
-  if (!Number.isInteger(stats?.thisRun)) return;
-  state.thisRunSl = stats.thisRun;
-  document.querySelector('#sl-count').textContent = String(stats.thisRun);
+window.gamebuddyBridge?.onSlStats(applySlStats);
+
+function formatLlmLog(entries) {
+  if (!entries?.length) return '等待模型请求。系统提示、完整输入 JSON、原始输出会显示在这里。';
+  return entries.map(entry => (
+    entry.text ? `[GameBuddy LLM] ${entry.label}\n${entry.text}` : `[GameBuddy LLM] ${entry.label}`
+  )).join('\n\n');
+}
+
+function applyLlmLog(payload) {
+  const entries = Array.isArray(payload?.entries) ? payload.entries : [];
+  const body = document.querySelector('#llm-log-body');
+  const status = document.querySelector('#llm-log-status');
+  if (!body || !status) return;
+  body.textContent = formatLlmLog(entries);
+  const last = entries[entries.length - 1];
+  status.textContent = last ? last.label : '还没有请求';
+  body.scrollTop = body.scrollHeight;
+}
+
+document.querySelector('#llm-log-copy')?.addEventListener('click', async () => {
+  const text = document.querySelector('#llm-log-body')?.textContent || '';
+  try {
+    await navigator.clipboard.writeText(text);
+    showToast('已复制模型日志');
+  } catch {
+    showToast('复制失败');
+  }
 });
+document.querySelector('#llm-log-clear')?.addEventListener('click', () => {
+  window.gamebuddyBridge?.clearLlmLog();
+});
+window.gamebuddyBridge?.onLlmLog(applyLlmLog);
