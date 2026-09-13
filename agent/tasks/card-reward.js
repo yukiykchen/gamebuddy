@@ -1,6 +1,6 @@
 const { SCHEMA } = require('../recommendation');
 const { createSpireCodexClient, normalizeKey, stripMarkup, inferUpgraded } = require('../knowledge/spire-codex');
-const { cardSearchText, deriveMechanicTags, isStatusGenerationTrigger } = require('../knowledge/mechanic-tags');
+const { cardSearchText, deriveMechanicTags, isStatusGenerationTrigger, inferOrbGeneration } = require('../knowledge/mechanic-tags');
 
 const codexClient = createSpireCodexClient();
 
@@ -145,6 +145,29 @@ function overlayUpgradedAdvice(advice, upgraded) {
     rankAppliesTo: 'unupgraded',
     note: '知识库档位针对未升级版本；本候选已升级，请按升级后卡面评价，不得仅因未升级档位选择 SKIP'
   };
+}
+
+function overlayRandomOrbAdvice(advice, orbGeneration) {
+  if (orbGeneration !== 'random' || !advice) return advice || null;
+  return {
+    ...advice,
+    goodWhen: [...new Set([
+      '牌组能稳定生成状态牌，从而随机生成任意种类充能球时',
+      ...(advice.goodWhen || []).filter(item => !/充能球类型|球槽|集中|目标球/.test(item))
+    ])].slice(0, 4),
+    badWhen: (advice.badWhen || []).filter(item => !/球槽|集中|目标球/.test(item)).slice(0, 3)
+  };
+}
+
+function orbGenerationFor(card) {
+  return inferOrbGeneration([
+    card?.description,
+    card?.text,
+    card?.upgrade_description,
+    card?.upgradeDescription,
+    card?.effect,
+    card?.description_raw
+  ].filter(Boolean).join(' '));
 }
 
 function deckContext(state, knowledge) {
@@ -387,10 +410,14 @@ function analyzeCard(card, state, context, threats, coachItem, enemyTags = new S
     scenarios: [...new Set(scenarios)].slice(0, 4),
     fit: { boss: fit.boss, elite: fit.elite },
     trigger: statusTrigger ? '每当生成状态牌（伤口、灼伤等）' : null,
+    orbGeneration: inferOrbGeneration(text),
     synergy: statusSynergy || (matchedSynergies[0]
       ? { tag: matchedSynergies[0].tag, count: matchedSynergies[0].count, label: matchedSynergies[0].tag }
       : null),
-    knowledgeEvaluation: overlayUpgradedAdvice(overlayStatusAdvice(card.evaluation?.advice, text), facts.upgraded),
+    knowledgeEvaluation: overlayUpgradedAdvice(
+      overlayRandomOrbAdvice(overlayStatusAdvice(card.evaluation?.advice, text), inferOrbGeneration(text)),
+      facts.upgraded
+    ),
     stats: coachItem ? {
       archetypeDelta: coachItem.commitment_delta ?? null,
       winnerSupport: coachItem.winner_support ?? null,
@@ -528,14 +555,16 @@ async function recommendCardReward(observation, { llm, now = Date.now(), codex =
           cost: card.cost ?? null,
           upgraded: inferUpgraded(card),
           description: stripMarkup((inferUpgraded(card) && (card.upgrade_description || card.upgradeDescription)) || card.description || card.text || '') || null,
-          mechanicTags: card.evaluation?.mechanicTags || []
+          mechanicTags: card.evaluation?.mechanicTags || [],
+          orbGeneration: orbGenerationFor(card)
         })),
         relics: (knowledge.relics || []).map(relic => ({
           id: relic.id || relic.name,
           name: relic.name || relic.id,
           rarity: relic.rarity || null,
           effect: stripMarkup(relic.description || relic.description_raw || '') || null,
-          notes: relic.notes || null
+          notes: relic.notes || null,
+          orbGeneration: orbGenerationFor(relic)
         })),
         potions: (knowledge.potions || []).map(potion => ({
           id: potion.id || potion.name,
@@ -554,6 +583,7 @@ async function recommendCardReward(observation, { llm, now = Date.now(), codex =
               cost: candidate.card.cost,
               upgraded: Boolean(candidate.card.upgraded),
               description: candidate.card.description || null,
+              orbGeneration: candidate.card.orbGeneration || null,
               score: candidate.score,
               pros: candidate.card.pros,
               cons: candidate.card.cons,

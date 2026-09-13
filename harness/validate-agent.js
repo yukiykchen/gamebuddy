@@ -10,7 +10,7 @@ const { resolveItem, inferUpgraded } = require('../agent/knowledge/spire-codex')
 const { parseJsonObject, createOpenAiClient, readLlmConfig, extractResponseText, resolveChatTemperature, parseAllowedTemperature } = require('../agent/llm/openai');
 const { createOrchestrator, selectTask, restChoicePending, eventChoicePending } = require('../agent/orchestrator');
 const { recommendEvent, eventPromptPayload } = require('../agent/tasks/event');
-const { deriveMechanicTags, generatesNamedStatus, isStatusGenerationTrigger } = require('../agent/knowledge/mechanic-tags');
+const { deriveMechanicTags, generatesNamedStatus, isStatusGenerationTrigger, inferOrbGeneration } = require('../agent/knowledge/mechanic-tags');
 
 const lifecycle = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'lifecycle.json'), 'utf8'));
 const mapState = lifecycle[2];
@@ -335,6 +335,8 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   assert.equal(thinkingOffPick.index, 0);
   assert.match(capturedChatBody.messages[0].content, /升级后效果/);
   assert.match(capturedChatBody.messages[0].content, /不得单独作为 SKIP/);
+  assert.match(capturedChatBody.messages[0].content, /随机生成一个充能球/);
+  assert.match(capturedChatBody.messages[0].content, /任意种类/);
 
   let temperatureCalls = 0;
   const retryClient = createOpenAiClient({
@@ -845,6 +847,10 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   assert.equal(isStatusGenerationTrigger('每当你生成状态牌的时候，随机生成一个充能球。'), true);
   assert.ok(deriveMechanicTags({ description: '抽3张牌。将一张灼伤加入你的弃牌堆。' }).includes('status_generate'));
   assert.ok(!deriveMechanicTags({ description: '每当你生成状态牌的时候，随机生成一个充能球。' }).includes('status_generate'));
+  assert.equal(inferOrbGeneration('每当你生成状态牌的时候，随机生成一个充能球。'), 'random');
+  assert.equal(inferOrbGeneration('生成1个闪电充能球。'), 'lightning');
+  assert.equal(inferOrbGeneration('在每场战斗开始时，生成1个闪电充能球。'), 'lightning');
+  assert.equal(inferOrbGeneration('生成1个闪电充能球。生成1个冰霜充能球。生成1个黑暗充能球。'), 'lightning,frost,dark');
 
   const statusDeck = [
     { id: 'OVERCLOCK', name: '超频', type: '技能', cost: 0, description: '抽3张牌。将一张灼伤加入你的弃牌堆。' },
@@ -931,6 +937,72 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   assert.match(statusPrompt.candidates[0].trigger, /状态牌/);
   assert.equal(statusPrompt.candidates[0].synergy.tag, 'status_generate');
   assert.equal(statusPrompt.candidates[0].synergy.count, 2);
+  assert.equal(statusPrompt.candidates[0].orbGeneration, 'random');
+  assert.ok(!(statusPrompt.candidates[0].knowledgeEvaluation?.badWhen || []).some(item => /目标球/.test(item)));
+
+  const mixedOrbDeck = [
+    ...statusDeck,
+    trashCard,
+    { id: 'ZAP', name: '电击+', type: '技能', cost: 0, description: '生成1个闪电充能球。' }
+  ];
+  const coolantCard = {
+    id: 'COOLANT',
+    name: '冷却剂',
+    type_key: 'Power',
+    rarity_key: 'Rare',
+    cost: 1,
+    description: '在你的回合开始时，你每有一种不同的充能球，就获得2点格挡。',
+    evaluation: { prior: { score: 71, tier: 'B' }, mechanicTags: ['orb'] }
+  };
+  let orbKindPrompt;
+  await recommendCardReward({
+    schema: 'gamebuddy.observation.v1',
+    fresh: true,
+    state: {
+      ...mapState,
+      combat: null,
+      player: { ...mapState.player, cards: mixedOrbDeck }
+    },
+    recentEvents: [{
+      name: 'card.reward.opened',
+      data: {
+        cards: [
+          coolantCard,
+          { id: 'ITERATION', name: '迭代+', cost: 1, upgraded: true, description: '每回合你第一次抽到状态牌时，抽3张牌。' }
+        ],
+        canSkip: true
+      }
+    }]
+  }, {
+    now: 53,
+    llm: {
+      enabled: true,
+      completeCardReward: async payload => {
+        orbKindPrompt = payload;
+        return { index: 1, reason: '迭代更贴状态循环' };
+      }
+    },
+    codex: {
+      loadDraftContext: async (state, reward) => ({
+        source: 'test',
+        deckCards: mixedOrbDeck,
+        relics: [{ id: 'CRACKED_CORE', name: '破损核心', description: '在每场战斗开始时，生成1个闪电充能球。' }],
+        coach: null,
+        cards: (reward.cards || []).map(card => (card.id === 'COOLANT' ? coolantCard : {
+          ...card,
+          type_key: 'Power',
+          evaluation: { prior: { score: 70, tier: 'B' }, mechanicTags: ['draw'] }
+        })),
+        threats: {}
+      })
+    }
+  });
+  const trashInDeck = orbKindPrompt.deck.find(card => card.id === 'TRASH_TO_TREASURE');
+  const zapInDeck = orbKindPrompt.deck.find(card => card.id === 'ZAP');
+  const crackedCore = orbKindPrompt.relics.find(relic => relic.id === 'CRACKED_CORE');
+  assert.equal(trashInDeck.orbGeneration, 'random');
+  assert.equal(zapInDeck.orbGeneration, 'lightning');
+  assert.equal(crackedCore.orbGeneration, 'lightning');
 
   const failedLlmCard = await recommendCardReward(rewardObservation, {
     codex: fakeCodex,

@@ -45,11 +45,28 @@ function deriveMechanicTags(card, existing = []) {
   return [...new Set([...(existing || []), ...statusTagsFromText(cardSearchText(card))])];
 }
 
+function inferOrbGeneration(text) {
+  const source = stripMarkup(text).toLowerCase();
+  if (!source) return null;
+  if (/随机.{0,16}充能球|充能球.{0,8}随机|random.{0,24}orb/.test(source)) return 'random';
+  const kinds = [];
+  if (/闪电|\blightning\b/.test(source)) kinds.push('lightning');
+  if (/冰霜|\bfrost\b/.test(source)) kinds.push('frost');
+  if (/黑暗|\bdark\b/.test(source)) kinds.push('dark');
+  if (/等离子|\bplasma\b/.test(source)) kinds.push('plasma');
+  if (/玻璃|\bglass\b/.test(source)) kinds.push('glass');
+  if (kinds.length === 1) return kinds[0];
+  if (kinds.length > 1) return kinds.join(',');
+  if (/生成.{0,16}充能球|channel.{0,20}orb/.test(source)) return 'unspecified';
+  return null;
+}
+
 module.exports = {
   stripMarkup,
   cardSearchText,
   generatesNamedStatus,
   isStatusGenerationTrigger,
   statusTagsFromText,
-  deriveMechanicTags
+  deriveMechanicTags,
+  inferOrbGeneration
 };
