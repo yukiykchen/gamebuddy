@@ -23,3 +23,10 @@ When a live SL is counted, the desktop pet SHALL speak a short Chinese line in t
 - **WHEN** a live SL is counted while a suggestion card, encounter guide, or recommendation is visible
 - **THEN** the pet remains in `advising`
 - **AND** the current advice speech is not replaced by the SL line until that advice is no longer presented
+
+### Requirement: Pet status shows this-run SL
+The pet status bar SHALL show this-run SL as a visible number whenever the count is known, including 0. It MUST NOT show a lifetime or career SL total.
+
+#### Scenario: Status after load
+- **WHEN** the pet window finishes loading and this-run SL is 2
+- **THEN** the pet status shows `SL 2` without waiting for another increment
