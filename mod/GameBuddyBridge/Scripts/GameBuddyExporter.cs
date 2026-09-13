@@ -184,7 +184,7 @@ public static class GameBuddyExporter
         var choosable = options.Where(option => !option.Locked).ToList();
         var signature = snapshot.Event is null || choosable.Count == 0
             ? string.Empty
-            : $"{snapshot.Event.Kind}|{snapshot.Event.Title}|{string.Join("|", choosable.Select(option => $"{option.Index}:{option.Label}:{option.Description}"))}";
+            : $"{snapshot.Event.EventId}|{snapshot.Event.PageId}|{snapshot.Event.Kind}|{snapshot.Event.Title}|{string.Join("|", choosable.Select(option => $"{option.Index}:{option.OptionId}:{option.Label}:{option.Description}"))}";
         if (choosable.Count > 0 && !string.Equals(signature, _lastEventSignature, StringComparison.Ordinal))
         {
             _lastEventSignature = signature;
@@ -193,6 +193,8 @@ public static class GameBuddyExporter
             {
                 title = snapshot.Event!.Title,
                 kind = snapshot.Event.Kind,
+                eventId = snapshot.Event.EventId,
+                pageId = snapshot.Event.PageId,
                 description = snapshot.Event.Description,
                 options = choosable
             });
@@ -218,6 +220,14 @@ public static class GameBuddyExporter
 
             var model = eventRoom.CanonicalEvent;
             var kind = model is AncientEventModel ? "ancient" : "event";
+            // Optional early-access identifiers can move between patches. Keep
+            // display text as the compatibility path when reflection finds none.
+            var eventId = ReadTextMember(model, "Id", "EventId", "ModelId");
+            var pageObject = ReadMember(eventRoom, "CurrentPage", "Page", "CurrentEventPage")
+                ?? ReadMember(model, "CurrentPage", "Page", "CurrentEventPage");
+            var pageId = ReadTextMember(pageObject, "Id", "PageId", "Name")
+                ?? ReadTextMember(eventRoom, "CurrentPageId", "PageId")
+                ?? ReadTextMember(model, "CurrentPageId", "PageId");
             var title = FormatLoc(model?.Title);
             var description = FormatLoc(model?.Description);
             var options = new List<EventOptionSnapshot>();
@@ -259,12 +269,13 @@ public static class GameBuddyExporter
                     }
 
                     var text = relicDescription.Length > 0 ? relicDescription : FormatLoc(option.Description);
-                    options.Add(new EventOptionSnapshot(index, label, text, option.IsLocked));
+                    var optionId = ReadTextMember(option, "Id", "OptionId", "TextKey", "TitleKey");
+                    options.Add(new EventOptionSnapshot(index, label, text, option.IsLocked, optionId));
                     index += 1;
                 }
             }
 
-            return new EventSnapshot(title, description, kind, options);
+            return new EventSnapshot(title, description, kind, options, eventId, pageId);
         }
         catch (Exception ex)
         {
@@ -735,14 +746,77 @@ public static class GameBuddyExporter
         return string.IsNullOrWhiteSpace(result) ? null : result;
     }
 
-    private static List<CardSnapshot> MapCards(IEnumerable<CardModel> cards)
+    private static bool? ReadBoolMember(object? source, params string[] names)
     {
-        return cards.Select(card => new CardSnapshot(
+        var value = ReadMember(source, names);
+        if (value is null) return null;
+        if (value is bool boolean) return boolean;
+        return bool.TryParse(value.ToString(), out var parsed) ? parsed : null;
+    }
+
+    private static int? ReadIntValue(object? value)
+    {
+        if (value is null) return null;
+        try
+        {
+            if (value is byte or sbyte or short or ushort or int or uint or long or ulong)
+            {
+                return Convert.ToInt32(value);
+            }
+
+            var amountMethod = value.GetType().GetMethod("GetAmountToSpend", Type.EmptyTypes);
+            if (amountMethod?.Invoke(value, null) is { } amount)
+            {
+                return Convert.ToInt32(amount);
+            }
+
+            var nested = ReadMember(value, "Amount", "Value", "BaseAmount", "Cost");
+            if (nested is not null && !ReferenceEquals(nested, value))
+            {
+                return Convert.ToInt32(nested);
+            }
+        }
+        catch
+        {
+            // Optional cost metadata can move between early-access patches.
+        }
+        return null;
+    }
+
+    private static CardSnapshot MapCard(CardModel card)
+    {
+        var energyCostX = card.EnergyCost.CostsX;
+        var energyCost = energyCostX ? null : card.EnergyCost.GetAmountToSpend();
+        var description = ReadTextMember(card, "DynamicDescription", "Description", "CanonicalDescription", "CardDescription");
+
+        var starCostObject = ReadMember(card, "StarCost", "StarsCost", "StarEnergyCost", "StarCostAmount", "RequiredStars", "StarsRequired");
+        var starCostX = ReadBoolMember(card, "IsXStarCost", "CostsXStars", "CostsXStar", "StarsCostX")
+            ?? ReadBoolMember(starCostObject, "CostsX", "IsX")
+            ?? false;
+        var starCost = starCostX ? null : ReadIntValue(starCostObject);
+        if (starCost <= 0) starCost = null;
+        var starMetadataAvailable = starCostObject is not null
+            || ReadMember(card, "IsXStarCost", "CostsXStars", "CostsXStar", "StarsCostX") is not null;
+
+        return new CardSnapshot(
             card.Id.Entry,
             card.Title,
             card.Type.ToString(),
-            card.EnergyCost.CostsX ? null : card.EnergyCost.GetAmountToSpend(),
-            card.IsUpgraded)).ToList();
+            energyCost,
+            card.IsUpgraded,
+            description,
+            description is null ? "unavailable" : "runtime",
+            energyCost,
+            energyCostX,
+            "runtime",
+            starCost,
+            starCostX,
+            starMetadataAvailable ? "runtime" : "unavailable");
+    }
+
+    private static List<CardSnapshot> MapCards(IEnumerable<CardModel> cards)
+    {
+        return cards.Select(MapCard).ToList();
     }
 
     private static EnemySnapshot MapEnemy(Creature enemy)
@@ -761,13 +835,26 @@ public sealed record BridgeMessage<T>(string Type, T Data);
 public sealed record BridgeEvent(string Type, string Name, long Timestamp, object? Data);
 
 public sealed record GameBuddyState(string Schema, long Timestamp, string Source, RunSnapshot Run, PlayerSnapshot Player, CombatSnapshot? Combat, MapSnapshot Map, EventSnapshot? Event);
-public sealed record EventSnapshot(string Title, string Description, string Kind, List<EventOptionSnapshot> Options);
-public sealed record EventOptionSnapshot(int Index, string Label, string Description, bool Locked);
+public sealed record EventSnapshot(string Title, string Description, string Kind, List<EventOptionSnapshot> Options, string? EventId, string? PageId);
+public sealed record EventOptionSnapshot(int Index, string Label, string Description, bool Locked, string? OptionId);
 public sealed record RunSnapshot(int Act, int Floor, string? Room, string Character, int TotalFloor, string? CurrentNode, string? CurrentCoord, string ActId, string ActName, string? NextBossId, string? NextBoss, string? SecondBossId, string? SecondBoss);
 public sealed record PlayerSnapshot(int Hp, int MaxHp, int Block, int Gold, int Energy, int MaxEnergy, List<CardSnapshot> Cards, List<OwnedItemSnapshot> Relics, List<OwnedItemSnapshot> Potions);
 public sealed record CombatSnapshot(int Turn, List<CardSnapshot> Hand, List<CardSnapshot> DrawPile, List<CardSnapshot> DiscardPile, List<CardSnapshot> ExhaustPile, List<EnemySnapshot> Enemies);
 public sealed record EnemySnapshot(string? Id, string Name, int Hp, int MaxHp, int Block, string? Intent, bool Alive);
-public sealed record CardSnapshot(string Id, string Name, string Type, int? Cost, bool Upgraded);
+public sealed record CardSnapshot(
+    string Id,
+    string Name,
+    string Type,
+    int? Cost,
+    bool Upgraded,
+    string? Description,
+    string DescriptionSource,
+    int? EnergyCost,
+    bool EnergyCostX,
+    string EnergyCostSource,
+    int? StarCost,
+    bool StarCostX,
+    string StarCostSource);
 public sealed record OwnedItemSnapshot(string Id, string Name);
 public sealed record MapSnapshot(
     List<string> Visited,

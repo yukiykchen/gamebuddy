@@ -1,4 +1,5 @@
 const { SCHEMA } = require('../recommendation');
+const { analyzeEventChoices } = require('../knowledge/event-rules');
 
 function eventOptions(state) {
   return Array.isArray(state?.event?.options)
@@ -21,40 +22,48 @@ function namedList(items) {
     .filter(Boolean);
 }
 
-function buildEventRecommendation(state, { source = 'rules', reason, now = Date.now(), index = 0 } = {}) {
-  const options = choosableEventOptions(state);
-  if (!options.length) return null;
-  const safeIndex = Math.max(0, Math.min(options.length - 1, Number(index) || 0));
-  const chosen = options[safeIndex];
+function recommendationOption(option) {
+  return {
+    action: 'CHOOSE_EVENT',
+    optionIndex: option.index,
+    optionId: option.optionId,
+    label: option.label,
+    description: option.description,
+    analysis: option.analysis
+  };
+}
+
+function eventReason(chosen) {
+  const pros = chosen.analysis?.pros || [];
+  const cons = chosen.analysis?.cons || [];
+  const benefit = pros.length ? `主要收益是${pros.slice(0, 2).join('、')}` : '该选项没有额外的已确认收益';
+  const risk = cons.length ? `；需要承担${cons.slice(0, 2).join('、')}` : '；当前没有识别到直接代价';
+  return `建议选择「${chosen.label}」：${benefit}${risk}。`;
+}
+
+function buildEventRecommendation(state, analyzed, { source = 'rules', reason, now = Date.now(), selectedIndex } = {}) {
+  const options = analyzed?.options || [];
+  const chosen = options.find(option => option.index === selectedIndex) || null;
+  if (!chosen) return null;
   const eventKind = state?.event?.kind === 'ancient' ? 'ancient' : 'event';
   return {
     schema: SCHEMA,
     task: 'event_choice',
     timestamp: now,
     source,
-    confidence: source === 'llm' ? 0.74 : 0.45,
+    confidence: Math.min(0.95, Math.max(0.25, (chosen.analysis?.confidence || 0.45) + (source === 'llm' ? 0.04 : 0))),
     eventKind,
     eventTitle: state?.event?.title || '',
-    reason: reason || `建议选择「${chosen.label}」。这是当前事件中可执行的选项。`,
-    primary: {
-      action: 'CHOOSE_EVENT',
-      optionIndex: Number(chosen.index ?? safeIndex),
-      label: chosen.label,
-      description: chosen.description || ''
-    },
+    eventKnowledge: analyzed.eventKnowledge,
+    reason: reason || eventReason(chosen),
+    primary: recommendationOption(chosen),
     alternatives: options
-      .map((option, optionIndex) => ({
-        action: 'CHOOSE_EVENT',
-        optionIndex: Number(option.index ?? optionIndex),
-        label: option.label,
-        description: option.description || ''
-      }))
-      .filter(option => option.optionIndex !== Number(chosen.index ?? safeIndex))
+      .filter(option => option.index !== chosen.index)
+      .map(recommendationOption)
   };
 }
 
-function eventPromptPayload(state) {
-  const options = choosableEventOptions(state);
+function eventPromptPayload(state, analyzed = analyzeEventChoices(state)) {
   return {
     kind: state?.event?.kind === 'ancient' ? 'ancient' : 'event',
     title: state?.event?.title || '',
@@ -64,44 +73,57 @@ function eventPromptPayload(state) {
     gold: state?.player?.gold,
     energyPerTurn: state?.player?.maxEnergy,
     relics: namedList(state?.player?.relics),
+    potions: namedList(state?.player?.potions),
     deck: namedList(state?.player?.cards),
-    options: options.map((option, index) => ({
-      index: Number(option.index ?? index),
+    eventKnowledge: analyzed.eventKnowledge,
+    allowedIndexes: analyzed.options.filter(option => option.analysis?.eligible).map(option => option.index),
+    options: analyzed.options.map(option => ({
+      index: option.index,
+      optionId: option.optionId,
       label: option.label,
-      description: option.description || ''
+      description: option.description,
+      analysis: option.analysis
     }))
   };
 }
 
 async function recommendEvent(state, { llm, now = Date.now() } = {}) {
-  const options = choosableEventOptions(state);
-  if (!options.length) return null;
+  if (!choosableEventOptions(state).length) return null;
+  const analyzed = analyzeEventChoices(state);
+  const ranked = analyzed.options
+    .filter(option => option.analysis?.eligible && option.analysis?.comparable)
+    .sort((left, right) => right.analysis.score - left.analysis.score || left.index - right.index);
+  const rulesPick = ranked[0] || null;
+  if (!rulesPick) return null;
   if (llm?.enabled && typeof llm.completeEvent === 'function') {
     try {
-      const pick = await llm.completeEvent(eventPromptPayload(state));
+      const pick = await llm.completeEvent(eventPromptPayload(state, analyzed));
       const index = Number(pick?.index);
-      if (Number.isInteger(index) && options.some((option, optionIndex) => Number(option.index ?? optionIndex) === index)) {
-        return buildEventRecommendation(state, {
+      const modelPick = analyzed.options.find(option => option.index === index && option.analysis?.eligible);
+      if (Number.isInteger(index) && modelPick) {
+        return buildEventRecommendation(state, analyzed, {
           source: 'llm',
           reason: typeof pick.reason === 'string' && pick.reason.trim() ? pick.reason.trim() : undefined,
           now,
-          index: options.findIndex((option, optionIndex) => Number(option.index ?? optionIndex) === index)
+          selectedIndex: index
         });
       }
     } catch {
-      // Fall through to the deterministic first-option fallback.
+      // Fall through to the deterministic, safety-gated rules result.
     }
   }
-  return buildEventRecommendation(state, { now });
+  return buildEventRecommendation(state, analyzed, { now, selectedIndex: rulesPick.index });
 }
 
 function eventSignature(state) {
   return JSON.stringify({
     room: state?.run?.room || null,
+    eventId: state?.event?.eventId || null,
+    pageId: state?.event?.pageId || null,
     kind: state?.event?.kind || null,
     title: state?.event?.title || null,
     description: state?.event?.description || null,
-    options: choosableEventOptions(state).map(option => [option.index, option.label, option.description])
+    options: choosableEventOptions(state).map(option => [option.index, option.optionId || null, option.label, option.description])
   });
 }
 

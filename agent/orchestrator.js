@@ -151,6 +151,7 @@ function createOrchestrator({
     if (signature === lastSignature && lastRecommendation) {
       if (!refresh && (task === 'card_reward' || !force)) return lastRecommendation;
     }
+    if (signature === lastSignature && !lastRecommendation && task === 'event_choice' && !refresh) return null;
 
     const current = ++generation;
     const promise = (async () => {
@@ -174,6 +175,13 @@ function createOrchestrator({
           return lastRecommendation;
         }
         if (!recommendation) {
+          if (task === 'event_choice') {
+            lastSignature = signature;
+            lastRecommendation = null;
+            onRecommendation?.(null);
+            onAgentStatus?.({ status: 'error', task, reason: 'event-rules-incomplete', timestamp: now() });
+            return null;
+          }
           if (task === 'card_reward' && lastRecommendation?.task === 'card_reward') {
             onAgentStatus?.({ status: 'ready', task, timestamp: now() });
             return lastRecommendation;

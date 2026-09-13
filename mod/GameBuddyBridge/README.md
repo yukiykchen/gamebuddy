@@ -13,7 +13,8 @@
 - 敌人：稳定 ID、名称、生命、格挡、是否存活、`Monster.NextMove` 类型
 - 敌人攻击意图：只导出游戏当前的 `Monster.NextMove` 类型，不推算实际伤害
 - 状态变化事件：战斗开始/结束、回合开始、地图打开、进入休息处、事件/开局祝福选项出现与结束
-- 事件房：当前事件标题、描述、可见选项（含远古祝福遗物名与效果）
+- 事件房：当前事件标题、描述、可见选项（含远古祝福遗物名与效果），并尽力读取稳定的事件、页面和选项 ID；早期访问字段变化时继续使用显示文本
+- 卡牌快照：导出升级状态、游戏当前格式化效果文本、普通能量/X 费与星/X 星费；可选运行时字段变化时明确标记不可用
 - 卡牌奖励：监听 `NCardRewardSelectionScreen` 打开和刷新，导出当前候选牌、刚结束的战斗类型/敌人和可读取到的下一个 Boss
 
 ## 构建环境
@@ -41,3 +42,5 @@ dotnet build .\mod\GameBuddyBridge\GameBuddyBridge.csproj -c Release `
 桌面端已经把回放桥和真实 Mod 桥放在同一个协议边界，后续 Agent 只需要订阅桌面端状态，不需要了解 Godot 或 STS2 内部对象。
 
 卡牌奖励通过 Harmony 生命周期 Hook 采集，但仍然只读：Mod 不会调用卡牌选择或跳过接口。游戏更新后若 `NCardRewardSelectionScreen` 的生命周期发生变化，日志会记录 `Harmony reward-screen patches failed`，其余状态采集仍会继续运行。
+
+卡牌的动态描述和星费属于早期访问版本中可能变化的可选成员，Bridge 使用容错只读反射读取。读取失败时对应来源为 `unavailable`，不会阻止状态发布；桌面端可以使用 Spire Codex 回退并保留来源标记。更新本 Mod 后需要重新构建、复制 `gamebuddy_bridge.dll` 并重启游戏。

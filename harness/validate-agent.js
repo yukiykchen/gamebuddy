@@ -6,11 +6,13 @@ const { validateRecommendation } = require('../agent/recommendation');
 const { rankRoutes, recommendRoute, scoreNode, scoreParts, buildScoreContext, ensureMapRoutes, routeChoiceCount } = require('../agent/tasks/route');
 const { isRestSite, recommendRest, rankSmithCards } = require('../agent/tasks/rest');
 const { findCardReward, recommendCardReward, analyzeCard, cardRewardSignature } = require('../agent/tasks/card-reward');
-const { resolveItem, inferUpgraded } = require('../agent/knowledge/spire-codex');
+const { resolveItem, inferUpgraded, rankEncounterMatches } = require('../agent/knowledge/spire-codex');
+const { encounterKind, encounterGuideSignature, buildEncounterGuide, mechanicStrategy } = require('../agent/tasks/encounter-guide');
 const { parseJsonObject, createOpenAiClient, readLlmConfig, extractResponseText, resolveChatTemperature, parseAllowedTemperature } = require('../agent/llm/openai');
 const { createOrchestrator, selectTask, restChoicePending, eventChoicePending } = require('../agent/orchestrator');
 const { recommendEvent, eventPromptPayload } = require('../agent/tasks/event');
 const { deriveMechanicTags, generatesNamedStatus, isStatusGenerationTrigger, inferOrbGeneration } = require('../agent/knowledge/mechanic-tags');
+const { matchEventKnowledge, parseOptionEffects, analyzeEventChoices } = require('../agent/knowledge/event-rules');
 
 const lifecycle = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'lifecycle.json'), 'utf8'));
 const mapState = lifecycle[2];
@@ -517,6 +519,8 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   assert.equal(restThenRoute.task, 'map_route');
 
   const paelEvent = {
+    eventId: 'PAEL',
+    pageId: null,
     title: '佩尔',
     description: '有傀儡来了？能帮我去看看父亲的状况么？我太累了……',
     kind: 'ancient',
@@ -575,6 +579,8 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   assert.equal(eventPayload.kind, 'ancient');
   assert.equal(eventPayload.energyPerTurn, paelObservation.state.player.maxEnergy);
   assert.equal(eventPayload.options.length, 3);
+  assert.equal(eventPayload.eventKnowledge.eventId, 'PAEL');
+  assert.ok(eventPayload.allowedIndexes.includes(1));
 
   const llmEventRec = await recommendEvent(paelObservation.state, {
     now: 20,
@@ -584,6 +590,8 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
         assert.equal(payload.kind, 'ancient');
         assert.ok(Array.isArray(payload.deck));
         assert.ok(Array.isArray(payload.relics));
+        assert.ok(Array.isArray(payload.potions));
+        assert.ok(payload.options.every(option => option.analysis));
         return { index: 1, reason: '删牌并升级更适合当前牌组。' };
       }
     }
@@ -595,7 +603,98 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
 
   const rulesEventRec = await recommendEvent(paelObservation.state, { now: 21 });
   assert.equal(rulesEventRec.source, 'rules');
-  assert.equal(rulesEventRec.primary.label, '佩尔之角');
+  assert.equal(rulesEventRec.primary.label, '佩尔之牙');
+  assert.ok(rulesEventRec.primary.analysis.pros.some(item => /移除 5 张牌/.test(item)));
+  assert.equal(rulesEventRec.eventKnowledge.gameVersion, 'v0.107.1');
+
+  const bathsState = {
+    ...paelObservation.state,
+    player: { ...paelObservation.state.player, hp: 3, maxHp: 80, gold: 40 },
+    event: {
+      eventId: 'ABYSSAL_BATHS',
+      pageId: 'INITIAL',
+      title: '深渊浴场',
+      description: '池水正在等待。',
+      kind: 'event',
+      options: [
+        { index: 0, optionId: 'IMMERSE', label: '投身其中', description: '获得2点最大生命值。受到3点伤害。', locked: false },
+        { index: 1, optionId: 'ABSTAIN', label: '敬而远之', description: '回复10点生命。', locked: false }
+      ]
+    }
+  };
+  const bathsAnalysis = analyzeEventChoices(bathsState);
+  assert.equal(bathsAnalysis.eventKnowledge.match, 'event-id');
+  assert.equal(bathsAnalysis.eventKnowledge.pageId, 'INITIAL');
+  assert.equal(bathsAnalysis.options[0].analysis.fatal, true);
+  assert.equal(bathsAnalysis.options[0].analysis.eligible, false);
+  assert.ok(bathsAnalysis.options[1].analysis.pros.some(item => /回复 10 生命/.test(item)));
+  const rejectedUnsafeLlm = await recommendEvent(bathsState, {
+    now: 22,
+    llm: { enabled: true, completeEvent: async () => ({ index: 0, reason: '错误选择致命选项' }) }
+  });
+  assert.equal(rejectedUnsafeLlm.source, 'rules');
+  assert.equal(rejectedUnsafeLlm.primary.optionIndex, 1);
+
+  const flowerKnowledge = matchEventKnowledge({
+    eventId: 'COLOSSAL_FLOWER',
+    pageId: 'REACH_DEEPER_2',
+    title: '巨大花卉',
+    description: '继续深入。',
+    options: [
+      { index: 0, optionId: 'EXTRACT_INSTEAD', label: '采集花蜜', description: '获得135金币。' },
+      { index: 1, optionId: 'POLLINOUS_CORE', label: '抵达核心', description: '失去7点生命值。获得花粉核心。' }
+    ]
+  });
+  assert.equal(flowerKnowledge.page.id, 'REACH_DEEPER_2');
+  assert.equal(flowerKnowledge.completeness, 'complete');
+
+  const effects = parseOptionEffects('获得303-363金币。失去7点生命。得到贪婪。');
+  assert.ok(effects.some(effect => effect.type === 'gold_gain' && effect.max === 363));
+  assert.ok(effects.some(effect => effect.type === 'hp_loss' && effect.min === 7));
+  assert.ok(parseOptionEffects('获得石之剑。').some(effect => effect.type === 'gain_relic'));
+
+  const unknownEventState = {
+    ...paelObservation.state,
+    event: {
+      title: '未收录事件', description: '无法理解的装置。', kind: 'event',
+      options: [
+        { index: 0, label: '左边', description: '未知结果。', locked: false },
+        { index: 1, label: '右边', description: '未知结果。', locked: false }
+      ]
+    }
+  };
+  assert.equal(await recommendEvent(unknownEventState, { now: 23 }), null);
+  const unknownStatuses = [];
+  const unknownOrchestrator = createOrchestrator({
+    llm: { enabled: false },
+    now: () => 24,
+    onAgentStatus: status => unknownStatuses.push(status)
+  });
+  const unknownObservation = {
+    schema: 'gamebuddy.observation.v1', fresh: true, state: unknownEventState,
+    recentEvents: [{ name: 'event.opened' }]
+  };
+  assert.equal(await unknownOrchestrator.consider(unknownObservation), null);
+  assert.equal(unknownStatuses.at(-1).reason, 'event-rules-incomplete');
+  const statusCount = unknownStatuses.length;
+  assert.equal(await unknownOrchestrator.consider(unknownObservation), null);
+  assert.equal(unknownStatuses.length, statusCount);
+
+  const unaffordableState = {
+    ...paelObservation.state,
+    player: { ...paelObservation.state.player, gold: 40 },
+    event: {
+      eventId: 'ZEN_WEAVER', pageId: 'INITIAL', title: '修禅织网者', description: '', kind: 'event',
+      options: [
+        { index: 0, optionId: 'BREATHING_TECHNIQUES', label: '呼吸技法', description: '支付50金币。将2张开悟加入到你的牌组。', locked: false },
+        { index: 1, optionId: 'EMOTIONAL_AWARENESS', label: '情绪觉察', description: '支付125金币。从你的牌组中移除1张牌。', locked: false }
+      ]
+    }
+  };
+  const unaffordable = analyzeEventChoices(unaffordableState);
+  assert.ok(unaffordable.options.every(option => option.analysis.insufficientResources));
+  assert.ok(unaffordable.options.every(option => option.analysis.eligible === false));
+  assert.equal(await recommendEvent(unaffordableState, { now: 25 }), null);
 
   const rewardObservation = {
     schema: 'gamebuddy.observation.v1',
@@ -682,6 +781,104 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   assert.equal(cardEnergyPrompt.player.energyPerTurn, 3);
   assert.equal(cardEnergyPrompt.player.maxEnergy, 3);
 
+  const runtimeCardIndex = new Map([['SEVENSTARS', {
+    id: 'SEVEN_STARS',
+    name: '七星',
+    description: '目录中的旧文本。',
+    cost: 2,
+    star_cost: 5,
+    is_x_star_cost: false
+  }]]);
+  const runtimeCard = resolveItem({
+    id: 'SEVEN_STARS',
+    name: '七星+',
+    upgraded: true,
+    description: '实机升级文本：对所有敌人造成伤害。',
+    descriptionSource: 'runtime',
+    cost: 1,
+    energyCost: 1,
+    energyCostX: false,
+    energyCostSource: 'runtime',
+    starCost: 7,
+    starCostX: false,
+    starCostSource: 'runtime'
+  }, runtimeCardIndex);
+  assert.match(runtimeCard.description, /实机升级文本/);
+  assert.equal(runtimeCard.descriptionSource, 'runtime');
+  assert.equal(runtimeCard.energyCost, 1);
+  assert.equal(runtimeCard.starCost, 7);
+  assert.equal(runtimeCard.starCostSource, 'runtime');
+  const runtimeXCard = resolveItem({
+    id: 'RUNTIME_X_CARD',
+    name: '实机X费牌',
+    upgraded: false,
+    description: '消耗所有能量并按消耗量生效。',
+    descriptionSource: 'runtime',
+    energyCost: null,
+    energyCostX: true,
+    energyCostSource: 'runtime',
+    starCost: null,
+    starCostX: false,
+    starCostSource: 'runtime'
+  }, new Map());
+  const partialRuntimeCard = resolveItem({
+    id: 'UNKNOWN_RUNTIME_CARD',
+    name: '未知实机牌',
+    upgraded: false,
+    description: null,
+    descriptionSource: 'unavailable',
+    energyCost: 1,
+    energyCostX: false,
+    energyCostSource: 'runtime',
+    starCost: null,
+    starCostX: false,
+    starCostSource: 'unavailable'
+  }, new Map());
+
+  let completeCardPrompt;
+  const runtimeCodex = {
+    loadDraftContext: async () => ({
+      source: 'spire-codex',
+      deckCards: [runtimeCard],
+      relics: [],
+      potions: [],
+      coach: null,
+      threats: { knownBoss: null, possibleBosses: [], possibleElites: [], knownUpcomingElites: [], defeatedEncounters: [] },
+      cards: [runtimeCard, runtimeXCard, partialRuntimeCard]
+    })
+  };
+  await recommendCardReward(rewardObservation, {
+    codex: runtimeCodex,
+    now: 15,
+    llm: {
+      enabled: true,
+      completeCardReward: async payload => {
+        completeCardPrompt = payload;
+        return { index: payload.candidates.findIndex(item => item.id === 'SEVEN_STARS'), reason: '按实机完整效果判断' };
+      }
+    }
+  });
+  const runtimeCandidate = completeCardPrompt.candidates.find(item => item.id === 'SEVEN_STARS');
+  const xCandidate = completeCardPrompt.candidates.find(item => item.id === 'RUNTIME_X_CARD');
+  const partialCandidate = completeCardPrompt.candidates.find(item => item.id === 'UNKNOWN_RUNTIME_CARD');
+  assert.equal(runtimeCandidate.upgraded, true);
+  assert.match(runtimeCandidate.description, /实机升级文本/);
+  assert.equal(runtimeCandidate.descriptionSource, 'runtime');
+  assert.deepEqual(runtimeCandidate.costs, {
+    energy: 1,
+    energyX: false,
+    stars: 7,
+    starsX: false,
+    source: { energy: 'runtime', stars: 'runtime' }
+  });
+  assert.equal(runtimeCandidate.contextCompleteness, 'complete');
+  assert.equal(xCandidate.costs.energy, null);
+  assert.equal(xCandidate.costs.energyX, true);
+  assert.equal(partialCandidate.description, null);
+  assert.equal(partialCandidate.descriptionSource, 'unavailable');
+  assert.equal(partialCandidate.contextCompleteness, 'partial');
+  assert.equal(completeCardPrompt.deck[0].contextCompleteness, 'complete');
+
   const momentumCatalog = {
     id: 'MOMENTUM_STRIKE',
     name: '趁势打击',
@@ -702,6 +899,7 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   assert.equal(momentumMerged.upgraded, true);
   assert.equal(momentumMerged.name, '趁势打击+');
   assert.equal(momentumMerged.cost, 1);
+  assert.equal(momentumMerged.descriptionSource, 'catalog');
   assert.match(momentumMerged.upgradeDescription, /13点伤害/);
   const momentumAnalysis = analyzeCard({
     ...momentumMerged,
@@ -1150,7 +1348,71 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   assert.equal(laterFlicker, firstFlicker);
   assert.equal(laterFlicker.reason, 'flicker-1');
 
-  console.log('Agent recommendation cases passed: 50');
+  const normalCombatState = {
+    ...mapState,
+    run: { ...mapState.run, act: 1, actId: 'OVERGROWTH', room: 'Monster', currentNode: 'Monster', currentCoord: '3,1' },
+    combat: {
+      turn: 1,
+      hand: [],
+      drawPile: [],
+      discardPile: [],
+      exhaustPile: [],
+      enemies: [
+        { id: 'SCALER', name: '成长怪', hp: 20, maxHp: 20, intent: 'BuffIntent', alive: true },
+        { id: 'MINION', name: '随从', hp: 12, maxHp: 12, intent: 'AttackIntent', alive: true }
+      ]
+    }
+  };
+  assert.equal(encounterKind(normalCombatState), 'Normal');
+  assert.equal(encounterKind({ ...normalCombatState, run: { ...normalCombatState.run, room: 'Event', currentNode: 'Unknown' } }), 'Normal');
+  assert.equal(
+    encounterGuideSignature(normalCombatState),
+    encounterGuideSignature({ ...normalCombatState, combat: { ...normalCombatState.combat, turn: 2 } })
+  );
+
+  const normalMatches = rankEncounterMatches([
+    { id: 'PARTIAL_NORMAL', room_type: 'Monster', act: 'Act 1 - Overgrowth', monsters: [{ id: 'SCALER' }] },
+    { id: 'EXACT_NORMAL', room_type: 'Monster', act: 'Act 1 - Overgrowth', monsters: [{ id: 'SCALER' }, { id: 'MINION' }] },
+    { id: 'WRONG_ACT_NORMAL', room_type: 'Monster', act: 'Act 2 - Hive', monsters: [{ id: 'SCALER' }, { id: 'MINION' }] }
+  ], normalCombatState.combat.enemies, { kind: 'Normal', act: 1, actId: 'OVERGROWTH' });
+  assert.equal(normalMatches[0].item.id, 'EXACT_NORMAL');
+  assert.equal(normalMatches[0].exactComposition, true);
+  assert.equal(normalMatches.find(match => match.item.id === 'PARTIAL_NORMAL').exactComposition, false);
+  assert.ok(!normalMatches.some(match => match.item.id === 'WRONG_ACT_NORMAL'));
+
+  const normalKnowledge = {
+    source: 'spire-codex',
+    kind: 'Normal',
+    encounter: { id: 'EXACT_NORMAL', name: '成长怪与随从', act: 'Act 1 - Overgrowth', isWeak: false, tags: [] },
+    monsters: [
+      {
+        id: 'SCALER', name: '成长怪', hp: { min: 20, max: 20 }, innatePowers: [],
+        attackPattern: { description: '强化后攻击。' }, mechanicTags: ['scaling'],
+        moves: [{ id: 'GROW', name: '成长', intent: 'Buff', damage: null, block: null, heal: null, powers: [] }]
+      },
+      {
+        id: 'MINION', name: '随从', hp: { min: 12, max: 12 }, innatePowers: [],
+        attackPattern: { description: '持续攻击。' }, mechanicTags: ['multi_hit'],
+        moves: [{ id: 'HIT', name: '连击', intent: 'Attack', damage: null, block: null, heal: null, powers: [] }]
+      }
+    ]
+  };
+  const derivedNormal = mechanicStrategy(normalKnowledge, normalCombatState);
+  assert.equal(derivedNormal.basis, 'mechanics');
+  assert.equal(derivedNormal.reviewStatus, 'mechanic-derived');
+  for (const field of ['deckChecks', 'priorityTargets', 'dangerWindows', 'tips', 'avoid']) {
+    assert.ok(derivedNormal[field].length > 0);
+  }
+  const normalGuide = await buildEncounterGuide(normalCombatState, {
+    now: 60,
+    codex: { loadEncounterContext: async () => normalKnowledge }
+  });
+  assert.equal(normalGuide.kind, 'normal');
+  assert.equal(normalGuide.title, '成长怪与随从');
+  assert.equal(normalGuide.strategy.basis, 'mechanics');
+  assert.ok(normalGuide.monsters.length === 2);
+
+  console.log('Agent recommendation cases passed: 74');
 }).catch(error => {
   console.error(error);
   process.exit(1);

@@ -7,6 +7,8 @@
   "scripts": {
     "start": "electron .",
     "dev": "electron .",
+    "spec:list": "openspec list",
+    "spec:validate": "openspec validate --strict",
     "demo": "node harness/run-demo.js",
     "mod:build": "powershell -ExecutionPolicy Bypass -File .\\mod\\GameBuddyBridge\\build.ps1",
     "dist:win": "electron-builder --win nsis --x64",
@@ -28,6 +30,7 @@
     "ws": "^8.18.3"
   },
   "devDependencies": {
+    "@fission-ai/openspec": "^1.13.0",
     "electron": "^37.2.6",
     "electron-builder": "^26.0.12"
   },

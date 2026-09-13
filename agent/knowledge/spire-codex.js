@@ -43,25 +43,70 @@ function inferUpgraded(card) {
   return /\+$/.test(String(card.name || '').trim());
 }
 
+function hasOwn(object, key) {
+  return Boolean(object) && Object.prototype.hasOwnProperty.call(object, key);
+}
+
+function hasText(value) {
+  return typeof value === 'string' && value.trim().length > 0;
+}
+
 function resolveItem(ref, index) {
   const raw = typeof ref === 'string' ? { id: ref, name: ref } : (ref || {});
-  const match = index.get(normalizeKey(raw.id)) || index.get(normalizeKey(raw.name));
-  if (!match) {
-    return { ...raw, upgraded: inferUpgraded(raw) };
-  }
+  const match = index.get(normalizeKey(raw.id)) || index.get(normalizeKey(raw.name)) || null;
+  const catalog = match || {};
   const upgraded = inferUpgraded(raw) || inferUpgraded(match);
+  const runtimeDescription = hasText(raw.description) && raw.descriptionSource !== 'unavailable'
+    ? raw.description
+    : null;
+  const runtimeDescriptionSource = runtimeDescription
+    ? (raw.descriptionSource === 'catalog' ? 'catalog' : 'runtime')
+    : null;
+  const catalogDescription = (upgraded && (catalog.upgradeDescription || catalog.upgrade_description))
+    || catalog.description
+    || null;
+  const runtimeEnergyKnown = raw.energyCostSource === 'runtime'
+    || hasOwn(raw, 'energyCost')
+    || hasOwn(raw, 'energyCostX')
+    || hasOwn(raw, 'cost');
+  const runtimeStarKnown = raw.starCostSource === 'runtime';
+  const catalogStarKnown = hasOwn(catalog, 'star_cost')
+    || hasOwn(catalog, 'starCost')
+    || hasOwn(catalog, 'is_x_star_cost')
+    || hasOwn(catalog, 'isXStarCost');
+  const energyCostX = runtimeEnergyKnown
+    ? Boolean(raw.energyCostX ?? raw.costsX)
+    : Boolean(catalog.energyCostX ?? catalog.is_x_cost ?? catalog.isXCost);
+  const energyCost = energyCostX
+    ? null
+    : (runtimeEnergyKnown
+      ? (raw.energyCost ?? raw.cost ?? null)
+      : (catalog.energyCost ?? catalog.cost ?? null));
+  const starCostX = runtimeStarKnown
+    ? Boolean(raw.starCostX)
+    : Boolean(catalog.starCostX ?? catalog.is_x_star_cost ?? catalog.isXStarCost);
+  const starCost = starCostX
+    ? null
+    : (runtimeStarKnown
+      ? (raw.starCost ?? null)
+      : (catalog.starCost ?? catalog.star_cost ?? null));
   return {
-    ...match,
+    ...catalog,
     ...raw,
-    originalId: raw.id || match.id || raw.name,
-    name: raw.name || match.name,
-    cost: raw.cost !== undefined && raw.cost !== ''
-      ? (Number.isFinite(Number(raw.cost)) ? Number(raw.cost) : raw.cost)
-      : match.cost,
+    originalId: raw.id || catalog.id || raw.name,
+    name: raw.name || catalog.name,
+    cost: energyCost,
+    energyCost,
+    energyCostX,
+    energyCostSource: runtimeEnergyKnown ? 'runtime' : (match ? 'catalog' : 'unavailable'),
+    starCost,
+    starCostX,
+    starCostSource: runtimeStarKnown ? 'runtime' : (catalogStarKnown ? 'catalog' : 'unavailable'),
     upgraded,
-    description: raw.description || match.description,
-    upgrade_description: raw.upgrade_description || raw.upgradeDescription || match.upgradeDescription || match.upgrade_description,
-    upgradeDescription: raw.upgradeDescription || raw.upgrade_description || match.upgradeDescription || match.upgrade_description
+    description: runtimeDescription || catalogDescription,
+    descriptionSource: runtimeDescriptionSource || (catalogDescription ? 'catalog' : 'unavailable'),
+    upgrade_description: raw.upgrade_description || raw.upgradeDescription || catalog.upgradeDescription || catalog.upgrade_description,
+    upgradeDescription: raw.upgradeDescription || raw.upgrade_description || catalog.upgradeDescription || catalog.upgrade_description
   };
 }
 
@@ -70,6 +115,42 @@ function actMatches(value, act, actId) {
   if (normalizedActId) return normalizeKey(value).includes(normalizedActId);
   if (!Number.isFinite(Number(act))) return false;
   return new RegExp(`\\bAct\\s+${Number(act)}\\b`, 'i').test(String(value || ''));
+}
+
+function encounterRoomType(kind) {
+  return String(kind).toLowerCase() === 'normal' ? 'Monster' : kind;
+}
+
+function sameMonster(left, right) {
+  const leftKeys = [left?.id, left?.name].map(normalizeKey).filter(Boolean);
+  const rightKeys = new Set([right?.id, right?.name].map(normalizeKey).filter(Boolean));
+  return leftKeys.some(key => rightKeys.has(key));
+}
+
+function rankEncounterMatches(encounters, enemyRefs, { kind, act, actId } = {}) {
+  const roomType = String(encounterRoomType(kind) || '').toLowerCase();
+  const actual = (enemyRefs || []).filter(Boolean);
+  return (encounters || [])
+    .filter(item => String(item?.room_type || '').toLowerCase() === roomType)
+    .filter(item => item.act == null || actMatches(item.act, act, actId))
+    .map(item => {
+      const catalogMonsters = item.monsters || [];
+      const matches = actual.filter(enemy => catalogMonsters.some(monster => sameMonster(monster, enemy))).length;
+      const catalogSize = (item.monsters || []).length;
+      // Encounter monster arrays can describe a spawn pool rather than literal
+      // multiplicity. A match is exact when every currently visible enemy is
+      // covered by that pool; extra catalog variants do not invalidate it.
+      const exactComposition = actual.length > 0 && matches === actual.length;
+      const score = matches * 100
+        + (item.act == null ? 0 : 20)
+        + (exactComposition ? 40 : 0)
+        - Math.abs(catalogSize - actual.length) * 8;
+      return { item, matches, exactComposition, score };
+    })
+    .filter(candidate => candidate.matches > 0)
+    .sort((left, right) => right.score - left.score
+      || Number(right.exactComposition) - Number(left.exactComposition)
+      || String(left.item.id).localeCompare(String(right.item.id)));
 }
 
 function mechanicTags(monster) {
@@ -83,12 +164,9 @@ function mechanicTags(monster) {
   if (/strength|力量|buff|增益/.test(text)) tags.push('scaling');
   if (/weak|虚弱|vulnerable|易伤|frail|脆弱/.test(text)) tags.push('debuffs');
   if (/artifact|人工制品/.test(text)) tags.push('artifact');
+  if (/thorns|荆棘/.test(text)) tags.push('thorns');
+  if (/regen|再生|heal|治疗|回复/.test(text) || moves.some(move => Number(move?.heal) > 0)) tags.push('healing');
   if (moves.some(move => Number(move?.block) > 0)) tags.push('block');
-  if (moves.some(move => {
-    const damage = move?.damage || {};
-    return Math.max(Number(damage.normal) || 0, Number(damage.ascension) || 0)
-      * Math.max(1, Number(damage.hit_count) || 1) >= 24;
-  })) tags.push('burst_damage');
   return [...new Set(tags)];
 }
 
@@ -364,14 +442,14 @@ function createSpireCodexClient({
 
   async function loadEncounterContext(state) {
     const catalogs = await loadEncounterCatalogs();
-    const kind = /boss/i.test(`${state?.run?.room || ''} ${state?.run?.currentNode || ''}`) ? 'Boss' : 'Elite';
+    const room = `${state?.run?.room || ''} ${state?.run?.currentNode || ''}`;
+    const kind = /boss/i.test(room) ? 'Boss' : /elite/i.test(room) ? 'Elite' : 'Normal';
     const enemyRefs = (state?.combat?.enemies || []).filter(enemy => enemy && enemy.alive !== false);
     const actualEnemies = enemyRefs.map(enemy => (
       catalogs.monsterIndex.get(normalizeKey(enemy?.id))
       || catalogs.monsterIndex.get(normalizeKey(enemy?.name))
       || null
     )).filter(Boolean);
-    const actualKeys = new Set(enemyRefs.flatMap(enemy => [normalizeKey(enemy.id), normalizeKey(enemy.name)]).filter(Boolean));
     const actId = state?.run?.actId || null;
     const act = state?.run?.act;
     let encounter = null;
@@ -380,17 +458,11 @@ function createSpireCodexClient({
       if (catalogs.encounterIndex.has(normalizeKey(state.run.nextBossId))) encounter = resolved;
     }
     if (!encounter) {
-      encounter = catalogs.encounters
-        .filter(item => String(item.room_type).toLowerCase() === kind.toLowerCase() && actMatches(item.act, act, actId))
-        .map(item => ({
-          item,
-          matches: (item.monsters || []).filter(monster => actualKeys.has(normalizeKey(monster.id)) || actualKeys.has(normalizeKey(monster.name))).length
-        }))
-        .sort((left, right) => right.matches - left.matches)
-        .find(item => item.matches > 0)?.item || null;
+      const match = rankEncounterMatches(catalogs.encounters, enemyRefs, { kind, act, actId })[0] || null;
+      encounter = match?.exactComposition ? match.item : null;
     }
     const encounterMonsters = (encounter?.monsters || []).map(ref => resolveItem(ref, catalogs.monsterIndex));
-    const monstersToExplain = [...new Map([...encounterMonsters, ...actualEnemies]
+    const monstersToExplain = [...new Map((actualEnemies.length ? actualEnemies : encounterMonsters)
       .filter(monster => catalogs.monsterIndex.has(normalizeKey(monster.id)) || catalogs.monsterIndex.has(normalizeKey(monster.name)))
       .map(monster => [monster.id || monster.name, monster])).values()];
     const monsters = monstersToExplain.map(monster => ({
@@ -420,6 +492,7 @@ function createSpireCodexClient({
         id: encounter.id,
         name: encounter.name,
         act: encounter.act,
+        isWeak: Boolean(encounter.is_weak),
         tags: encounter.tags || []
       } : null,
       monsters
@@ -429,4 +502,4 @@ function createSpireCodexClient({
   return { loadDraftContext, loadEncounterContext };
 }
 
-module.exports = { DEFAULT_BASE_URL, normalizeKey, stripMarkup, mechanicTags, inferUpgraded, resolveItem, createSpireCodexClient };
+module.exports = { DEFAULT_BASE_URL, normalizeKey, stripMarkup, mechanicTags, inferUpgraded, resolveItem, rankEncounterMatches, createSpireCodexClient };

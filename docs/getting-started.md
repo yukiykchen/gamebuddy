@@ -30,6 +30,20 @@ npm ci
 
 仓库包含 `package-lock.json`，开发和 CI 优先使用 `npm ci`。只有明确需要升级依赖或重写 lockfile 时才使用 `npm install`。
 
+OpenSpec CLI 已作为项目本地开发依赖安装。开发可观察行为前先查看 active change：
+
+```bash
+npm run spec:list
+```
+
+规范文件完成后可对指定 change 做严格校验：
+
+```bash
+npm run spec:validate -- export-runtime-card-effects
+```
+
+CLI 由 `package-lock.json` 锁定，不需要再全局安装 `openspec`。
+
 ## 3. 不连接游戏启动 Demo
 
 最短路径：

@@ -77,11 +77,40 @@ function numeric(value) {
   return Number.isFinite(Number(value)) ? Number(value) : 0;
 }
 
+function optionalNumber(value) {
+  if (value === null || value === undefined || value === '') return null;
+  return Number.isFinite(Number(value)) ? Number(value) : null;
+}
+
+function cardCosts(card) {
+  const energyX = Boolean(card.energyCostX ?? card.costsX ?? card.is_x_cost ?? card.isXCost);
+  const starsX = Boolean(card.starCostX ?? card.is_x_star_cost ?? card.isXStarCost);
+  return {
+    energy: energyX ? null : optionalNumber(card.energyCost ?? card.cost),
+    energyX,
+    stars: starsX ? null : optionalNumber(card.starCost ?? card.star_cost),
+    starsX,
+    source: {
+      energy: card.energyCostSource || 'unavailable',
+      stars: card.starCostSource || 'unavailable'
+    }
+  };
+}
+
+function cardContextCompleteness(card, description) {
+  const costs = cardCosts(card);
+  const descriptionKnown = Boolean(description) && card.descriptionSource !== 'unavailable';
+  const costsKnown = costs.source.energy !== 'unavailable' && costs.source.stars !== 'unavailable';
+  return descriptionKnown && costsKnown ? 'complete' : 'partial';
+}
+
 function cardFacts(card) {
   const upgraded = inferUpgraded(card);
   const upgradeText = card.upgrade_description || card.upgradeDescription;
-  const description = stripMarkup((upgraded && upgradeText) || card.description || card.text || '');
-  const cost = card.is_x_cost || card.isXCost ? null : (Number.isFinite(Number(card.cost)) ? Number(card.cost) : null);
+  const preferRuntime = card.descriptionSource === 'runtime' && card.description;
+  const description = stripMarkup(preferRuntime || (upgraded && upgradeText) || card.description || card.text || '');
+  const costs = cardCosts(card);
+  const cost = costs.energy;
   const block = numeric(card.block);
   const draw = numeric(card.cards_draw || card.cardsDraw);
   const energy = numeric(card.energy_gain || card.energyGain);
@@ -114,7 +143,10 @@ function cardFacts(card) {
     isConditional: /if |when |whenever|若|如果|每当|致命|fatal|只能|only/.test(searchable),
     exhausts: /exhaust|消耗/.test(searchable),
     innate: /innate|固有/.test(searchable),
-    upgraded
+    upgraded,
+    costs,
+    descriptionSource: card.descriptionSource || (description ? 'catalog' : 'unavailable'),
+    contextCompleteness: cardContextCompleteness(card, description)
   };
 }
 
@@ -402,8 +434,11 @@ function analyzeCard(card, state, context, threats, coachItem, enemyTags = new S
     type: card.type || card.type_key || '未知',
     rarity: card.rarity || card.rarity_key || '未知',
     cost: facts.cost,
+    costs: facts.costs,
     upgraded: facts.upgraded,
-    description: facts.description || stripMarkup(card.upgrade_description || card.upgradeDescription) || '暂未取得卡牌描述',
+    description: facts.description || null,
+    descriptionSource: facts.descriptionSource,
+    contextCompleteness: facts.contextCompleteness,
     score: Math.max(0, Math.min(100, Math.round(score))),
     pros: pros.slice(0, 4),
     cons: cons.slice(0, 3),
@@ -552,9 +587,12 @@ async function recommendCardReward(observation, { llm, now = Date.now(), codex =
           id: card.id || card.name,
           name: card.name || card.id,
           type: card.type || card.type_key || null,
-          cost: card.cost ?? null,
+          cost: cardCosts(card).energy,
+          costs: cardCosts(card),
           upgraded: inferUpgraded(card),
-          description: stripMarkup((inferUpgraded(card) && (card.upgrade_description || card.upgradeDescription)) || card.description || card.text || '') || null,
+          description: cardFacts(card).description || null,
+          descriptionSource: cardFacts(card).descriptionSource,
+          contextCompleteness: cardFacts(card).contextCompleteness,
           mechanicTags: card.evaluation?.mechanicTags || [],
           orbGeneration: orbGenerationFor(card)
         })),
@@ -581,9 +619,12 @@ async function recommendCardReward(observation, { llm, now = Date.now(), codex =
               id: candidate.card.id,
               name: candidate.card.name,
               cost: candidate.card.cost,
+              costs: candidate.card.costs,
               upgraded: Boolean(candidate.card.upgraded),
               description: candidate.card.description || null,
               orbGeneration: candidate.card.orbGeneration || null,
+              descriptionSource: candidate.card.descriptionSource,
+              contextCompleteness: candidate.card.contextCompleteness,
               score: candidate.score,
               pros: candidate.card.pros,
               cons: candidate.card.cons,

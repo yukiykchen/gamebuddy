@@ -29,8 +29,36 @@ assert.equal(validateMessage({
   type: 'event',
   name: 'card.reward.opened',
   timestamp: Date.now(),
-  data: { cards: [{ id: 'ANGER', name: '愤怒' }, 'IRON_WAVE'], canSkip: true }
+  data: {
+    cards: [{
+      id: 'SEVEN_STARS',
+      name: '七星+',
+      upgraded: true,
+      cost: 1,
+      description: '实机升级效果。',
+      descriptionSource: 'runtime',
+      energyCost: 1,
+      energyCostX: false,
+      energyCostSource: 'runtime',
+      starCost: 7,
+      starCostX: false,
+      starCostSource: 'runtime'
+    }, 'IRON_WAVE'],
+    canSkip: true
+  }
 }).ok, true);
+assert.equal(validateMessage({
+  type: 'event',
+  name: 'card.reward.opened',
+  timestamp: Date.now(),
+  data: { cards: [{ id: 'BAD_COST', energyCostX: 'yes' }] }
+}).ok, false);
+assert.equal(validateMessage({
+  type: 'event',
+  name: 'card.reward.opened',
+  timestamp: Date.now(),
+  data: { cards: [{ id: 'BAD_SOURCE', descriptionSource: 'guessed' }] }
+}).ok, false);
 assert.equal(validateMessage({
   type: 'event',
   name: 'card.reward.opened',
@@ -56,11 +84,24 @@ assert.equal(validateState({
   ...validState,
   combat: null,
   event: {
+    eventId: 'SUNKEN_STATUE',
+    pageId: 'INITIAL',
     title: '沉没雕像',
     description: '钱可是个好东西……',
-    options: [{ index: 0, label: '拿起石剑', description: '获得石之剑。', locked: false }]
+    options: [{ index: 0, optionId: 'GRAB_SWORD', label: '拿起石剑', description: '获得石之剑。', locked: false }]
   }
 }).ok, true);
+assert.equal(validateState({
+  ...validState,
+  combat: null,
+  event: {
+    eventId: 42,
+    pageId: 'INITIAL',
+    title: '错误事件',
+    description: '',
+    options: [{ index: 0, optionId: false, label: '选项', description: '' }]
+  }
+}).ok, false);
 assert.equal(validateState({
   ...validState,
   combat: null,
@@ -97,4 +138,4 @@ assert.equal(validateState({
   reward: { cards: [] }
 }).ok, false);
 
-console.log('Protocol validation cases passed: 20');
+console.log('Protocol validation cases passed: 22');

@@ -1,4 +1,4 @@
-const { createSpireCodexClient, stripMarkup } = require('../knowledge/spire-codex');
+const { createSpireCodexClient, normalizeKey, stripMarkup } = require('../knowledge/spire-codex');
 const cardEvaluations = require('../knowledge/card-evaluations.json');
 const encounterStrategies = require('../knowledge/encounter-strategies.json');
 
@@ -21,7 +21,7 @@ function encounterKind(state) {
   const room = `${state?.run?.room || ''} ${state?.run?.currentNode || ''}`;
   if (/boss/i.test(room)) return 'Boss';
   if (/elite/i.test(room)) return 'Elite';
-  return null;
+  return 'Normal';
 }
 
 function encounterGuideSignature(state) {
@@ -73,10 +73,6 @@ function dangerAndTips(monsters) {
     dangers.push('存在多段攻击，力量成长会被多次放大');
     tips.push('虚弱和降力量对多段攻击收益很高');
   }
-  if (tags.has('burst_damage')) {
-    dangers.push('存在高爆发回合');
-    tips.push('提前留格挡牌，必要时用药水跨过爆发回合');
-  }
   if (tags.has('scaling')) {
     dangers.push('战斗拖久后敌方会成长');
     tips.push('准备稳定成长方案，或集中输出尽快结束战斗');
@@ -90,6 +86,19 @@ function dangerAndTips(monsters) {
     tips.push('优先处理关键随从，群体伤害在这里更有价值');
   }
   if (tags.has('artifact')) tips.push('先消耗人工制品，再使用虚弱、易伤等关键减益');
+  if (tags.has('debuffs')) {
+    dangers.push('会施加虚弱、易伤或脆弱，后续攻防效率可能下降');
+    tips.push('关键减益回合优先保证生存，不要依赖刚好够用的攻防数值');
+  }
+  if (tags.has('block')) tips.push('把主要输出安排在敌人没有建立格挡的窗口');
+  if (tags.has('thorns')) {
+    dangers.push('反伤会惩罚大量低伤害攻击次数');
+    tips.push('优先使用高价值单次攻击或非攻击伤害，并为反伤保留生命与格挡余量');
+  }
+  if (tags.has('healing')) {
+    dangers.push('敌人能够治疗或再生，拖延会抵消已经投入的输出');
+    tips.push('围绕治疗窗口集中输出，优先压制能持续回复的目标');
+  }
   return {
     dangers: [...new Set(dangers)].slice(0, 4),
     tips: [...new Set(tips)].slice(0, 4)
@@ -132,6 +141,7 @@ function communityStrategy(encounter) {
   const profile = strategyIndex.get(encounter?.id);
   if (!profile) return null;
   return {
+    basis: 'community',
     summary: profile.summary,
     dangerWindows: profile.dangerWindows || [],
     deckChecks: profile.deckChecks || [],
@@ -148,6 +158,98 @@ function communityStrategy(encounter) {
   };
 }
 
+function mechanicStrategy(knowledge, state, advice = dangerAndTips(knowledge?.monsters || [])) {
+  const monsters = knowledge?.monsters || [];
+  const tags = new Set(monsters.flatMap(monster => monster.mechanicTags || []));
+  const multiTarget = (state?.combat?.enemies || []).filter(enemy => enemy?.alive !== false).length > 1 || monsters.length > 1;
+  const summary = tags.has('summons')
+    ? '召唤型遭遇。尽早压制召唤源并减少场上敌人数量，避免压力随回合扩大。'
+    : tags.has('scaling')
+      ? '成长型普通战。完成必要启动后尽快转入输出，避免把战斗拖进敌方成长阶段。'
+      : tags.has('status_cards')
+        ? '牌堆污染战。兼顾前置输出与牌堆整理，避免状态牌让后续回合失去行动力。'
+        : multiTarget
+          ? '多目标节奏战。集中火力先减少一个行动者，通常比平均压低所有敌人更稳。'
+          : '常规单体战。根据行动循环安排攻防，在安全回合推进输出并避免无效拖延。';
+  const deckChecks = [];
+  if (multiTarget || tags.has('summons')) deckChecks.push('群体伤害，或能快速完成第一次点杀的单体爆发');
+  if (tags.has('multi_hit')) deckChecks.push('稳定格挡、虚弱或降力量手段');
+  if (tags.has('status_cards')) deckChecks.push('额外抽牌、弃牌、消耗或其他牌堆整理能力');
+  if (tags.has('scaling')) deckChecks.push('能在前几个循环结束战斗的前置输出');
+  if (tags.has('artifact')) deckChecks.push('廉价减益用于消耗人工制品，再施加关键控制');
+  if (tags.has('thorns')) deckChecks.push('高价值单次攻击、非攻击伤害或足够的反伤承受能力');
+  if (tags.has('healing')) deckChecks.push('能压过治疗或再生的集中输出');
+  if (!deckChecks.length) deckChecks.push('稳定的基础攻防，以及坏抽牌时仍能执行的低费牌');
+
+  const activeEnemies = state?.combat?.enemies || [];
+  const activeByKey = new Map(activeEnemies.flatMap(enemy => [
+    [normalizeKey(enemy.id), enemy],
+    [normalizeKey(enemy.name), enemy]
+  ]).filter(([key]) => key));
+  const targetOrder = monsters.map(monster => {
+    const monsterTags = new Set(monster.mechanicTags || []);
+    const active = activeByKey.get(normalizeKey(monster.id)) || activeByKey.get(normalizeKey(monster.name));
+    const attacking = /attack/i.test(String(active?.intent || ''));
+    const score = (monsterTags.has('summons') ? 5 : 0)
+      + (monsterTags.has('healing') ? 4 : 0)
+      + (monsterTags.has('scaling') ? 4 : 0)
+      + (monsterTags.has('status_cards') ? 3 : 0)
+      + (monsterTags.has('multi_hit') ? 2 : 0)
+      + (attacking ? 1 : 0);
+    const reasons = [];
+    if (monsterTags.has('summons')) reasons.push('会召唤');
+    if (monsterTags.has('healing')) reasons.push('会回复');
+    if (monsterTags.has('scaling')) reasons.push('会成长');
+    if (monsterTags.has('status_cards')) reasons.push('会污染牌堆');
+    if (monsterTags.has('multi_hit')) reasons.push('有多段攻击');
+    if (attacking) reasons.push('当前显示攻击意图');
+    return { name: monster.name, score, reasons };
+  }).sort((left, right) => right.score - left.score || left.name.localeCompare(right.name, 'zh-CN'));
+  const priorityTargets = multiTarget
+    ? [targetOrder[0]?.score > 0
+      ? `优先处理「${targetOrder[0].name}」：${targetOrder[0].reasons.join('、')}，更容易扩大场面压力`
+      : '优先击杀本回合能够安全收掉的目标，尽快减少敌方行动次数']
+    : ['单体遭遇；围绕敌人的行动循环安排输出和防御'];
+
+  const avoid = [];
+  if (multiTarget) avoid.push('平均分散单体伤害，导致多个敌人持续行动');
+  if (tags.has('scaling') || tags.has('summons')) avoid.push('只做长期准备而不削减敌方数量或推进击杀');
+  if (tags.has('status_cards')) avoid.push('忽略牌堆污染，直到关键回合抽满状态牌');
+  if (tags.has('artifact')) avoid.push('把关键虚弱或易伤直接浪费在人工制品上');
+  if (tags.has('thorns')) avoid.push('连续使用大量低价值攻击，无谓承受多次反伤');
+  if (tags.has('healing')) avoid.push('在敌人即将回复时平均分散输出，无法形成有效击杀压力');
+  if (!avoid.length) avoid.push('安全回合过度防御，或危险回合为了贪输出放弃必要防守');
+
+  return {
+    basis: 'mechanics',
+    summary,
+    dangerWindows: advice.dangers.length ? advice.dangers : ['敌人行动模式已确认，但没有额外的高危机制标签'],
+    deckChecks: deckChecks.slice(0, 4),
+    priorityTargets,
+    tips: (advice.tips.length ? advice.tips : ['观察当前意图，在安全回合输出、危险回合保留必要防守']).slice(0, 5),
+    avoid: avoid.slice(0, 4),
+    confidence: null,
+    reviewStatus: 'mechanic-derived',
+    capturedAt: encounterStrategies.capturedAt,
+    sources: [{ id: 'spire-codex', title: 'Spire Codex encounters and monsters API', url: 'https://spire-codex.com/api' }]
+  };
+}
+
+function unavailableStrategy(names) {
+  return {
+    basis: 'unavailable',
+    summary: `${names.join(' + ') || '本场敌人'}的完整机制资料暂未匹配，本次只提供保守提示。`,
+    dangerWindows: ['注意游戏当前显示的攻击、强化、减益或召唤意图'],
+    deckChecks: ['保留基础攻防与药水，不依据未知机制提前消耗关键资源'],
+    priorityTargets: names.length > 1 ? ['优先减少能够安全击杀的敌人数量'] : ['根据当前意图安排攻防'],
+    tips: ['Spire Codex 暂时不可用或未匹配该敌人；本次不生成具体机制猜测。'],
+    avoid: ['不要把未确认的行动循环当成确定事实'],
+    confidence: null,
+    reviewStatus: 'unavailable',
+    sources: []
+  };
+}
+
 async function buildEncounterGuide(state, { codex = codexClient, now = Date.now() } = {}) {
   const kind = encounterKind(state);
   if (!kind) return null;
@@ -156,7 +258,7 @@ async function buildEncounterGuide(state, { codex = codexClient, now = Date.now(
     const monsters = (knowledge.monsters || []).map(monsterGuide);
     if (!monsters.length) throw new Error('no matching monsters');
     const advice = dangerAndTips(knowledge.monsters || []);
-    const strategy = communityStrategy(knowledge.encounter);
+    const strategy = communityStrategy(knowledge.encounter) || mechanicStrategy(knowledge, state, advice);
     return {
       schema: 'gamebuddy.encounter-guide.v1',
       timestamp: now,
@@ -179,11 +281,11 @@ async function buildEncounterGuide(state, { codex = codexClient, now = Date.now(
       source: 'bridge',
       gameVersion: cardEvaluations.game?.version || null,
       monsters: names.map(name => ({ name, hp: '资料暂未匹配', innate: [], cycle: '暂无可靠机制资料', moves: [] })),
-      strategy: null,
-      dangers: [],
-      tips: ['Spire Codex 暂时不可用或未匹配该敌人；本次不生成猜测内容。']
+      strategy: unavailableStrategy(names),
+      dangers: ['注意游戏当前显示的攻击、强化、减益或召唤意图'],
+      tips: ['Spire Codex 暂时不可用或未匹配该敌人；本次不生成具体机制猜测。']
     };
   }
 }
 
-module.exports = { encounterKind, encounterGuideSignature, buildEncounterGuide, moveText, dangerAndTips };
+module.exports = { encounterKind, encounterGuideSignature, buildEncounterGuide, moveText, dangerAndTips, mechanicStrategy };

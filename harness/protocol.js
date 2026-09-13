@@ -1,5 +1,33 @@
 const SUPPORTED_SCHEMA = 'gamebuddy.state.v1';
 const SUPPORTED_EVENTS = new Set(['combat.started', 'turn.started', 'combat.ended', 'map.opened', 'rest.opened', 'rest.closed', 'event.opened', 'event.closed', 'card.played', 'card.reward.opened', 'card.reward.closed']);
+const CARD_SOURCES = new Set(['runtime', 'catalog', 'unavailable']);
+
+function validateCardSnapshot(card, prefix) {
+  if (typeof card === 'string' && card) return { ok: true };
+  if (!card || typeof card !== 'object') return { ok: false, reason: `${prefix} must be an object` };
+  if (card.upgraded !== undefined && typeof card.upgraded !== 'boolean') {
+    return { ok: false, reason: `${prefix}.upgraded must be a boolean` };
+  }
+  for (const field of ['cost', 'energyCost', 'starCost']) {
+    if (card[field] !== undefined && card[field] !== null && !Number.isFinite(card[field])) {
+      return { ok: false, reason: `${prefix}.${field} must be a number or null` };
+    }
+  }
+  for (const field of ['energyCostX', 'starCostX']) {
+    if (card[field] !== undefined && typeof card[field] !== 'boolean') {
+      return { ok: false, reason: `${prefix}.${field} must be a boolean` };
+    }
+  }
+  if (card.description !== undefined && card.description !== null && typeof card.description !== 'string') {
+    return { ok: false, reason: `${prefix}.description must be a string or null` };
+  }
+  for (const field of ['descriptionSource', 'energyCostSource', 'starCostSource']) {
+    if (card[field] !== undefined && !CARD_SOURCES.has(card[field])) {
+      return { ok: false, reason: `${prefix}.${field} has an unsupported source` };
+    }
+  }
+  return { ok: true };
+}
 
 function validateReward(reward, prefix = 'reward') {
   if (!reward || typeof reward !== 'object') return { ok: false, reason: `${prefix} must be an object` };
@@ -12,6 +40,8 @@ function validateReward(reward, prefix = 'reward') {
     if (!card || typeof card !== 'object' || (!card.id && !card.name)) {
       return { ok: false, reason: `${prefix} card entries need an id or name` };
     }
+    const cardValidation = validateCardSnapshot(card, `${prefix}.cards`);
+    if (!cardValidation.ok) return cardValidation;
   }
   if (reward.canSkip !== undefined && typeof reward.canSkip !== 'boolean') {
     return { ok: false, reason: `${prefix}.canSkip must be a boolean` };
@@ -37,6 +67,10 @@ function validateState(state) {
   for (const field of ['cards', 'relics', 'potions']) {
     if (!Array.isArray(state.player[field])) return { ok: false, reason: `player.${field} must be an array` };
   }
+  for (const card of state.player.cards) {
+    const cardValidation = validateCardSnapshot(card, 'player.cards');
+    if (!cardValidation.ok) return cardValidation;
+  }
   if (state.combat !== null && state.combat !== undefined) {
     if (typeof state.combat !== 'object') return { ok: false, reason: 'combat must be an object or null' };
     for (const field of ['turn', 'hand', 'drawPile', 'discardPile', 'exhaustPile', 'enemies']) {
@@ -47,6 +81,12 @@ function validateState(state) {
     if (!Array.isArray(state.combat.discardPile)) return { ok: false, reason: 'combat.discardPile must be an array' };
     if (!Array.isArray(state.combat.exhaustPile)) return { ok: false, reason: 'combat.exhaustPile must be an array' };
     if (!Array.isArray(state.combat.enemies)) return { ok: false, reason: 'combat.enemies must be an array' };
+    for (const field of ['hand', 'drawPile', 'discardPile', 'exhaustPile']) {
+      for (const card of state.combat[field]) {
+        const cardValidation = validateCardSnapshot(card, `combat.${field}`);
+        if (!cardValidation.ok) return cardValidation;
+      }
+    }
   }
   if (!state.map || typeof state.map !== 'object' || !Array.isArray(state.map.visited)) return { ok: false, reason: 'map.visited must be an array' };
   if (state.map.nodes !== undefined) {
@@ -77,9 +117,17 @@ function validateState(state) {
     if (state.event.kind !== undefined && state.event.kind !== null && typeof state.event.kind !== 'string') {
       return { ok: false, reason: 'event.kind must be a string' };
     }
+    for (const field of ['eventId', 'pageId']) {
+      if (state.event[field] !== undefined && state.event[field] !== null && typeof state.event[field] !== 'string') {
+        return { ok: false, reason: `event.${field} must be a string or null` };
+      }
+    }
     for (const option of state.event.options) {
       if (!option || typeof option !== 'object' || !Number.isInteger(option.index) || typeof option.label !== 'string') {
         return { ok: false, reason: 'event option needs integer index and label' };
+      }
+      if (option.optionId !== undefined && option.optionId !== null && typeof option.optionId !== 'string') {
+        return { ok: false, reason: 'event optionId must be a string or null' };
       }
     }
   }
@@ -97,6 +145,8 @@ function validateState(state) {
       if (card.description !== undefined && typeof card.description !== 'string') {
         return { ok: false, reason: 'card reward option description must be a string' };
       }
+      const cardValidation = validateCardSnapshot(card, 'cardReward.options');
+      if (!cardValidation.ok) return cardValidation;
     }
   }
   if (state.reward !== undefined && state.reward !== null) {
@@ -136,4 +186,4 @@ function validateMessage(message) {
   return { ok: true };
 }
 
-module.exports = { SUPPORTED_EVENTS, SUPPORTED_SCHEMA, validateMessage, validateState, stateSignature };
+module.exports = { SUPPORTED_EVENTS, SUPPORTED_SCHEMA, validateCardSnapshot, validateMessage, validateState, stateSignature };

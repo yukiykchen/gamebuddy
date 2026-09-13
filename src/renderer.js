@@ -157,17 +157,29 @@ function eventView() {
     : escapeHtml(rec?.eventTitle || state.event?.title || '事件选项');
   const reason = rec?.reason
     ? escapeHtml(rec.reason)
-    : '出现可选项后，这里会结合牌组、遗物和生命给出推荐。';
+    : fromState.length
+      ? '当前选项效果资料不足，无法形成可靠首选；请按游戏原文判断，不会默认选择第一个按钮。'
+      : '出现可选项后，这里会结合牌组、遗物和生命给出推荐。';
+  const riskLabels = { low: '低风险', medium: '中风险', high: '高风险', fatal: '致命' };
   const cards = options.length
-    ? options.map(option => `
+    ? options.map(option => {
+      const analysis = option.analysis || {};
+      const pros = (analysis.pros || []).slice(0, 3).map(item => `<li class="positive">${escapeHtml(item)}</li>`).join('');
+      const cons = [...(analysis.cons || []), ...(analysis.unknown || [])].slice(0, 3).map(item => `<li>${escapeHtml(item)}</li>`).join('');
+      const risk = analysis.riskLevel ? riskLabels[analysis.riskLevel] || analysis.riskLevel : '效果待确认';
+      return `
       <article class="draft-card ${option.recommended ? 'top-pick' : ''}">
         <span class="pick-tag">${option.recommended ? '建议' : '备选'}</span>
         <div class="card-name">${escapeHtml(option.label)}</div>
         <p>${escapeHtml(option.description || '游戏内选项效果。')}</p>
-      </article>`).join('')
+        <div class="draft-fit"><span class="fit-${analysis.riskLevel === 'low' ? 'strong' : analysis.riskLevel === 'medium' ? 'medium' : 'weak'}">${escapeHtml(risk)}</span><span>${analysis.eligible === false ? '不可推荐' : Number.isFinite(analysis.score) ? `规则分 ${analysis.score}` : '未评分'}</span></div>
+        ${pros || cons ? `<ul class="draft-notes">${pros}${cons}</ul>` : ''}
+      </article>`;
+    }).join('')
     : '<div class="data-empty large-empty">等待事件选项同步。开局祝福和途中事件的按钮文案会显示在这里。</div>';
   const sourceLabel = rec ? (rec.source === 'llm' ? '模型复核' : '规则评分') : '等待分析';
-  return `<div class="draft-layout rest-layout"><section class="panel draft-offer"><div class="draft-kicker">${kicker}</div><h2 class="draft-title">${title}</h2><p class="recommendation-reason">${reason}</p><div class="draft-cards">${cards}</div></section><section class="panel draft-side"><div class="panel-heading"><span class="panel-title">当前局面</span><span class="panel-meta">${sourceLabel}</span></div><div class="deck-stat"><span>生命</span><strong>${state.player.hp || 0} / ${state.player.maxHp || 0}</strong></div><div class="deck-stat"><span>金币</span><strong>${state.player.gold ?? '--'}</strong></div><div class="deck-stat"><span>卡组</span><strong>${state.player.cards?.length || 0}</strong></div><div class="deck-stat"><span>遗物</span><strong>${state.player.relics?.length || 0}</strong></div><div class="data-empty" style="margin-top:18px">GameBuddy 不会替你点击选项。</div></section></div>`;
+  const knowledge = rec?.eventKnowledge || {};
+  return `<div class="draft-layout rest-layout"><section class="panel draft-offer"><div class="draft-kicker">${kicker}</div><h2 class="draft-title">${title}</h2><p class="recommendation-reason">${reason}</p><div class="draft-cards">${cards}</div></section><section class="panel draft-side"><div class="panel-heading"><span class="panel-title">当前局面</span><span class="panel-meta">${sourceLabel}</span></div><div class="deck-stat"><span>生命</span><strong>${state.player.hp || 0} / ${state.player.maxHp || 0}</strong></div><div class="deck-stat"><span>金币</span><strong>${state.player.gold ?? '--'}</strong></div><div class="deck-stat"><span>卡组</span><strong>${state.player.cards?.length || 0}</strong></div><div class="deck-stat"><span>遗物 / 药水</span><strong>${state.player.relics?.length || 0} / ${state.player.potions?.length || 0}</strong></div><div class="deck-stat"><span>事件资料</span><strong>${escapeHtml(knowledge.gameVersion || '运行时文本')}</strong></div><div class="deck-stat"><span>匹配方式</span><strong>${escapeHtml(knowledge.match || '未匹配')}</strong></div><div class="data-empty" style="margin-top:18px">随机结果保持未知；GameBuddy 不会替你点击选项。</div></section></div>`;
 }
 
 function draftView() {

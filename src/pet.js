@@ -117,8 +117,10 @@ function refreshCardMeta() {
   if (!recommendation || !petState.cardVisible) return;
   const confidence = Math.round((Number(recommendation.confidence) || 0) * 100);
   const version = recommendation.primary?.analysis?.stats?.knowledgeVersion
-    || recommendation.strategy?.gameVersion;
-  cardMeta.textContent = cardSourceLabel(recommendation, confidence, version);
+    || recommendation.strategy?.gameVersion
+    || recommendation.eventKnowledge?.gameVersion;
+  const match = recommendation.eventKnowledge?.match;
+  cardMeta.textContent = `${cardSourceLabel(recommendation, confidence, version)}${match ? ` · ${match}` : ''}`;
 }
 
 function applyThisRunSl(count) {
@@ -188,14 +190,20 @@ function setCardRecommendation(recommendation) {
   }
   if (recommendation.task === 'event_choice') {
     const alts = (recommendation.alternatives || []).slice(0, 2).map(item => item.label).filter(Boolean);
+    const analysis = primary.analysis || {};
     cardKicker.textContent = recommendation.eventKind === 'ancient' ? '开局祝福建议' : '事件建议';
     cardTitle.textContent = `建议选择「${primary.label || '这个选项'}」`;
     cardReason.textContent = recommendation.reason || '当前局面下，这是更稳妥的选项。';
-    cardPoints.innerHTML = `${cardPointList('为什么选它', [
-      primary.description || recommendation.reason || '结合当前牌组和生命，这项更划算'
-    ].filter(Boolean), 'positive')}${alts.length ? cardPointList('其他选项', alts, 'neutral') : ''}`;
+    cardPoints.innerHTML = `${cardPointList('主要收益', analysis.pros?.length
+      ? analysis.pros.slice(0, 3)
+      : [primary.description || '当前效果未形成结构化收益'].filter(Boolean), 'positive')}${cardPointList('代价与风险', [
+      ...(analysis.cons || []),
+      ...(analysis.unknown || [])
+    ].slice(0, 3), 'negative')}${alts.length ? cardPointList('其他选项', alts, 'neutral') : ''}`;
     const confidence = Math.round((Number(recommendation.confidence) || 0) * 100);
-    cardMeta.textContent = cardSourceLabel(recommendation, confidence);
+    const version = recommendation.eventKnowledge?.gameVersion;
+    const match = recommendation.eventKnowledge?.match;
+    cardMeta.textContent = `${cardSourceLabel(recommendation, confidence, version)}${match ? ` · ${match}` : ''}`;
     cardPanel.classList.add('visible');
     petState.cardVisible = true;
     petState.cardRecommendation = recommendation;
@@ -246,7 +254,9 @@ function setEncounterGuide(guide) {
     flushPendingSlSpeech();
     return;
   }
-  guideKicker.textContent = guide.kind === 'boss' ? 'BOSS 攻略' : '精英攻略';
+  const guideLabels = { boss: 'BOSS 攻略', elite: '精英攻略', normal: '小怪攻略' };
+  const speechLabels = { boss: 'Boss', elite: '精英', normal: '小怪' };
+  guideKicker.textContent = guideLabels[guide.kind] || '遭遇攻略';
   guideTitle.textContent = guide.title || '敌人机制';
   const monsters = (guide.monsters || []).map(monster => `
     <article class="guide-monster">
@@ -258,17 +268,19 @@ function setEncounterGuide(guide) {
   const strategy = guide.strategy;
   const summary = strategy?.summary
     ? `<p class="guide-summary strategy">${escapeHtml(strategy.summary)}</p>`
-    : '<p class="guide-summary">本场只有机制数据，暂无匹配的社区打法档案。</p>';
+    : '<p class="guide-summary">本场只有机制数据，暂无匹配的打法档案。</p>';
   guideContent.innerHTML = `${summary}${guideList('先检查你的牌组', strategy?.deckChecks, 'check')}${guideList('目标优先级', strategy?.priorityTargets, 'target')}${monsters}${guideList('主要危险', guide.dangers, 'danger')}${guideList('应对建议', guide.tips, 'tip')}${guideList('常见失误', strategy?.avoid, 'avoid')}`;
   const sourceCount = strategy?.sources?.length || 0;
   const confidence = strategy?.confidence === 'high' ? '高可信' : strategy?.confidence === 'medium' ? '中可信' : '';
-  guideSource.textContent = guide.source === 'spire-codex'
-    ? `机制：Spire Codex · 攻略：${sourceCount} 个社区来源${confidence ? ` · ${confidence}` : ''} · stable ${guide.gameVersion || '当前版本'}`
-    : '数据来源：游戏 Bridge · 未匹配到完整资料';
+  guideSource.textContent = guide.source !== 'spire-codex'
+    ? '数据来源：游戏 Bridge · 未匹配到完整资料'
+    : strategy?.basis === 'community'
+      ? `机制：Spire Codex · 攻略：${sourceCount} 个社区来源${confidence ? ` · ${confidence}` : ''} · stable ${guide.gameVersion || '当前版本'}`
+      : `机制与策略推导：Spire Codex · 非社区人工复核 · stable ${guide.gameVersion || '当前版本'}`;
   guidePanel.classList.add('visible');
   petState.guideVisible = true;
   applyPose();
-  say(`${guide.kind === 'boss' ? 'Boss' : '精英'}攻略来了`);
+  say(`${speechLabels[guide.kind] || '遭遇'}攻略来了`);
 }
 
 function setStatus(status) {
