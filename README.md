@@ -6,10 +6,17 @@ GameBuddy 是面向《杀戮尖塔 2》的 Windows AI 桌面搭子。它通过�
 
 ## 立即体验
 
-开发环境需要 Node.js 20+。首次安装依赖后，可直接启动带固定回放数据的完整界面：
+开发环境需要 Git、Node.js 20+ 和 npm。首次使用从源码获取项目并安装锁定依赖：
 
 ```bash
+git clone https://github.com/yukiykchen/gamebuddy.git
+cd gamebuddy
 npm ci
+```
+
+随后可直接启动带固定回放数据的完整界面：
+
+```bash
 npm run demo
 ```
 
@@ -115,7 +122,7 @@ GAMEBUDDY_LLM_REASONING_EFFORT=xhigh
 GAMEBUDDY_LLM_API_KEY=
 ```
 
-不要提交 `.env`。如果没有配置 Key，启动日志会显示 `GameBuddy LLM: rules only`，选牌、路线和休息处仍可使用规则建议。
+`GAMEBUDDY_LLM_BASE_URL` 可填写服务根地址或以 `/v1` 结尾的 API 地址，GameBuddy 会自动规范化；只支持 Chat Completions 的兼容服务应把 `GAMEBUDDY_LLM_WIRE_API` 改为 `chat`。不要把 GitHub PAT 等无关令牌当作模型 API Key，也不要提交 `.env`。如果没有配置 Key，启动日志会显示 `GameBuddy LLM: rules only`，选牌、路线、休息处和事件仍可使用规则建议。
 
 ## 接入真实游戏
 
@@ -134,7 +141,7 @@ GAMEBUDDY_LLM_API_KEY=
 npm run mod:build -- -Sts2Dir "C:\Program Files (x86)\Steam\steamapps\common\Slay the Spire 2"
 ```
 
-重启游戏并启用 `GameBuddy Bridge`，进入一局后启动桌面端：
+确认构建输出已经复制到 `<STS2>\mods\GameBuddyBridge`。完整退出游戏后重新启动，在游戏主菜单或设置中的 `Mods` / `Modding` 页面启用 `GameBuddy Bridge`（入口名称可能随 Early Access 版本变化），再开始或继续一局并启动桌面端：
 
 ```powershell
 npm start
@@ -162,7 +169,6 @@ npm run harness:inspect -- --once
 | `npm run knowledge:cards` | 按指定 stable / beta 版本刷新全卡评价 |
 | `npm run mod:build -- -Sts2Dir ...` | 在 Windows 构建并安装游戏 Mod |
 | `npm run dist:win` | 构建 Windows NSIS 安装包 |
-| `npm run codex` | 使用项目隔离配置启动 Codex CLI |
 
 ## 文档导航
 
@@ -183,6 +189,8 @@ npm run harness:inspect -- --once
 - 带有本地游戏安装的 `self-hosted, windows, sts2` Runner 构建 Mod。
 
 公开 Runner 无法获得游戏私有程序集，因此不能构建 `gamebuddy_bridge.dll`。Windows 安装包也不包含能够绕过游戏安装要求的 Mod 二进制；Mod 必须在合法安装游戏的 Windows 环境中构建。
+
+当前文档的完整受支持流程是“克隆源码 + 本机构建 Mod + `npm start`”。NSIS 安装包仅包含桌面端，尚未提供 Mod 自动安装和图形化 API Key 设置；使用安装包时仍需单独安装 Mod，并通过 Windows 用户环境变量配置 `GAMEBUDDY_LLM_*`。
 
 ## 已知限制
 

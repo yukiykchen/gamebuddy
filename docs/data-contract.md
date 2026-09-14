@@ -257,7 +257,7 @@ Spire Codex API 默认地址为 `https://spire-codex.com/api`，可用 `GAMEBUDD
 
 `fresh=false` 时不发新建议。应用只展示建议，不会替玩家点地图。
 
-LLM 默认读取本机 Codex CLI 配置（`~/.codex/config.toml`、`~/.codex/auth.json`）。环境变量 `GAMEBUDDY_LLM_BASE_URL`、`GAMEBUDDY_LLM_API_KEY`、`GAMEBUDDY_LLM_MODEL`、`GAMEBUDDY_LLM_WIRE_API` 可以覆盖。`wire_api = "responses"` 时请求 `/v1/responses`。
+LLM 配置来自项目根目录 `.env` 或启动进程的环境变量。`GAMEBUDDY_LLM_API_KEY` 优先于 `OPENAI_API_KEY`；`GAMEBUDDY_LLM_BASE_URL`、`GAMEBUDDY_LLM_MODEL`、`GAMEBUDDY_LLM_WIRE_API` 和 `GAMEBUDDY_LLM_REASONING_EFFORT` 控制服务、模型与接口。Base URL 会自动规范化到 `/v1`；`wire_api = "responses"` 时请求 `/v1/responses`，`chat` 时请求 `/v1/chat/completions`。当前实现不读取 Codex CLI 配置或鉴权文件。
 
 ## 接入边界
 

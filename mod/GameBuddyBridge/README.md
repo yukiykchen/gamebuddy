@@ -19,7 +19,7 @@
 
 ## 构建环境
 
-STS2 Mod 使用游戏随附的 Godot .NET SDK 和程序集。需要在 Windows、安装了游戏和 Godot .NET SDK 的机器上构建：
+STS2 Mod 使用游戏程序集和 `Godot.NET.Sdk/4.5.1`。需要在 Windows、安装了游戏、[.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0) 和 [MegaDot / Godot .NET 4.5.1](https://megadot.megacrit.com/) 的机器上构建。在 Steam 库中右键游戏并选择“管理 → 浏览本地文件”可找到实际安装目录：
 
 ```powershell
 dotnet build .\mod\GameBuddyBridge\GameBuddyBridge.csproj -c Release `
@@ -28,6 +28,25 @@ dotnet build .\mod\GameBuddyBridge\GameBuddyBridge.csproj -c Release `
 ```
 
 也可以设置 `STS2_DIR` 环境变量。构建前项目会检查 `data_sts2_windows_x86_64\sts2.dll` 和 `0Harmony.dll` 是否存在，避免生成一个看似成功但无法加载的 Mod。
+
+## 安装与启用
+
+带 `CopyModAfterBuild=true` 的构建会生成并复制以下文件：
+
+```text
+<STS2>\mods\GameBuddyBridge\gamebuddy_bridge.dll
+<STS2>\mods\GameBuddyBridge\GameBuddyBridge.json
+```
+
+完整退出游戏后重新启动，在首次 Mod 提示或主菜单/设置中的 `Mods` / `Modding` 页面启用 `GameBuddy Bridge`；Early Access 版本可能调整入口名称。manifest 的 `dependencies` 为空，因此无需安装 BaseLib、ModConfig 或其他第三方 Mod。游戏只在启动时扫描 Mod，替换 DLL 后必须重启。
+
+启用后开始或继续一局，在 GameBuddy 仓库根目录执行：
+
+```powershell
+npm run harness:inspect -- --once
+```
+
+输出包含 `source=sts2-mod-bridge` 即表示 Mod 已加载且本地 WebSocket 正常。若一直无法连接，依次检查 DLL/JSON 是否位于同一目录、Mod 是否启用、游戏是否已经重启，以及端口 `27182` 是否被 Replay Bridge 占用。
 
 ## 协议
 
