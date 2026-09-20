@@ -120,7 +120,7 @@ function refreshCardMeta() {
     || recommendation.strategy?.gameVersion
     || recommendation.eventKnowledge?.gameVersion;
   const match = recommendation.eventKnowledge?.match;
-  cardMeta.textContent = `${cardSourceLabel(recommendation, confidence, version)}${match ? ` · ${match}` : ''}`;
+  cardMeta.textContent = `${cardSourceLabel(recommendation, confidence, version)}${match ? ` · ${match}` : ''}${recommendation.task === 'map_route' ? recommendation.routesTruncated ? ' · 路线未完整枚举' : ' · 启发式比较' : ''}`;
 }
 
 function applyThisRunSl(count) {
@@ -171,6 +171,22 @@ function setCardRecommendation(recommendation) {
     return;
   }
   const primary = recommendation.primary || {};
+  if (recommendation.task === 'map_route') {
+    const profiles = recommendation.routeProfiles || {};
+    const healthLabel = profiles.healthBand === 'danger' ? '危险血量' : profiles.healthBand === 'caution' ? '谨慎血量' : '健康血量';
+    const profileLabel = profiles.active === 'safe' ? '保命策略' : profiles.active === 'balanced' ? '平衡策略' : '成长策略';
+    cardKicker.textContent = '路线分叉建议';
+    cardTitle.textContent = `建议走${primary.displayLabel || primary.label || '下一节点'}`;
+    cardReason.textContent = recommendation.reason || '当前局面下，这条路线的收益与风险更合适。';
+    cardPoints.innerHTML = `${cardPointList('当前策略', [`${healthLabel} · ${profileLabel}`, profiles[profiles.active]?.displayLabel || primary.displayLabel || '资料不足'], 'positive')}${cardPointList('三档对照', [`安全：${profiles.safe?.displayLabel || '资料不足'}`, `平衡：${profiles.balanced?.displayLabel || '资料不足'}`, `成长：${profiles.growth?.displayLabel || '资料不足'}`], 'neutral')}`;
+    cardMeta.textContent = `${cardSourceLabel(recommendation, Math.round((Number(recommendation.confidence) || 0) * 100))}${recommendation.routesTruncated ? ' · 路线未完整枚举' : ' · 启发式比较'}`;
+    cardPanel.classList.add('visible');
+    petState.cardVisible = true;
+    petState.cardRecommendation = recommendation;
+    applyPose();
+    say(`下一步建议走${primary.displayLabel || primary.label}`);
+    return;
+  }
   if (recommendation.task === 'rest_site') {
     cardKicker.textContent = '休息处建议';
     cardTitle.textContent = primary.action === 'HEAL'
@@ -338,10 +354,6 @@ function setRecommendation(recommendation) {
     return;
   }
   if (recommendation.task !== 'map_route' || !recommendation.primary?.label) return;
-  if (recommendation.tie?.isTie) {
-    say(`${recommendation.tie.label}，任选其一`);
-    return;
-  }
   say(`下一步建议走${recommendation.primary.displayLabel || recommendation.primary.label}`);
 }
 

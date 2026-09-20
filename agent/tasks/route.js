@@ -56,7 +56,7 @@ function scoreParts(type, ctx = {}) {
     case 'Elite': {
       const relicPayoff = relicCount <= 1 ? 12 : relicCount <= 4 ? 9 : 6;
       const payoff = relicPayoff + 4;
-      const risk = hpRatioValue < 0.35 ? -24
+      const risk = hpRatioValue <= 0.35 ? -24
         : hpRatioValue < 0.45 ? -16
         : hpRatioValue < 0.6 ? -7
         : hpRatioValue < 0.75 ? -3
@@ -66,8 +66,8 @@ function scoreParts(type, ctx = {}) {
     case 'RestSite': {
       const missing = 1 - hpRatioValue;
       const heal = missing >= 0.5 ? 14 : missing >= 0.3 ? 8 : missing >= 0.15 ? 3 : 0;
-      const smith = unupgraded >= 6 ? 9 : unupgraded >= 3 ? 7 : unupgraded >= 1 ? 5 : 3;
-      return { payoff: heal + smith, risk: 0 };
+      const smith = unupgraded >= 6 ? 9 : unupgraded >= 3 ? 7 : unupgraded >= 1 ? 5 : 0;
+      return { payoff: Math.max(heal, smith), risk: 0 };
     }
     case 'Shop': {
       const remove = gold >= 75
@@ -81,7 +81,7 @@ function scoreParts(type, ctx = {}) {
     case 'Ancient':
       return { payoff: 7, risk: 0 };
     case 'Unknown':
-      return { payoff: 4, risk: hpRatioValue < 0.35 ? -4 : 0 };
+      return { payoff: 4, risk: hpRatioValue <= 0.35 ? -4 : 0 };
     case 'Monster':
     case 'Boss':
     case 'Unassigned':
@@ -96,12 +96,77 @@ function scoreNode(type, ctx) {
   return parts.payoff + parts.risk;
 }
 
-function restAfterEliteBonus(upcoming, ctx) {
-  const eliteAt = upcoming.findIndex(node => node.type === 'Elite');
-  if (eliteAt < 0) return 0;
-  const restAfter = upcoming.some((node, index) => index > eliteAt && node.type === 'RestSite');
-  if (!restAfter) return 0;
-  return ctx.hpRatio < 0.55 ? 8 : 4;
+function healthBand(ctx) {
+  if (ctx.hpRatio <= 0.35) return 'danger';
+  if (ctx.hpRatio < 0.65) return 'caution';
+  return 'healthy';
+}
+
+function routeProfile(ctx) {
+  const band = healthBand(ctx);
+  return band === 'danger' ? 'safe' : band === 'caution' ? 'balanced' : 'growth';
+}
+
+function profileNodeScore(type, parts, ctx, profile) {
+  if (type === 'Elite') {
+    if (profile === 'safe') return parts.payoff * 0.45 + parts.risk * 1.6 - (ctx.hpRatio <= 0.2 ? 10 : 6);
+    if (profile === 'balanced') return parts.payoff * 0.8 + parts.risk * 1.15 - (ctx.hpRatio <= 0.45 ? 2 : 0);
+    return parts.payoff + parts.risk;
+  }
+  if (type === 'Monster') return profile === 'safe' ? (ctx.hpRatio <= 0.2 ? -5 : -3) : profile === 'balanced' ? 0 : 2;
+  if (type === 'Unknown') {
+    if (profile === 'safe') return parts.payoff * 0.4 + parts.risk - (ctx.hpRatio <= 0.2 ? 2 : 0);
+    if (profile === 'balanced') return parts.payoff * 0.75 + parts.risk;
+  }
+  return parts.payoff + parts.risk;
+}
+
+function sequenceBonus(upcoming, profile) {
+  let score = 0;
+  const notes = [];
+  for (let index = 0; index < upcoming.length; index += 1) {
+    const here = upcoming[index].type;
+    const next = upcoming[index + 1]?.type;
+    const twoAhead = upcoming[index + 2]?.type;
+    if (here === 'Elite' && next === 'RestSite') {
+      score += profile === 'safe' ? 2 : profile === 'balanced' ? 3 : 4;
+      notes.push('精英后紧接火堆');
+    } else if (here === 'Elite' && twoAhead === 'RestSite') {
+      score += 2;
+      notes.push('精英后隔一层有火堆');
+    }
+    if (here === 'RestSite' && next === 'Elite') {
+      score += 2;
+      notes.push('精英前紧接火堆');
+    }
+    if (here === 'Treasure' && next === 'Elite') {
+      score += 2;
+      notes.push('精英前有宝箱');
+    }
+  }
+  return { score, notes };
+}
+
+function routeStructure(upcoming, nodesById, profile) {
+  let flexibility = 0;
+  let longestCombatStreak = 0;
+  let combatStreak = 0;
+  for (const item of upcoming) {
+    flexibility += Math.max(0, nodeChildren(nodesById.get(item.id)).length - 1);
+    if (item.type === 'Monster' || item.type === 'Elite') {
+      combatStreak += 1;
+      longestCombatStreak = Math.max(longestCombatStreak, combatStreak);
+    } else {
+      combatStreak = 0;
+    }
+  }
+  const flexibilityBonus = Math.min(3, flexibility) * (profile === 'safe' ? 1 : profile === 'balanced' ? 0.75 : 0.5);
+  const pressurePenalty = Math.max(0, longestCombatStreak - 1) * (profile === 'safe' ? 3 : profile === 'balanced' ? 2 : 1);
+  return {
+    score: flexibilityBonus - pressurePenalty,
+    flexibility,
+    longestCombatStreak
+  };
 }
 
 function nodeChildren(node) {
@@ -167,9 +232,61 @@ function walkMapRoutes(byId, originId, bossId, maxRoutes) {
   return { routes, truncated };
 }
 
+function findContinuation(byId, originId, bossId) {
+  const path = [];
+  const seen = new Set();
+  function visit(id) {
+    if (!byId.has(id) || seen.has(id)) return false;
+    seen.add(id);
+    path.push(id);
+    const children = nodeChildren(byId.get(id)).filter(child => byId.has(child));
+    if ((bossId && id === bossId) || (!bossId && !children.length)) return true;
+    for (const child of children) {
+      if (visit(child)) return true;
+    }
+    path.pop();
+    seen.delete(id);
+    return false;
+  }
+  return visit(originId) ? path : null;
+}
+
+function coverCurrentChoices(map, routes, maxRoutes) {
+  const nodes = Array.isArray(map?.nodes) ? map.nodes : [];
+  const byId = new Map(nodes.map(node => [node.id, node]));
+  const current = map?.current;
+  if (!current || !byId.has(current)) return { routes, supplemented: false };
+  const children = nodeChildren(byId.get(current)).filter(id => byId.has(id));
+  if (!children.length) return { routes, supplemented: false };
+  const visited = map.visited || [];
+  const representatives = new Map();
+  for (const route of routes) {
+    const target = nextStep(route, current, visited);
+    if (children.includes(target) && !representatives.has(target)) representatives.set(target, route);
+  }
+  let supplemented = false;
+  for (const child of children) {
+    if (representatives.has(child)) continue;
+    const continuation = findContinuation(byId, child, map.boss || null);
+    if (!continuation) continue;
+    representatives.set(child, [current, ...continuation]);
+    supplemented = true;
+  }
+  if (!supplemented) return { routes, supplemented: false };
+  const result = [...representatives.values()];
+  for (const route of routes) {
+    if (result.length >= maxRoutes) break;
+    if (!result.includes(route)) result.push(route);
+  }
+  return { routes: result, supplemented: true };
+}
+
 function ensureMapRoutes(map, maxRoutes = 256) {
   if (!map || typeof map !== 'object') return { visited: [], nodes: [], routes: [] };
-  if (Array.isArray(map.routes) && map.routes.length) return map;
+  if (Array.isArray(map.routes) && map.routes.length) {
+    const covered = coverCurrentChoices(map, map.routes, maxRoutes);
+    return covered.supplemented ? { ...map, routes: covered.routes, routesTruncated: true } : map;
+  }
   const nodes = Array.isArray(map.nodes) ? map.nodes : [];
   if (!nodes.length) return map;
   const byId = new Map(nodes.map(node => [node.id, node]));
@@ -189,10 +306,11 @@ function ensureMapRoutes(map, maxRoutes = 256) {
   const toBoss = map.boss ? collected.filter(route => route.includes(map.boss)) : [];
   let routes = toBoss.length ? toBoss : collected.filter(route => route.length > 1);
   if (!routes.length) routes = origins.map(id => [id]);
+  const covered = coverCurrentChoices(map, routes, maxRoutes);
   return {
     ...map,
-    routes,
-    routesTruncated: truncated || Boolean(map.routesTruncated)
+    routes: covered.routes,
+    routesTruncated: truncated || covered.supplemented || Boolean(map.routesTruncated)
   };
 }
 
@@ -250,7 +368,7 @@ function targetPositionLabel(map, targetId) {
   return sameRow.length > 1 ? `从左第${position + 1}个` : '';
 }
 
-function rankRoutes(state) {
+function rankRoutes(state, requestedProfile) {
   const map = ensureMapRoutes(state?.map || {});
   const routes = Array.isArray(map.routes) ? map.routes : [];
   const nodes = Array.isArray(map.nodes) ? map.nodes : [];
@@ -258,6 +376,7 @@ function rankRoutes(state) {
   const current = map.current || null;
   const visited = Array.isArray(map.visited) ? map.visited : [];
   const ctx = buildScoreContext(state);
+  const profile = ['safe', 'balanced', 'growth'].includes(requestedProfile) ? requestedProfile : routeProfile(ctx);
 
   const ranked = routes.map((route, index) => {
     const targetId = nextStep(route, current, visited);
@@ -273,7 +392,7 @@ function rankRoutes(state) {
       const node = nodesById.get(id);
       if (!node) continue;
       const parts = scoreParts(node.type, ctx);
-      const nodeScore = parts.payoff + parts.risk;
+      const nodeScore = profileNodeScore(node.type, parts, ctx, profile);
       score += nodeScore;
       upcoming.push({
         id: node.id,
@@ -283,8 +402,10 @@ function rankRoutes(state) {
         risk: parts.risk
       });
     }
-    score += restAfterEliteBonus(upcoming, ctx);
-    if (ctx.hpRatio < 0.45) score += Math.max(0, 8 - route.length);
+    const sequence = sequenceBonus(upcoming, profile);
+    score += sequence.score;
+    const structure = routeStructure(upcoming, nodesById, profile);
+    score += structure.score;
     const target = nodesById.get(targetId);
     const eliteCount = upcoming.filter(node => node.type === 'Elite').length;
     const restSiteCount = upcoming.filter(node => node.type === 'RestSite').length;
@@ -295,6 +416,10 @@ function rankRoutes(state) {
       upcoming,
       eliteCount,
       restSiteCount,
+      profile,
+      flexibility: structure.flexibility,
+      longestCombatStreak: structure.longestCombatStreak,
+      sequenceNotes: sequence.notes,
       targetId: targetId || route[route.length - 1] || '',
       targetType: target?.type || '',
       target: target ? { row: target.row, col: target.col } : null,
@@ -307,12 +432,14 @@ function rankRoutes(state) {
     item.direction = directions.get(item.targetId) || item.targetPosition || '';
     item.displayLabel = `${item.direction}${item.label}`;
   }
-  return ranked.sort((a, b) =>
-    b.eliteCount - a.eliteCount
-    || b.restSiteCount - a.restSiteCount
-    || b.score - a.score
-    || a.index - b.index
-  );
+  const bestByTarget = new Map();
+  for (const item of ranked) {
+    const previous = bestByTarget.get(item.targetId);
+    if (!previous || item.score > previous.score || (item.score === previous.score && item.index < previous.index)) {
+      bestByTarget.set(item.targetId, item);
+    }
+  }
+  return [...bestByTarget.values()].sort((a, b) => b.score - a.score || a.index - b.index);
 }
 
 function explainRoute(ranked, state) {
@@ -324,6 +451,7 @@ function explainRoute(ranked, state) {
   clauses.push(`这条路线后续有 ${ranked.eliteCount} 个精英和 ${ranked.restSiteCount} 个火堆`);
   const followUp = ranked.upcoming.slice(1, 4).map(node => mapTypeLabel(node.type));
   if (followUp.length) clauses.push(`通过后续是 ${followUp.join(' → ')}`);
+  if (ranked.sequenceNotes.length) clauses.push(ranked.sequenceNotes.slice(0, 2).join('、'));
 
   if (ranked.targetType === 'Elite' || types.has('Elite')) {
     if (ctx.hpRatio < 0.45) clauses.push('精英有遗物和更好的卡牌奖励，但当前生命偏危险');
@@ -342,12 +470,13 @@ function explainRoute(ranked, state) {
   return `下一步走${nextLabel}。${clauses.join('；')}。`;
 }
 
-function confidenceFor(ranked, source) {
+function confidenceFor(ranked, source, routesTruncated) {
   const best = ranked[0]?.score || 0;
   const second = ranked[1]?.score ?? best;
   const gap = best - second;
   const base = source === 'llm' ? 0.7 : 0.52;
-  return Math.max(0.4, Math.min(source === 'llm' ? 0.9 : 0.78, base + gap / 40));
+  const upperBound = gap <= 1.5 ? 0.55 : routesTruncated ? 0.55 : source === 'llm' ? 0.9 : 0.78;
+  return Math.max(0.4, Math.min(upperBound, base + gap / 40));
 }
 
 function toAlternative(item) {
@@ -364,25 +493,29 @@ function toAlternative(item) {
   };
 }
 
-function sameRouteRank(left, right) {
+function similarRouteEvidence(left, right) {
   return Boolean(left && right
-    && left.eliteCount === right.eliteCount
-    && left.restSiteCount === right.restSiteCount
-    && left.score === right.score);
+    && Math.abs(left.score - right.score) <= 1.5
+    && left.upcoming.map(node => node.type).join(',') === right.upcoming.map(node => node.type).join(','));
 }
 
-function buildRecommendation(chosen, ranked, { source, reason, now }) {
-  const equalBest = sameRouteRank(chosen, ranked[0])
-    ? ranked.filter(item => sameRouteRank(item, chosen) && item.targetId !== chosen.targetId)
+function profileSummary(item) {
+  return item ? { targetId: item.targetId, displayLabel: item.displayLabel, score: item.score, route: item.route } : null;
+}
+
+function buildRecommendation(chosen, ranked, { source, reason, now, routeProfiles, routesTruncated }) {
+  const closeAlternatives = similarRouteEvidence(chosen, ranked[0])
+    ? ranked.filter(item => similarRouteEvidence(item, chosen) && item.targetId !== chosen.targetId)
     : [];
-  const equivalentItems = equalBest.length
-    ? [...new Map([chosen, ...equalBest].map(item => [item.targetId, item])).values()]
+  const closeItems = closeAlternatives.length
+    ? [...new Map([chosen, ...closeAlternatives].map(item => [item.targetId, item])).values()]
       .sort((left, right) => (left.target?.col ?? 0) - (right.target?.col ?? 0))
     : [];
-  const tie = equivalentItems.length > 1 ? {
-    isTie: true,
-    label: `${[...new Set(equivalentItems.map(item => item.displayLabel))].join('、')}等价`,
-    targets: equivalentItems.map(item => ({
+  const uncertainty = closeItems.length > 1 ? {
+    isClose: true,
+    label: '当前可见信息下差距较小',
+    preferredTargetId: chosen.targetId,
+    targets: closeItems.map(item => ({
       targetId: item.targetId,
       label: item.label,
       displayLabel: item.displayLabel,
@@ -396,8 +529,10 @@ function buildRecommendation(chosen, ranked, { source, reason, now }) {
     task: 'map_route',
     timestamp: now,
     source,
-    confidence: confidenceFor(ranked, source),
+    confidence: confidenceFor(ranked, source, routesTruncated),
     reason,
+    routeProfiles,
+    routesTruncated,
     primary: {
       action: 'TAKE_ROUTE',
       targetId: chosen.targetId,
@@ -411,11 +546,12 @@ function buildRecommendation(chosen, ranked, { source, reason, now }) {
       score: chosen.score
     },
     alternatives: ranked.filter(item => item !== chosen).slice(0, 4).map(toAlternative),
-    tie
+    uncertainty,
+    tie: null
   };
 }
 
-function promptPayload(state, ranked) {
+function promptPayload(state, ranked, routeProfiles) {
   const ctx = buildScoreContext(state);
   const player = state?.player || {};
   return {
@@ -429,7 +565,10 @@ function promptPayload(state, ranked) {
     unupgraded: ctx.unupgraded,
     removableStarters: ctx.removable,
     current: state?.map?.current || null,
-    candidates: ranked.slice(0, 5).map((item, index) => ({
+    activeProfile: routeProfiles.active,
+    healthBand: routeProfiles.healthBand,
+    routesTruncated: Boolean(state?.map?.routesTruncated),
+    candidates: ranked.map((item, index) => ({
       index,
       score: item.score,
       next: item.label,
@@ -440,6 +579,12 @@ function promptPayload(state, ranked) {
       direction: item.direction || null,
       eliteCount: item.eliteCount,
       restSiteCount: item.restSiteCount,
+      safeScore: routeProfiles.safeScores[item.targetId] ?? null,
+      balancedScore: routeProfiles.balancedScores[item.targetId] ?? null,
+      growthScore: routeProfiles.growthScores[item.targetId] ?? null,
+      flexibility: item.flexibility,
+      longestCombatStreak: item.longestCombatStreak,
+      sequenceNotes: item.sequenceNotes,
       path: item.upcoming.map(node => mapTypeLabel(node.type)).join(' → '),
       payoff: item.upcoming.reduce((sum, node) => sum + (node.payoff || 0), 0),
       risk: item.upcoming.reduce((sum, node) => sum + (node.risk || 0), 0),
@@ -449,8 +594,23 @@ function promptPayload(state, ranked) {
 }
 
 async function recommendRoute(state, { llm, now = Date.now() } = {}) {
-  const ranked = rankRoutes({ ...state, map: ensureMapRoutes(state?.map || {}) });
+  const routableState = { ...state, map: ensureMapRoutes(state?.map || {}) };
+  const ranked = rankRoutes(routableState);
   if (!ranked.length || !ranked[0].targetId) return null;
+  const safeRanked = rankRoutes(routableState, 'safe');
+  const balancedRanked = rankRoutes(routableState, 'balanced');
+  const growthRanked = rankRoutes(routableState, 'growth');
+  const ctx = buildScoreContext(routableState);
+  const routeProfiles = {
+    active: ranked[0].profile,
+    healthBand: healthBand(ctx),
+    safe: profileSummary(safeRanked[0]),
+    balanced: profileSummary(balancedRanked[0]),
+    growth: profileSummary(growthRanked[0]),
+    safeScores: Object.fromEntries(safeRanked.map(item => [item.targetId, item.score])),
+    balancedScores: Object.fromEntries(balancedRanked.map(item => [item.targetId, item.score])),
+    growthScores: Object.fromEntries(growthRanked.map(item => [item.targetId, item.score]))
+  };
 
   let chosen = ranked[0];
   let source = 'rules';
@@ -458,9 +618,10 @@ async function recommendRoute(state, { llm, now = Date.now() } = {}) {
 
   if (llm?.enabled && typeof llm.completeRoute === 'function') {
     try {
-      const pick = await llm.completeRoute(promptPayload(state, ranked));
+      const pick = await llm.completeRoute(promptPayload(routableState, ranked, routeProfiles));
       const index = Number(pick?.index);
-      if (Number.isInteger(index) && ranked[index]) {
+      const maxDeviation = routeProfiles.active === 'safe' ? 6 : routeProfiles.active === 'balanced' ? 10 : Infinity;
+      if (Number.isInteger(index) && ranked[index] && ranked[index].score >= ranked[0].score - maxDeviation) {
         chosen = ranked[index];
         source = 'llm';
         if (typeof pick.reason === 'string' && pick.reason.trim()) reason = pick.reason.trim();
@@ -472,17 +633,29 @@ async function recommendRoute(state, { llm, now = Date.now() } = {}) {
     }
   }
 
-  const equalBest = sameRouteRank(chosen, ranked[0])
-    ? ranked.filter(item => sameRouteRank(item, chosen) && item.targetId !== chosen.targetId)
+  const closeAlternatives = similarRouteEvidence(chosen, ranked[0])
+    ? ranked.filter(item => similarRouteEvidence(item, chosen) && item.targetId !== chosen.targetId)
     : [];
-  if (equalBest.length) {
-    const labels = [...new Set([chosen, ...equalBest]
+  if (closeAlternatives.length) {
+    const labels = [...new Set([chosen, ...closeAlternatives]
       .sort((left, right) => (left.target?.col ?? 0) - (right.target?.col ?? 0))
       .map(item => item.displayLabel))].join('和');
-    reason = `${labels}当前评分相同，后续收益与风险没有可验证差异，可以任选。`;
+    reason = `${labels}在当前可见信息下差距较小，暂时优先${chosen.displayLabel}；这不是客观等价，未知事件和后续局面可能改变排序。`;
   }
 
-  return buildRecommendation(chosen, ranked, { source, reason, now });
+  const profileLabel = routeProfiles.active === 'safe' ? '危险生命的保命策略' : routeProfiles.active === 'balanced' ? '谨慎平衡策略' : '健康生命的成长策略';
+  const profileChoices = [routeProfiles.safe, routeProfiles.balanced, routeProfiles.growth].filter(Boolean);
+  const distinctProfileTargets = new Set(profileChoices.map(item => item.targetId));
+  if (distinctProfileTargets.size > 1) {
+    reason += ` 安全视角偏向${routeProfiles.safe.displayLabel}，平衡视角偏向${routeProfiles.balanced.displayLabel}，收益视角偏向${routeProfiles.growth.displayLabel}；当前采用${profileLabel}。`;
+  } else if (chosen.targetId !== routeProfiles.safe?.targetId) {
+    reason += ` 三种规则视角都偏向${routeProfiles.safe.displayLabel}；本次模型改选${chosen.displayLabel}，请留意取舍。`;
+  } else {
+    reason += ` 三种视角都偏向${routeProfiles.safe.displayLabel}；当前采用${profileLabel}。`;
+  }
+  if (routableState.map.routesTruncated) reason += ' 地图路线枚举已截断，后续比较可能不完整。';
+
+  return buildRecommendation(chosen, ranked, { source, reason, now, routeProfiles, routesTruncated: Boolean(routableState.map.routesTruncated) });
 }
 
 function routeSignature(state) {
@@ -507,6 +680,7 @@ module.exports = {
   mapTypeLabel,
   hpRatio,
   buildScoreContext,
+  healthBand,
   scoreParts,
   scoreNode,
   ensureMapRoutes,

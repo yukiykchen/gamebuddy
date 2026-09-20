@@ -220,7 +220,7 @@ Spire Codex API 默认地址为 `https://spire-codex.com/api`，可用 `GAMEBUDD
 
 同一份 `strategy` 也会挂到卡牌奖励 Agent 的 `threats.knownBoss`、`possibleElites` 和 `knownUpcomingElites` 上，并随完整遭遇上下文送入 LLM。这样模型评判奖励牌时能针对具体遭遇的牌组检查和常见失误，而不是只看到笼统的 Boss / Elite 标签。
 
-路线任务在没有配置 LLM 时用规则打分：每个节点拆成**收益**和**风险**。精英按遗物缺口和生命评估；火堆同时计算回血和未升级牌的敲升级价值；商店按金币、卡组厚度和打击/防御数量计算删牌与购物。同一条路上精英后面有火堆时会加协同分。进入休息处后，`rest-site-strategy` Skill 会逐张比较升级前后效果，并结合完整牌组、遗物、药水、地图、生命安全线和近期强敌，单独建议 **回血还是升级哪一张牌**。有 OpenAI 兼容接口时，模型只在规则生成的真实候选中复核选择和解释。同一层出现多个同类型节点时，建议会携带 `targetId`、`target.row`、`target.col`、`direction` 和 `displayLabel`；最高分存在多个不同目标时，`tie.isTie=true`，客户端应展示为等价路线而非任意宣称其中一条更优。
+路线任务在没有配置 LLM 时用规则打分：每个节点拆成**收益**和**风险**，并在安全、平衡与成长三个视角下评价。生命 ≥65% 视为健康并采用成长视角，35%～65% 采用平衡视角，生命 ≤35% 视为危险并采用安全视角。精英按遗物缺口和生命评估，火堆考虑回血与升级，商店按金币和删牌需求估计价值；路线还会考虑后续分叉带来的调整空间和连续战斗压力。精英附近的火堆、精英前的宝箱只在相邻或隔一层时加有限协同分，不把未来不确定收益当成保证。当前可选入口一一去重，各取最佳后续路径，再交给 LLM 受限复核；明显违背危险生命安全首选的模型选择会被拒绝。`routeProfiles` 给出三种视角的入口和相对分，`routesTruncated` 表示地图枚举未完整；分数不是胜率或伤害预测。进入休息处后，`rest-site-strategy` Skill 会逐张比较升级前后效果，并结合完整牌组、遗物、药水、地图、生命安全线和近期强敌，单独建议 **回血还是升级哪一张牌**。同一层出现多个同类型节点时，建议会携带 `targetId`、`target.row`、`target.col`、`direction` 和 `displayLabel`；当可见信息无法拉开差距时，仍保留一个暂时首选、降低置信度，并用 `uncertainty.isClose=true` 标记，而不宣称不同路线客观等价。
 
 ```json
 {
@@ -230,6 +230,17 @@ Spire Codex API 默认地址为 `https://spire-codex.com/api`，可用 `GAMEBUDD
   "source": "rules",
   "confidence": 0.62,
   "reason": "金币还够用，下一步可以进商店调整卡组。",
+  "routesTruncated": false,
+  "routeProfiles": {
+    "active": "growth",
+    "healthBand": "healthy",
+    "safe": { "targetId": "2,0", "displayLabel": "左侧商店", "score": 19, "route": ["1,0", "2,0", "3,0"] },
+    "balanced": { "targetId": "2,0", "displayLabel": "左侧商店", "score": 19, "route": ["1,0", "2,0", "3,0"] },
+    "growth": { "targetId": "2,0", "displayLabel": "左侧商店", "score": 19, "route": ["1,0", "2,0", "3,0"] },
+    "safeScores": { "2,0": 19, "2,1": 6 },
+    "balancedScores": { "2,0": 19, "2,1": 11 },
+    "growthScores": { "2,0": 19, "2,1": 16 }
+  },
   "primary": {
     "action": "TAKE_ROUTE",
     "targetId": "2,0",
@@ -251,6 +262,7 @@ Spire Codex API 默认地址为 `https://spire-codex.com/api`，可用 `GAMEBUDD
       "score": 7
     }
   ],
+  "uncertainty": null,
   "tie": null
 }
 ```

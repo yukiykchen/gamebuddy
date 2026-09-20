@@ -254,7 +254,7 @@ function createOpenAiClient(config = readLlmConfig(), { fetchImpl = globalThis.f
   return {
     enabled,
     completeRoute: payload => completeJson(
-      '你是杀戮尖塔 2 的路线顾问。权衡收益和风险：精英给遗物和更好的牌；火堆可回血或升级；商店可删牌和买东西提高战斗力。候选中的 targetId、row、col、direction 和 displayLabel 用于唯一定位节点；四个或更多入口时必须使用“从左第 N 个”，不得笼统称为“中间”，也不得把同类型节点混为一条路线。只从给定候选里选一条，不要发明新路线，不要建议出牌。若多条候选收益与风险相同，应明确说明它们等价。用 JSON 回答：{"index":0,"reason":"两句中文解释"}。',
+      '你是杀戮尖塔 2 的路线顾问。每个候选是当前一个不同的可点击入口及其最佳后续路径。healthBand 按生命分为 healthy（至少 65%）、caution（高于 35% 且低于 65%）和 danger（至多 35%）；activeProfile 对应 growth、balanced、safe。safeScore、balancedScore 和 growthScore 只是启发式相对分，不是胜率或伤害预测。权衡当前生命、金币、精英收益、火堆、商店、路线灵活性、连续战斗压力和已知路径；危险血量时不能靠臆测未来回血来忽略明显风险。targetId、row、col、direction 和 displayLabel 用于唯一定位节点；四个或更多入口时必须使用“从左第 N 个”，不得笼统称为“中间”。只从给定候选里选一条，不要发明新路线或未知问号结果，不要建议出牌。即使分数相同，也要保留一个暂时首选，并说明当前证据无法拉开差距，不得宣称路线客观等价。routesTruncated 为真时承认路线枚举不完整。用 JSON 回答：{"index":0,"reason":"两句中文解释，说明安全、成长和不确定性的取舍"}。',
       payload,
       'map_route'
     ),

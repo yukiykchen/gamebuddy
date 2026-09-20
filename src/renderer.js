@@ -258,7 +258,7 @@ function mapNodeClass(type, id) {
   const rec = state.recommendation?.task === 'map_route' ? state.recommendation : null;
   if (id && id === state.map?.current) classes.push('current');
   if (rec?.primary?.route?.includes(id) && id !== state.map?.current) classes.push('on-route');
-  if (id && (id === rec?.primary?.targetId || rec?.tie?.targets?.some(target => target.targetId === id))) classes.push('recommended');
+  if (id && id === rec?.primary?.targetId) classes.push('recommended');
   if (type === 'Elite') classes.push('elite');
   if (type === 'RestSite') classes.push('rest');
   if (type === 'Boss') classes.push('boss');
@@ -291,16 +291,25 @@ function routeView() {
       return mapTypeLabel(node?.type);
     }).join(' → ');
     const recommended = Boolean(rec && sameRoute(route, rec.primary.route));
-    const equivalent = Boolean(rec?.tie?.targets?.some(target => route.includes(target.targetId)));
-    return `<div class="route-choice${recommended || equivalent ? ' recommended' : ''}"><strong>${equivalent ? '等价路线' : recommended ? '建议路线' : `路线 ${String(index + 1).padStart(2, '0')}`}</strong><span>${escapeHtml(labels)}</span></div>`;
+    const closeAlternative = Boolean(rec?.uncertainty?.targets?.some(target => target.targetId !== rec.primary?.targetId && route.includes(target.targetId)));
+    return `<div class="route-choice${recommended ? ' recommended' : ''}"><strong>${recommended ? '建议路线' : closeAlternative ? '接近备选' : `路线 ${String(index + 1).padStart(2, '0')}`}</strong><span>${escapeHtml(labels)}</span></div>`;
   }).join('');
-  const routeTitle = rec?.tie?.isTie ? rec.tie.label : rec?.primary?.displayLabel || rec?.primary?.label;
+  const routeTitle = rec?.primary?.displayLabel || rec?.primary?.label;
   const title = routeTitle ? `下一步：${escapeHtml(routeTitle)}` : state.run.currentNode ? mapTypeLabel(state.run.currentNode) : '等待地图状态';
   const reason = rec?.reason ? escapeHtml(rec.reason) : (nodes.length
     ? `本层 ${nodes.length} 个节点，从当前位置出发有 ${routes.length} 条可达 Boss 的路线${map.routesTruncated ? '（已截断）' : ''}。`
     : '启动游戏并打开地图后，这里会显示真实位置和全部路线。');
+  const profileRows = rec?.routeProfiles
+    ? ['safe', 'balanced', 'growth'].map(profile => {
+        const choice = rec.routeProfiles[profile];
+        if (!choice) return '';
+        const title = profile === 'safe' ? '安全视角' : profile === 'balanced' ? '平衡视角' : '收益视角';
+        const active = rec.routeProfiles.active === profile ? ' · 当前采用' : '';
+        return `<div class="route-choice${choice.targetId === rec.primary?.targetId ? ' recommended' : ''}"><strong>${title}${active}</strong><span>${escapeHtml(choice.displayLabel)} · 仅比较真实可达路线，不预测伤害</span></div>`;
+      }).join('')
+    : '';
   const sourceLabel = rec ? (rec.source === 'llm' ? '模型' : '规则') : '等待分析';
-  return `<div class="route-layout"><section class="panel map-panel"><div class="panel-heading"><span class="panel-title">当前地图</span><span class="panel-meta">${map.current || state.run.currentCoord || '等待地图数据'}</span></div>${mapGrid}<div class="map-legend"><span>战斗</span><span class="legend-elite">精英</span><span>问号</span><span>商店</span><span class="legend-rest">休息处</span><span class="legend-current">当前位置</span><span class="legend-recommended">建议下一步</span></div></section><section class="panel route-advice"><div class="eyebrow">MAP / ${rec ? 'RECOMMENDATION' : 'LIVE STATE'}</div><h2>${title}</h2><p>${reason}</p>${routeList || `<div class="route-choice"><strong>已访问节点</strong><span>${visited || '--'}</span></div>`}<div class="score-row" style="margin-top:24px"><div class="score-number">${rec ? Math.round((rec.confidence || 0) * 100) : routes.length || '--'}</div><div class="score-copy"><strong>${rec ? `${sourceLabel}置信度` : '可达路线'}</strong><span>${rec ? `还有 ${rec.alternatives?.length || 0} 条备选 · 共 ${routes.length} 条可达 Boss` : Object.entries(typeCounts).map(([type, count]) => `${mapTypeLabel(type)} ${count}`).join(' · ') || '等待完整地图数据'}</span></div></div></section></div>`;
+  return `<div class="route-layout"><section class="panel map-panel"><div class="panel-heading"><span class="panel-title">当前地图</span><span class="panel-meta">${map.current || state.run.currentCoord || '等待地图数据'}</span></div>${mapGrid}<div class="map-legend"><span>战斗</span><span class="legend-elite">精英</span><span>问号</span><span>商店</span><span class="legend-rest">休息处</span><span class="legend-current">当前位置</span><span class="legend-recommended">建议下一步</span></div></section><section class="panel route-advice"><div class="eyebrow">MAP / ${rec ? 'RECOMMENDATION' : 'LIVE STATE'}</div><h2>${title}</h2><p>${reason}</p>${profileRows}${routeList || `<div class="route-choice"><strong>已访问节点</strong><span>${visited || '--'}</span></div>`}<div class="score-row" style="margin-top:24px"><div class="score-number">${rec ? Math.round((rec.confidence || 0) * 100) : routes.length || '--'}</div><div class="score-copy"><strong>${rec ? `${sourceLabel}置信度` : '可达路线'}</strong><span>${rec ? `还有 ${rec.alternatives?.length || 0} 个备选入口 · 共 ${routes.length} 条可达 Boss 路线${rec.routesTruncated ? '（枚举已截断）' : ''}` : Object.entries(typeCounts).map(([type, count]) => `${mapTypeLabel(type)} ${count}`).join(' · ') || '等待完整地图数据'}</span></div></div></section></div>`;
 }
 
 function render() {

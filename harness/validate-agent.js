@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { createObservationStore } = require('./observation-store');
 const { validateRecommendation } = require('../agent/recommendation');
-const { rankRoutes, recommendRoute, scoreNode, scoreParts, buildScoreContext, ensureMapRoutes, routeChoiceCount } = require('../agent/tasks/route');
+const { rankRoutes, recommendRoute, scoreNode, scoreParts, buildScoreContext, healthBand, ensureMapRoutes, routeChoiceCount } = require('../agent/tasks/route');
 const { isRestSite, recommendRest, rankSmithCards } = require('../agent/tasks/rest');
 const { findCardReward, recommendCardReward, analyzeCard, cardRewardSignature } = require('../agent/tasks/card-reward');
 const { resolveItem, inferUpgraded, rankEncounterMatches } = require('../agent/knowledge/spire-codex');
@@ -18,9 +18,9 @@ const lifecycle = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'l
 const mapState = lifecycle[2];
 
 const shopOverElite = rankRoutes(mapState);
-assert.equal(shopOverElite[0].targetType, 'Elite');
-assert.equal(shopOverElite[0].eliteCount, 1);
-assert.equal(shopOverElite[1].eliteCount, 0);
+assert.equal(shopOverElite[0].targetType, 'Shop');
+assert.equal(shopOverElite[0].eliteCount, 0);
+assert.equal(shopOverElite[1].eliteCount, 1);
 
 const shopCtx = buildScoreContext(mapState);
 assert.ok(scoreParts('Shop', shopCtx).payoff > scoreParts('Elite', shopCtx).payoff);
@@ -31,8 +31,11 @@ const lowHpState = {
   player: { ...mapState.player, hp: 20, maxHp: 80, gold: 109 }
 };
 const lowHp = rankRoutes(lowHpState);
-assert.equal(lowHp[0].targetType, 'Elite');
+assert.equal(lowHp[0].targetType, 'Shop');
 assert.ok(scoreNode('Elite', buildScoreContext(lowHpState)) < 0);
+assert.equal(healthBand({ hpRatio: 0.65 }), 'healthy');
+assert.equal(healthBand({ hpRatio: 0.5 }), 'caution');
+assert.equal(healthBand({ hpRatio: 0.35 }), 'danger');
 
 const healthyElite = rankRoutes({
   ...mapState,
@@ -61,6 +64,7 @@ const fullHpSmith = rankRoutes({
 });
 assert.equal(fullHpSmith[0].targetType, 'RestSite');
 assert.ok(scoreParts('RestSite', buildScoreContext({ player: { ...mapState.player, hp: 80, maxHp: 80 } })).payoff >= 9);
+assert.equal(scoreParts('RestSite', buildScoreContext({ player: { ...mapState.player, hp: 40, maxHp: 80 } })).payoff, 14);
 
 const upgradePriorities = rankSmithCards([
   { id: 'TEST_DRAW', name: '测试过牌', type: 'Skill', cost: 1, upgraded: false, description: '抽1张牌。', upgradeDescription: '抽2张牌。' },
@@ -144,6 +148,39 @@ assert.deepEqual(
   fourBattleRoutes.map(route => route.displayLabel),
   ['从左第1个战斗', '从左第2个战斗', '从左第3个战斗', '从左第4个战斗']
 );
+
+const sharedEntranceState = {
+  ...twoTreasureState,
+  map: {
+    visited: ['1,1'],
+    current: '1,1',
+    boss: '4,1',
+    nodes: [
+      { id: '1,1', row: 1, col: 1, type: 'RestSite', children: ['2,0', '2,2'] },
+      { id: '2,0', row: 2, col: 0, type: 'Treasure', children: ['3,0', '3,1'] },
+      { id: '2,2', row: 2, col: 2, type: 'Shop', children: ['3,2'] },
+      { id: '3,0', row: 3, col: 0, type: 'Unknown', children: ['4,1'] },
+      { id: '3,1', row: 3, col: 1, type: 'RestSite', children: ['4,1'] },
+      { id: '3,2', row: 3, col: 2, type: 'Monster', children: ['4,1'] },
+      { id: '4,1', row: 4, col: 1, type: 'Boss', children: [] }
+    ],
+    routes: [
+      ['1,1', '2,0', '3,0', '4,1'],
+      ['1,1', '2,0', '3,1', '4,1'],
+      ['1,1', '2,2', '3,2', '4,1']
+    ]
+  }
+};
+assert.equal(rankRoutes(sharedEntranceState).length, 2);
+assert.equal(rankRoutes(sharedEntranceState).find(item => item.targetId === '2,0').route[2], '3,1');
+
+const truncatedChoices = ensureMapRoutes({
+  ...sharedEntranceState.map,
+  routes: [['1,1', '2,0', '3,1', '4,1']],
+  routesTruncated: true
+});
+assert.equal(routeChoiceCount({ map: truncatedChoices }), 2);
+assert.equal(truncatedChoices.routes.length, 2);
 
 function restState(hp) {
   return {
@@ -231,8 +268,11 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   assert.equal(rulesRec.source, 'rules');
   assert.equal(rulesRec.task, 'map_route');
   assert.equal(rulesRec.primary.action, 'TAKE_ROUTE');
-  assert.equal(rulesRec.primary.targetId, '2,1');
-  assert.match(rulesRec.reason, /精英和.*火堆|遗物|升级/);
+  assert.equal(rulesRec.primary.targetId, '2,0');
+  assert.equal(rulesRec.routeProfiles.active, 'growth');
+  assert.equal(rulesRec.routeProfiles.healthBand, 'healthy');
+  assert.ok(rulesRec.routeProfiles.balanced);
+  assert.match(rulesRec.reason, /商店|购物/);
 
   const llm = {
     enabled: true,
@@ -240,14 +280,31 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   };
   const llmRec = await recommendRoute(mapState, { llm, now: 2 });
   assert.equal(llmRec.source, 'llm');
-  assert.equal(llmRec.primary.label, '商店');
+  assert.equal(llmRec.primary.label, '精英');
   assert.match(llmRec.reason, /精英/);
 
+  const unsafePick = await recommendRoute(lowHpState, { llm, now: 2 });
+  assert.equal(unsafePick.primary.targetId, '2,0');
+  assert.equal(unsafePick.routeProfiles.active, 'safe');
+
+  let sharedPayload;
+  await recommendRoute(sharedEntranceState, {
+    now: 2,
+    llm: { enabled: true, completeRoute: async payload => {
+      sharedPayload = payload;
+      return { index: 0, reason: '比较两个不同入口。' };
+    } }
+  });
+  assert.deepEqual(new Set(sharedPayload.candidates.map(item => item.targetId)), new Set(['2,0', '2,2']));
+  assert.equal(sharedPayload.candidates.length, 2);
+
   const tiedTreasureRec = await recommendRoute(twoTreasureState, { now: 2 });
-  assert.equal(tiedTreasureRec.tie.isTie, true);
-  assert.equal(tiedTreasureRec.tie.targets.length, 2);
+  assert.equal(tiedTreasureRec.tie, null);
+  assert.equal(tiedTreasureRec.uncertainty.isClose, true);
+  assert.equal(tiedTreasureRec.uncertainty.targets.length, 2);
   assert.equal(tiedTreasureRec.primary.displayLabel, '左侧宝箱');
-  assert.match(tiedTreasureRec.reason, /可以任选/);
+  assert.match(tiedTreasureRec.reason, /暂时优先左侧宝箱/);
+  assert.doesNotMatch(tiedTreasureRec.reason, /任选/);
 
   let capturedRoutePayload;
   await recommendRoute(twoTreasureState, {
@@ -402,8 +459,8 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
     now: () => 3
   });
   const first = await orchestrator.consider(observation);
-  assert.equal(first.primary.targetId, '2,1');
-  assert.equal(published.primary.targetId, '2,1');
+  assert.equal(first.primary.targetId, '2,0');
+  assert.equal(published.primary.targetId, '2,0');
   const second = await orchestrator.consider(observation);
   assert.equal(second, first);
 

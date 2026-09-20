@@ -139,14 +139,14 @@ function clearAgentThinking(task) {
 
 function publishRecommendation(recommendation) {
   broadcast('bridge-recommendation', recommendation);
-  if (recommendation?.task === 'card_reward' || recommendation?.task === 'rest_site' || recommendation?.task === 'event_choice') {
+  if (recommendation?.task === 'card_reward' || recommendation?.task === 'rest_site' || recommendation?.task === 'event_choice' || recommendation?.task === 'map_route') {
     activeCardRecommendation = recommendation;
     syncPetWindowSize();
     keepPetVisible();
     petWindow?.webContents.send('bridge-card-recommendation', recommendation);
     return;
   }
-  if (recommendation && activeCardRecommendation) {
+  if (activeCardRecommendation && (!recommendation || recommendation.task !== activeCardRecommendation.task)) {
     clearCardRecommendation();
   }
 }
