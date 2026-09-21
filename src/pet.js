@@ -14,6 +14,9 @@ const cardTitle = document.querySelector('#card-title');
 const cardReason = document.querySelector('#card-reason');
 const cardPoints = document.querySelector('#card-points');
 const cardMeta = document.querySelector('#card-meta');
+const spriteRoot = document.querySelector('#pet-sprite');
+const { createPetSprite } = window.GameBuddyPetSprite;
+const petSprite = createPetSprite(spriteRoot);
 
 const ADVICE_TASKS = new Set(['card_reward', 'rest_site', 'map_route', 'event_choice']);
 const POSES = new Set(['waiting', 'watching', 'thinking', 'advising']);
@@ -114,7 +117,7 @@ function refreshCardMeta() {
 function applyPose() {
   const pose = currentPose();
   if (!POSES.has(pose)) return;
-  stage.dataset.pose = pose;
+  petSprite.setPose(pose);
   statusLabel.textContent = `${connectionLabel} · ${POSE_LABELS[pose]}`;
   refreshCardMeta();
 }
