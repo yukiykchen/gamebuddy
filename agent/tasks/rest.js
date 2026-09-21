@@ -9,7 +9,7 @@ function hpRatio(player) {
 }
 
 function isRestSite(state) {
-  if (state?.combat) return false;
+  if (!state || state.combat) return false;
   const room = String(state.run?.room || '');
   const node = String(state.run?.currentNode || '');
   if (/rest|camp/i.test(room)) return true;

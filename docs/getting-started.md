@@ -105,11 +105,12 @@ Copy-Item .env.example .env
 编辑 `.env`：
 
 ```dotenv
-GAMEBUDDY_LLM_BASE_URL=https://ai.gs88.shop
+GAMEBUDDY_LLM_BASE_URL=https://api.deepseek.com/v1
 GAMEBUDDY_LLM_API_KEY=your_api_key
-GAMEBUDDY_LLM_MODEL=gpt-5.5
-GAMEBUDDY_LLM_WIRE_API=responses
-GAMEBUDDY_LLM_REASONING_EFFORT=xhigh
+GAMEBUDDY_LLM_MODEL=deepseek-v4-pro
+GAMEBUDDY_LLM_WIRE_API=chat
+GAMEBUDDY_LLM_REASONING_EFFORT=high
+GAMEBUDDY_LLM_THINKING=enabled
 ```
 
 配置说明：
@@ -118,6 +119,7 @@ GAMEBUDDY_LLM_REASONING_EFFORT=xhigh
 - `GAMEBUDDY_LLM_BASE_URL` 可写服务根地址（如 `https://example.com`）或 `/v1` 地址；GameBuddy 会自动补齐且不会重复添加 `/v1`。
 - 服务支持 OpenAI Responses API 时使用 `responses`；只兼容 `/v1/chat/completions` 时改为 `chat`。
 - `GAMEBUDDY_LLM_MODEL` 必须填写该服务实际开放的模型 ID，默认值不代表所有服务都可用。
+- 需要更快实时建议时设置 `GAMEBUDDY_LLM_THINKING=disabled`；Kimi K2 开启内部思考时路线/选牌可能超过 30 秒，禁用后通常约 3-5 秒。
 - 当前实现只读取项目根目录 `.env` 或启动进程中的 `GAMEBUDDY_LLM_*` / `OPENAI_API_KEY`，不会自动读取 Codex CLI 的配置或鉴权文件。
 
 密钥优先级为 `GAMEBUDDY_LLM_API_KEY`、`OPENAI_API_KEY`。`.env` 已被 Git 忽略，不要把密钥写入 `.env.example`、README、fixture、截图、日志或提交记录；如果密钥曾被公开，应立即在对应服务后台撤销并重新生成。
@@ -125,7 +127,7 @@ GAMEBUDDY_LLM_REASONING_EFFORT=xhigh
 启动时查看终端日志：
 
 ```text
-GameBuddy LLM: gpt-5.5 · responses · env
+GameBuddy LLM: deepseek-v4-pro · chat · env
 ```
 
 如果显示：

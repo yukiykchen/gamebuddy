@@ -1,7 +1,7 @@
 const { loadProjectEnv } = require('./load-env');
 
 const DEFAULT_BASE_URL = 'https://ai.gs88.shop';
-const DEFAULT_MODEL = 'gpt-5.5';
+const DEFAULT_MODEL = 'deepseek-v4-pro';
 
 function normalizeApiRoot(baseURL) {
   const trimmed = String(baseURL || '').trim().replace(/\/+$/, '');
@@ -47,6 +47,9 @@ function chatCompletionsBody(config, system, user, temperature = resolveChatTemp
   };
   if (Number.isFinite(temperature)) body.temperature = temperature;
   if (config.thinking) body.thinking = { type: config.thinking };
+  if (/deepseek-v4-pro/i.test(String(config.model)) && config.reasoningEffort) {
+    body.reasoning = { effort: config.reasoningEffort };
+  }
   return body;
 }
 

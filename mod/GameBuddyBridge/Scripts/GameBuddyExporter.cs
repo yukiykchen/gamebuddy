@@ -786,7 +786,7 @@ public static class GameBuddyExporter
     private static CardSnapshot MapCard(CardModel card)
     {
         var energyCostX = card.EnergyCost.CostsX;
-        var energyCost = energyCostX ? null : card.EnergyCost.GetAmountToSpend();
+        int? energyCost = energyCostX ? null : card.EnergyCost.GetAmountToSpend();
         var description = ReadTextMember(card, "DynamicDescription", "Description", "CanonicalDescription", "CardDescription");
 
         var starCostObject = ReadMember(card, "StarCost", "StarsCost", "StarEnergyCost", "StarCostAmount", "RequiredStars", "StarsRequired");

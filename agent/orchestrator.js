@@ -97,6 +97,7 @@ function createOrchestrator({
   let lastRecommendation = null;
   let inFlight = null;
   let generation = 0;
+  let runtimeLlm = llm;
 
   async function consider(observation, { force = false, reason } = {}) {
     const task = selectTask(observation);
@@ -157,7 +158,7 @@ function createOrchestrator({
     const promise = (async () => {
       onAgentStatus?.({ status: 'thinking', task, timestamp: now() });
       const taskOptions = {
-        llm: client,
+        llm: runtimeLlm || client,
         now: now()
       };
       try {
@@ -232,6 +233,15 @@ function createOrchestrator({
     onRecommendation?.(null);
   }
 
+  function setLlm(nextLlm) {
+    runtimeLlm = nextLlm;
+    generation += 1;
+    lastSignature = '';
+    inFlight = null;
+    lastRecommendation = null;
+    onRecommendation?.(null);
+  }
+
   function hasPublishedFor(observation) {
     const task = selectTask(observation);
     if (!task || !lastRecommendation) return false;
@@ -243,6 +253,7 @@ function createOrchestrator({
     getRecommendation: () => lastRecommendation,
     hasPublishedFor,
     clearRecommendation,
+    setLlm,
     selectTask
   };
 }

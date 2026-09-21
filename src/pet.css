@@ -87,6 +87,10 @@ button { font: inherit; }
 .pet-status { position: absolute; left: 12px; right: 12px; bottom: 6px; display: flex; align-items: center; gap: 5px; padding: 4px 8px; border: 1px solid rgba(67, 83, 77, .9); background: rgba(20, 24, 24, .92); color: #aab5ae; font-size: 9px; }
 .pet-status #pet-status-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pet-sl { margin-left: auto; flex: 0 0 auto; color: var(--amber); font-weight: 700; letter-spacing: .04em; }
+.thinking-toggle { min-width: 38px; height: 17px; margin-left: auto; padding: 0 5px; border: 1px solid #4e5e59; border-radius: 8px; background: transparent; color: #aab5ae; font-size: 8px; line-height: 15px; cursor: pointer; }
+.thinking-toggle.active { border-color: var(--mint); color: var(--mint); background: rgba(120, 198, 168, .12); }
+.thinking-toggle.disabled { opacity: .5; cursor: not-allowed; }
+.thinking-toggle + .pet-sl { margin-left: 4px; }
 .status-dot { width: 5px; height: 5px; flex: 0 0 auto; border-radius: 50%; background: var(--amber); }.status-dot.live { background: var(--mint); }.status-dot.alert { background: var(--red); }
 
 .pet-stage[data-pose="waiting"] .pet-body { animation: float 3s ease-in-out infinite; }

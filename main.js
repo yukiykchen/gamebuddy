@@ -32,17 +32,47 @@ const observationStore = createObservationStore({ staleAfterMs: 5000 });
 let slTracker = createSlTracker();
 let lastSlStats = slTracker.snapshot();
 const llmConfig = readLlmConfig();
+const baseLlmConfig = { ...llmConfig };
+let llmThinkingEnabled = llmConfig.thinking !== 'disabled';
 if (llmConfig.enabled) {
-  const thinkingLabel = llmConfig.thinking === 'disabled' ? ' · thinking off' : llmConfig.thinking === 'enabled' ? ' · thinking on' : '';
-  console.log(`GameBuddy LLM: ${llmConfig.model} · ${llmConfig.wireApi} · ${llmConfig.source}${llmConfig.providerName ? `/${llmConfig.providerName}` : ''}${thinkingLabel}`);
+  console.log(`GameBuddy LLM: ${llmConfig.model} · ${llmConfig.wireApi} · ${llmConfig.source}${llmConfig.providerName ? `/${llmConfig.providerName}` : ''}${llmThinkingEnabled ? ' · thinking on' : ' · thinking off'}`);
 } else {
   console.log('GameBuddy LLM: rules only');
 }
-const orchestrator = createOrchestrator({
-  llm: createOpenAiClient(llmConfig, { onThinkingChange: updateAgentThinking, onLog: publishLlmLog }),
-  onRecommendation: publishRecommendation,
-  onAgentStatus: status => broadcast('agent-status', status)
-});
+let orchestrator;
+
+function logLlmMode() {
+  console.log(llmConfig.enabled
+    ? `GameBuddy LLM: ${llmConfig.model} · ${llmConfig.wireApi}${llmThinkingEnabled ? ' · thinking on' : ' · thinking off'}`
+    : 'GameBuddy LLM: rules only');
+}
+
+function applyLlmMode() {
+  const nextConfig = {
+    ...baseLlmConfig,
+    thinking: llmThinkingEnabled ? 'enabled' : 'disabled'
+  };
+  orchestrator.setLlm(llmConfig.enabled
+    ? createOpenAiClient(nextConfig, { onThinkingChange: updateAgentThinking, onLog: publishLlmLog })
+    : null);
+  broadcast('bridge-llm-mode', { enabled: llmConfig.enabled, thinking: llmThinkingEnabled });
+  logLlmMode();
+}
+
+function buildOrchestrator() {
+  orchestrator = createOrchestrator({
+    llm: llmConfig.enabled
+      ? createOpenAiClient({
+          ...baseLlmConfig,
+          thinking: llmThinkingEnabled ? 'enabled' : 'disabled'
+        }, { onThinkingChange: updateAgentThinking, onLog: publishLlmLog })
+      : null,
+    onRecommendation: publishRecommendation,
+    onAgentStatus: status => broadcast('agent-status', status)
+  });
+}
+
+buildOrchestrator();
 
 function withRoutableState(state) {
   if (!state?.map) return state;
@@ -256,6 +286,14 @@ function showPetContextMenu(point) {
   if (!petWindow || petWindow.isDestroyed()) return;
   const menu = Menu.buildFromTemplate([
     { label: '打开 GameBuddy', click: () => { mainWindow?.show(); keepPetVisible(); } },
+    {
+      label: `思考模式：${llmThinkingEnabled ? '开' : '关'}`,
+      enabled: llmConfig.enabled,
+      click: () => {
+        llmThinkingEnabled = !llmThinkingEnabled;
+        applyLlmMode();
+      }
+    },
     { type: 'separator' },
     { label: '关闭桌面宠物', click: hidePet }
   ]);
@@ -482,6 +520,10 @@ ipcMain.on('toggle-pet', () => {
 });
 ipcMain.on('pet-pass-through', (_event, enabled) => petWindow?.setIgnoreMouseEvents(Boolean(enabled), { forward: true }));
 ipcMain.on('pet-context-menu', (_event, point) => showPetContextMenu(point));
+ipcMain.on('toggle-llm-thinking', () => {
+  llmThinkingEnabled = !llmThinkingEnabled;
+  applyLlmMode();
+});
 ipcMain.on('pet-drag-start', (_event, point) => {
   if (!petWindow || petWindow.isDestroyed() || !point) return;
   const [x, y] = petWindow.getPosition();

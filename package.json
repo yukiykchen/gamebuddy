@@ -71,5 +71,9 @@
       "createStartMenuShortcut": true,
       "shortcutName": "GameBuddy"
     }
+  },
+  "allowScripts": {
+    "electron@37.10.3": true,
+    "electron-winstaller@5.4.0": true
   }
 }

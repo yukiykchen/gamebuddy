@@ -3,6 +3,7 @@ const speech = document.querySelector('#speech');
 const statusDot = document.querySelector('.status-dot');
 const statusLabel = document.querySelector('#pet-status-label');
 const slLabel = document.querySelector('#pet-sl');
+const thinkingToggle = document.querySelector('#thinking-toggle');
 const guidePanel = document.querySelector('#encounter-guide');
 const guideKicker = document.querySelector('#guide-kicker');
 const guideTitle = document.querySelector('#guide-title');
@@ -40,6 +41,7 @@ let tourPose = null;
 let tourTimer = 0;
 let tourStarted = false;
 let pendingSlSpeech = null;
+let llmMode = { enabled: false, thinking: false };
 
 function canSpeakSl() {
   return !tourPose && !petState.thinking && !hasAdvice();
@@ -59,6 +61,15 @@ function setSlStats(stats) {
     return;
   }
   say(stats.speech);
+}
+
+function updateThinkingToggle() {
+  if (!thinkingToggle) return;
+  thinkingToggle.classList.toggle('active', llmMode.enabled && llmMode.thinking);
+  thinkingToggle.classList.toggle('disabled', !llmMode.enabled);
+  thinkingToggle.textContent = llmMode.enabled
+    ? `思考 ${llmMode.thinking ? '开' : '关'}`
+    : '规则模式';
 }
 
 function escapeHtml(value) {
@@ -408,3 +419,14 @@ window.gamebuddyBridge?.onEncounterGuide(setEncounterGuide);
 window.gamebuddyBridge?.onCardRecommendation(setCardRecommendation);
 window.gamebuddyBridge?.onAgentThinking(setAgentThinking);
 window.gamebuddyBridge?.onSlStats(setSlStats);
+window.gamebuddyBridge?.onLlmMode(mode => {
+  llmMode = mode || { enabled: false, thinking: false };
+  updateThinkingToggle();
+});
+thinkingToggle?.addEventListener('click', event => {
+  event.stopPropagation();
+  if (!llmMode.enabled) return;
+  window.windowControls?.toggleLlmThinking();
+});
+
+updateThinkingToggle();

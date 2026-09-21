@@ -101,7 +101,7 @@ Agent 的设计原则是“规则先产生合法候选，模型只做受限复�
 
 ## LLM 配置
 
-LLM 是可选能力。复制示例环境变量并填写自己的 API Key：
+LLM 是可选能力。项目已内置 DeepSeek 的 OpenAI 兼容接入。复制示例环境变量并填写自己的 DeepSeek API Key：
 
 ```bash
 cp .env.example .env
@@ -116,11 +116,29 @@ Copy-Item .env.example .env
 默认配置：
 
 ```dotenv
-GAMEBUDDY_LLM_BASE_URL=https://ai.gs88.shop
-GAMEBUDDY_LLM_MODEL=gpt-5.5
-GAMEBUDDY_LLM_WIRE_API=responses
-GAMEBUDDY_LLM_REASONING_EFFORT=xhigh
+GAMEBUDDY_LLM_BASE_URL=https://api.deepseek.com/v1
 GAMEBUDDY_LLM_API_KEY=
+GAMEBUDDY_LLM_MODEL=deepseek-v4-pro
+GAMEBUDDY_LLM_WIRE_API=chat
+GAMEBUDDY_LLM_REASONING_EFFORT=high
+GAMEBUDDY_LLM_THINKING=enabled
+```
+
+在 [DeepSeek 开放平台](https://platform.deepseek.com/) 创建 Key 后，把它填入 `.env` 的 `GAMEBUDDY_LLM_API_KEY`。当前可用模型包括 `deepseek-flash` 和 `deepseek-v4-pro`；`deepseek-v4-pro` 用于更强的思考复核，`deepseek-flash` 适合快速实时建议。若使用 Kimi 或其他思考型模型，在 `.env` 加 `GAMEBUDDY_LLM_THINKING=disabled` 可显著加快响应；Kimi K2 本机实测路线从约 54 秒降到约 4 秒，选牌从约 48 秒降到约 3 秒。把 `GAMEBUDDY_LLM_THINKING` 改回 `enabled` 可恢复思考模式。
+
+启动 GameBuddy 后，终端日志应显示：
+
+```text
+GameBuddy LLM: deepseek-v4-pro · chat · env
+```
+
+若要临时验证连通性，可执行：
+
+```bash
+curl -sS https://api.deepseek.com/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $GAMEBUDDY_LLM_API_KEY" \
+  -d '{"model":"deepseek-flash","messages":[{"role":"user","content":"用 JSON 回答：{\"ok\":true}"}]}'
 ```
 
 `GAMEBUDDY_LLM_BASE_URL` 可填写服务根地址或以 `/v1` 结尾的 API 地址，GameBuddy 会自动规范化；只支持 Chat Completions 的兼容服务应把 `GAMEBUDDY_LLM_WIRE_API` 改为 `chat`。不要把 GitHub PAT 等无关令牌当作模型 API Key，也不要提交 `.env`。如果没有配置 Key，启动日志会显示 `GameBuddy LLM: rules only`，选牌、路线、休息处和事件仍可使用规则建议。
