@@ -2,6 +2,7 @@ const stage = document.querySelector('#pet-stage');
 const speech = document.querySelector('#speech');
 const statusDot = document.querySelector('.status-dot');
 const statusLabel = document.querySelector('#pet-status-label');
+const thinkingTime = document.querySelector('#thinking-time');
 const thinkingToggle = document.querySelector('#thinking-toggle');
 const guidePanel = document.querySelector('#encounter-guide');
 const guideKicker = document.querySelector('#guide-kicker');
@@ -48,6 +49,10 @@ let tourTimer = 0;
 let tourStarted = false;
 let llmMode = { enabled: false, thinking: false };
 let cardExpanded = false;
+let activeThinkingTask = '';
+let thinkingStartedAtByTask = {};
+let thinkingDurationsByTask = {};
+let thinkingTimer = 0;
 
 const CARD_PRESENTATION = {
   card_reward: { mark: '牌', kicker: '选牌建议' },
@@ -129,7 +134,30 @@ function startReplayPoseTour() {
 
 function cardSourceLabel(recommendation, confidence, version) {
   const source = recommendation.source === 'llm' ? 'LLM 复核' : '规则评分';
-  return `来源：${source} / 置信度 ${confidence}%${version ? ` / ${version}` : ''}`;
+  const duration = recommendation.source === 'llm' ? thinkingDurationsByTask[recommendation.task] : null;
+  return `来源：${source} / 置信度 ${confidence}%${version ? ` / ${version}` : ''}${Number.isFinite(duration) ? ` / 思考 ${formatThinkingDuration(duration)}` : ''}`;
+}
+
+function formatThinkingDuration(durationMs) {
+  return `${(Math.max(0, Number(durationMs) || 0) / 1000).toFixed(1)} 秒`;
+}
+
+function refreshThinkingTime() {
+  const startedAt = thinkingStartedAtByTask[activeThinkingTask];
+  if (!petState.thinking || !activeThinkingTask || !Number.isFinite(startedAt)) {
+    thinkingTime.hidden = true;
+    return;
+  }
+  thinkingTime.textContent = formatThinkingDuration(Date.now() - startedAt);
+  thinkingTime.hidden = false;
+}
+
+function syncThinkingTimer() {
+  window.clearInterval(thinkingTimer);
+  thinkingTimer = 0;
+  refreshThinkingTime();
+  if (!petState.thinking || !activeThinkingTask) return;
+  thinkingTimer = window.setInterval(refreshThinkingTime, 100);
 }
 
 function refreshCardMeta() {
@@ -258,6 +286,10 @@ function setCardRecommendation(recommendation) {
 
 function setAgentThinking(state) {
   petState.thinking = Boolean(state?.thinking);
+  activeThinkingTask = state?.tasks?.[0] || '';
+  thinkingStartedAtByTask = state?.startedAtByTask || {};
+  thinkingDurationsByTask = state?.durationsByTask || {};
+  syncThinkingTimer();
   applyPose();
   if (!petState.thinking || hasAdvice()) return;
   const task = state.tasks?.[0];

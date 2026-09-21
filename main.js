@@ -28,7 +28,8 @@ let cachedEncounterGuide = null;
 let activeCardRecommendation = null;
 let activeCardExpanded = false;
 const activeLlmRequests = new Map();
-let lastAgentThinking = { thinking: false, tasks: [], model: null };
+const completedLlmDurationByTask = new Map();
+let lastAgentThinking = { thinking: false, tasks: [], model: null, startedAtByTask: {}, durationsByTask: {} };
 const observationStore = createObservationStore({ staleAfterMs: 5000 });
 const llmConfig = readLlmConfig();
 const baseLlmConfig = { ...llmConfig };
@@ -131,16 +132,38 @@ function clearLlmLog() {
   }
 }
 
-function updateAgentThinking(thinking, detail = {}) {
-  const requestId = detail.requestId || detail.task || 'llm';
-  if (thinking) activeLlmRequests.set(requestId, detail);
-  else activeLlmRequests.delete(requestId);
+function buildAgentThinkingState(model) {
   const requests = [...activeLlmRequests.values()];
-  lastAgentThinking = {
+  const startedAtByTask = {};
+  for (const request of requests) {
+    if (!request.task || !Number.isFinite(request.startedAt)) continue;
+    startedAtByTask[request.task] = Math.min(startedAtByTask[request.task] || request.startedAt, request.startedAt);
+  }
+  return {
     thinking: requests.length > 0,
     tasks: [...new Set(requests.map(request => request.task).filter(Boolean))],
-    model: detail.model || llmConfig.model || null
+    model: model || requests[0]?.model || llmConfig.model || null,
+    startedAtByTask,
+    durationsByTask: Object.fromEntries(completedLlmDurationByTask)
   };
+}
+
+function updateAgentThinking(thinking, detail = {}) {
+  const requestId = detail.requestId || detail.task || 'llm';
+  if (thinking) {
+    completedLlmDurationByTask.delete(detail.task);
+    activeLlmRequests.set(requestId, {
+      ...detail,
+      startedAt: activeLlmRequests.get(requestId)?.startedAt || Date.now()
+    });
+  } else {
+    const completed = activeLlmRequests.get(requestId);
+    if (completed?.task && Number.isFinite(completed.startedAt)) {
+      completedLlmDurationByTask.set(completed.task, Math.max(0, Date.now() - completed.startedAt));
+    }
+    activeLlmRequests.delete(requestId);
+  }
+  lastAgentThinking = buildAgentThinkingState(detail.model);
   broadcast('bridge-agent-thinking', lastAgentThinking);
 }
 
@@ -148,12 +171,7 @@ function clearAgentThinking(task) {
   for (const [requestId, request] of activeLlmRequests) {
     if (!task || request.task === task) activeLlmRequests.delete(requestId);
   }
-  const requests = [...activeLlmRequests.values()];
-  lastAgentThinking = {
-    thinking: requests.length > 0,
-    tasks: [...new Set(requests.map(request => request.task).filter(Boolean))],
-    model: requests[0]?.model || null
-  };
+  lastAgentThinking = buildAgentThinkingState();
   broadcast('bridge-agent-thinking', lastAgentThinking);
 }
 

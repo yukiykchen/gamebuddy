@@ -101,6 +101,8 @@ button { font: inherit; }
 .pet-shadow { position: absolute; left: 48px; bottom: 27px; width: 116px; height: 18px; border-radius: 50%; background: rgba(0, 0, 0, .24); filter: blur(4px); }
 .pet-status { position: absolute; left: 12px; right: 12px; bottom: 6px; display: flex; align-items: center; gap: 5px; padding: 4px 8px; border: 1px solid rgba(67, 83, 77, .9); background: rgba(20, 24, 24, .92); color: #aab5ae; font-size: 9px; }
 .pet-status #pet-status-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.thinking-time { flex: 0 0 auto; color: var(--mint); font-variant-numeric: tabular-nums; letter-spacing: .01em; }
+.thinking-time[hidden] { display: none; }
 .thinking-toggle { min-width: 38px; height: 17px; margin-left: auto; padding: 0 5px; border: 1px solid #4e5e59; border-radius: 8px; background: transparent; color: #aab5ae; font-size: 8px; line-height: 15px; cursor: pointer; }
 .thinking-toggle.active { border-color: var(--mint); color: var(--mint); background: rgba(120, 198, 168, .12); }
 .thinking-toggle.disabled { opacity: .5; cursor: not-allowed; }

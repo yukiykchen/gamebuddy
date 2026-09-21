@@ -29,6 +29,17 @@ The card MUST provide one control that expands or collapses its detailed reasoni
 - **WHEN** a new recommendation is published
 - **THEN** the new card returns to its collapsed state
 
+### Requirement: LLM latency remains visible without obscuring advice
+The pet overlay MUST show the elapsed request time while an LLM recommendation is running. After an LLM-backed recommendation completes, its detailed metadata MUST preserve the final elapsed time. Rule-only recommendations MUST NOT display an LLM duration.
+
+#### Scenario: LLM request is running
+- **WHEN** an LLM recommendation request is active
+- **THEN** the pet status bar updates its elapsed time in seconds
+
+#### Scenario: LLM recommendation completes
+- **WHEN** an LLM-backed recommendation replaces the thinking state
+- **THEN** the expanded recommendation metadata shows the final elapsed time
+
 ### Requirement: Pet window follows advice disclosure state
 The Electron pet window MUST use a compact card height while advice details are collapsed and a taller height while details are expanded. It MUST restore compact pet size when the advice is dismissed.
 
