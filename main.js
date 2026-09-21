@@ -8,7 +8,6 @@ const { ensureMapRoutes, routeChoiceCount } = require('./agent/tasks/route');
 const { decide } = require('./agent/router');
 const { recordDecision } = require('./agent/recorder');
 const { encounterGuideSignature, buildEncounterGuide } = require('./agent/tasks/encounter-guide');
-const { createSlTracker } = require('./harness/sl-stats');
 const fs = require('node:fs');
 
 const BRIDGE_URL = process.env.GAMEBUDDY_BRIDGE_URL || 'ws://127.0.0.1:27182';
@@ -29,8 +28,6 @@ let activeCardRecommendation = null;
 const activeLlmRequests = new Map();
 let lastAgentThinking = { thinking: false, tasks: [], model: null };
 const observationStore = createObservationStore({ staleAfterMs: 5000 });
-let slTracker = createSlTracker();
-let lastSlStats = slTracker.snapshot();
 const llmConfig = readLlmConfig();
 const baseLlmConfig = { ...llmConfig };
 let llmThinkingEnabled = llmConfig.thinking !== 'disabled';
@@ -95,7 +92,7 @@ let agentRunId = null;
 
 function currentObservation(now = Date.now()) {
   const observation = observationStore.getObservation(now);
-  return { ...observation, decision: decide(observation), slStats: lastSlStats };
+  return { ...observation, decision: decide(observation) };
 }
 
 function startAgentRun() {
@@ -115,11 +112,6 @@ function broadcastBridgeStatus(status, detail = '') {
   broadcast('bridge-status', lastBridgeStatus);
 }
 
-function publishSlStats(stats) {
-  lastSlStats = stats;
-  broadcast('bridge-sl-stats', stats);
-}
-
 const MAX_LLM_LOG_ENTRIES = 80;
 let llmLogEntries = [];
 
@@ -135,10 +127,6 @@ function clearLlmLog() {
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.webContents.send('bridge-llm-log', { entries: [] });
   }
-}
-
-function noteLiveRun(hasLiveRun, state) {
-  publishSlStats(slTracker.observe({ hasLiveRun, state }));
 }
 
 function updateAgentThinking(thinking, detail = {}) {
@@ -324,15 +312,11 @@ function connectBridge() {
         console.error('[Runmate DEBUG] invalid state reason:', result.reason);
         console.error('[Runmate DEBUG] raw message:', JSON.stringify(message, null, 2).slice(0, 4000));
         broadcastBridgeStatus('invalid', result.reason);
-        noteLiveRun(false);
         return;
       }
       if (result.kind === 'state' || result.kind === 'duplicate') {
         const liveState = withRoutableState(result.state || observationStore.getState());
-        if (liveState) {
-          broadcastBridgeStatus('live');
-          noteLiveRun(true, liveState);
-        }
+        if (liveState) broadcastBridgeStatus('live');
       }
       if (result.kind === 'state') {
         if (result.accepted) {
@@ -375,7 +359,6 @@ function connectBridge() {
     if (bridgeSocket === socket) bridgeSocket = null;
     clearEncounterGuide();
     clearCardRecommendation();
-    noteLiveRun(false);
     broadcastBridgeStatus('waiting', '等待本地 Mod Bridge');
     clearTimeout(bridgeReconnectTimer);
     bridgeReconnectTimer = setTimeout(connectBridge, 2500);
@@ -426,7 +409,6 @@ function createMainWindow() {
     const recommendation = orchestrator.getRecommendation();
     if (recommendation) mainWindow.webContents.send('bridge-recommendation', recommendation);
     else void considerObservation(observation, { force: true });
-    mainWindow.webContents.send('bridge-sl-stats', lastSlStats);
     mainWindow.webContents.send('bridge-llm-log', { entries: llmLogEntries });
   });
   mainWindow.on('close', event => {
@@ -475,7 +457,6 @@ function createPetWindow() {
     const recommendation = orchestrator.getRecommendation();
     if (recommendation) petWindow.webContents.send('bridge-recommendation', recommendation);
     petWindow.webContents.send('bridge-agent-thinking', lastAgentThinking);
-    petWindow.webContents.send('bridge-sl-stats', lastSlStats);
     if (activeCardRecommendation) petWindow.webContents.send('bridge-card-recommendation', activeCardRecommendation);
     if (activeEncounterGuide) {
       syncPetWindowSize();
@@ -555,10 +536,6 @@ ipcMain.handle('refresh-recommendation', async () => {
 });
 
 app.whenReady().then(() => {
-  slTracker = createSlTracker({
-    persistPath: BRIDGE_MODE === 'replay' ? null : path.join(app.getPath('userData'), 'sl-stats.json')
-  });
-  lastSlStats = slTracker.snapshot();
   createMainWindow();
   createPetWindow();
   createTray();
@@ -566,7 +543,6 @@ app.whenReady().then(() => {
   petTopmostTimer = setInterval(keepPetVisible, 1000);
   bridgeHealthTimer = setInterval(() => {
     if (lastBridgeStatus.status === 'live' && !observationStore.getObservation().fresh) {
-      noteLiveRun(false);
       broadcastBridgeStatus('stale', '已连接，但超过 5 秒没有新的游戏状态');
     }
   }, 1000);

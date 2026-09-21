@@ -5,11 +5,11 @@
 ## ADDED Requirements
 
 ### Requirement: Main window uses a run HUD instead of a dashboard sidebar
-The main window SHALL put character, act/floor, HP, gold, deck size, relic count, this-run SL, and live/waiting status into a single top HUD. It MUST NOT use a persistent left sidebar whose primary job is stacking connection details, numbered navigation, a model advertisement, and run stats together.
+The main window SHALL put character, act/floor, HP, gold, deck size, relic count, and live/waiting status into a single top HUD. It MUST NOT use a persistent left sidebar whose primary job is stacking connection details, numbered navigation, a model advertisement, and run stats together.
 
 #### Scenario: HUD after a live snapshot
 - **WHEN** a live run snapshot is shown
-- **THEN** the top HUD shows character, floor, HP, gold, and this-run SL without opening a nested sidebar section
+- **THEN** the top HUD shows character, floor, HP, and gold without opening a nested sidebar section
 
 ### Requirement: Scene switching uses plain Chinese tabs
 The main window SHALL switch combat, card reward, and route/rest views with unlabeled-as-sequence tabs named in Chinese. Those tabs MUST NOT be numbered `01` / `02` / `03`, and page titles MUST NOT use tracked all-caps English eyebrows as the primary heading.

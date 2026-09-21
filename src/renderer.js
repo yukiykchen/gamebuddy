@@ -12,8 +12,7 @@ const state = {
   map: { visited: [] },
   reward: null,
   event: null,
-  recommendation: null,
-  thisRunSl: null
+  recommendation: null
 };
 
 const viewContainer = document.querySelector('#view-container');
@@ -347,7 +346,6 @@ function updateRunSummary() {
   document.querySelector('#deck-count').textContent = state.player.cards?.length || '--';
   document.querySelector('#relic-count').textContent = state.player.relics?.length || '--';
   document.querySelector('#gold-count').textContent = state.run.act ? (state.player.gold ?? 0) : '--';
-  document.querySelector('#sl-count').textContent = Number.isInteger(state.thisRunSl) ? String(state.thisRunSl) : '--';
 }
 
 function bindViewActions() {
@@ -458,15 +456,7 @@ setInterval(() => {
 
 render();
 setBridgeStatus({ status: 'waiting' });
-function applySlStats(stats) {
-  if (!Number.isInteger(stats?.thisRun)) return;
-  state.thisRunSl = stats.thisRun;
-  const el = document.querySelector('#sl-count');
-  if (el) el.textContent = String(stats.thisRun);
-}
-
 window.gamebuddyBridge?.onState(applyBridgeState);
-window.gamebuddyBridge?.onObservation(observation => applySlStats(observation?.slStats));
 window.gamebuddyBridge?.onEvent(event => {
   if (event.name === 'card.reward.opened') {
     state.reward = event.data || null;
@@ -530,7 +520,6 @@ window.gamebuddyBridge?.onStatus(status => {
   setBridgeStatus(status);
   if (status.status === 'connected') showToast('已连接《杀戮尖塔 2》实时数据');
 });
-window.gamebuddyBridge?.onSlStats(applySlStats);
 
 function formatLlmLog(entries) {
   if (!entries?.length) return '等待模型请求。系统提示、完整输入 JSON、原始输出会显示在这里。';

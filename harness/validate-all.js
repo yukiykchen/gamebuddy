@@ -14,7 +14,6 @@ const checks = [
   ['event fixture', [path.join(__dirname, 'validate-events.js'), path.join(__dirname, 'fixtures', 'recorded-smoke.events.json')]],
   ['inspect syntax', [path.join(__dirname, 'inspect-bridge.js')]],
   ['protocol cases', [path.join(__dirname, 'validate-protocol.js')]],
-  ['sl stats cases', [path.join(__dirname, 'validate-sl-stats.js')]],
   ['observation cases', [path.join(__dirname, 'validate-observation.js')]],
   ['fixture validation', [path.join(__dirname, 'validate-replay.js')]],
   ['recorded fixture', [path.join(__dirname, 'validate-replay.js'), path.join(__dirname, 'fixtures', 'recorded-smoke.json')]],

@@ -15,8 +15,4 @@ When a card-reward, rest-site, or encounter-guide panel is visible beside the pe
 - **AND** the overlay does not render the full main-window analysis block
 
 ### Requirement: Overlay status is a floor strip not browser chrome
-The pet status control SHALL sit as a small floor strip under the character, showing live/waiting, pose, and this-run SL when known. It MUST NOT use a wide bordered chip that reads as a browser or IDE status bar.
-
-#### Scenario: SL remains on the strip
-- **WHEN** this-run SL is 2 and the overlay is live
-- **THEN** the floor strip still shows `SL 2`
+The pet status control SHALL sit as a small floor strip under the character, showing live/waiting and pose. It MUST NOT use a wide bordered chip that reads as a browser or IDE status bar.

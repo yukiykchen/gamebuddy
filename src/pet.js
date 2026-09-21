@@ -2,7 +2,6 @@ const stage = document.querySelector('#pet-stage');
 const speech = document.querySelector('#speech');
 const statusDot = document.querySelector('.status-dot');
 const statusLabel = document.querySelector('#pet-status-label');
-const slLabel = document.querySelector('#pet-sl');
 const thinkingToggle = document.querySelector('#thinking-toggle');
 const guidePanel = document.querySelector('#encounter-guide');
 const guideKicker = document.querySelector('#guide-kicker');
@@ -33,35 +32,13 @@ const petState = {
   cardVisible: false,
   guideVisible: false,
   recommendation: null,
-  cardRecommendation: null,
-  thisRunSl: null
+  cardRecommendation: null
 };
 let connectionLabel = '等待游戏';
 let tourPose = null;
 let tourTimer = 0;
 let tourStarted = false;
-let pendingSlSpeech = null;
 let llmMode = { enabled: false, thinking: false };
-
-function canSpeakSl() {
-  return !tourPose && !petState.thinking && !hasAdvice();
-}
-
-function flushPendingSlSpeech() {
-  if (!pendingSlSpeech || !canSpeakSl()) return;
-  say(pendingSlSpeech);
-  pendingSlSpeech = null;
-}
-
-function setSlStats(stats) {
-  applyThisRunSl(stats?.thisRun);
-  if (!stats?.incremented || !stats.speech) return;
-  if (!canSpeakSl()) {
-    pendingSlSpeech = stats.speech;
-    return;
-  }
-  say(stats.speech);
-}
 
 function updateThinkingToggle() {
   if (!thinkingToggle) return;
@@ -134,13 +111,6 @@ function refreshCardMeta() {
   cardMeta.textContent = `${cardSourceLabel(recommendation, confidence, version)}${match ? ` · ${match}` : ''}${recommendation.task === 'map_route' ? recommendation.routesTruncated ? ' · 路线未完整枚举' : ' · 启发式比较' : ''}`;
 }
 
-function applyThisRunSl(count) {
-  if (!Number.isInteger(count)) return;
-  petState.thisRunSl = count;
-  slLabel.hidden = false;
-  slLabel.textContent = `SL ${count}`;
-}
-
 function applyPose() {
   const pose = currentPose();
   if (!POSES.has(pose)) return;
@@ -178,7 +148,6 @@ function setCardRecommendation(recommendation) {
     petState.cardVisible = false;
     petState.cardRecommendation = null;
     applyPose();
-    flushPendingSlSpeech();
     return;
   }
   const primary = recommendation.primary || {};
@@ -260,7 +229,6 @@ function setCardRecommendation(recommendation) {
 function setAgentThinking(state) {
   petState.thinking = Boolean(state?.thinking);
   applyPose();
-  if (!petState.thinking) flushPendingSlSpeech();
   if (!petState.thinking || hasAdvice()) return;
   const task = state.tasks?.[0];
   const labels = {
@@ -278,7 +246,6 @@ function setEncounterGuide(guide) {
     guideContent.innerHTML = '';
     petState.guideVisible = false;
     applyPose();
-    flushPendingSlSpeech();
     return;
   }
   const guideLabels = { boss: 'BOSS 攻略', elite: '精英攻略', normal: '小怪攻略' };
@@ -352,7 +319,6 @@ function setRecommendation(recommendation) {
   applyPose();
   if (!recommendation) {
     if (petState.live && !petState.thinking && !hasAdvice()) say('我在看着这局');
-    flushPendingSlSpeech();
     return;
   }
   if (recommendation.task === 'card_reward' && recommendation.primary?.label) {
@@ -413,12 +379,10 @@ document.querySelector('#card-close').addEventListener('click', () => {
 });
 window.gamebuddyBridge?.onStatus(setStatus);
 window.gamebuddyBridge?.onState(setState);
-window.gamebuddyBridge?.onObservation(observation => applyThisRunSl(observation?.slStats?.thisRun));
 window.gamebuddyBridge?.onRecommendation(setRecommendation);
 window.gamebuddyBridge?.onEncounterGuide(setEncounterGuide);
 window.gamebuddyBridge?.onCardRecommendation(setCardRecommendation);
 window.gamebuddyBridge?.onAgentThinking(setAgentThinking);
-window.gamebuddyBridge?.onSlStats(setSlStats);
 window.gamebuddyBridge?.onLlmMode(mode => {
   llmMode = mode || { enabled: false, thinking: false };
   updateThinkingToggle();
