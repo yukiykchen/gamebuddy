@@ -214,7 +214,7 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
 
 Spire Codex API 默认地址为 `https://spire-codex.com/api`，可用 `GAMEBUDDY_SPIRE_CODEX_URL` 覆盖。GameBuddy 不复制 Spire Codex 的源码或整库数据。
 
-任何房间只要 `combat` 非空，主进程都会生成独立的 `gamebuddy.encounter-guide.v1` 攻略消息并发送给桌面宠物。`kind` 为 `normal`、`elite` 或 `boss`；问号事件触发的战斗在不是精英/Boss 时也归为 `normal`，并按实际敌人匹配。该消息不占用 recommendation 槽位，因此不会覆盖路线、休息处或卡牌奖励建议。攻略按楼层和地图坐标去重，每场只自动弹出一次，手动关闭后本场不再弹出，战斗结束后自动收起。
+任何房间只要 `combat` 非空，主进程都会生成独立的 `gamebuddy.encounter-guide.v1` 攻略消息并发送给桌面宠物。`kind` 为 `normal`、`elite` 或 `boss`；问号事件触发的战斗在不是精英/Boss 时也归为 `normal`，并按实际敌人匹配。该消息不占用 recommendation 槽位，因此不会覆盖路线、休息处或卡牌奖励建议。攻略按楼层和地图坐标去重，每场只自动弹出一次；手动关闭后不会再次自动打扰，但当前战斗可通过桌宠按钮重新打开，战斗结束后自动清理。
 
 `strategy` 字段包括 `summary`、`dangerWindows`、`deckChecks`、`priorityTargets`、`tips`、`avoid`、`confidence`、`reviewStatus`、`basis` 和可追溯的 `sources`。stable `v0.107.1` 的 12 个 Boss 和 12 个精英优先按稳定 ID 使用 `encounter-strategies.json` 的社区复核档案，此时 `basis=community`。Spire Codex 收录的 63 个普通遭遇按当前 Act 和实际敌人组合匹配；没有人工档案时使用确定机制生成同结构建议，标记 `basis=mechanics` 与 `reviewStatus=mechanic-derived`，界面不会显示社区来源数量。目录无法匹配时只给保守提示，不猜测具体机制。
 

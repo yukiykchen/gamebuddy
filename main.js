@@ -24,6 +24,7 @@ let petDragState;
 let encounterGuideKey = '';
 let dismissedEncounterGuideKey = '';
 let activeEncounterGuide = null;
+let cachedEncounterGuide = null;
 let activeCardRecommendation = null;
 const activeLlmRequests = new Map();
 let lastAgentThinking = { thinking: false, tasks: [], model: null };
@@ -195,6 +196,19 @@ function syncPetWindowSize() {
   resizePetWindow(activeEncounterGuide ? 'guide' : activeCardRecommendation ? 'card' : 'compact');
 }
 
+function encounterGuideState() {
+  return {
+    available: Boolean(cachedEncounterGuide && encounterGuideKey),
+    visible: Boolean(activeEncounterGuide),
+    kind: cachedEncounterGuide?.kind || null,
+    title: cachedEncounterGuide?.title || null
+  };
+}
+
+function publishEncounterGuideState() {
+  petWindow?.webContents.send('bridge-encounter-guide-state', encounterGuideState());
+}
+
 function dismissCardRecommendation() {
   clearCardRecommendation();
 }
@@ -234,19 +248,36 @@ function handleAcceptedEvent(event) {
 }
 
 function dismissEncounterGuide() {
+  if (!activeEncounterGuide) return;
   dismissedEncounterGuideKey = encounterGuideKey;
   activeEncounterGuide = null;
   petWindow?.webContents.send('bridge-encounter-guide', null);
   syncPetWindowSize();
+  publishEncounterGuideState();
+}
+
+function reopenEncounterGuide() {
+  if (!cachedEncounterGuide || !encounterGuideKey) {
+    publishEncounterGuideState();
+    return;
+  }
+  dismissedEncounterGuideKey = '';
+  activeEncounterGuide = cachedEncounterGuide;
+  syncPetWindowSize();
+  keepPetVisible();
+  petWindow?.webContents.send('bridge-encounter-guide', activeEncounterGuide);
+  publishEncounterGuideState();
 }
 
 function clearEncounterGuide() {
+  const hadGuide = Boolean(activeEncounterGuide || cachedEncounterGuide);
   encounterGuideKey = '';
   dismissedEncounterGuideKey = '';
-  if (!activeEncounterGuide) return;
   activeEncounterGuide = null;
-  petWindow?.webContents.send('bridge-encounter-guide', null);
+  cachedEncounterGuide = null;
+  if (hadGuide) petWindow?.webContents.send('bridge-encounter-guide', null);
   syncPetWindowSize();
+  publishEncounterGuideState();
 }
 
 async function considerEncounterGuide(state) {
@@ -259,10 +290,12 @@ async function considerEncounterGuide(state) {
   encounterGuideKey = key;
   const guide = await buildEncounterGuide(state);
   if (encounterGuideKey !== key || dismissedEncounterGuideKey === key || !guide) return;
+  cachedEncounterGuide = guide;
   activeEncounterGuide = guide;
   syncPetWindowSize();
   keepPetVisible();
   petWindow?.webContents.send('bridge-encounter-guide', guide);
+  publishEncounterGuideState();
 }
 
 function hidePet() {
@@ -462,6 +495,7 @@ function createPetWindow() {
       syncPetWindowSize();
       petWindow.webContents.send('bridge-encounter-guide', activeEncounterGuide);
     }
+    publishEncounterGuideState();
   });
   petWindow.once('ready-to-show', () => petWindow.showInactive());
 }
@@ -518,6 +552,7 @@ ipcMain.on('pet-drag-move', (_event, point) => {
 });
 ipcMain.on('pet-drag-end', () => { petDragState = undefined; });
 ipcMain.on('dismiss-encounter-guide', dismissEncounterGuide);
+ipcMain.on('reopen-encounter-guide', reopenEncounterGuide);
 ipcMain.on('dismiss-card-recommendation', dismissCardRecommendation);
 ipcMain.on('accept-decision', (_event, decision) => {
   if (agentRunId && decision) recordDecision({ runId: agentRunId, observation: currentObservation(), decision, accepted: true });

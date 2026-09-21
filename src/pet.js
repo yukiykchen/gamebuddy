@@ -8,6 +8,7 @@ const guideKicker = document.querySelector('#guide-kicker');
 const guideTitle = document.querySelector('#guide-title');
 const guideContent = document.querySelector('#guide-content');
 const guideSource = document.querySelector('#guide-source');
+const guideReopen = document.querySelector('#guide-reopen');
 const cardPanel = document.querySelector('#card-recommendation');
 const cardKicker = document.querySelector('#card-kicker');
 const cardTitle = document.querySelector('#card-title');
@@ -275,9 +276,19 @@ function setEncounterGuide(guide) {
       ? `机制：Spire Codex · 攻略：${sourceCount} 个社区来源${confidence ? ` · ${confidence}` : ''} · stable ${guide.gameVersion || '当前版本'}`
       : `机制与策略推导：Spire Codex · 非社区人工复核 · stable ${guide.gameVersion || '当前版本'}`;
   guidePanel.classList.add('visible');
+  guideReopen.hidden = true;
   petState.guideVisible = true;
   applyPose();
   say(`${speechLabels[guide.kind] || '遭遇'}攻略来了`);
+}
+
+function setEncounterGuideState(state) {
+  const canReopen = Boolean(state?.available && !state?.visible);
+  guideReopen.hidden = !canReopen;
+  if (!canReopen) return;
+  const labels = { boss: '重新打开 Boss 攻略', elite: '重新打开精英攻略', normal: '重新打开小怪攻略' };
+  guideReopen.textContent = labels[state.kind] || '重新打开怪物攻略';
+  guideReopen.title = state.title ? `查看：${state.title}` : '重新打开本场怪物攻略';
 }
 
 function setStatus(status) {
@@ -376,6 +387,11 @@ document.querySelector('#guide-close').addEventListener('click', () => {
   setEncounterGuide(null);
   window.windowControls?.dismissEncounterGuide();
 });
+guideReopen.addEventListener('click', event => {
+  event.stopPropagation();
+  guideReopen.hidden = true;
+  window.windowControls?.reopenEncounterGuide();
+});
 document.querySelector('#card-close').addEventListener('click', () => {
   setCardRecommendation(null);
   window.windowControls?.dismissCardRecommendation();
@@ -384,6 +400,7 @@ window.gamebuddyBridge?.onStatus(setStatus);
 window.gamebuddyBridge?.onState(setState);
 window.gamebuddyBridge?.onRecommendation(setRecommendation);
 window.gamebuddyBridge?.onEncounterGuide(setEncounterGuide);
+window.gamebuddyBridge?.onEncounterGuideState(setEncounterGuideState);
 window.gamebuddyBridge?.onCardRecommendation(setCardRecommendation);
 window.gamebuddyBridge?.onAgentThinking(setAgentThinking);
 window.gamebuddyBridge?.onLlmMode(mode => {
