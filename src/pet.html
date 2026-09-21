@@ -4,20 +4,29 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GameBuddy Pet</title>
-    <link rel="stylesheet" href="./pet.css?v=reopen-guide" />
+    <link rel="stylesheet" href="./pet.css?v=focus-ui" />
   </head>
   <body>
     <main class="pet-stage" id="pet-stage" data-pose="waiting">
       <aside class="card-recommendation" id="card-recommendation" aria-live="polite">
         <div class="card-head">
-          <div><span class="card-kicker" id="card-kicker">卡牌奖励建议</span><h1 id="card-title">推荐拿取</h1></div>
+          <span class="card-mark" id="card-mark" aria-hidden="true">牌</span>
+          <div class="card-heading"><span class="card-kicker" id="card-kicker">选牌建议</span><h1 id="card-title">拿哪张牌</h1></div>
           <button class="card-close" id="card-close" aria-label="关闭当前建议">×</button>
         </div>
-        <div class="card-scroll">
-          <p class="card-reason" id="card-reason"></p>
-          <div class="card-points" id="card-points"></div>
+        <button class="card-expand" id="card-expand" type="button" aria-expanded="false" aria-controls="card-details">
+          <span id="card-expand-label">展开理由</span><span class="card-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="card-details" id="card-details" hidden>
+          <div class="card-scroll">
+            <section class="card-reason-block">
+              <span>判断依据</span>
+              <p class="card-reason" id="card-reason"></p>
+            </section>
+            <div class="card-points" id="card-points"></div>
+          </div>
+          <div class="card-meta" id="card-meta"></div>
         </div>
-        <div class="card-meta" id="card-meta"></div>
       </aside>
       <aside class="encounter-guide" id="encounter-guide" aria-live="polite">
         <div class="guide-head">
@@ -45,6 +54,6 @@
       </button>
     </main>
     <script src="./pet-sprite/index.js?v=static-poses"></script>
-    <script src="./pet.js?v=reopen-guide"></script>
+    <script src="./pet.js?v=focus-ui"></script>
   </body>
 </html>

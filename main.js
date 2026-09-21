@@ -26,6 +26,7 @@ let dismissedEncounterGuideKey = '';
 let activeEncounterGuide = null;
 let cachedEncounterGuide = null;
 let activeCardRecommendation = null;
+let activeCardExpanded = false;
 const activeLlmRequests = new Map();
 let lastAgentThinking = { thinking: false, tasks: [], model: null };
 const observationStore = createObservationStore({ staleAfterMs: 5000 });
@@ -160,6 +161,7 @@ function publishRecommendation(recommendation) {
   broadcast('bridge-recommendation', recommendation);
   if (recommendation?.task === 'card_reward' || recommendation?.task === 'rest_site' || recommendation?.task === 'event_choice' || recommendation?.task === 'map_route') {
     activeCardRecommendation = recommendation;
+    activeCardExpanded = false;
     syncPetWindowSize();
     keepPetVisible();
     petWindow?.webContents.send('bridge-card-recommendation', recommendation);
@@ -180,8 +182,10 @@ function resizePetWindow(mode = 'compact') {
   if (!petWindow || petWindow.isDestroyed()) return;
   const target = mode === 'guide'
     ? { width: 570, height: 520 }
-    : mode === 'card'
-      ? { width: 570, height: 340 }
+    : mode === 'card-expanded'
+      ? { width: 570, height: 420 }
+      : mode === 'card'
+        ? { width: 570, height: 252 }
       : { width: 214, height: 242 };
   const bounds = petWindow.getBounds();
   const display = screen.getDisplayMatching(bounds).workArea;
@@ -193,7 +197,11 @@ function resizePetWindow(mode = 'compact') {
 }
 
 function syncPetWindowSize() {
-  resizePetWindow(activeEncounterGuide ? 'guide' : activeCardRecommendation ? 'card' : 'compact');
+  resizePetWindow(activeEncounterGuide
+    ? 'guide'
+    : activeCardRecommendation
+      ? activeCardExpanded ? 'card-expanded' : 'card'
+      : 'compact');
 }
 
 function encounterGuideState() {
@@ -216,7 +224,14 @@ function dismissCardRecommendation() {
 function clearCardRecommendation() {
   if (!activeCardRecommendation) return;
   activeCardRecommendation = null;
+  activeCardExpanded = false;
   petWindow?.webContents.send('bridge-card-recommendation', null);
+  syncPetWindowSize();
+}
+
+function setCardExpanded(expanded) {
+  if (!activeCardRecommendation || activeEncounterGuide) return;
+  activeCardExpanded = Boolean(expanded);
   syncPetWindowSize();
 }
 
@@ -554,6 +569,7 @@ ipcMain.on('pet-drag-end', () => { petDragState = undefined; });
 ipcMain.on('dismiss-encounter-guide', dismissEncounterGuide);
 ipcMain.on('reopen-encounter-guide', reopenEncounterGuide);
 ipcMain.on('dismiss-card-recommendation', dismissCardRecommendation);
+ipcMain.on('set-card-expanded', (_event, expanded) => setCardExpanded(expanded));
 ipcMain.on('accept-decision', (_event, decision) => {
   if (agentRunId && decision) recordDecision({ runId: agentRunId, observation: currentObservation(), decision, accepted: true });
 });

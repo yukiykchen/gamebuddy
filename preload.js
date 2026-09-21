@@ -13,7 +13,8 @@ contextBridge.exposeInMainWorld('windowControls', {
   endPetDrag: () => ipcRenderer.send('pet-drag-end'),
   dismissEncounterGuide: () => ipcRenderer.send('dismiss-encounter-guide'),
   reopenEncounterGuide: () => ipcRenderer.send('reopen-encounter-guide'),
-  dismissCardRecommendation: () => ipcRenderer.send('dismiss-card-recommendation')
+  dismissCardRecommendation: () => ipcRenderer.send('dismiss-card-recommendation'),
+  setCardExpanded: expanded => ipcRenderer.send('set-card-expanded', Boolean(expanded))
 });
 
 contextBridge.exposeInMainWorld('gamebuddyBridge', {

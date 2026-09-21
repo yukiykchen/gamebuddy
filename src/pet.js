@@ -10,8 +10,12 @@ const guideContent = document.querySelector('#guide-content');
 const guideSource = document.querySelector('#guide-source');
 const guideReopen = document.querySelector('#guide-reopen');
 const cardPanel = document.querySelector('#card-recommendation');
+const cardMark = document.querySelector('#card-mark');
 const cardKicker = document.querySelector('#card-kicker');
 const cardTitle = document.querySelector('#card-title');
+const cardExpand = document.querySelector('#card-expand');
+const cardExpandLabel = document.querySelector('#card-expand-label');
+const cardDetails = document.querySelector('#card-details');
 const cardReason = document.querySelector('#card-reason');
 const cardPoints = document.querySelector('#card-points');
 const cardMeta = document.querySelector('#card-meta');
@@ -43,6 +47,14 @@ let tourPose = null;
 let tourTimer = 0;
 let tourStarted = false;
 let llmMode = { enabled: false, thinking: false };
+let cardExpanded = false;
+
+const CARD_PRESENTATION = {
+  card_reward: { mark: '牌', kicker: '选牌建议' },
+  map_route: { mark: '路', kicker: '路线建议' },
+  rest_site: { mark: '火', kicker: '火堆建议' },
+  event_choice: { mark: '事', kicker: '事件建议' }
+};
 
 function updateThinkingToggle() {
   if (!thinkingToggle) return;
@@ -69,6 +81,22 @@ function guideList(title, items, className = '') {
 function cardPointList(title, items, className) {
   if (!items?.length) return '';
   return `<section class="card-point ${className}"><strong>${escapeHtml(title)}</strong><ul>${items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul></section>`;
+}
+
+function setCardExpanded(expanded, notifyMain = true) {
+  cardExpanded = Boolean(expanded);
+  cardExpand.setAttribute('aria-expanded', String(cardExpanded));
+  cardExpandLabel.textContent = cardExpanded ? '收起详情' : '展开理由';
+  cardDetails.hidden = !cardExpanded;
+  if (notifyMain) window.windowControls?.setCardExpanded(cardExpanded);
+}
+
+function prepareCard(recommendation, title) {
+  const presentation = CARD_PRESENTATION[recommendation.task] || CARD_PRESENTATION.card_reward;
+  cardMark.textContent = presentation.mark;
+  cardKicker.textContent = presentation.kicker;
+  cardTitle.textContent = title;
+  setCardExpanded(false);
 }
 
 function hasAdvice() {
@@ -101,7 +129,7 @@ function startReplayPoseTour() {
 
 function cardSourceLabel(recommendation, confidence, version) {
   const source = recommendation.source === 'llm' ? 'LLM 复核' : '规则评分';
-  return `${source} · 置信度 ${confidence}%${version ? ` · ${version}` : ''}`;
+  return `来源：${source} / 置信度 ${confidence}%${version ? ` / ${version}` : ''}`;
 }
 
 function refreshCardMeta() {
@@ -112,7 +140,7 @@ function refreshCardMeta() {
     || recommendation.strategy?.gameVersion
     || recommendation.eventKnowledge?.gameVersion;
   const match = recommendation.eventKnowledge?.match;
-  cardMeta.textContent = `${cardSourceLabel(recommendation, confidence, version)}${match ? ` · ${match}` : ''}${recommendation.task === 'map_route' ? recommendation.routesTruncated ? ' · 路线未完整枚举' : ' · 启发式比较' : ''}`;
+  cardMeta.textContent = `${cardSourceLabel(recommendation, confidence, version)}${match ? ` / ${match}` : ''}${recommendation.task === 'map_route' ? recommendation.routesTruncated ? ' / 路线未完整枚举' : ' / 启发式比较' : ''}`;
 }
 
 function applyPose() {
@@ -147,6 +175,7 @@ function restAdvicePoints(recommendation) {
 function setCardRecommendation(recommendation) {
   if (!recommendation) {
     cardPanel.classList.remove('visible');
+    setCardExpanded(false, false);
     cardReason.textContent = '';
     cardPoints.innerHTML = '';
     petState.cardVisible = false;
@@ -159,11 +188,10 @@ function setCardRecommendation(recommendation) {
     const profiles = recommendation.routeProfiles || {};
     const healthLabel = profiles.healthBand === 'danger' ? '危险血量' : profiles.healthBand === 'caution' ? '谨慎血量' : '健康血量';
     const profileLabel = profiles.active === 'safe' ? '保命策略' : profiles.active === 'balanced' ? '平衡策略' : '成长策略';
-    cardKicker.textContent = '路线分叉建议';
-    cardTitle.textContent = `建议走${primary.displayLabel || primary.label || '下一节点'}`;
+    prepareCard(recommendation, `走${primary.displayLabel || primary.label || '下一节点'}`);
     cardReason.textContent = recommendation.reason || '当前局面下，这条路线的收益与风险更合适。';
     cardPoints.innerHTML = `${cardPointList('当前策略', [`${healthLabel} · ${profileLabel}`, profiles[profiles.active]?.displayLabel || primary.displayLabel || '资料不足'], 'positive')}${cardPointList('三档对照', [`安全：${profiles.safe?.displayLabel || '资料不足'}`, `平衡：${profiles.balanced?.displayLabel || '资料不足'}`, `成长：${profiles.growth?.displayLabel || '资料不足'}`], 'neutral')}`;
-    cardMeta.textContent = `${cardSourceLabel(recommendation, Math.round((Number(recommendation.confidence) || 0) * 100))}${recommendation.routesTruncated ? ' · 路线未完整枚举' : ' · 启发式比较'}`;
+    cardMeta.textContent = `${cardSourceLabel(recommendation, Math.round((Number(recommendation.confidence) || 0) * 100))}${recommendation.routesTruncated ? ' / 路线未完整枚举' : ' / 启发式比较'}`;
     cardPanel.classList.add('visible');
     petState.cardVisible = true;
     petState.cardRecommendation = recommendation;
@@ -172,10 +200,9 @@ function setCardRecommendation(recommendation) {
     return;
   }
   if (recommendation.task === 'rest_site') {
-    cardKicker.textContent = '休息处建议';
-    cardTitle.textContent = primary.action === 'HEAL'
-      ? (primary.label || '建议回血')
-      : (primary.label || `升级「${primary.cardName || '这张牌'}」`);
+    prepareCard(recommendation, primary.action === 'HEAL'
+      ? '在火堆回血'
+      : `升级「${primary.cardName || '这张牌'}」`);
     cardReason.textContent = recommendation.reason || '当前局面下，这是休息处更稳妥的选择。';
     cardPoints.innerHTML = restAdvicePoints(recommendation);
     const confidence = Math.round((Number(recommendation.confidence) || 0) * 100);
@@ -191,8 +218,8 @@ function setCardRecommendation(recommendation) {
   if (recommendation.task === 'event_choice') {
     const alts = (recommendation.alternatives || []).slice(0, 2).map(item => item.label).filter(Boolean);
     const analysis = primary.analysis || {};
-    cardKicker.textContent = recommendation.eventKind === 'ancient' ? '开局祝福建议' : '事件建议';
-    cardTitle.textContent = `建议选择「${primary.label || '这个选项'}」`;
+    prepareCard(recommendation, `选择「${primary.label || '这个选项'}」`);
+    cardKicker.textContent = recommendation.eventKind === 'ancient' ? '开局祝福' : '事件建议';
     cardReason.textContent = recommendation.reason || '当前局面下，这是更稳妥的选项。';
     cardPoints.innerHTML = `${cardPointList('主要收益', analysis.pros?.length
       ? analysis.pros.slice(0, 3)
@@ -203,7 +230,7 @@ function setCardRecommendation(recommendation) {
     const confidence = Math.round((Number(recommendation.confidence) || 0) * 100);
     const version = recommendation.eventKnowledge?.gameVersion;
     const match = recommendation.eventKnowledge?.match;
-    cardMeta.textContent = `${cardSourceLabel(recommendation, confidence, version)}${match ? ` · ${match}` : ''}`;
+    cardMeta.textContent = `${cardSourceLabel(recommendation, confidence, version)}${match ? ` / ${match}` : ''}`;
     cardPanel.classList.add('visible');
     petState.cardVisible = true;
     petState.cardRecommendation = recommendation;
@@ -211,10 +238,9 @@ function setCardRecommendation(recommendation) {
     say(`建议选择「${primary.label}」`);
     return;
   }
-  cardKicker.textContent = '卡牌奖励建议';
-  cardTitle.textContent = primary.action === 'SKIP'
-    ? '建议跳过这次奖励'
-    : `推荐「${primary.cardName || primary.label || '这张牌'}」`;
+  prepareCard(recommendation, primary.action === 'SKIP'
+    ? '这次跳过，不拿牌'
+    : `拿「${primary.cardName || primary.label || '这张牌'}」`);
   cardReason.textContent = recommendation.reason || '当前局面下，这是规则评分最高的选择。';
   const analysis = primary.analysis;
   cardPoints.innerHTML = analysis
@@ -271,10 +297,10 @@ function setEncounterGuide(guide) {
   const sourceCount = strategy?.sources?.length || 0;
   const confidence = strategy?.confidence === 'high' ? '高可信' : strategy?.confidence === 'medium' ? '中可信' : '';
   guideSource.textContent = guide.source !== 'spire-codex'
-    ? '数据来源：游戏 Bridge · 未匹配到完整资料'
+    ? '数据来源：游戏 Bridge / 未匹配到完整资料'
     : strategy?.basis === 'community'
-      ? `机制：Spire Codex · 攻略：${sourceCount} 个社区来源${confidence ? ` · ${confidence}` : ''} · stable ${guide.gameVersion || '当前版本'}`
-      : `机制与策略推导：Spire Codex · 非社区人工复核 · stable ${guide.gameVersion || '当前版本'}`;
+      ? `机制：Spire Codex / 攻略：${sourceCount} 个社区来源${confidence ? ` / ${confidence}` : ''} / stable ${guide.gameVersion || '当前版本'}`
+      : `机制与策略推导：Spire Codex / 非社区人工复核 / stable ${guide.gameVersion || '当前版本'}`;
   guidePanel.classList.add('visible');
   guideReopen.hidden = true;
   petState.guideVisible = true;
@@ -391,6 +417,10 @@ guideReopen.addEventListener('click', event => {
   event.stopPropagation();
   guideReopen.hidden = true;
   window.windowControls?.reopenEncounterGuide();
+});
+cardExpand.addEventListener('click', event => {
+  event.stopPropagation();
+  setCardExpanded(!cardExpanded);
 });
 document.querySelector('#card-close').addEventListener('click', () => {
   setCardRecommendation(null);
