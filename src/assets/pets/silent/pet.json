@@ -1,0 +1,24 @@
+{
+  "id": "silent",
+  "displayName": "静默猎手",
+  "renderer": "image",
+  "character": "silent",
+  "poses": {
+    "waiting": {
+      "image": "waiting.gif",
+      "alt": "静默猎手 waiting"
+    },
+    "watching": {
+      "image": "watching.gif",
+      "alt": "静默猎手 watching"
+    },
+    "thinking": {
+      "image": "thinking.gif",
+      "alt": "静默猎手 thinking"
+    },
+    "advising": {
+      "image": "advising.gif",
+      "alt": "静默猎手 advising"
+    }
+  }
+}

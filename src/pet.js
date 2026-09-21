@@ -23,6 +23,7 @@ const cardMeta = document.querySelector('#card-meta');
 const spriteRoot = document.querySelector('#pet-sprite');
 const { createPetSprite } = window.GameBuddyPetSprite;
 const petSprite = createPetSprite(spriteRoot);
+let currentPetSkin = null;
 
 const ADVICE_TASKS = new Set(['card_reward', 'rest_site', 'map_route', 'event_choice']);
 const POSES = new Set(['waiting', 'watching', 'thinking', 'advising']);
@@ -68,6 +69,12 @@ function updateThinkingToggle() {
   thinkingToggle.textContent = llmMode.enabled
     ? `思考 ${llmMode.thinking ? '开' : '关'}`
     : '规则模式';
+}
+
+function applyPetSkin(skin) {
+  if (skin?.renderer !== 'image' || !skin?.config) return;
+  currentPetSkin = skin;
+  petSprite.setPack(skin.config);
 }
 
 function escapeHtml(value) {
@@ -469,6 +476,7 @@ window.gamebuddyBridge?.onLlmMode(mode => {
   llmMode = mode || { enabled: false, thinking: false };
   updateThinkingToggle();
 });
+window.gamebuddyBridge?.onPetSkin(applyPetSkin);
 thinkingToggle?.addEventListener('click', event => {
   event.stopPropagation();
   if (!llmMode.enabled) return;

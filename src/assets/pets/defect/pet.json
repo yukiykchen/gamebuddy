@@ -1,0 +1,24 @@
+{
+  "id": "defect",
+  "displayName": "故障机器人",
+  "renderer": "image",
+  "character": "defect",
+  "poses": {
+    "waiting": {
+      "image": "waiting.gif",
+      "alt": "故障机器人 waiting"
+    },
+    "watching": {
+      "image": "watching.gif",
+      "alt": "故障机器人 watching"
+    },
+    "thinking": {
+      "image": "thinking.gif",
+      "alt": "故障机器人 thinking"
+    },
+    "advising": {
+      "image": "advising.gif",
+      "alt": "故障机器人 advising"
+    }
+  }
+}

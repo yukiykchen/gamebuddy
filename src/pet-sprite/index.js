@@ -42,17 +42,27 @@ function createImagePetSprite(root, config) {
   image.draggable = false;
   root.append(image);
   let activePose = '';
+  let activeConfig = config;
 
   return {
     kind: config.kind,
+    setPack(nextConfig) {
+      if (!nextConfig || nextConfig.kind !== 'image') return;
+      activeConfig = nextConfig;
+      const current = activePose;
+      if (current && nextConfig.poses?.[current]) {
+        activePose = '';
+        this.setPose(current);
+      }
+    },
     setPose(pose) {
-      const poseConfig = config.poses[pose];
+      const poseConfig = activeConfig.poses?.[pose];
       if (!poseConfig || activePose === pose) return;
       activePose = pose;
       root.dataset.pose = pose;
-      image.src = poseConfig.image;
+      image.src = `${activeConfig.basePath || ''}${poseConfig.image}`;
       image.alt = poseConfig.alt || '';
-      image.addEventListener('error', () => console.error(`[GameBuddy] pet sprite failed to load: ${poseConfig.image}`), { once: true });
+      image.addEventListener('error', () => console.error(`[GameBuddy] pet sprite failed to load: ${image.src}`), { once: true });
     },
     destroy() {
       image.remove();
@@ -70,7 +80,10 @@ const rendererFactories = Object.freeze({
 function createPetSprite(root, config = petSpriteConfig) {
   const factory = rendererFactories[config.kind];
   if (!factory) throw new Error(`Unknown pet sprite renderer: ${config.kind}`);
-  return factory(root, config);
+  const normalizedConfig = config.kind === 'image' && !config.basePath
+    ? { ...config, basePath: '' }
+    : config;
+  return factory(root, normalizedConfig);
 }
 
 window.GameBuddyPetSprite = Object.freeze({

@@ -1,12 +1,17 @@
 ## ADDED Requirements
 
 ### Requirement: Pet appearance can be switched at runtime
-The pet overlay SHALL offer an appearance selector in its context menu when at least one valid skin pack is available. Selecting a different pack MUST update the visible pet immediately while preserving the current pose, speech, advice panel, status strip, drag behavior, and click-to-open behavior.
+The pet overlay SHALL offer an appearance selector in its context menu when at least one valid skin pack is available. Selecting a different pack MUST update the visible pet immediately while preserving the current pose, speech, advice panel, status strip, drag behavior, and click-to-open behavior. The selector SHALL include a mode for automatic character matching when character-bound packs are available.
 
 #### Scenario: User switches skin while watching
 - **WHEN** the pet is in `watching` and the user selects another skin from the context menu
 - **THEN** the newly selected skin displays its `watching` animation immediately
 - **AND** the live status and other overlay controls remain unchanged
+
+#### Scenario: Automatic mode follows character
+- **WHEN** automatic appearance mode is active and the current run character has a bound skin
+- **THEN** the pet uses that character skin
+- **AND** the selector marks automatic mode as active
 
 #### Scenario: User switches skin while advice is open
 - **WHEN** the pet is in `advising` with an advice ticket visible and the user selects another skin

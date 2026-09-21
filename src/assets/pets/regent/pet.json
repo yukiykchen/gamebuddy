@@ -1,0 +1,24 @@
+{
+  "id": "regent",
+  "displayName": "储君",
+  "renderer": "image",
+  "character": "regent",
+  "poses": {
+    "waiting": {
+      "image": "waiting.gif",
+      "alt": "储君 waiting"
+    },
+    "watching": {
+      "image": "watching.gif",
+      "alt": "储君 watching"
+    },
+    "thinking": {
+      "image": "thinking.gif",
+      "alt": "储君 thinking"
+    },
+    "advising": {
+      "image": "advising.gif",
+      "alt": "储君 advising"
+    }
+  }
+}

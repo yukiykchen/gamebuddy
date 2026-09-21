@@ -31,6 +31,9 @@ const activeLlmRequests = new Map();
 const completedLlmDurationByTask = new Map();
 let lastAgentThinking = { thinking: false, tasks: [], model: null, startedAtByTask: {}, durationsByTask: {} };
 const observationStore = createObservationStore({ staleAfterMs: 5000 });
+const PET_SKINS_DIR = path.join(__dirname, 'src', 'assets', 'pets');
+const PET_POSES = ['waiting', 'watching', 'thinking', 'advising'];
+const PET_PREFERENCES_PATH = path.join(app.getPath('userData'), 'pet-preferences.json');
 const llmConfig = readLlmConfig();
 const baseLlmConfig = { ...llmConfig };
 let llmThinkingEnabled = llmConfig.thinking !== 'disabled';
@@ -73,6 +76,120 @@ function buildOrchestrator() {
 }
 
 buildOrchestrator();
+
+function loadPetSkins() {
+  const skins = [];
+  let defaultSkin = null;
+  if (!fs.existsSync(PET_SKINS_DIR)) return { skins, defaultSkin };
+  for (const entry of fs.readdirSync(PET_SKINS_DIR, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const packDir = path.join(PET_SKINS_DIR, entry.name);
+    const manifestPath = path.join(packDir, 'pet.json');
+    if (!fs.existsSync(manifestPath)) continue;
+    try {
+      const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+      if (!manifest || typeof manifest !== 'object' || manifest.renderer !== 'image' || typeof manifest.id !== 'string') continue;
+      const poseConfigs = {};
+      let complete = true;
+      for (const pose of PET_POSES) {
+        const poseConfig = manifest.poses?.[pose];
+        if (!poseConfig || typeof poseConfig.image !== 'string') {
+          complete = false;
+          break;
+        }
+        const imagePath = path.resolve(packDir, poseConfig.image);
+        if (!imagePath.startsWith(`${path.resolve(packDir)}${path.sep}`) && imagePath !== path.resolve(packDir)) {
+          complete = false;
+          break;
+        }
+        if (!fs.existsSync(imagePath)) {
+          complete = false;
+          break;
+        }
+        poseConfigs[pose] = { image: `./assets/pets/${entry.name}/${poseConfig.image}`, alt: poseConfig.alt || `${manifest.displayName || entry.name} ${pose}` };
+      }
+      if (!complete) continue;
+      const skin = {
+        id: manifest.id,
+        displayName: manifest.displayName || entry.name,
+        renderer: manifest.renderer,
+        character: typeof manifest.character === 'string' ? manifest.character : null,
+        config: { kind: manifest.renderer, basePath: '', poses: poseConfigs }
+      };
+      skins.push(skin);
+      if (!defaultSkin || manifest.default === true) defaultSkin = skin;
+    } catch {
+      continue;
+    }
+  }
+  if (!defaultSkin) defaultSkin = skins[0] || null;
+  return { skins, defaultSkin };
+}
+
+const { skins: petSkins, defaultSkin: defaultPetSkin } = loadPetSkins();
+const petSkinById = new Map(petSkins.map(skin => [skin.id, skin]));
+const petSkinByCharacter = new Map(petSkins.filter(skin => skin.character).map(skin => [skin.character, skin]));
+let petSkinMode = 'auto';
+let manualPetSkinId = null;
+let activePetSkin = defaultPetSkin;
+
+function readPetPreferences() {
+  try {
+    const parsed = JSON.parse(fs.readFileSync(PET_PREFERENCES_PATH, 'utf8'));
+    if (parsed?.mode === 'manual' && petSkinById.has(parsed.skinId)) {
+      petSkinMode = 'manual';
+      manualPetSkinId = parsed.skinId;
+      activePetSkin = petSkinById.get(parsed.skinId);
+    }
+  } catch {
+    // Missing or corrupt preferences use automatic mode.
+  }
+}
+
+function writePetPreferences() {
+  try {
+    fs.writeFileSync(PET_PREFERENCES_PATH, JSON.stringify({
+      mode: petSkinMode,
+      skinId: petSkinMode === 'manual' ? manualPetSkinId : null
+    }), 'utf8');
+  } catch {
+    // Preferences are best-effort; runtime selection still works.
+  }
+}
+
+function publishPetSkin() {
+  petWindow?.webContents.send('bridge-pet-skin', activePetSkin);
+}
+
+function selectPetSkin(skinId, mode = 'manual') {
+  if (!petSkinById.has(skinId)) return;
+  petSkinMode = mode;
+  manualPetSkinId = skinId;
+  activePetSkin = petSkinById.get(skinId);
+  writePetPreferences();
+  publishPetSkin();
+}
+
+function applyCharacterSkin(character) {
+  if (!character || petSkinMode === 'manual') return;
+  const nextSkin = petSkinByCharacter.get(String(character).toLowerCase());
+  if (!nextSkin || nextSkin.id === activePetSkin?.id) return;
+  activePetSkin = nextSkin;
+  publishPetSkin();
+}
+
+function setPetSkinMode(mode) {
+  if (mode === 'manual' && manualPetSkinId) {
+    petSkinMode = 'manual';
+    activePetSkin = petSkinById.get(manualPetSkinId) || activePetSkin;
+  } else {
+    petSkinMode = 'auto';
+    const character = observationStore.getState()?.run?.character;
+    activePetSkin = (character && petSkinByCharacter.get(String(character).toLowerCase())) || defaultPetSkin;
+  }
+  writePetPreferences();
+  publishPetSkin();
+}
 
 function withRoutableState(state) {
   if (!state?.map) return state;
@@ -338,6 +455,12 @@ function hidePet() {
 
 function showPetContextMenu(point) {
   if (!petWindow || petWindow.isDestroyed()) return;
+  const skinItems = petSkins.map(skin => ({
+    label: skin.displayName,
+    type: 'radio',
+    checked: petSkinMode === 'manual' && manualPetSkinId === skin.id,
+    click: () => selectPetSkin(skin.id, 'manual')
+  }));
   const menu = Menu.buildFromTemplate([
     { label: '打开 GameBuddy', click: () => { mainWindow?.show(); keepPetVisible(); } },
     {
@@ -347,6 +470,14 @@ function showPetContextMenu(point) {
         llmThinkingEnabled = !llmThinkingEnabled;
         applyLlmMode();
       }
+    },
+    {
+      label: '切换形象',
+      submenu: [
+        { label: '自动跟随角色', type: 'radio', checked: petSkinMode === 'auto', click: () => setPetSkinMode('auto') },
+        { type: 'separator' },
+        ...skinItems
+      ]
     },
     { type: 'separator' },
     { label: '关闭桌面宠物', click: hidePet }
@@ -389,6 +520,7 @@ function connectBridge() {
           if (!agentRunId) startAgentRun();
           const observation = currentObservation();
           const routableState = withRoutableState(observation.state);
+          applyCharacterSkin(routableState?.run?.character);
           if (!routableState.combat && routeChoiceCount(routableState) <= 1) clearAgentThinking('map_route');
           recordDecision({ runId: agentRunId, observation: { ...observation, state: routableState }, decision: observation.decision });
           broadcast('bridge-state', routableState);
@@ -516,6 +648,7 @@ function createPetWindow() {
   petWindow.loadFile(path.join(__dirname, 'src', 'pet.html'));
   petWindow.webContents.on('did-finish-load', () => {
     petWindow.webContents.send('bridge-status', lastBridgeStatus);
+    publishPetSkin();
     const observation = currentObservation();
     const state = observation.state;
     if (state) petWindow.webContents.send('bridge-state', withRoutableState(state));
@@ -572,6 +705,8 @@ ipcMain.on('toggle-llm-thinking', () => {
   llmThinkingEnabled = !llmThinkingEnabled;
   applyLlmMode();
 });
+ipcMain.on('select-pet-skin', (_event, skinId) => selectPetSkin(skinId, 'manual'));
+ipcMain.on('set-pet-skin-mode', (_event, mode) => setPetSkinMode(mode));
 ipcMain.on('pet-drag-start', (_event, point) => {
   if (!petWindow || petWindow.isDestroyed() || !point) return;
   const [x, y] = petWindow.getPosition();
@@ -605,6 +740,8 @@ ipcMain.handle('refresh-recommendation', async () => {
 });
 
 app.whenReady().then(() => {
+  readPetPreferences();
+  applyCharacterSkin(observationStore.getState()?.run?.character);
   createMainWindow();
   createPetWindow();
   createTray();

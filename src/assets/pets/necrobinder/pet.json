@@ -1,0 +1,24 @@
+{
+  "id": "necrobinder",
+  "displayName": "亡灵契约师",
+  "renderer": "image",
+  "character": "necrobinder",
+  "poses": {
+    "waiting": {
+      "image": "waiting.gif",
+      "alt": "亡灵契约师 waiting"
+    },
+    "watching": {
+      "image": "watching.gif",
+      "alt": "亡灵契约师 watching"
+    },
+    "thinking": {
+      "image": "thinking.gif",
+      "alt": "亡灵契约师 thinking"
+    },
+    "advising": {
+      "image": "advising.gif",
+      "alt": "亡灵契约师 advising"
+    }
+  }
+}
