@@ -47,6 +47,29 @@ function validateRecommendation(recommendation) {
       return { ok: false, reason: 'card_reward needs candidate options' };
     }
   }
+  if (recommendation.task === 'shop_choice') {
+    if (!['BUY_ITEM', 'REMOVE_CARD', 'SAVE_GOLD'].includes(primary.action)) {
+      return { ok: false, reason: 'shop_choice action must be BUY_ITEM, REMOVE_CARD, or SAVE_GOLD' };
+    }
+    if (!Number.isFinite(primary.totalSpend) || primary.totalSpend < 0 || !Number.isFinite(primary.remainingGold) || primary.remainingGold < 0) {
+      return { ok: false, reason: 'shop_choice needs valid spend and remaining gold' };
+    }
+    if (!Array.isArray(primary.plan)) return { ok: false, reason: 'shop_choice needs a plan array' };
+    if (Number.isFinite(recommendation.context?.gold) && primary.totalSpend > recommendation.context.gold) {
+      return { ok: false, reason: 'shop_choice plan exceeds current gold' };
+    }
+    if (primary.action === 'SAVE_GOLD' && primary.plan.length !== 0) {
+      return { ok: false, reason: 'shop_choice SAVE_GOLD plan must be empty' };
+    }
+    if (primary.action === 'BUY_ITEM') {
+      if (!Number.isInteger(primary.itemIndex) || typeof primary.itemId !== 'string' || !primary.itemId || typeof primary.itemName !== 'string' || !primary.itemName) {
+        return { ok: false, reason: 'shop_choice BUY_ITEM needs current item identity' };
+      }
+    }
+    if (primary.action === 'REMOVE_CARD' && (typeof primary.removeCardName !== 'string' || !primary.removeCardName)) {
+      return { ok: false, reason: 'shop_choice REMOVE_CARD needs removeCardName' };
+    }
+  }
   if (recommendation.alternatives !== undefined && !Array.isArray(recommendation.alternatives)) {
     return { ok: false, reason: 'alternatives must be an array' };
   }

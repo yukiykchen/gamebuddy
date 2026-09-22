@@ -25,6 +25,19 @@ assert.equal(validateMessage({
 assert.equal(validateMessage({ type: 'event', name: 'event.opened', timestamp: Date.now() }).ok, true);
 assert.equal(validateMessage({ type: 'event', name: 'event.closed', timestamp: Date.now() }).ok, true);
 assert.equal(validateMessage({ type: 'event', name: 'card.reward.closed', timestamp: Date.now() }).ok, true);
+const validShop = {
+  gold: 180,
+  items: [
+    { index: 0, itemType: 'card', id: 'IRON_WAVE', name: '铁斩波', price: 52, affordable: true, stocked: true, onSale: false, description: '造成伤害并获得格挡。', card: { id: 'IRON_WAVE', name: '铁斩波', upgraded: false, description: '造成伤害并获得格挡。', descriptionSource: 'runtime' } },
+    { index: 1, itemType: 'relic', id: 'BAG_OF_PREPARATION', name: '准备背包', price: 175, affordable: true, stocked: true, onSale: false, description: '战斗开始时抽牌。' }
+  ]
+};
+assert.equal(validateState({ ...validState, combat: null, shop: validShop }).ok, true);
+assert.equal(validateMessage({ type: 'event', name: 'shop.opened', timestamp: Date.now(), data: validShop }).ok, true);
+assert.equal(validateMessage({ type: 'event', name: 'shop.updated', timestamp: Date.now(), data: { ...validShop, gold: 128, items: validShop.items.slice(1) } }).ok, true);
+assert.equal(validateMessage({ type: 'event', name: 'shop.closed', timestamp: Date.now() }).ok, true);
+assert.equal(validateMessage({ type: 'event', name: 'shop.opened', timestamp: Date.now(), data: { ...validShop, items: [{ ...validShop.items[0], price: -1 }] } }).ok, false);
+assert.equal(validateMessage({ type: 'event', name: 'shop.opened', timestamp: Date.now(), data: { ...validShop, items: [{ ...validShop.items[0], itemType: 'mystery' }] } }).ok, false);
 assert.equal(validateMessage({
   type: 'event',
   name: 'card.reward.opened',

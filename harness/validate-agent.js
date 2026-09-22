@@ -6,6 +6,7 @@ const { validateRecommendation } = require('../agent/recommendation');
 const { rankRoutes, recommendRoute, scoreNode, scoreParts, buildScoreContext, healthBand, ensureMapRoutes, routeChoiceCount } = require('../agent/tasks/route');
 const { isRestSite, recommendRest, rankSmithCards } = require('../agent/tasks/rest');
 const { findCardReward, recommendCardReward, analyzeCard, cardRewardSignature } = require('../agent/tasks/card-reward');
+const { findShop, shopSignature, removeTarget, buildPlans, recommendShop } = require('../agent/tasks/shop');
 const { resolveItem, inferUpgraded, rankEncounterMatches } = require('../agent/knowledge/spire-codex');
 const { encounterKind, encounterGuideSignature, buildEncounterGuide, mechanicStrategy } = require('../agent/tasks/encounter-guide');
 const { parseJsonObject, createOpenAiClient, readLlmConfig, extractResponseText, resolveChatTemperature, parseAllowedTemperature } = require('../agent/llm/openai');
@@ -1469,7 +1470,58 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   assert.equal(normalGuide.strategy.basis, 'mechanics');
   assert.ok(normalGuide.monsters.length === 2);
 
-  console.log('Agent recommendation cases passed: 74');
+  const shopState = {
+    ...mapState,
+    run: { ...mapState.run, room: 'Merchant', currentNode: 'Shop' },
+    player: {
+      ...mapState.player,
+      gold: 180,
+      maxPotionSlots: 3,
+      cards: [
+        { id: 'STRIKE', name: '打击', type: 'Attack', upgraded: false, description: '造成 6 点伤害。' },
+        { id: 'DEFEND', name: '防御', type: 'Skill', upgraded: false, description: '获得 5 点格挡。' }
+      ],
+      relics: [],
+      potions: []
+    },
+    combat: null,
+    shop: {
+      gold: 180,
+      items: [
+        { index: 0, itemType: 'card', id: 'IRON_WAVE', name: '铁斩波', price: 50, affordable: true, stocked: true, onSale: false, card: { id: 'IRON_WAVE', name: '铁斩波', type: 'Attack', upgraded: true, description: '造成伤害并获得格挡。', descriptionSource: 'runtime', energyCost: 1, energyCostSource: 'runtime', starCostSource: 'unavailable' } },
+        { index: 1, itemType: 'relic', id: 'RINGING_TRIANGLE', name: '三角铃鼓', price: 120, affordable: true, stocked: true, onSale: true, description: '在每场战斗的第一回合保留你的手牌。' },
+        { index: 2, itemType: 'potion', id: 'REGEN_POTION', name: '再生药水', price: 55, affordable: true, stocked: true, onSale: false, description: '获得 5 层再生。' },
+        { index: 3, itemType: 'service', id: 'CARD_REMOVAL', name: '删除一张牌', price: 75, affordable: true, stocked: true, onSale: false, description: '从牌组中永久删除一张牌。' }
+      ]
+    }
+  };
+  const shopObservation = { state: shopState, fresh: true, recentEvents: [{ name: 'shop.opened', data: shopState.shop }] };
+  assert.equal(findShop(shopObservation).items.length, 4);
+  assert.notEqual(shopSignature(shopObservation), shopSignature({ ...shopObservation, state: { ...shopState, shop: { ...shopState.shop, gold: 80 } }, recentEvents: [{ name: 'shop.updated', data: { ...shopState.shop, gold: 80 } }] }));
+  assert.equal(removeTarget(shopState.player.cards).name, '打击');
+  const legalPlans = buildPlans(shopState.shop.items.map(item => ({ ...item, score: 70 })), shopState.shop, shopState);
+  assert.ok(legalPlans.some(plan => plan.action === 'SAVE_GOLD'));
+  assert.ok(legalPlans.every(plan => plan.totalSpend <= shopState.shop.gold));
+  const shopKnowledge = {
+    source: 'spire-codex',
+    cards: [shopState.shop.items[0].card],
+    deckCards: shopState.player.cards,
+    relics: [],
+    potions: [],
+    threats: { knownBoss: { name: '守护者', exact: true, monsters: [] }, knownUpcomingElites: [], possibleElites: [], possibleBosses: [] },
+    coach: null
+  };
+  const shopRec = await recommendShop(shopObservation, {
+    now: 61,
+    codex: { loadDraftContext: async () => shopKnowledge },
+    llm: { enabled: true, completeShop: async () => ({ index: 999, reason: '非法索引' }) }
+  });
+  assert.equal(shopRec.task, 'shop_choice');
+  assert.equal(validateRecommendation(shopRec).ok, true);
+  assert.ok(shopRec.primary.totalSpend <= shopState.shop.gold);
+  assert.ok(['BUY_ITEM', 'REMOVE_CARD', 'SAVE_GOLD'].includes(shopRec.primary.action));
+
+  console.log('Agent recommendation cases passed: 82');
 }).catch(error => {
   console.error(error);
   process.exit(1);

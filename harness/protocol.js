@@ -1,6 +1,7 @@
 const SUPPORTED_SCHEMA = 'gamebuddy.state.v1';
-const SUPPORTED_EVENTS = new Set(['combat.started', 'turn.started', 'combat.ended', 'map.opened', 'rest.opened', 'rest.closed', 'event.opened', 'event.closed', 'card.played', 'card.reward.opened', 'card.reward.closed']);
+const SUPPORTED_EVENTS = new Set(['combat.started', 'turn.started', 'combat.ended', 'map.opened', 'rest.opened', 'rest.closed', 'event.opened', 'event.closed', 'shop.opened', 'shop.updated', 'shop.closed', 'card.played', 'card.reward.opened', 'card.reward.closed']);
 const CARD_SOURCES = new Set(['runtime', 'catalog', 'unavailable']);
+const SHOP_ITEM_TYPES = new Set(['card', 'relic', 'potion', 'service']);
 
 function validateCardSnapshot(card, prefix) {
   if (typeof card === 'string' && card) return { ok: true };
@@ -45,6 +46,41 @@ function validateReward(reward, prefix = 'reward') {
   }
   if (reward.canSkip !== undefined && typeof reward.canSkip !== 'boolean') {
     return { ok: false, reason: `${prefix}.canSkip must be a boolean` };
+  }
+  return { ok: true };
+}
+
+function validateShop(shop, prefix = 'shop') {
+  if (!shop || typeof shop !== 'object') return { ok: false, reason: `${prefix} must be an object` };
+  if (!Number.isFinite(shop.gold) || shop.gold < 0) return { ok: false, reason: `${prefix}.gold must be a non-negative number` };
+  if (!Array.isArray(shop.items) || shop.items.length > 30) return { ok: false, reason: `${prefix}.items must be an array with at most 30 entries` };
+  const indexes = new Set();
+  for (const item of shop.items) {
+    if (!item || typeof item !== 'object') return { ok: false, reason: `${prefix} item must be an object` };
+    if (!Number.isInteger(item.index) || item.index < 0 || indexes.has(item.index)) {
+      return { ok: false, reason: `${prefix} item needs a unique non-negative index` };
+    }
+    indexes.add(item.index);
+    if (!SHOP_ITEM_TYPES.has(item.itemType)) return { ok: false, reason: `${prefix} item has unsupported itemType` };
+    if (typeof item.id !== 'string' || !item.id || typeof item.name !== 'string' || !item.name) {
+      return { ok: false, reason: `${prefix} item needs id and name` };
+    }
+    if (item.price !== null && item.price !== undefined && (!Number.isFinite(item.price) || item.price < 0)) {
+      return { ok: false, reason: `${prefix} item price must be a non-negative number or null` };
+    }
+    for (const field of ['affordable', 'stocked', 'onSale']) {
+      if (item[field] !== undefined && typeof item[field] !== 'boolean') {
+        return { ok: false, reason: `${prefix} item ${field} must be a boolean` };
+      }
+    }
+    if (item.description !== undefined && item.description !== null && typeof item.description !== 'string') {
+      return { ok: false, reason: `${prefix} item description must be a string or null` };
+    }
+    if (item.itemType === 'card') {
+      if (!item.card || typeof item.card !== 'object') return { ok: false, reason: `${prefix} card item needs card details` };
+      const cardValidation = validateCardSnapshot(item.card, `${prefix}.items.card`);
+      if (!cardValidation.ok) return cardValidation;
+    }
   }
   return { ok: true };
 }
@@ -153,6 +189,10 @@ function validateState(state) {
     const validation = validateReward(state.reward, 'state.reward');
     if (!validation.ok) return validation;
   }
+  if (state.shop !== undefined && state.shop !== null) {
+    const validation = validateShop(state.shop, 'state.shop');
+    if (!validation.ok) return validation;
+  }
   for (const field of ['hp', 'maxHp', 'block', 'gold', 'energy', 'maxEnergy']) {
     if (!Number.isFinite(state.player[field])) return { ok: false, reason: `player.${field} is invalid` };
   }
@@ -169,6 +209,7 @@ function stateSignature(state) {
     cardReward: state.cardReward,
     reward: state.reward ?? null,
     rewards: state.rewards ?? null,
+    shop: state.shop ?? null,
     eventId: state.run?.eventId ?? null
   });
 }
@@ -183,7 +224,11 @@ function validateMessage(message) {
     const validation = validateReward(message.data, 'card.reward.opened data');
     if (!validation.ok) return validation;
   }
+  if ((message.name === 'shop.opened' || message.name === 'shop.updated') && message.data !== undefined && message.data !== null) {
+    const validation = validateShop(message.data, `${message.name} data`);
+    if (!validation.ok) return validation;
+  }
   return { ok: true };
 }
 
-module.exports = { SUPPORTED_EVENTS, SUPPORTED_SCHEMA, validateCardSnapshot, validateMessage, validateState, stateSignature };
+module.exports = { SUPPORTED_EVENTS, SUPPORTED_SCHEMA, validateCardSnapshot, validateShop, validateMessage, validateState, stateSignature };

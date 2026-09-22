@@ -60,6 +60,7 @@ function createObservationStore({ historyLimit = 100, staleAfterMs = 5000 } = {}
           || (Array.isArray(state.map?.routes) && state.map.routes.length > 0)
           || (Array.isArray(state.event?.options) && state.event.options.length > 0)
           || (Array.isArray(state.cardReward?.options) && state.cardReward.options.length > 0)
+          || (Array.isArray(state.shop?.items) && state.shop.items.length > 0)
         ))
       )),
       state: state || null,

@@ -10,6 +10,7 @@ using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Context;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Merchant;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Logging;
 using MegaCrit.Sts2.Core.Models;
@@ -47,6 +48,8 @@ public static class GameBuddyExporter
     private static string? _lastCombatNodeType;
     private static string _lastEventSignature = string.Empty;
     private static bool _eventChoiceOpen;
+    private static string _lastShopSignature = string.Empty;
+    private static bool _shopOpen;
 
     public static void Initialize(string modDirectory)
     {
@@ -112,6 +115,7 @@ public static class GameBuddyExporter
             PublishCardRewardIfReady(snapshot);
             PublishTransitions(snapshot);
             PublishEventLifecycle(snapshot);
+            PublishShopLifecycle(snapshot);
         }
         catch (Exception ex)
         {
@@ -206,6 +210,29 @@ public static class GameBuddyExporter
             _eventChoiceOpen = false;
             _lastEventSignature = string.Empty;
             PublishEvent("event.closed");
+        }
+    }
+
+    private static void PublishShopLifecycle(GameBuddyState snapshot)
+    {
+        var shop = snapshot.Shop;
+        var signature = shop is null
+            ? string.Empty
+            : $"{shop.Gold}|{string.Join("|", shop.Items.Select(item => $"{item.Index}:{item.ItemType}:{item.Id}:{item.Price}:{item.Stocked}:{item.Card?.Upgraded}"))}";
+        if (shop is not null && !string.Equals(signature, _lastShopSignature, StringComparison.Ordinal))
+        {
+            var eventName = _shopOpen ? "shop.updated" : "shop.opened";
+            _shopOpen = true;
+            _lastShopSignature = signature;
+            PublishEvent(eventName, shop);
+            return;
+        }
+
+        if (_shopOpen && shop is null)
+        {
+            _shopOpen = false;
+            _lastShopSignature = string.Empty;
+            PublishEvent("shop.closed");
         }
     }
 
@@ -435,6 +462,7 @@ public static class GameBuddyExporter
         var nextBoss = runState.Act.BossEncounter.Title.GetFormattedText();
         var secondBossId = runState.Act.SecondBossEncounter?.Id.Entry;
         var secondBoss = runState.Act.SecondBossEncounter?.Title.GetFormattedText();
+        var maxPotionSlots = ReadIntValue(ReadMember(player, "MaxPotionSlots", "PotionSlots", "PotionCapacity", "MaxPotions"));
         return new GameBuddyState(
             "gamebuddy.state.v1",
             DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
@@ -462,10 +490,95 @@ public static class GameBuddyExporter
                 combat?.MaxEnergy ?? 0,
                 MapCards(player.Deck.Cards),
                 player.Relics.Select(relic => new OwnedItemSnapshot(relic.Id.Entry, relic.Title.GetFormattedText())).ToList(),
-                player.Potions.Select(potion => new OwnedItemSnapshot(potion.Id.Entry, potion.Title.GetFormattedText())).ToList()),
+                player.Potions.Select(potion => new OwnedItemSnapshot(potion.Id.Entry, potion.Title.GetFormattedText())).ToList(),
+                maxPotionSlots),
             combatState,
             mapSnapshot,
-            BuildEventSnapshot(runState));
+            BuildEventSnapshot(runState),
+            BuildShopSnapshot(runState, player));
+    }
+
+    private static ShopSnapshot? BuildShopSnapshot(RunState runState, Player player)
+    {
+        try
+        {
+            if (runState.CurrentRoom is not MerchantRoom room)
+            {
+                return null;
+            }
+
+            MerchantInventory? inventory = room.Inventories.Find(candidate => candidate.Player == player);
+            if (inventory is null)
+            {
+                return null;
+            }
+
+            var items = new List<ShopItemSnapshot>();
+            var index = 0;
+            foreach (var entry in inventory.CardEntries)
+            {
+                var card = entry.CreationResult?.Card;
+                if (card is null || !entry.IsStocked) continue;
+                items.Add(MapShopItem(index++, "card", card.Id.Entry, FormatLoc(card.Title), entry, ReadTextMember(card, "Rarity", "CardRarity"),
+                    ReadTextMember(card, "DynamicDescription", "Description", "CanonicalDescription", "CardDescription"), MapCard(card)));
+            }
+            foreach (var entry in inventory.RelicEntries)
+            {
+                var relic = entry.Model;
+                if (relic is null || !entry.IsStocked) continue;
+                items.Add(MapShopItem(index++, "relic", relic.Id.Entry, FormatLoc(relic.Title), entry, ReadTextMember(relic, "Rarity", "RelicRarity"),
+                    ReadTextMember(relic, "DynamicDescription", "Description"), null));
+            }
+            foreach (var entry in inventory.PotionEntries)
+            {
+                var potion = entry.Model;
+                if (potion is null || !entry.IsStocked) continue;
+                items.Add(MapShopItem(index++, "potion", potion.Id.Entry, FormatLoc(potion.Title), entry, ReadTextMember(potion, "Rarity", "PotionRarity"),
+                    ReadTextMember(potion, "DynamicDescription", "Description"), null));
+            }
+
+            var removalEntry = ReadMember(inventory, "CardRemovalEntry", "RemovalEntry", "PurgeEntry")
+                ?? ReadMember(room, "CardRemovalEntry", "RemovalEntry", "PurgeEntry");
+            if (removalEntry is not null && (ReadBoolMember(removalEntry, "IsStocked", "Available", "Enabled") ?? true))
+            {
+                items.Add(MapShopItem(index, "service", "CARD_REMOVAL", "删除一张牌", removalEntry, null,
+                    "从牌组中永久删除一张牌。", null));
+            }
+            else
+            {
+                var removalPrice = ReadIntValue(ReadMember(inventory, "CardRemovalCost", "RemovalCost", "PurgeCost", "CurrentRemovalCost"))
+                    ?? ReadIntValue(ReadMember(room, "CardRemovalCost", "RemovalCost", "PurgeCost", "CurrentRemovalCost"));
+                if (removalPrice is not null)
+                {
+                    items.Add(new ShopItemSnapshot(index, "service", "CARD_REMOVAL", "删除一张牌", removalPrice,
+                        removalPrice <= player.Gold, true, false, null, "从牌组中永久删除一张牌。", null));
+                }
+            }
+
+            return new ShopSnapshot(player.Gold, items);
+        }
+        catch (Exception ex)
+        {
+            Log.Warn($"[GameBuddyBridge] shop capture failed: {ex.Message}");
+            return null;
+        }
+    }
+
+    private static ShopItemSnapshot MapShopItem(
+        int index,
+        string itemType,
+        string id,
+        string name,
+        object entry,
+        string? rarity,
+        string? description,
+        CardSnapshot? card)
+    {
+        var price = ReadIntValue(ReadMember(entry, "Price", "Cost", "CurrentPrice", "CurrentCost", "FinalPrice", "FinalCost", "_price", "_cost"));
+        var affordable = ReadBoolMember(entry, "EnoughGold", "IsAffordable") ?? false;
+        var stocked = ReadBoolMember(entry, "IsStocked", "Stocked", "Available") ?? true;
+        var onSale = ReadBoolMember(entry, "OnSale", "IsOnSale", "Discounted") ?? false;
+        return new ShopItemSnapshot(index, itemType, id, name, price, affordable, stocked, onSale, rarity, description, card);
     }
 
     private static MapSnapshot BuildMapSnapshot(RunState runState)
@@ -834,11 +947,11 @@ public static class GameBuddyExporter
 public sealed record BridgeMessage<T>(string Type, T Data);
 public sealed record BridgeEvent(string Type, string Name, long Timestamp, object? Data);
 
-public sealed record GameBuddyState(string Schema, long Timestamp, string Source, RunSnapshot Run, PlayerSnapshot Player, CombatSnapshot? Combat, MapSnapshot Map, EventSnapshot? Event);
+public sealed record GameBuddyState(string Schema, long Timestamp, string Source, RunSnapshot Run, PlayerSnapshot Player, CombatSnapshot? Combat, MapSnapshot Map, EventSnapshot? Event, ShopSnapshot? Shop);
 public sealed record EventSnapshot(string Title, string Description, string Kind, List<EventOptionSnapshot> Options, string? EventId, string? PageId);
 public sealed record EventOptionSnapshot(int Index, string Label, string Description, bool Locked, string? OptionId);
 public sealed record RunSnapshot(int Act, int Floor, string? Room, string Character, int TotalFloor, string? CurrentNode, string? CurrentCoord, string ActId, string ActName, string? NextBossId, string? NextBoss, string? SecondBossId, string? SecondBoss);
-public sealed record PlayerSnapshot(int Hp, int MaxHp, int Block, int Gold, int Energy, int MaxEnergy, List<CardSnapshot> Cards, List<OwnedItemSnapshot> Relics, List<OwnedItemSnapshot> Potions);
+public sealed record PlayerSnapshot(int Hp, int MaxHp, int Block, int Gold, int Energy, int MaxEnergy, List<CardSnapshot> Cards, List<OwnedItemSnapshot> Relics, List<OwnedItemSnapshot> Potions, int? MaxPotionSlots);
 public sealed record CombatSnapshot(int Turn, List<CardSnapshot> Hand, List<CardSnapshot> DrawPile, List<CardSnapshot> DiscardPile, List<CardSnapshot> ExhaustPile, List<EnemySnapshot> Enemies);
 public sealed record EnemySnapshot(string? Id, string Name, int Hp, int MaxHp, int Block, string? Intent, bool Alive);
 public sealed record CardSnapshot(
@@ -856,6 +969,8 @@ public sealed record CardSnapshot(
     bool StarCostX,
     string StarCostSource);
 public sealed record OwnedItemSnapshot(string Id, string Name);
+public sealed record ShopSnapshot(int Gold, List<ShopItemSnapshot> Items);
+public sealed record ShopItemSnapshot(int Index, string ItemType, string Id, string Name, int? Price, bool Affordable, bool Stocked, bool OnSale, string? Rarity, string? Description, CardSnapshot? Card);
 public sealed record MapSnapshot(
     List<string> Visited,
     string? Current,

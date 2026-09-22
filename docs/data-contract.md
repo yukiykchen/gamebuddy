@@ -111,6 +111,22 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
 
 `eventId`、`pageId` 和 `optionId` 是向后兼容的可选字段。新 Bridge 会从当前游戏对象反射读取稳定标识；Early Access 版本移动成员或旧 Bridge 没有这些字段时均返回/视为 `null`，Agent 再按中文标题、页面描述和可见选项文本匹配。运行时 `description` 始终优先，因为它包含本次事件的真实动态数值。
 
+商店房通过可选 `shop` 字段上报当前玩家看到的实际库存。`price=null` 表示当前版本未能读取价格，此商品不会进入可购买计划；卡牌项包含完整 `card` 快照，遗物和药水项优先携带游戏运行时效果文本：
+
+```json
+{
+  "shop": {
+    "gold": 184,
+    "items": [
+      { "index": 0, "itemType": "card", "id": "ANGER", "name": "愤怒", "price": 52, "stocked": true, "affordable": true, "onSale": false, "card": { "id": "ANGER", "name": "愤怒", "upgraded": false, "description": "造成6点伤害。" } },
+      { "index": 4, "itemType": "relic", "id": "BAG_OF_PREPARATION", "name": "准备背包", "price": 150, "stocked": true, "affordable": true, "description": "战斗开始时，抽2张牌。" },
+      { "index": 7, "itemType": "potion", "id": "FIRE_POTION", "name": "火焰药水", "price": 50, "stocked": true, "affordable": true, "description": "造成一次性伤害。" },
+      { "index": 9, "itemType": "service", "id": "CARD_REMOVAL", "name": "删牌服务", "price": 75, "stocked": true, "affordable": true }
+    ]
+  }
+}
+```
+
 卡牌奖励也可以临时出现在状态的可选 `reward` 字段中。常规 Mod 通过下方事件发送，状态字段主要供其他适配器和回放使用：
 
 ```json
@@ -143,6 +159,9 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
 - `rest.closed`（休息处选择完成：回血、升级，或离开休息 UI。`data.action` 为 `HEAL` / `SMITH` / `null`）
 - `event.opened`（事件房或开局祝福出现可选项；`data` 含 `title`、`kind`、`options`）
 - `event.closed`（可选项消失或离开事件房）
+- `shop.opened`（进入商店并读取到库存）
+- `shop.updated`（金币、库存、价格或售出状态变化）
+- `shop.closed`（离开商店）
 - `combat.ended`
 - `card.reward.opened`
 - `card.reward.closed`
@@ -172,6 +191,8 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
 选牌 LLM 对候选牌和完整牌组都接收 `upgraded`、`description`、`descriptionSource`、结构化 `costs` 和 `contextCompleteness`。实机值优先于目录；`contextCompleteness=partial` 或来源为 `unavailable` 时，模型提示词明确禁止猜测缺失效果与费用。
 
 `event.opened` 在事件房可见可选项变化时发送。开局远古祝福（如佩尔三选一遗物）与途中事件共用这条路径。事件、页面和选项 ID 会同时进入事件签名，因此多页面事件推进后会重新分析，而同一页面的重复快照不会重复调用。选完或离开后发送 `event.closed`；桌面端据此结束 `event_choice` 建议卡。各幕开局常先发过 `map.opened`，因此不能靠再发一次地图事件来收起开局建议。
+
+`shop.opened` / `shop.updated` 的 `data` 与状态中的 `shop` 相同。玩家购买、删牌或金币变化后，Bridge 发送 `shop.updated`，桌面端只刷新实际库存和余额，并保留进店时一次生成的完整购物清单，不再次调用商店 Agent；`shop.closed` 会停止商店思考并清除该清单。
 
 `card.played` 仍待接入对应 STS2 生命周期 Hook。
 
@@ -208,11 +229,13 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
 
 ## Agent 建议
 
-主进程里的 `agent/` 消费 `gamebuddy.observation.v1`，产出 `gamebuddy.recommendation.v1`。当前实现卡牌奖励 `card_reward`、路线 `map_route` 和休息处 `rest_site`；战斗出牌 `combat_play` 暂缓。
+主进程里的 `agent/` 消费 `gamebuddy.observation.v1`，产出 `gamebuddy.recommendation.v1`。当前实现卡牌奖励 `card_reward`、商店 `shop_choice`、事件 `event_choice`、路线 `map_route` 和休息处 `rest_site`；战斗出牌 `combat_play` 暂缓。
 
 卡牌奖励 Agent 会读取 Spire Codex 公共 API 的简体中文卡牌、遗物、药水、怪物和遭遇数据，并调用 `/api/runs/pick-coach` 取得当前牌组/遗物对应的流派、相似胜局支持度和 offer-conditioned 拿取率。送给模型的实时上下文包括：完整牌组与升级状态、每件遗物和药水的完整效果、金币/生命/能量、当前 Act 的全部地图节点与路线、已确定 Boss 的完整招式和机制，以及本章可能精英池。规则层也会针对多目标、多段攻击、成长、爆发和状态牌污染等机制加权。三张都不能改善牌组时可以建议 `SKIP`。API 超时或不可用时自动退回 Bridge 数据和本地规则，不阻塞选牌界面。
 
 Spire Codex API 默认地址为 `https://spire-codex.com/api`，可用 `GAMEBUDDY_SPIRE_CODEX_URL` 覆盖。GameBuddy 不复制 Spire Codex 的源码或整库数据。
+
+商店 Agent 从进店库存生成满足预算的合法组合，最多规划 3 项购买，并始终加入 `SAVE_GOLD`。卡牌沿用完整卡面与牌组协同分析；遗物和药水结合运行时效果、已有资源、药水槽和后续强敌；删牌会从当前牌组中给出具体目标。提示词包含完整牌组及升级状态、持有遗物/药水效果、地图、确定 Boss、已知或可能精英、全部商品分析和规则层候选方案。LLM 只能返回候选索引，不能虚构商品、价格或超预算组合。结果一次列出本次应购买的全部商品、删牌目标、建议顺序、总花费和余额；后续库存事件不触发逐件重新决策。
 
 任何房间只要 `combat` 非空，主进程都会生成独立的 `gamebuddy.encounter-guide.v1` 攻略消息并发送给桌面宠物。`kind` 为 `normal`、`elite` 或 `boss`；问号事件触发的战斗在不是精英/Boss 时也归为 `normal`，并按实际敌人匹配。该消息不占用 recommendation 槽位，因此不会覆盖路线、休息处或卡牌奖励建议。攻略按楼层和地图坐标去重，每场只自动弹出一次；手动关闭后不会再次自动打扰，但当前战斗可通过桌宠按钮重新打开，战斗结束后自动清理。
 

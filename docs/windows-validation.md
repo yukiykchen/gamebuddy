@@ -39,9 +39,10 @@ mods\GameBuddyBridge\GameBuddyBridge.json
 11. 打开卡牌奖励，确认三张候选牌、当前牌组和 `card.reward.opened` 事件完整，界面能建议拿牌或跳过；完成选择后确认收到 `card.reward.closed`，卡牌思考动画和旧建议立即消失且不再重复触发。
 12. 进入休息处，确认界面能在回血和具体卡牌升级之间给出建议。
 13. 进入问号事件，确认主面板和桌宠展示逐选项收益、代价、风险、资料版本与匹配方式；多页面事件推进后重新分析，低血量时明确致死选项不得成为首选。
-14. 分别进入普通怪、精英和 Boss 战，确认桌宠显示“小怪攻略”“精英攻略”“BOSS 攻略”；手动关闭后本场不重复打扰，下一场战斗可以再次弹出。
-15. 触发一次选牌、路线、火堆或事件 LLM 请求，确认桌宠状态栏实时累计秒数；结果返回后展开建议，确认来源信息保留最终思考用时，规则模式不显示该字段。
-16. 关闭游戏，确认 GameBuddy 回到等待状态并自动重连。
+14. 进入商店，确认主面板读取全部在售卡牌、遗物、药水、删牌服务和实际价格；桌宠一次给出完整购物清单、顺序、总价与余额，且总价不超过当前金币。逐件购买时只刷新库存与余额，不再次触发思考或改变原清单；离开后建议消失。
+15. 分别进入普通怪、精英和 Boss 战，确认桌宠显示“小怪攻略”“精英攻略”“BOSS 攻略”；手动关闭后本场不重复打扰，下一场战斗可以再次弹出。
+16. 触发一次选牌、路线、火堆、事件或商店 LLM 请求，确认桌宠状态栏实时累计秒数；结果返回后展开建议，确认来源信息保留最终思考用时，规则模式不显示该字段。
+17. 关闭游戏，确认 GameBuddy 回到等待状态并自动重连。
 
 ## 记录结果
 
@@ -55,6 +56,7 @@ Hand updates: yes / no
 Enemy intent (no damage estimate): yes / no
 Card reward and recommendation: yes / no
 Rest recommendation: yes / no
+Shop inventory and recommendation: yes / no
 Elite guide popup: yes / no
 Boss guide popup: yes / no
 Reconnect: yes / no

@@ -25,7 +25,7 @@ const { createPetSprite } = window.GameBuddyPetSprite;
 const petSprite = createPetSprite(spriteRoot);
 let currentPetSkin = null;
 
-const ADVICE_TASKS = new Set(['card_reward', 'rest_site', 'map_route', 'event_choice']);
+const ADVICE_TASKS = new Set(['card_reward', 'rest_site', 'map_route', 'event_choice', 'shop_choice']);
 const POSES = new Set(['waiting', 'watching', 'thinking', 'advising']);
 const POSE_LABELS = { waiting: '等待', watching: '旁观', thinking: '思考', advising: '建议' };
 const POSE_TOUR = ['waiting', 'watching', 'thinking', 'advising'];
@@ -59,7 +59,8 @@ const CARD_PRESENTATION = {
   card_reward: { mark: '牌', kicker: '选牌建议' },
   map_route: { mark: '路', kicker: '路线建议' },
   rest_site: { mark: '火', kicker: '火堆建议' },
-  event_choice: { mark: '事', kicker: '事件建议' }
+  event_choice: { mark: '事', kicker: '事件建议' },
+  shop_choice: { mark: '店', kicker: '商店建议' }
 };
 
 function updateThinkingToggle() {
@@ -273,6 +274,20 @@ function setCardRecommendation(recommendation) {
     say(`建议选择「${primary.label}」`);
     return;
   }
+  if (recommendation.task === 'shop_choice') {
+    const analysis = primary.analysis || {};
+    const plan = primary.plan || [];
+    const title = primary.label || (primary.action === 'SAVE_GOLD' ? '先不买，保留金币' : '按购物清单购买');
+    prepareCard(recommendation, title);
+    cardReason.textContent = recommendation.reason || '这是当前库存和预算下更合适的消费方式。';
+    cardPoints.innerHTML = `${plan.length ? cardPointList('本次完整购物清单', plan.map((item, index) => `${index + 1}. ${item.itemType === 'service' && item.analysis?.removeTarget ? `删除「${item.analysis.removeTarget.name}」` : `购买「${item.name}」`} · ${item.price} 金币`), 'positive') : cardPointList('为什么保留金币', ['当前商品提升不足，保留预算等待后续商店'], 'neutral')}${cardPointList('主要收益', analysis.pros?.slice(0, 3), 'positive')}${cardPointList('需要留意', analysis.cons?.slice(0, 3), 'negative')}${cardPointList('预算', [`整份清单花费 ${primary.totalSpend || 0}，完成后剩余 ${primary.remainingGold ?? recommendation.context?.gold ?? 0} 金币`], 'neutral')}`;
+    cardPanel.classList.add('visible');
+    petState.cardVisible = true;
+    petState.cardRecommendation = recommendation;
+    applyPose();
+    say(title);
+    return;
+  }
   prepareCard(recommendation, primary.action === 'SKIP'
     ? '这次跳过，不拿牌'
     : `拿「${primary.cardName || primary.label || '这张牌'}」`);
@@ -304,7 +319,8 @@ function setAgentThinking(state) {
     card_reward: '正在比较三张奖励牌',
     map_route: '正在推演后续路线',
     rest_site: '正在权衡回血和升级',
-    event_choice: '正在分析事件选项'
+    event_choice: '正在分析事件选项',
+    shop_choice: '正在比较商店商品和预算'
   };
   say(labels[task] || '正在结合这局思考');
 }
@@ -386,6 +402,8 @@ function setState(next) {
     say('小心，敌人显示攻击意图');
   } else if (/rest|camp/i.test(String(next.run?.room || '')) || /rest/i.test(String(next.run?.currentNode || ''))) {
     say('休息处，想想回血还是升级');
+  } else if (next.shop?.items?.length) {
+    say('正在读取商店里的全部商品');
   } else if (next.run?.room === 'map') {
     say('地图已打开');
   } else {
@@ -407,6 +425,9 @@ function setRecommendation(recommendation) {
     return;
   }
   if (recommendation.task === 'event_choice' && recommendation.primary?.label) {
+    return;
+  }
+  if (recommendation.task === 'shop_choice' && recommendation.primary?.label) {
     return;
   }
   if (recommendation.task !== 'map_route' || !recommendation.primary?.label) return;

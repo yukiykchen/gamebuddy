@@ -134,7 +134,7 @@ function eventChoicePending(observation) {
   const events = observation?.recentEvents || [];
   for (let index = events.length - 1; index >= 0; index -= 1) {
     const name = events[index]?.name;
-    if (name === 'event.closed' || name === 'combat.started' || name === 'card.reward.opened') return false;
+    if (name === 'event.closed' || name === 'combat.started' || name === 'card.reward.opened' || name === 'shop.opened') return false;
     if (name === 'event.opened') return true;
   }
   if (state.event && typeof state.event === 'object') return true;

@@ -173,6 +173,9 @@ h1 { margin: 9px 0 7px; color: var(--cream); font: 500 30px Georgia, "Songti SC"
 .draft-kicker { color: var(--amber); font-size: 10px; letter-spacing: 1.5px; }
 .draft-title { margin: 8px 0 21px; color: var(--cream); font: 500 24px Georgia, serif; }
 .draft-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.shop-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.shop-item { min-height: 220px; }
+.shop-layout .draft-side { align-self: start; }
 .draft-card { min-height: 190px; padding: 17px; border: 1px solid #4a4238; background: linear-gradient(155deg, #393029, #242321); }
 .draft-card.top-pick { border-color: var(--amber); box-shadow: inset 0 2px 0 var(--amber); }
 .draft-card .card-name { margin-top: 14px; font-size: 14px; }

@@ -12,6 +12,7 @@ const state = {
   map: { visited: [] },
   reward: null,
   event: null,
+  shop: null,
   recommendation: null
 };
 
@@ -181,6 +182,42 @@ function eventView() {
   return `<div class="draft-layout rest-layout"><section class="panel draft-offer"><div class="draft-kicker">${kicker}</div><h2 class="draft-title">${title}</h2><p class="recommendation-reason">${reason}</p><div class="draft-cards">${cards}</div></section><section class="panel draft-side"><div class="panel-heading"><span class="panel-title">当前局面</span><span class="panel-meta">${sourceLabel}</span></div><div class="deck-stat"><span>生命</span><strong>${state.player.hp || 0} / ${state.player.maxHp || 0}</strong></div><div class="deck-stat"><span>金币</span><strong>${state.player.gold ?? '--'}</strong></div><div class="deck-stat"><span>卡组</span><strong>${state.player.cards?.length || 0}</strong></div><div class="deck-stat"><span>遗物 / 药水</span><strong>${state.player.relics?.length || 0} / ${state.player.potions?.length || 0}</strong></div><div class="deck-stat"><span>事件资料</span><strong>${escapeHtml(knowledge.gameVersion || '运行时文本')}</strong></div><div class="deck-stat"><span>匹配方式</span><strong>${escapeHtml(knowledge.match || '未匹配')}</strong></div><div class="data-empty" style="margin-top:18px">随机结果保持未知；GameBuddy 不会替你点击选项。</div></section></div>`;
 }
 
+function shopView() {
+  const rec = state.recommendation?.task === 'shop_choice' ? state.recommendation : null;
+  const primary = rec?.primary;
+  const itemKey = item => `${item.itemType}:${item.id || item.name}`;
+  const analyzedByKey = new Map((rec?.inventory || []).map(item => [itemKey(item), item]));
+  const rawItems = Array.isArray(state.shop?.items)
+    ? state.shop.items.map(item => ({ ...analyzedByKey.get(itemKey(item)), ...item, analysis: analyzedByKey.get(itemKey(item))?.analysis }))
+    : rec?.inventory || [];
+  const typeLabels = { card: '卡牌', relic: '遗物', potion: '药水', service: '服务' };
+  const plannedItems = new Set((primary?.plan || []).map(itemKey));
+  const cards = rawItems.length
+    ? rawItems.map(item => {
+      const analysis = item.analysis || {};
+      const recommended = plannedItems.has(itemKey(item));
+      const effect = analysis.effect || analysis.description || item.description || item.card?.description || '没有读取到完整效果文本。';
+      const pros = (analysis.pros || []).slice(0, 2).map(text => `<li class="positive">${escapeHtml(text)}</li>`).join('');
+      const cons = (analysis.cons || []).slice(0, 2).map(text => `<li>${escapeHtml(text)}</li>`).join('');
+      const price = Number.isFinite(item.price) ? `${item.price} 金币` : '价格未读取';
+      const affordable = item.affordable === true || (Number.isFinite(item.price) && item.price <= (state.shop?.gold ?? state.player.gold ?? 0));
+      const status = item.stocked === false ? '已售出' : !affordable ? '金币不足' : item.onSale ? '折扣' : '在售';
+      return `<article class="draft-card shop-item ${recommended ? 'top-pick' : ''}">
+        <div class="draft-card-head"><span class="pick-tag">${recommended ? '清单' : escapeHtml(status)}</span><strong>${Number.isFinite(item.score) ? item.score : '--'}</strong></div>
+        <div class="card-name">${escapeHtml(item.name || item.id)}</div>
+        <div class="draft-card-meta">${escapeHtml(typeLabels[item.itemType] || item.itemType)} · ${escapeHtml(price)}${item.rarity ? ` · ${escapeHtml(item.rarity)}` : ''}</div>
+        <p>${escapeHtml(effect)}</p>
+        ${pros || cons ? `<ul class="draft-notes">${pros}${cons}</ul>` : ''}
+      </article>`;
+    }).join('')
+    : `<div class="data-empty large-empty">${state.shop ? '当前已没有仍在售的商品；进店时生成的购物清单仍保留在右侧。' : '进入商店后，Mod 会同步全部在售卡牌、遗物、药水和删牌服务。'}</div>`;
+  const title = primary?.label || '等待商店库存';
+  const reason = rec?.reason || '商店打开后，会结合当前牌组、金币、完整地图和后续强敌生成购买建议。';
+  const plan = (primary?.plan || []).map((item, index) => `<div class="route-choice ${index === 0 ? 'recommended' : ''}"><strong>${index + 1}. ${item.itemType === 'service' && item.analysis?.removeTarget ? `删除「${escapeHtml(item.analysis.removeTarget.name)}」` : `购买「${escapeHtml(item.name)}」`}</strong><span>${item.price} 金币 · 规则分 ${item.score}</span></div>`).join('');
+  const threats = rec?.context || {};
+  return `<div class="draft-layout shop-layout"><section class="panel draft-offer"><div class="draft-kicker">MERCHANT / INVENTORY</div><h2 class="draft-title">${escapeHtml(title)}</h2><p class="recommendation-reason">${escapeHtml(reason)}</p><div class="draft-cards shop-grid">${cards}</div></section><section class="panel draft-side"><div class="panel-heading"><span class="panel-title">本次完整购物清单</span><span class="panel-meta">${rec ? rec.source === 'llm' ? '模型复核' : '规则评分' : '等待分析'}</span></div><div class="deck-stat"><span>当前金币</span><strong>${state.shop?.gold ?? state.player.gold ?? '--'}</strong></div><div class="deck-stat"><span>清单总价</span><strong>${primary?.totalSpend ?? 0}</strong></div><div class="deck-stat"><span>完成后余额</span><strong>${primary?.remainingGold ?? state.player.gold ?? '--'}</strong></div><div class="deck-stat"><span>确定 Boss</span><strong>${escapeHtml(threats.knownBoss || '尚未识别')}</strong></div><div class="deck-stat"><span>确定精英</span><strong>${escapeHtml((threats.knownUpcomingElites || []).join('、') || '尚未识别')}</strong></div><div class="deck-stat"><span>后续商店</span><strong>${threats.futureShops ?? '--'}</strong></div>${plan || '<div class="data-empty draft-disclaimer">当前建议是保留金币，不购买库存商品。</div>'}<div class="data-empty draft-disclaimer">这是进店时一次生成的完整清单；按顺序购买即可，不会每买一件重新分析。GameBuddy 不会替你点击。</div></section></div>`;
+}
+
 function draftView() {
   const rec = state.recommendation?.task === 'card_reward' ? state.recommendation : null;
   const rawCards = state.reward?.cards || state.reward?.offered || state.reward?.options || [];
@@ -320,12 +357,15 @@ function render() {
       ? ['EVENT / CHOICE', state.recommendation?.eventKind === 'ancient' ? '开局选哪个祝福？' : '这个事件选哪项？', '根据牌组、遗物和生命，在可见选项里给出推荐。']
       : showingRest()
       ? ['REST / CAMPFIRE', '回血还是升级？', '根据生命缺口、后续精英和未升级的牌，给出休息处选择。']
-      : ['MAP / ACT ' + String(state.run.act || 1).padStart(2, '0'), '下一步往哪里走？', '把战斗风险、卡组成长和遗物收益，压缩成一条可执行的路线。']
+      : ['MAP / ACT ' + String(state.run.act || 1).padStart(2, '0'), '下一步往哪里走？', '把战斗风险、卡组成长和遗物收益，压缩成一条可执行的路线。'],
+    shop: ['MERCHANT / SHOP', '这家商店买什么？', '结合牌组、预算、完整地图和后续强敌，给出当前库存的购买优先级。']
   }[state.mode];
   document.querySelector('#page-eyebrow').textContent = copy[0];
   document.querySelector('#page-title').textContent = copy[1];
   document.querySelector('#page-description').textContent = copy[2];
-  viewContainer.innerHTML = showingEvent()
+  viewContainer.innerHTML = state.mode === 'shop'
+    ? shopView()
+    : showingEvent()
     ? eventView()
     : showingRest()
     ? restView()
@@ -386,6 +426,7 @@ function setBridgeStatus(status) {
     state.enemy = null;
     state.hand = [];
     state.reward = null;
+    state.shop = null;
     state.selectedCard = '';
     state.recommendation = null;
     state.syncedAt = 0;
@@ -417,6 +458,7 @@ function applyBridgeState(next) {
   if (next.player) state.player = { ...state.player, ...next.player };
   state.map = next.map || { visited: [] };
   state.event = next.event || null;
+  state.shop = next.shop || null;
   if (Object.prototype.hasOwnProperty.call(next, 'reward')) state.reward = next.reward;
   const incomingCombat = next.combat;
   state.combat = incomingCombat ? {
@@ -445,7 +487,8 @@ function applyBridgeState(next) {
   if (next.combat) state.reward = null;
   state.syncedAt = Date.now();
   if (atRestSite(next.run, state.combat)) state.mode = 'route';
-  if (state.mode === 'combat' || state.mode === 'route' || state.mode === 'draft') render();
+  if (next.shop) state.mode = 'shop';
+  if (state.mode === 'combat' || state.mode === 'route' || state.mode === 'draft' || state.mode === 'shop') render();
 }
 
 setInterval(() => {
@@ -466,7 +509,8 @@ window.gamebuddyBridge?.onEvent(event => {
   }
   if (event.name === 'map.opened') {
     state.reward = null;
-    if (state.recommendation?.task === 'card_reward' || state.recommendation?.task === 'event_choice') state.recommendation = null;
+    state.shop = null;
+    if (state.recommendation?.task === 'card_reward' || state.recommendation?.task === 'event_choice' || state.recommendation?.task === 'shop_choice') state.recommendation = null;
     state.mode = 'route';
     render();
     showToast('地图已打开；出现分叉时会生成路线建议');
@@ -503,18 +547,32 @@ window.gamebuddyBridge?.onEvent(event => {
     render();
     showToast('事件已选完，开始看下一步');
   }
+  if (event.name === 'shop.opened' || event.name === 'shop.updated') {
+    state.shop = event.data || state.shop;
+    state.mode = 'shop';
+    render();
+    showToast(event.name === 'shop.updated' ? '商店库存和余额已更新，继续按原购物清单购买' : '已读取全部商店商品并生成完整购物清单');
+  }
+  if (event.name === 'shop.closed') {
+    if (state.recommendation?.task === 'shop_choice') state.recommendation = null;
+    state.shop = null;
+    state.mode = 'route';
+    render();
+    showToast('已离开商店');
+  }
 });
 window.gamebuddyBridge?.onRecommendation(recommendation => {
   if (!recommendation) {
     state.recommendation = null;
-    if (state.mode === 'route' || state.mode === 'draft') render();
+    if (state.mode === 'route' || state.mode === 'draft' || state.mode === 'shop') render();
     return;
   }
-  if (recommendation.task !== 'map_route' && recommendation.task !== 'rest_site' && recommendation.task !== 'card_reward' && recommendation.task !== 'event_choice') return;
+  if (recommendation.task !== 'map_route' && recommendation.task !== 'rest_site' && recommendation.task !== 'card_reward' && recommendation.task !== 'event_choice' && recommendation.task !== 'shop_choice') return;
   state.recommendation = recommendation;
   if (recommendation.task === 'rest_site' || recommendation.task === 'event_choice') state.mode = 'route';
   if (recommendation.task === 'card_reward') state.mode = 'draft';
-  if (state.mode === 'route' || state.mode === 'draft') render();
+  if (recommendation.task === 'shop_choice') state.mode = 'shop';
+  if (state.mode === 'route' || state.mode === 'draft' || state.mode === 'shop') render();
 });
 window.gamebuddyBridge?.onStatus(status => {
   setBridgeStatus(status);

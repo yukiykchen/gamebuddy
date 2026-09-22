@@ -3,6 +3,7 @@ const { recommendRoute, routeSignature, routeChoiceCount } = require('./tasks/ro
 const { isRestSite, recommendRest, restSignature } = require('./tasks/rest');
 const { recommendEvent, eventSignature, choosableEventOptions, eventChoicePending } = require('./tasks/event');
 const { findCardReward, recommendCardReward, cardRewardSignature } = require('./tasks/card-reward');
+const { findShop, recommendShop, shopSignature } = require('./tasks/shop');
 const { createOpenAiClient, readLlmConfig } = require('./llm/openai');
 
 const SCENE_EVENTS = new Set([
@@ -13,10 +14,13 @@ const SCENE_EVENTS = new Set([
   'rest.opened',
   'rest.closed',
   'event.opened',
+  'shop.opened',
+  'shop.updated',
+  'shop.closed',
   'map.opened'
 ]);
 
-const REST_CHOICE_DONE = new Set(['rest.closed', 'map.opened', 'combat.started', 'card.reward.opened']);
+const REST_CHOICE_DONE = new Set(['rest.closed', 'map.opened', 'combat.started', 'card.reward.opened', 'shop.opened']);
 
 function latestSceneEvent(observation) {
   const events = observation?.recentEvents || [];
@@ -59,7 +63,7 @@ function eventChoiceFinished(observation) {
   for (let index = events.length - 1; index >= 0; index -= 1) {
     const name = events[index]?.name;
     if (name === 'event.closed') return true;
-    if (name === 'event.opened' || name === 'combat.started' || name === 'card.reward.opened') return false;
+    if (name === 'event.opened' || name === 'combat.started' || name === 'card.reward.opened' || name === 'shop.opened') return false;
   }
   return false;
 }
@@ -69,6 +73,7 @@ function selectTask(observation) {
   if (!state) return null;
   if (state.combat) return null;
   if (findCardReward(observation)) return 'card_reward';
+  if (findShop(observation)) return 'shop_choice';
   if (choosableEventOptions(state).length > 0) return 'event_choice';
   if (eventChoicePending(observation)) return null;
   if (restChoicePending(observation)) return 'rest_site';
@@ -83,6 +88,7 @@ function signatureFor(task, observation, state) {
   if (task === 'rest_site') return restSignature(state);
   if (task === 'map_route') return routeSignature(state);
   if (task === 'event_choice') return eventSignature(state);
+  if (task === 'shop_choice') return shopSignature(observation);
   return '';
 }
 
@@ -127,6 +133,7 @@ function createOrchestrator({
       const leaveScene = observation?.state?.combat
         || scene === 'card.reward.closed'
         || scene === 'rest.closed'
+        || scene === 'shop.closed'
         || mapWithoutFork
         || restFinishedIdle;
       if (leaveScene && !cardStillRunning) {
@@ -146,8 +153,10 @@ function createOrchestrator({
 
     const signature = `${task}:${signatureFor(task, observation, observation.state)}`;
     const refresh = reason === 'refresh';
+    if (task === 'shop_choice' && lastRecommendation?.task === 'shop_choice' && !refresh) return lastRecommendation;
     if (inFlight && inFlight.signature === signature && !refresh) return inFlight.promise;
     if (inFlight && inFlight.task === task && task === 'card_reward' && !refresh) return inFlight.promise;
+    if (inFlight && inFlight.task === task && task === 'shop_choice' && !refresh) return inFlight.promise;
     if (!observation?.fresh && !force && !refresh && lastRecommendation) return lastRecommendation;
     if (signature === lastSignature && lastRecommendation) {
       if (!refresh && (task === 'card_reward' || !force)) return lastRecommendation;
@@ -164,11 +173,13 @@ function createOrchestrator({
       try {
         const recommendation = task === 'card_reward'
           ? await recommendCardReward(observation, taskOptions)
-          : task === 'event_choice'
-            ? await recommendEvent(observation.state, taskOptions)
-            : task === 'rest_site'
-              ? await recommendRest(observation.state, taskOptions)
-              : await recommendRoute(observation.state, taskOptions);
+          : task === 'shop_choice'
+            ? await recommendShop(observation, taskOptions)
+            : task === 'event_choice'
+              ? await recommendEvent(observation.state, taskOptions)
+              : task === 'rest_site'
+                ? await recommendRest(observation.state, taskOptions)
+                : await recommendRoute(observation.state, taskOptions);
         if (current !== generation) {
           if (recommendation) {
             console.warn(`GameBuddy dropped ${task} result because a newer consider started`);

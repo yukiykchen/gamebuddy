@@ -47,6 +47,11 @@ function emitTransitions(socket, snapshot) {
   if (restNow && !restBefore) sendEvent(socket, 'rest.opened');
   const closed = inferRestClosed(previousSnapshot, snapshot);
   if (closed) sendEvent(socket, 'rest.closed', closed);
+  const previousShop = previousSnapshot?.shop || null;
+  const currentShop = snapshot.shop || null;
+  if (currentShop && !previousShop) sendEvent(socket, 'shop.opened', currentShop);
+  else if (currentShop && previousShop && JSON.stringify(currentShop) !== JSON.stringify(previousShop)) sendEvent(socket, 'shop.updated', currentShop);
+  else if (!currentShop && previousShop) sendEvent(socket, 'shop.closed');
   previousSnapshots.set(socket, snapshot);
 }
 
