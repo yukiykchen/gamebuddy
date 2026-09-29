@@ -1,5 +1,6 @@
 const stage = document.querySelector('#pet-stage');
 const speech = document.querySelector('#speech');
+const speechText = document.querySelector('#speech-text');
 const statusDot = document.querySelector('.status-dot');
 const statusLabel = document.querySelector('#pet-status-label');
 const thinkingTime = document.querySelector('#thinking-time');
@@ -27,7 +28,6 @@ let currentPetSkin = null;
 
 const ADVICE_TASKS = new Set(['card_reward', 'rest_site', 'map_route', 'event_choice', 'shop_choice']);
 const POSES = new Set(['waiting', 'watching', 'thinking', 'advising']);
-const POSE_LABELS = { waiting: '等待', watching: '旁观', thinking: '思考', advising: '建议' };
 const POSE_TOUR = ['waiting', 'watching', 'thinking', 'advising'];
 const POSE_TOUR_LINES = {
   waiting: '姿态演示：等开局',
@@ -69,13 +69,15 @@ function updateThinkingToggle() {
   thinkingToggle.classList.toggle('disabled', !llmMode.enabled);
   thinkingToggle.textContent = llmMode.enabled
     ? `思考 ${llmMode.thinking ? '开' : '关'}`
-    : '规则模式';
+    : '规则';
+  thinkingToggle.title = llmMode.enabled ? '切换 LLM 深度思考' : '当前为规则模式';
 }
 
 function applyPetSkin(skin) {
   if (skin?.renderer !== 'image' || !skin?.config) return;
   currentPetSkin = skin;
   petSprite.setPack(skin.config);
+  stage.dataset.skin = skin.id;
 }
 
 function escapeHtml(value) {
@@ -98,9 +100,11 @@ function cardPointList(title, items, className) {
 
 function setCardExpanded(expanded, notifyMain = true) {
   cardExpanded = Boolean(expanded);
+  stage.classList.toggle('card-expanded', cardExpanded);
   cardExpand.setAttribute('aria-expanded', String(cardExpanded));
   cardExpandLabel.textContent = cardExpanded ? '收起详情' : '展开理由';
   cardDetails.hidden = !cardExpanded;
+  applyPose();
   if (notifyMain) window.windowControls?.setCardExpanded(cardExpanded);
 }
 
@@ -182,14 +186,18 @@ function refreshCardMeta() {
 function applyPose() {
   const pose = currentPose();
   if (!POSES.has(pose)) return;
+  stage.dataset.pose = pose;
   petSprite.setPose(pose);
-  statusLabel.textContent = `${connectionLabel} · ${POSE_LABELS[pose]}`;
+  statusLabel.textContent = connectionLabel;
+  speech.classList.toggle('has-details', petState.cardVisible && !cardExpanded);
+  speech.setAttribute('aria-label', petState.cardVisible && !cardExpanded ? '展开当前建议的理由' : '打开 GameBuddy 主面板');
   refreshCardMeta();
 }
 
 function say(message, fromTour = false) {
   if (tourPose && !fromTour) return;
-  speech.textContent = message;
+  speechText.textContent = message;
+  speech.title = message;
   speech.classList.add('visible');
 }
 
@@ -217,6 +225,7 @@ function setCardRecommendation(recommendation) {
     petState.cardVisible = false;
     petState.cardRecommendation = null;
     applyPose();
+    if (!petState.guideVisible) say(petState.thinking ? '正在结合这局思考' : petState.live ? '我在看着这局' : '正在连接游戏');
     return;
   }
   const primary = recommendation.primary || {};
@@ -232,7 +241,7 @@ function setCardRecommendation(recommendation) {
     petState.cardVisible = true;
     petState.cardRecommendation = recommendation;
     applyPose();
-    say(`下一步建议走${primary.displayLabel || primary.label}`);
+    say(cardTitle.textContent);
     return;
   }
   if (recommendation.task === 'rest_site') {
@@ -248,7 +257,7 @@ function setCardRecommendation(recommendation) {
     petState.cardVisible = true;
     petState.cardRecommendation = recommendation;
     applyPose();
-    say(primary.action === 'HEAL' ? '建议回血' : `建议升级${primary.cardName || ''}`);
+    say(cardTitle.textContent);
     return;
   }
   if (recommendation.task === 'event_choice') {
@@ -271,7 +280,7 @@ function setCardRecommendation(recommendation) {
     petState.cardVisible = true;
     petState.cardRecommendation = recommendation;
     applyPose();
-    say(`建议选择「${primary.label}」`);
+    say(cardTitle.textContent);
     return;
   }
   if (recommendation.task === 'shop_choice') {
@@ -303,7 +312,7 @@ function setCardRecommendation(recommendation) {
   petState.cardVisible = true;
   petState.cardRecommendation = recommendation;
   applyPose();
-  say(primary.action === 'SKIP' ? '这次建议跳过' : `建议拿 ${primary.cardName || primary.label}`);
+  say(cardTitle.textContent);
 }
 
 function setAgentThinking(state) {
@@ -328,6 +337,7 @@ function setAgentThinking(state) {
 function setEncounterGuide(guide) {
   if (!guide) {
     guidePanel.classList.remove('visible');
+    stage.classList.remove('guide-visible');
     guideContent.innerHTML = '';
     petState.guideVisible = false;
     applyPose();
@@ -357,6 +367,7 @@ function setEncounterGuide(guide) {
       ? `机制：Spire Codex / 攻略：${sourceCount} 个社区来源${confidence ? ` / ${confidence}` : ''} / stable ${guide.gameVersion || '当前版本'}`
       : `机制与策略推导：Spire Codex / 非社区人工复核 / stable ${guide.gameVersion || '当前版本'}`;
   guidePanel.classList.add('visible');
+  stage.classList.add('guide-visible');
   guideReopen.hidden = true;
   petState.guideVisible = true;
   applyPose();
@@ -377,19 +388,24 @@ function setStatus(status) {
   petState.live = status.status === 'live';
   statusDot.classList.remove('live', 'alert');
   if (replay) {
-    connectionLabel = '回放 DEMO';
+    connectionLabel = '演示中';
     statusDot.classList.add('live');
     startReplayPoseTour();
   } else if (status.status === 'live') {
     statusDot.classList.add('live');
-    connectionLabel = '游戏 LIVE';
+    connectionLabel = '已连接';
+    if (!hasAdvice() && !petState.thinking) say('我在看着这局');
   } else if (status.status === 'invalid' || status.status === 'stale') {
     statusDot.classList.add('alert');
-    connectionLabel = status.status === 'stale' ? '数据停滞' : '数据异常';
+    connectionLabel = status.status === 'stale' ? '数据延迟' : '数据异常';
     say(status.status === 'stale' ? '游戏状态停住了' : '数据格式需要检查');
   } else {
-    connectionLabel = status.status === 'connected' ? '等待游戏' : status.status === 'demo' ? '回放数据' : '等待游戏';
-    if (status.status === 'connecting') say('正在找游戏');
+    connectionLabel = status.status === 'connected' ? '等待对局' : status.status === 'connecting' ? '连接中' : status.status === 'demo' ? '演示中' : '未连接';
+    if (!hasAdvice()) {
+      if (status.status === 'connecting') say('正在连接游戏');
+      else if (status.status === 'connected') say('等待开始对局');
+      else if (status.status !== 'demo') say('等待游戏启动');
+    }
   }
   applyPose();
 }
@@ -438,6 +454,14 @@ applyPose();
 
 const petButton = document.querySelector('#pet-button');
 let dragState;
+
+speech.addEventListener('click', () => {
+  if (petState.cardVisible && !cardExpanded) {
+    setCardExpanded(true);
+    return;
+  }
+  window.windowControls?.openMain();
+});
 
 petButton.addEventListener('pointerdown', event => {
   if (event.button !== 0) return;

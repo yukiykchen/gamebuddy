@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GameBuddy Pet</title>
-    <link rel="stylesheet" href="./pet.css?v=focus-ui" />
+    <link rel="stylesheet" href="./pet.css?v=bubble-refresh" />
   </head>
   <body>
     <main class="pet-stage" id="pet-stage" data-pose="waiting">
@@ -37,8 +37,11 @@
         <div class="guide-source" id="guide-source">数据来源：Spire Codex</div>
       </aside>
       <button class="guide-reopen" id="guide-reopen" type="button" hidden>查看怪物攻略</button>
+      <button class="speech visible" id="speech" type="button" aria-label="打开 GameBuddy 主面板">
+        <span class="speech-text" id="speech-text">正在连接游戏</span>
+        <span class="speech-chevron" aria-hidden="true"></span>
+      </button>
       <button class="pet-button" id="pet-button" aria-label="打开 GameBuddy 建议面板">
-        <span class="speech" id="speech">等你出牌</span>
         <span class="thinking-cloud" aria-hidden="true"><i></i><i></i><i></i></span>
         <span class="thinking-orbit" aria-hidden="true"><i></i><i></i><i></i></span>
         <span class="pet-glow"></span>
@@ -50,10 +53,10 @@
           <span class="pet-scarf"></span><span class="pet-foot left"></span><span class="pet-foot right"></span>
         </span>
         <span class="pet-shadow"></span>
-        <span class="pet-status"><span class="status-dot"></span><span id="pet-status-label">等待游戏 · 等待</span><span class="thinking-time" id="thinking-time" title="本次 LLM 思考用时" hidden>0.0 秒</span><button class="thinking-toggle" id="thinking-toggle" type="button">思考 开</button></span>
       </button>
+      <div class="pet-status" aria-live="polite"><span class="status-dot"></span><span id="pet-status-label">未连接</span><span class="thinking-time" id="thinking-time" title="本次 LLM 思考用时" hidden>0.0 秒</span><button class="thinking-toggle" id="thinking-toggle" type="button">规则</button></div>
     </main>
-    <script src="./pet-sprite/index.js?v=static-poses"></script>
-    <script src="./pet.js?v=focus-ui"></script>
+    <script src="./pet-sprite/index.js?v=bubble-refresh"></script>
+    <script src="./pet.js?v=bubble-refresh"></script>
   </body>
 </html>

@@ -4,10 +4,10 @@ const SPRITE_POSES = Object.freeze(['waiting', 'watching', 'thinking', 'advising
 const imageSpriteConfig = Object.freeze({
   kind: 'image',
   poses: Object.freeze({
-    waiting: { image: './assets/pet/cujun-waiting.gif', alt: '桌宠等待游戏' },
-    watching: { image: './assets/pet/cujun-watching.gif', alt: '桌宠旁观对局' },
-    thinking: { image: './assets/pet/cujun-thinking.gif', alt: '桌宠正在思考' },
-    advising: { image: './assets/pet/cujun-advising.gif', alt: '桌宠给出建议' }
+    waiting: { image: './assets/pet/cujun-waiting.gif', poster: './assets/pet/cujun-waiting.png', alt: '桌宠等待游戏' },
+    watching: { image: './assets/pet/cujun-watching.gif', poster: './assets/pet/cujun-watching.png', alt: '桌宠旁观对局' },
+    thinking: { image: './assets/pet/cujun-thinking.gif', poster: './assets/pet/cujun-thinking.png', alt: '桌宠正在思考' },
+    advising: { image: './assets/pet/cujun-advising.gif', poster: './assets/pet/cujun-advising.png', alt: '桌宠给出建议' }
   })
 });
 
@@ -43,6 +43,15 @@ function createImagePetSprite(root, config) {
   root.append(image);
   let activePose = '';
   let activeConfig = config;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const updateFrame = () => {
+    const poseConfig = activeConfig.poses?.[activePose];
+    if (!poseConfig) return;
+    image.src = `${activeConfig.basePath || ''}${reducedMotion.matches && poseConfig.poster ? poseConfig.poster : poseConfig.image}`;
+    image.alt = poseConfig.alt || '';
+  };
+  image.addEventListener('error', () => console.error(`[GameBuddy] pet sprite failed to load: ${image.src}`));
+  reducedMotion.addEventListener('change', updateFrame);
 
   return {
     kind: config.kind,
@@ -60,11 +69,10 @@ function createImagePetSprite(root, config) {
       if (!poseConfig || activePose === pose) return;
       activePose = pose;
       root.dataset.pose = pose;
-      image.src = `${activeConfig.basePath || ''}${poseConfig.image}`;
-      image.alt = poseConfig.alt || '';
-      image.addEventListener('error', () => console.error(`[GameBuddy] pet sprite failed to load: ${image.src}`), { once: true });
+      updateFrame();
     },
     destroy() {
+      reducedMotion.removeEventListener('change', updateFrame);
       image.remove();
       root.classList.remove('pet-sprite--image');
       delete root.dataset.pose;

@@ -106,7 +106,13 @@ function loadPetSkins() {
           complete = false;
           break;
         }
-        poseConfigs[pose] = { image: `./assets/pets/${entry.name}/${poseConfig.image}`, alt: poseConfig.alt || `${manifest.displayName || entry.name} ${pose}` };
+        const posterPath = typeof poseConfig.poster === 'string' ? path.resolve(packDir, poseConfig.poster) : null;
+        const poster = posterPath
+          && posterPath.startsWith(`${path.resolve(packDir)}${path.sep}`)
+          && fs.existsSync(posterPath)
+          ? `./assets/pets/${entry.name}/${poseConfig.poster}`
+          : null;
+        poseConfigs[pose] = { image: `./assets/pets/${entry.name}/${poseConfig.image}`, poster, alt: poseConfig.alt || `${manifest.displayName || entry.name} ${pose}` };
       }
       if (!complete) continue;
       const skin = {
@@ -319,9 +325,7 @@ function resizePetWindow(mode = 'compact') {
     ? { width: 570, height: 520 }
     : mode === 'card-expanded'
       ? { width: 570, height: 420 }
-      : mode === 'card'
-        ? { width: 570, height: 252 }
-      : { width: 214, height: 242 };
+      : { width: 320, height: 330 };
   const bounds = petWindow.getBounds();
   const display = screen.getDisplayMatching(bounds).workArea;
   const right = bounds.x + bounds.width;
@@ -628,10 +632,10 @@ function createMainWindow() {
 
 function createPetWindow() {
   petWindow = new BrowserWindow({
-    width: 214,
-    height: 242,
-    minWidth: 214,
-    minHeight: 242,
+    width: 320,
+    height: 330,
+    minWidth: 320,
+    minHeight: 330,
     maxWidth: 570,
     maxHeight: 520,
     frame: false,
@@ -651,7 +655,7 @@ function createPetWindow() {
   });
 
   const { workArea } = screen.getPrimaryDisplay();
-  petWindow.setPosition(workArea.x + workArea.width - 238, workArea.y + workArea.height - 270);
+  petWindow.setPosition(workArea.x + workArea.width - 344, workArea.y + workArea.height - 358);
   petWindow.setMaximumSize(570, 520);
   petWindow.setAlwaysOnTop(true, 'screen-saver');
   petWindow.loadFile(path.join(__dirname, 'src', 'pet.html'));

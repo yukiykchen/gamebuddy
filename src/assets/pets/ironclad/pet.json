@@ -6,18 +6,22 @@
   "poses": {
     "waiting": {
       "image": "waiting.gif",
+      "poster": "waiting.png",
       "alt": "战士 waiting"
     },
     "watching": {
       "image": "watching.gif",
+      "poster": "watching.png",
       "alt": "战士 watching"
     },
     "thinking": {
       "image": "thinking.gif",
+      "poster": "thinking.png",
       "alt": "战士 thinking"
     },
     "advising": {
       "image": "advising.gif",
+      "poster": "advising.png",
       "alt": "战士 advising"
     }
   }
