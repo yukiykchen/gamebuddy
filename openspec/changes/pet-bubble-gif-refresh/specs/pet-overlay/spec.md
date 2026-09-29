@@ -19,7 +19,7 @@ The pet overlay MUST show one primary speech bubble containing the current statu
 
 ### Requirement: Pet artwork follows pose and reduced motion
 
-The overlay MUST use supplied character artwork for each existing skin and each of the four poses. Under `prefers-reduced-motion: reduce`, the artwork MUST use a static frame for the selected pose.
+The overlay MUST retain the original character GIF artwork for each existing skin and each of the four poses. Under `prefers-reduced-motion: reduce`, the artwork MUST use a static frame generated from that original GIF for the selected pose.
 
 #### Scenario: Character changes pose
 
