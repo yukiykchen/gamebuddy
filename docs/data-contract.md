@@ -237,7 +237,7 @@ Spire Codex API 默认地址为 `https://spire-codex.com/api`，可用 `GAMEBUDD
 
 商店 Agent 从进店库存生成满足预算的合法组合，最多规划 3 项购买，并始终加入 `SAVE_GOLD`。卡牌沿用完整卡面与牌组协同分析；遗物和药水结合运行时效果、已有资源、药水槽和后续强敌；删牌会从当前牌组中给出具体目标。提示词包含完整牌组及升级状态、持有遗物/药水效果、地图、确定 Boss、已知或可能精英、全部商品分析和规则层候选方案。LLM 只能返回候选索引，不能虚构商品、价格或超预算组合。结果一次列出本次应购买的全部商品、删牌目标、建议顺序、总花费和余额；后续库存事件不触发逐件重新决策。
 
-任何房间只要 `combat` 非空，主进程都会生成独立的 `gamebuddy.encounter-guide.v1` 攻略消息并发送给桌面宠物。`kind` 为 `normal`、`elite` 或 `boss`；问号事件触发的战斗在不是精英/Boss 时也归为 `normal`，并按实际敌人匹配。该消息不占用 recommendation 槽位，因此不会覆盖路线、休息处或卡牌奖励建议。攻略按楼层和地图坐标去重，每场只自动弹出一次；手动关闭后不会再次自动打扰，但当前战斗可通过桌宠按钮重新打开，战斗结束后自动清理。
+任何房间只要 `combat` 非空，主进程都会生成独立的 `gamebuddy.encounter-guide.v1` 攻略消息并发送给桌面宠物。`kind` 为 `normal`、`elite` 或 `boss`；问号事件触发的战斗在不是精英/Boss 时也归为 `normal`，并按实际敌人匹配。该消息不占用 recommendation 槽位，因此不会覆盖路线、休息处或卡牌奖励建议。攻略按楼层和地图坐标去重，每场只自动弹出一次；手动关闭后不会再次自动打扰，但当前战斗可通过桌宠顶部“查看攻略”气泡重新打开，战斗结束后自动清理。重新打开请求会返回当前缓存攻略；桌宠收到确认后展示，失败时保留入口以便重试。
 
 `strategy` 字段包括 `summary`、`dangerWindows`、`deckChecks`、`priorityTargets`、`tips`、`avoid`、`confidence`、`reviewStatus`、`basis` 和可追溯的 `sources`。stable `v0.107.1` 的 12 个 Boss 和 12 个精英优先按稳定 ID 使用 `encounter-strategies.json` 的社区复核档案，此时 `basis=community`。Spire Codex 收录的 63 个普通遭遇按当前 Act 和实际敌人组合匹配；没有人工档案时使用确定机制生成同结构建议，标记 `basis=mechanics` 与 `reviewStatus=mechanic-derived`，界面不会显示社区来源数量。目录无法匹配时只给保守提示，不猜测具体机制。
 

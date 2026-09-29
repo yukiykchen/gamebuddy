@@ -422,7 +422,7 @@ function dismissEncounterGuide() {
 function reopenEncounterGuide() {
   if (!cachedEncounterGuide || !encounterGuideKey) {
     publishEncounterGuideState();
-    return;
+    return false;
   }
   dismissedEncounterGuideKey = '';
   activeEncounterGuide = cachedEncounterGuide;
@@ -430,6 +430,7 @@ function reopenEncounterGuide() {
   keepPetVisible();
   petWindow?.webContents.send('bridge-encounter-guide', activeEncounterGuide);
   publishEncounterGuideState();
+  return activeEncounterGuide;
 }
 
 function clearEncounterGuide() {
@@ -733,7 +734,7 @@ ipcMain.on('pet-drag-move', (_event, point) => {
 });
 ipcMain.on('pet-drag-end', () => { petDragState = undefined; });
 ipcMain.on('dismiss-encounter-guide', dismissEncounterGuide);
-ipcMain.on('reopen-encounter-guide', reopenEncounterGuide);
+ipcMain.handle('reopen-encounter-guide', reopenEncounterGuide);
 ipcMain.on('dismiss-card-recommendation', dismissCardRecommendation);
 ipcMain.on('set-card-expanded', (_event, expanded) => setCardExpanded(expanded));
 ipcMain.on('accept-decision', (_event, decision) => {

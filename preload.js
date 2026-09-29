@@ -14,7 +14,7 @@ contextBridge.exposeInMainWorld('windowControls', {
   movePet: point => ipcRenderer.send('pet-drag-move', point),
   endPetDrag: () => ipcRenderer.send('pet-drag-end'),
   dismissEncounterGuide: () => ipcRenderer.send('dismiss-encounter-guide'),
-  reopenEncounterGuide: () => ipcRenderer.send('reopen-encounter-guide'),
+  reopenEncounterGuide: () => ipcRenderer.invoke('reopen-encounter-guide'),
   dismissCardRecommendation: () => ipcRenderer.send('dismiss-card-recommendation'),
   setCardExpanded: expanded => ipcRenderer.send('set-card-expanded', Boolean(expanded))
 });

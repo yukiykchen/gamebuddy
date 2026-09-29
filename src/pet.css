@@ -35,8 +35,8 @@ button { font: inherit; }
 .card-head h1 { margin: 3px 0 0; overflow: hidden; color: var(--panel-text); font-size: 18px; font-weight: 720; line-height: 1.25; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .card-close, .guide-close { width: 28px; height: 28px; display: grid; place-items: center; flex: 0 0 auto; padding: 0; border: 1px solid transparent; border-radius: 50%; background: transparent; color: var(--panel-muted); font-size: 19px; line-height: 1; cursor: pointer; transition: color .16s ease, background .16s ease, transform .16s ease; }
 .card-close:hover, .guide-close:hover { background: rgba(255, 255, 255, .07); color: var(--panel-text); }
-.card-close:active, .guide-close:active, .guide-reopen:active { transform: scale(.97); }
-.card-close:focus-visible, .guide-close:focus-visible, .guide-reopen:focus-visible { outline: 2px solid var(--panel-accent); outline-offset: 2px; }
+.card-close:active, .guide-close:active { transform: scale(.97); }
+.card-close:focus-visible, .guide-close:focus-visible { outline: 2px solid var(--panel-accent); outline-offset: 2px; }
 .card-details[hidden] { display: none; }
 .card-details { min-height: 0; border-top: 1px solid var(--panel-line); animation: details-in .18s ease-out both; }
 .card-scroll { max-height: 236px; overflow-y: auto; padding: 13px 15px 4px; scrollbar-width: thin; scrollbar-color: #56625d transparent; }
@@ -72,10 +72,6 @@ button { font: inherit; }
 .guide-list li::marker { color: var(--panel-accent); }
 .guide-innate { margin-top: 7px; color: #c9b7ae; font-size: 10px; line-height: 1.5; }
 .guide-source { padding: 9px 15px; border-top: 1px solid var(--panel-line); color: #76837c; font-size: 9px; line-height: 1.4; }
-.guide-reopen { position: absolute; z-index: 8; top: 8px; left: 50%; width: max-content; max-width: calc(100% - 24px); min-height: 52px; padding: 11px 14px; border: 1px solid color-mix(in srgb, var(--pet-accent) 36%, #30413f); border-radius: 14px 14px 14px 5px; background: rgba(19, 30, 30, .96); color: var(--panel-text); text-align: left; font-size: 14px; font-weight: 680; line-height: 1.35; cursor: pointer; box-shadow: 0 9px 24px rgba(3, 12, 15, .28); transform: translateX(-50%); transition: border-color .16s ease; }
-.guide-reopen:hover { border-color: var(--panel-accent); }
-.guide-reopen[hidden] { display: none; }
-.pet-stage:has(.guide-reopen:not([hidden])) .speech { display: none; }
 .speech { position: absolute; z-index: 5; top: 8px; left: 50%; width: max-content; max-width: calc(100% - 24px); min-height: 52px; display: flex; align-items: center; padding: 11px 14px; border: 1px solid color-mix(in srgb, var(--pet-accent) 36%, #30413f); border-radius: 14px 14px 14px 5px; background: rgba(19, 30, 30, .96); color: #f5f5ee; text-align: left; font-size: 14px; font-weight: 680; line-height: 1.35; cursor: pointer; box-shadow: 0 9px 24px rgba(3, 12, 15, .28), inset 0 1px rgba(255,255,255,.05); opacity: 0; transform: translate(-50%, 5px); transition: opacity .18s ease, transform .18s ease, border-color .18s ease; }
 .speech::after { content: ""; position: absolute; bottom: -5px; left: 50%; width: 9px; height: 9px; border-right: 1px solid color-mix(in srgb, var(--pet-accent) 36%, #30413f); border-bottom: 1px solid color-mix(in srgb, var(--pet-accent) 36%, #30413f); background: #13201f; transform: translateX(-50%) rotate(45deg); }
 .speech:hover { border-color: var(--pet-accent); }
@@ -171,5 +167,5 @@ button { font: inherit; }
 @keyframes details-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) {
   .pet-body, .thinking-cloud i, .thinking-orbit, .pet-glow, .eye, .card-recommendation.visible, .encounter-guide.visible, .card-details { animation: none !important; }
-  .speech, .guide-reopen, .thinking-toggle { transition: none !important; }
+  .speech, .thinking-toggle { transition: none !important; }
 }

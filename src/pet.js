@@ -10,7 +10,6 @@ const guideKicker = document.querySelector('#guide-kicker');
 const guideTitle = document.querySelector('#guide-title');
 const guideContent = document.querySelector('#guide-content');
 const guideSource = document.querySelector('#guide-source');
-const guideReopen = document.querySelector('#guide-reopen');
 const cardPanel = document.querySelector('#card-recommendation');
 const cardMark = document.querySelector('#card-mark');
 const cardKicker = document.querySelector('#card-kicker');
@@ -39,6 +38,7 @@ const petState = {
   thinking: false,
   cardVisible: false,
   guideVisible: false,
+  guideReopenAvailable: false,
   recommendation: null,
   cardRecommendation: null
 };
@@ -52,6 +52,7 @@ let activeThinkingTask = '';
 let thinkingStartedAtByTask = {};
 let thinkingDurationsByTask = {};
 let thinkingTimer = 0;
+let guideReopenPending = false;
 
 const CARD_PRESENTATION = {
   card_reward: { mark: '牌', kicker: '选牌建议' },
@@ -63,15 +64,14 @@ const CARD_PRESENTATION = {
 
 function updateThinkingToggle() {
   if (!thinkingToggle) return;
-  thinkingToggle.classList.toggle('active', llmMode.enabled && llmMode.thinking);
+  const thinkingOn = llmMode.enabled && llmMode.thinking;
+  thinkingToggle.classList.toggle('active', thinkingOn);
   thinkingToggle.disabled = !llmMode.enabled;
-  thinkingToggle.setAttribute('aria-pressed', String(llmMode.enabled && llmMode.thinking));
-  thinkingToggle.textContent = llmMode.enabled
-    ? `AI 思考：${llmMode.thinking ? '开' : '关'}`
-    : 'AI 未启用';
+  thinkingToggle.setAttribute('aria-pressed', String(thinkingOn));
+  thinkingToggle.textContent = `思考模式：${thinkingOn ? '开' : '关'}`;
   thinkingToggle.title = llmMode.enabled
-    ? '切换 AI 深度思考；关闭后仍会使用 AI 提供建议'
-    : 'AI 未启用，当前使用本地规则建议；可在 .env 配置 API Key';
+    ? '切换模型深度思考；关闭后仍会使用模型提供建议'
+    : '配置 API Key 后可开启思考模式；当前使用本地规则建议';
 }
 
 function applyPetSkin(skin) {
@@ -116,7 +116,7 @@ function prepareCard(recommendation, title) {
 }
 
 function hasAdvice() {
-  if (petState.cardVisible || petState.guideVisible) return true;
+  if (petState.cardVisible || petState.guideVisible || petState.guideReopenAvailable) return true;
   return ADVICE_TASKS.has(petState.recommendation?.task);
 }
 
@@ -188,8 +188,10 @@ function applyPose() {
   stage.dataset.pose = pose;
   petSprite.setPose(pose);
   statusLabel.textContent = connectionLabel;
-  speech.classList.toggle('has-details', petState.cardVisible && !cardExpanded);
-  speech.setAttribute('aria-label', petState.cardVisible && !cardExpanded ? '展开当前建议的理由' : '打开 GameBuddy 主面板');
+  speech.classList.toggle('has-details', petState.guideReopenAvailable || (petState.cardVisible && !cardExpanded));
+  speech.setAttribute('aria-label', petState.guideReopenAvailable
+    ? '查看本场敌人攻略'
+    : petState.cardVisible && !cardExpanded ? '展开当前建议的理由' : '打开 GameBuddy 主面板');
   refreshCardMeta();
 }
 
@@ -367,19 +369,23 @@ function setEncounterGuide(guide) {
       : `机制与策略推导：Spire Codex / 非社区人工复核 / stable ${guide.gameVersion || '当前版本'}`;
   guidePanel.classList.add('visible');
   stage.classList.add('guide-visible');
-  guideReopen.hidden = true;
   petState.guideVisible = true;
+  petState.guideReopenAvailable = false;
   applyPose();
   say(`${speechLabels[guide.kind] || '遭遇'}攻略来了`);
 }
 
 function setEncounterGuideState(state) {
+  const wasAvailable = petState.guideReopenAvailable;
   const canReopen = Boolean(state?.available && !state?.visible);
-  guideReopen.hidden = !canReopen;
-  if (!canReopen) return;
-  const labels = { boss: '重新打开 Boss 攻略', elite: '重新打开精英攻略', normal: '重新打开小怪攻略' };
-  guideReopen.textContent = labels[state.kind] || '重新打开怪物攻略';
-  guideReopen.title = state.title ? `查看：${state.title}` : '重新打开本场怪物攻略';
+  petState.guideReopenAvailable = canReopen;
+  if (canReopen) {
+    say('查看攻略');
+    speech.title = state.title ? `查看「${state.title}」的打法` : '查看本场敌人攻略';
+  } else if (wasAvailable && !petState.guideVisible) {
+    say(petState.cardVisible ? cardTitle.textContent : petState.live ? '我在看着这局' : '正在连接游戏');
+  }
+  applyPose();
 }
 
 function setStatus(status) {
@@ -454,7 +460,23 @@ applyPose();
 const petButton = document.querySelector('#pet-button');
 let dragState;
 
-speech.addEventListener('click', () => {
+speech.addEventListener('click', async () => {
+  if (petState.guideReopenAvailable) {
+    if (guideReopenPending) return;
+    guideReopenPending = true;
+    speech.disabled = true;
+    try {
+      const guide = await window.windowControls?.reopenEncounterGuide();
+      if (guide && !petState.guideVisible) setEncounterGuide(guide);
+      if (!guide && petState.guideReopenAvailable) say('攻略暂时打不开，点我重试');
+    } catch {
+      if (petState.guideReopenAvailable) say('攻略暂时打不开，点我重试');
+    } finally {
+      guideReopenPending = false;
+      speech.disabled = false;
+    }
+    return;
+  }
   if (petState.cardVisible && !cardExpanded) {
     setCardExpanded(true);
     return;
@@ -495,11 +517,6 @@ petButton.addEventListener('contextmenu', event => {
 document.querySelector('#guide-close').addEventListener('click', () => {
   setEncounterGuide(null);
   window.windowControls?.dismissEncounterGuide();
-});
-guideReopen.addEventListener('click', event => {
-  event.stopPropagation();
-  guideReopen.hidden = true;
-  window.windowControls?.reopenEncounterGuide();
 });
 document.querySelector('#card-close').addEventListener('click', event => {
   event.stopPropagation();
