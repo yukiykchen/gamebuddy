@@ -119,14 +119,15 @@ button { font: inherit; }
 .pet-scarf { position: absolute; left: 4px; right: 4px; top: 76px; height: 21px; border-radius: 0 0 40% 40%; background: var(--amber); transform: rotate(-3deg); }.pet-scarf::after { content: ""; position: absolute; right: 6px; top: 10px; width: 17px; height: 31px; background: #c98537; transform: rotate(-18deg); }
 .pet-foot { position: absolute; bottom: -8px; width: 34px; height: 18px; border: 2px solid #6a8f7e; border-radius: 50%; background: #9fb4a5; }.pet-foot.left { left: 22px; }.pet-foot.right { right: 22px; }
 .pet-shadow { position: absolute; left: 48px; bottom: 27px; width: 116px; height: 18px; border-radius: 50%; background: rgba(0, 0, 0, .24); filter: blur(4px); }
-.pet-status { position: absolute; z-index: 5; left: 34px; right: 34px; bottom: 6px; min-height: 26px; display: flex; align-items: center; gap: 7px; padding: 4px 10px; border-radius: 999px; background: rgba(20, 27, 27, .84); color: #ced5d0; font-size: 10px; box-shadow: 0 5px 14px rgba(3, 12, 15, .22); }
-.pet-stage.card-expanded .pet-status, .pet-stage.guide-visible .pet-status { left: auto; right: 8px; width: 206px; }
+.pet-status { position: absolute; z-index: 5; left: 50%; bottom: 6px; width: max-content; max-width: calc(100% - 20px); min-height: 30px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 4px 6px 4px 11px; border: 1px solid rgba(225, 238, 233, .1); border-radius: 999px; background: rgba(20, 27, 27, .92); color: #e3e9e4; font-size: 10px; box-shadow: 0 7px 20px rgba(3, 12, 15, .28), inset 0 1px rgba(255, 255, 255, .04); transform: translateX(-50%); }
+.pet-stage.card-expanded .pet-status, .pet-stage.guide-visible .pet-status { left: calc(100% - 107px); max-width: 206px; }
 .pet-status #pet-status-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .thinking-time { flex: 0 0 auto; color: var(--pet-accent); font-variant-numeric: tabular-nums; letter-spacing: .01em; }
 .thinking-time[hidden] { display: none; }
-.thinking-toggle { min-width: 34px; height: 18px; margin-left: auto; padding: 0 5px; border: 1px solid rgba(225, 238, 233, .18); border-radius: 6px; background: transparent; color: #c0cbc6; font-size: 9px; line-height: 16px; white-space: nowrap; cursor: pointer; }
-.thinking-toggle.active { border-color: var(--pet-accent); color: var(--pet-accent); background: color-mix(in srgb, var(--pet-accent) 12%, transparent); }
-.thinking-toggle.disabled { opacity: .5; cursor: not-allowed; }
+.thinking-toggle { flex: 0 0 auto; min-height: 22px; padding: 2px 8px; border: 1px solid rgba(225, 238, 233, .16); border-radius: 999px; background: rgba(225, 238, 233, .07); color: #d1dbd5; font-size: 10px; line-height: 16px; white-space: nowrap; cursor: pointer; transition: border-color .16s ease, background .16s ease, color .16s ease; }
+.thinking-toggle:hover:not(:disabled) { border-color: color-mix(in srgb, var(--pet-accent) 50%, transparent); }
+.thinking-toggle.active { border-color: color-mix(in srgb, var(--pet-accent) 48%, transparent); color: var(--pet-accent); background: color-mix(in srgb, var(--pet-accent) 14%, transparent); }
+.thinking-toggle:disabled { color: #a2ada7; cursor: default; }
 .status-dot { width: 6px; height: 6px; flex: 0 0 auto; border-radius: 50%; background: var(--pet-accent); }.status-dot.live { background: var(--mint); }.status-dot.alert { background: var(--red); }
 
 .pet-stage[data-pose="waiting"] .pet-body { animation: float 3s ease-in-out infinite; }

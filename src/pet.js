@@ -66,11 +66,14 @@ const CARD_PRESENTATION = {
 function updateThinkingToggle() {
   if (!thinkingToggle) return;
   thinkingToggle.classList.toggle('active', llmMode.enabled && llmMode.thinking);
-  thinkingToggle.classList.toggle('disabled', !llmMode.enabled);
+  thinkingToggle.disabled = !llmMode.enabled;
+  thinkingToggle.setAttribute('aria-pressed', String(llmMode.enabled && llmMode.thinking));
   thinkingToggle.textContent = llmMode.enabled
-    ? `思考 ${llmMode.thinking ? '开' : '关'}`
-    : '规则';
-  thinkingToggle.title = llmMode.enabled ? '切换 LLM 深度思考' : '当前为规则模式';
+    ? `AI 思考：${llmMode.thinking ? '开' : '关'}`
+    : 'AI 未启用';
+  thinkingToggle.title = llmMode.enabled
+    ? '切换 AI 深度思考；关闭后仍会使用 AI 提供建议'
+    : 'AI 未启用，当前使用本地规则建议；可在 .env 配置 API Key';
 }
 
 function applyPetSkin(skin) {
