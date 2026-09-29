@@ -15,8 +15,6 @@ const cardPanel = document.querySelector('#card-recommendation');
 const cardMark = document.querySelector('#card-mark');
 const cardKicker = document.querySelector('#card-kicker');
 const cardTitle = document.querySelector('#card-title');
-const cardExpand = document.querySelector('#card-expand');
-const cardExpandLabel = document.querySelector('#card-expand-label');
 const cardDetails = document.querySelector('#card-details');
 const cardReason = document.querySelector('#card-reason');
 const cardPoints = document.querySelector('#card-points');
@@ -104,8 +102,6 @@ function cardPointList(title, items, className) {
 function setCardExpanded(expanded, notifyMain = true) {
   cardExpanded = Boolean(expanded);
   stage.classList.toggle('card-expanded', cardExpanded);
-  cardExpand.setAttribute('aria-expanded', String(cardExpanded));
-  cardExpandLabel.textContent = cardExpanded ? '收起详情' : '展开理由';
   cardDetails.hidden = !cardExpanded;
   applyPose();
   if (notifyMain) window.windowControls?.setCardExpanded(cardExpanded);
@@ -505,13 +501,9 @@ guideReopen.addEventListener('click', event => {
   guideReopen.hidden = true;
   window.windowControls?.reopenEncounterGuide();
 });
-cardExpand.addEventListener('click', event => {
+document.querySelector('#card-close').addEventListener('click', event => {
   event.stopPropagation();
-  setCardExpanded(!cardExpanded);
-});
-document.querySelector('#card-close').addEventListener('click', () => {
-  setCardRecommendation(null);
-  window.windowControls?.dismissCardRecommendation();
+  setCardExpanded(false);
 });
 window.gamebuddyBridge?.onStatus(setStatus);
 window.gamebuddyBridge?.onState(setState);
