@@ -356,6 +356,34 @@ public static class GameBuddyExporter
         return value.ToString()?.Trim() ?? string.Empty;
     }
 
+    /// <summary>
+    /// Card effect text, resolved the way the game's own card UI resolves it. A card's loc
+    /// template carries selectors such as {Damage:diff()} and {IfUpgraded:show:...} that only
+    /// resolve once the card's dynamic variables and preview args are bound to it; formatting
+    /// the bare template makes the game log a "Localization formatting error!" entry with a
+    /// full managed stack for every card in every snapshot, and hands the desktop an unresolved
+    /// template instead of the numbers the player sees. When the game's builder is unavailable,
+    /// the description is reported as unavailable rather than formatted bare.
+    /// </summary>
+    private static string? ReadCardDescription(CardModel? card)
+    {
+        if (card is null) return null;
+
+        try
+        {
+            var resolved = card.GetDescriptionForPile(card.Pile?.Type ?? PileType.None);
+            if (!string.IsNullOrWhiteSpace(resolved) && !HasUnresolvedSelector(resolved)) return resolved.Trim();
+        }
+        catch
+        {
+            // Description plumbing can move between early-access patches.
+        }
+
+        return ReadTextMember(card, "DynamicDescription", "CanonicalDescription", "CardDescription");
+    }
+
+    private static bool HasUnresolvedSelector(string text) => text.Contains('{') || text.Contains('}');
+
     public static void TrackCardRewardScreen(Node screen)
     {
         _activeCardRewardScreen = screen;
@@ -520,7 +548,7 @@ public static class GameBuddyExporter
                 var card = entry.CreationResult?.Card;
                 if (card is null || !entry.IsStocked) continue;
                 items.Add(MapShopItem(index++, "card", card.Id.Entry, FormatLoc(card.Title), entry, ReadTextMember(card, "Rarity", "CardRarity"),
-                    ReadTextMember(card, "DynamicDescription", "Description", "CanonicalDescription", "CardDescription"), MapCard(card)));
+                    ReadCardDescription(card), MapCard(card)));
             }
             foreach (var entry in inventory.RelicEntries)
             {
@@ -900,7 +928,7 @@ public static class GameBuddyExporter
     {
         var energyCostX = card.EnergyCost.CostsX;
         int? energyCost = energyCostX ? null : card.EnergyCost.GetAmountToSpend();
-        var description = ReadTextMember(card, "DynamicDescription", "Description", "CanonicalDescription", "CardDescription");
+        var description = ReadCardDescription(card);
 
         var starCostObject = ReadMember(card, "StarCost", "StarsCost", "StarEnergyCost", "StarCostAmount", "RequiredStars", "StarsRequired");
         var starCostX = ReadBoolMember(card, "IsXStarCost", "CostsXStars", "CostsXStar", "StarsCostX")
