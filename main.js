@@ -319,13 +319,33 @@ function keepPetVisible() {
   petWindow.showInactive();
 }
 
-function resizePetWindow(mode = 'compact') {
-  if (!petWindow || petWindow.isDestroyed()) return;
-  const target = mode === 'guide'
+function petWindowTargetSize(mode = 'compact') {
+  return mode === 'guide'
     ? { width: 570, height: 520 }
     : mode === 'card-expanded'
       ? { width: 570, height: 420 }
       : { width: 320, height: 330 };
+}
+
+// Windows resizes a moved window from its own DPI rounding whenever only the position is
+// supplied, so at any scale factor other than 100% a position-only move grows the window by
+// about one DIP per step. Drag handlers must therefore always pass the size as well.
+// setBounds also accepts -0 and fractional numbers, which setPosition rejects.
+function movePetWindow(x, y) {
+  petWindow.setBounds({
+    x: Math.round(x) + 0,
+    y: Math.round(y) + 0,
+    ...petWindowTargetSize(activeEncounterGuide
+      ? 'guide'
+      : activeCardRecommendation
+        ? (activeCardExpanded ? 'card-expanded' : 'card')
+        : 'compact')
+  }, false);
+}
+
+function resizePetWindow(mode = 'compact') {
+  if (!petWindow || petWindow.isDestroyed()) return;
+  const target = petWindowTargetSize(mode);
   const bounds = petWindow.getBounds();
   const display = screen.getDisplayMatching(bounds).workArea;
   const right = bounds.x + bounds.width;
@@ -730,7 +750,7 @@ ipcMain.on('pet-drag-move', (_event, point) => {
   if (!petDragState || !petWindow || petWindow.isDestroyed() || !point) return;
   const x = petDragState.windowX + Number(point.x) - petDragState.startX;
   const y = petDragState.windowY + Number(point.y) - petDragState.startY;
-  petWindow.setPosition(Math.round(x), Math.round(y), false);
+  movePetWindow(x, y);
 });
 ipcMain.on('pet-drag-end', () => { petDragState = undefined; });
 ipcMain.on('dismiss-encounter-guide', dismissEncounterGuide);
