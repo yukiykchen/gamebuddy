@@ -1,6 +1,7 @@
 const events = require('../data/codex/events.json');
 const relics = require('../data/codex/relics.json');
 const potions = require('../data/codex/potions.json');
+const cards = require('../data/codex/cards.json');
 const cardEvaluations = require('./card-evaluations.json');
 
 const GAME_VERSION = cardEvaluations.game?.version || 'v0.107.1';
@@ -8,6 +9,22 @@ const eventById = new Map();
 const eventByName = new Map();
 const relicNames = relics.map(relic => stripMarkup(relic.name)).filter(name => name.length >= 2);
 const potionNames = potions.map(potion => stripMarkup(potion.name)).filter(name => name.length >= 2);
+
+// Eternal cards cannot be taken away by any card-removal effect. Match the game's CardKeyword
+// enum key rather than the localized keyword text, which is "永恒" on zh and "Eternal" on en.
+const idKey = value => String(value || '').trim().toLowerCase();
+const eternalCardIds = new Set(
+  cards
+    .filter(card => (card.keywords_key || []).some(key => idKey(key) === 'eternal'))
+    .map(card => idKey(card.id))
+);
+
+// null means the deck is unknown, so the caller keeps its previous scoring.
+function removableCardCount(state) {
+  const deck = Array.isArray(state?.player?.cards) ? state.player.cards : null;
+  if (!deck) return null;
+  return deck.filter(card => !eternalCardIds.has(idKey(card?.id))).length;
+}
 
 function stripMarkup(value) {
   return String(value || '')
@@ -208,7 +225,27 @@ function analyzeOption(option, state, catalogOption, knowledge) {
         cons.push(effectLabel(effect));
         break;
       case 'gold_loss_all': score -= gold * 0.1; cons.push(effectLabel(effect)); break;
-      case 'remove_cards': score += value * 14; pros.push(effectLabel(effect)); break;
+      case 'remove_cards': {
+        const removable = removableCardCount(state);
+        if (removable === null) {
+          score += value * 14;
+          pros.push(effectLabel(effect));
+          break;
+        }
+        if (removable === 0) {
+          score -= 6;
+          cons.push(`${effectLabel(effect)}：牌组里的牌都是永恒牌，无法删除`);
+          break;
+        }
+        if (removable < value) {
+          score += removable * 14;
+          pros.push(`${effectLabel(effect)}（牌组里只有 ${removable} 张可以删除）`);
+          break;
+        }
+        score += value * 14;
+        pros.push(effectLabel(effect));
+        break;
+      }
       case 'remove_random_card': score -= 8; riskPoints += 15; cons.push(effectLabel(effect)); break;
       case 'upgrade_cards': score += value * 11; pros.push(effectLabel(effect)); break;
       case 'upgrade_all_cards': score += Math.max(24, (state?.player?.cards || []).filter(card => !card?.upgraded).length * 7); pros.push(effectLabel(effect)); break;
