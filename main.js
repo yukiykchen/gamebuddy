@@ -300,7 +300,7 @@ function clearAgentThinking(task) {
 
 function publishRecommendation(recommendation) {
   broadcast('bridge-recommendation', recommendation);
-  if (recommendation?.task === 'card_reward' || recommendation?.task === 'rest_site' || recommendation?.task === 'event_choice' || recommendation?.task === 'map_route' || recommendation?.task === 'shop_choice') {
+  if (recommendation?.task === 'card_reward' || recommendation?.task === 'card_removal' || recommendation?.task === 'rest_site' || recommendation?.task === 'event_choice' || recommendation?.task === 'map_route' || recommendation?.task === 'shop_choice') {
     activeCardRecommendation = recommendation;
     activeCardExpanded = false;
     syncPetWindowSize();
@@ -378,12 +378,16 @@ function handleAcceptedEvent(event) {
   if (!event) return;
   broadcast('bridge-event', event);
   if (event.name === 'combat.ended') clearEncounterGuide();
-  if (['card.reward.closed', 'map.opened', 'combat.started', 'rest.closed', 'event.closed', 'shop.closed'].includes(event.name)) {
+  if (['card.reward.closed', 'card.removal.closed', 'map.opened', 'combat.started', 'rest.closed', 'event.closed', 'shop.closed'].includes(event.name)) {
     clearCardRecommendation();
     clearAgentThinking('card_reward');
+    clearAgentThinking('card_removal');
     clearAgentThinking('shop_choice');
     if (event.name === 'rest.closed') clearAgentThinking('rest_site');
     if (event.name === 'event.closed') clearAgentThinking('event_choice');
+  }
+  if (event.name === 'card.removal.opened') {
+    clearAgentThinking('map_route');
   }
   if (event.name === 'rest.opened' && activeCardRecommendation?.task === 'card_reward') {
     clearCardRecommendation();
@@ -405,7 +409,7 @@ function handleAcceptedEvent(event) {
     clearAgentThinking('rest_site');
     clearAgentThinking('event_choice');
   }
-  if (event.name === 'card.reward.closed' || event.name === 'map.opened' || event.name === 'rest.closed' || event.name === 'event.closed' || event.name === 'shop.closed') {
+  if (event.name === 'card.reward.closed' || event.name === 'card.removal.closed' || event.name === 'map.opened' || event.name === 'rest.closed' || event.name === 'event.closed' || event.name === 'shop.closed') {
     orchestrator.clearRecommendation();
   }
 }
@@ -550,14 +554,14 @@ function connectBridge() {
         const observation = observationStore.getObservation();
         if (result.accepted) broadcast('bridge-observation', observation);
         const agentObservation = observationForAgent(observation);
-        const reuseCardReward = result.event?.name === 'card.reward.opened'
+        const reuseSingleShot = ['card.reward.opened', 'card.removal.opened'].includes(result.event?.name)
           && orchestrator.hasPublishedFor(agentObservation);
-        if (reuseCardReward) broadcast('bridge-recommendation', orchestrator.getRecommendation());
-        const forceEvents = new Set(['map.opened', 'rest.opened', 'rest.closed', 'event.opened', 'event.closed', 'shop.opened', 'shop.closed', 'card.reward.opened']);
+        if (reuseSingleShot) broadcast('bridge-recommendation', orchestrator.getRecommendation());
+        const forceEvents = new Set(['map.opened', 'rest.opened', 'rest.closed', 'event.opened', 'event.closed', 'shop.opened', 'shop.closed', 'card.reward.opened', 'card.removal.opened']);
         const derivedRestClosed = (result.derivedEvents || []).some(event => event.name === 'rest.closed');
         void considerObservation(observation, {
           force: ((result.kind === 'event' && forceEvents.has(result.event?.name)) || derivedRestClosed)
-            && !reuseCardReward
+            && !reuseSingleShot
         });
       }
     } catch (error) {

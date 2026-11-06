@@ -6,7 +6,8 @@ const { validateRecommendation } = require('../agent/recommendation');
 const { rankRoutes, recommendRoute, scoreNode, scoreParts, buildScoreContext, healthBand, ensureMapRoutes, routeChoiceCount } = require('../agent/tasks/route');
 const { isRestSite, recommendRest, rankSmithCards } = require('../agent/tasks/rest');
 const { findCardReward, recommendCardReward, analyzeCard, cardRewardSignature } = require('../agent/tasks/card-reward');
-const { findShop, shopSignature, removeTarget, buildPlans, recommendShop } = require('../agent/tasks/shop');
+const { findShop, shopSignature, removeTarget, removeTargets, buildPlans, recommendShop } = require('../agent/tasks/shop');
+const { findCardRemoval, recommendCardRemoval, cardRemovalSignature } = require('../agent/tasks/card-removal');
 const { resolveItem, inferUpgraded, rankEncounterMatches } = require('../agent/knowledge/spire-codex');
 const { encounterKind, encounterGuideSignature, buildEncounterGuide, mechanicStrategy } = require('../agent/tasks/encounter-guide');
 const { parseJsonObject, createOpenAiClient, readLlmConfig, extractResponseText, resolveChatTemperature, parseAllowedTemperature } = require('../agent/llm/openai');
@@ -1521,6 +1522,84 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   assert.ok(shopRec.primary.totalSpend <= shopState.shop.gold);
   assert.ok(['BUY_ITEM', 'REMOVE_CARD', 'SAVE_GOLD'].includes(shopRec.primary.action));
 
+  // card_removal: the deck selection screen the game opens for every manual card removal.
+  let removalCases = 0;
+  const removalDeck = [
+    { id: 'CURSE_OF_GREED', name: '贪婪之咒', type: 'Curse', upgraded: false },
+    { id: 'STRIKE', name: '打击', type: 'Attack', upgraded: false },
+    { id: 'STRIKE', name: '打击', type: 'Attack', upgraded: false },
+    { id: 'BASH', name: '重击+', type: 'Attack', upgraded: true }
+  ];
+  const removalPayload = { cards: removalDeck, minSelect: 1, maxSelect: 1, cancelable: false, promptTable: 'card_selection', promptKey: 'TO_REMOVE', inShop: false, candidateCount: 4 };
+  const removalObservation = { state: { ...mapState, combat: null }, fresh: true, recentEvents: [{ name: 'card.removal.opened', data: removalPayload }] };
+
+  const removalSelection = findCardRemoval(removalObservation);
+  assert.equal(removalSelection.candidateCount, 4);
+  assert.equal(removalSelection.cancelable, false);
+  assert.equal(selectTask(removalObservation), 'card_removal');
+  removalCases += 3;
+
+  const removalRec = recommendCardRemoval(removalObservation, { now: 71 });
+  assert.equal(validateRecommendation(removalRec).ok, true);
+  assert.equal(removalRec.task, 'card_removal');
+  assert.equal(removalRec.primary.action, 'REMOVE_CARDS');
+  assert.equal(removalRec.primary.count, 1);
+  assert.equal(removalRec.primary.cardNames[0], '贪婪之咒');
+  removalCases += 5;
+
+  // Duplicate deck cards stay separate targets, so two Strikes can both be listed.
+  const twoRemovalObservation = { ...removalObservation, recentEvents: [{ name: 'card.removal.opened', data: { ...removalPayload, minSelect: 3, maxSelect: 3 } }] };
+  const twoRec = recommendCardRemoval(twoRemovalObservation, { now: 72 });
+  assert.equal(twoRec.primary.count, 3);
+  assert.deepEqual(twoRec.primary.cardNames, ['贪婪之咒', '打击', '打击']);
+  removalCases += 2;
+
+  const fiveRemovalObservation = { ...removalObservation, recentEvents: [{ name: 'card.removal.opened', data: { ...removalPayload, minSelect: 5, maxSelect: 5 } }] };
+  const fiveRec = recommendCardRemoval(fiveRemovalObservation, { now: 73 });
+  assert.equal(fiveRec.primary.count, 4);
+  assert.ok(fiveRec.reason.includes('少于要求的 5 张'));
+  removalCases += 2;
+
+  assert.equal(removeTargets(removalDeck, 2).map(pick => pick.name).join(','), '贪婪之咒,打击');
+  assert.equal(removeTarget(removalDeck).name, '贪婪之咒');
+  removalCases += 2;
+
+  assert.notEqual(cardRemovalSignature(removalObservation), cardRemovalSignature(twoRemovalObservation));
+  assert.equal(cardRemovalSignature(removalObservation), cardRemovalSignature({ ...removalObservation, recentEvents: [{ name: 'card.removal.opened', data: removalPayload }] }));
+  removalCases += 2;
+
+  const closedRemovalObservation = { ...removalObservation, recentEvents: [...removalObservation.recentEvents, { name: 'card.removal.closed' }] };
+  assert.equal(findCardRemoval(closedRemovalObservation), null);
+  assert.notEqual(selectTask(closedRemovalObservation), 'card_removal');
+  removalCases += 2;
+
+  // The merchant removal service opens the same screen, so card_removal must win over shop_choice.
+  const shopRemovalObservation = {
+    state: { ...shopState, combat: null },
+    fresh: true,
+    recentEvents: [{ name: 'shop.opened', data: shopState.shop }, { name: 'card.removal.opened', data: { ...removalPayload, inShop: true } }]
+  };
+  assert.ok(findShop(shopRemovalObservation));
+  assert.equal(selectTask(shopRemovalObservation), 'card_removal');
+  // Without the removal event the same observation must still be a shop decision, otherwise the
+  // priority assertion above compares two branches that never compete.
+  assert.equal(selectTask({ ...shopRemovalObservation, recentEvents: [{ name: 'shop.opened', data: shopState.shop }] }), 'shop_choice');
+  removalCases += 3;
+
+  let removalPublishes = 0;
+  const removalOrchestrator = createOrchestrator({
+    llm: { enabled: false },
+    now: () => 74,
+    onRecommendation: value => { if (value) removalPublishes += 1; }
+  });
+  await removalOrchestrator.consider(removalObservation, { force: true });
+  const firstRemovalPublish = removalOrchestrator.getRecommendation();
+  await removalOrchestrator.consider(removalObservation, { force: true });
+  assert.equal(removalPublishes, 1);
+  assert.equal(removalOrchestrator.getRecommendation(), firstRemovalPublish);
+  removalCases += 2;
+
+  console.log(`card_removal cases passed: ${removalCases}`);
   console.log('Agent recommendation cases passed: 82');
 }).catch(error => {
   console.error(error);

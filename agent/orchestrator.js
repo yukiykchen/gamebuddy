@@ -3,6 +3,7 @@ const { recommendRoute, routeSignature, routeChoiceCount } = require('./tasks/ro
 const { isRestSite, recommendRest, restSignature } = require('./tasks/rest');
 const { recommendEvent, eventSignature, choosableEventOptions, eventChoicePending } = require('./tasks/event');
 const { findCardReward, recommendCardReward, cardRewardSignature } = require('./tasks/card-reward');
+const { findCardRemoval, recommendCardRemoval, cardRemovalSignature } = require('./tasks/card-removal');
 const { findShop, recommendShop, shopSignature } = require('./tasks/shop');
 const { createOpenAiClient, readLlmConfig } = require('./llm/openai');
 
@@ -11,6 +12,8 @@ const SCENE_EVENTS = new Set([
   'combat.ended',
   'card.reward.opened',
   'card.reward.closed',
+  'card.removal.opened',
+  'card.removal.closed',
   'rest.opened',
   'rest.closed',
   'event.opened',
@@ -73,6 +76,7 @@ function selectTask(observation) {
   if (!state) return null;
   if (state.combat) return null;
   if (findCardReward(observation)) return 'card_reward';
+  if (findCardRemoval(observation)) return 'card_removal';
   if (findShop(observation)) return 'shop_choice';
   if (choosableEventOptions(state).length > 0) return 'event_choice';
   if (eventChoicePending(observation)) return null;
@@ -85,6 +89,7 @@ function selectTask(observation) {
 
 function signatureFor(task, observation, state) {
   if (task === 'card_reward') return cardRewardSignature(observation);
+  if (task === 'card_removal') return cardRemovalSignature(observation);
   if (task === 'rest_site') return restSignature(state);
   if (task === 'map_route') return routeSignature(state);
   if (task === 'event_choice') return eventSignature(state);
@@ -126,17 +131,21 @@ function createOrchestrator({
       const cardStillRunning = inFlight?.task === 'card_reward'
         && scene !== 'card.reward.closed'
         && !observation?.state?.combat;
+      const removalStillRunning = inFlight?.task === 'card_removal'
+        && scene !== 'card.removal.closed'
+        && !observation?.state?.combat;
       const mapWithoutFork = isMapScene(observation) && routeChoiceCount(observation?.state) <= 1;
       const restFinishedIdle = !restChoicePending(observation)
         && isRestSite(observation?.state)
         && routeChoiceCount(observation?.state) <= 1;
       const leaveScene = observation?.state?.combat
         || scene === 'card.reward.closed'
+        || scene === 'card.removal.closed'
         || scene === 'rest.closed'
         || scene === 'shop.closed'
         || mapWithoutFork
         || restFinishedIdle;
-      if (leaveScene && !cardStillRunning) {
+      if (leaveScene && !cardStillRunning && !removalStillRunning) {
         generation += 1;
         lastSignature = '';
         inFlight = null;
@@ -156,10 +165,11 @@ function createOrchestrator({
     if (task === 'shop_choice' && lastRecommendation?.task === 'shop_choice' && !refresh) return lastRecommendation;
     if (inFlight && inFlight.signature === signature && !refresh) return inFlight.promise;
     if (inFlight && inFlight.task === task && task === 'card_reward' && !refresh) return inFlight.promise;
+    if (inFlight && inFlight.task === task && task === 'card_removal' && !refresh) return inFlight.promise;
     if (inFlight && inFlight.task === task && task === 'shop_choice' && !refresh) return inFlight.promise;
     if (!observation?.fresh && !force && !refresh && lastRecommendation) return lastRecommendation;
     if (signature === lastSignature && lastRecommendation) {
-      if (!refresh && (task === 'card_reward' || !force)) return lastRecommendation;
+      if (!refresh && (task === 'card_reward' || task === 'card_removal' || !force)) return lastRecommendation;
     }
     if (signature === lastSignature && !lastRecommendation && task === 'event_choice' && !refresh) return null;
 
@@ -173,7 +183,9 @@ function createOrchestrator({
       try {
         const recommendation = task === 'card_reward'
           ? await recommendCardReward(observation, taskOptions)
-          : task === 'shop_choice'
+          : task === 'card_removal'
+            ? await Promise.resolve(recommendCardRemoval(observation, taskOptions))
+            : task === 'shop_choice'
             ? await recommendShop(observation, taskOptions)
             : task === 'event_choice'
               ? await recommendEvent(observation.state, taskOptions)

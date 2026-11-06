@@ -97,7 +97,7 @@ function isRemovableCard(card) {
   return !keys.some(key => String(key).toLowerCase() === 'eternal');
 }
 
-function removeTarget(deck) {
+function removeTargets(deck, count = 1) {
   const candidates = (deck || [])
     .map((card, index) => ({ card, index }))
     .filter(entry => isRemovableCard(entry.card))
@@ -121,7 +121,11 @@ function removeTarget(deck) {
     if (card.upgraded === true || /\+$/.test(name)) score -= 22;
     return { index, id: card.id || name, name, score, reason: reasons[0] || '删除后可以提高核心牌的抽取稳定性' };
   }).sort((left, right) => right.score - left.score || left.index - right.index);
-  return candidates[0] || null;
+  return candidates.slice(0, Math.max(1, count));
+}
+
+function removeTarget(deck) {
+  return removeTargets(deck, 1)[0] || null;
 }
 
 function analyzeRelic(item, state, knowledge, threats, tags) {
@@ -492,6 +496,8 @@ module.exports = {
   findShop,
   shopSignature,
   removeTarget,
+  removeTargets,
+  isRemovableCard,
   analyzeItems,
   buildPlans,
   recommendShop
