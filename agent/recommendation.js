@@ -47,6 +47,15 @@ function validateRecommendation(recommendation) {
       return { ok: false, reason: 'card_reward needs candidate options' };
     }
   }
+  if (recommendation.task === 'card_removal') {
+    if (primary.action !== 'REMOVE_CARDS') return { ok: false, reason: 'card_removal action must be REMOVE_CARDS' };
+    if (!Number.isInteger(primary.count) || primary.count < 1) return { ok: false, reason: 'card_removal needs a count' };
+    if (!Array.isArray(primary.cards) || primary.cards.length === 0) return { ok: false, reason: 'card_removal needs suggested cards' };
+    if (primary.cards.some(card => !card || typeof card.name !== 'string' || !card.name.trim())) {
+      return { ok: false, reason: 'card_removal cards need names' };
+    }
+    if (primary.cards.length > primary.count) return { ok: false, reason: 'card_removal suggests more cards than requested' };
+  }
   if (recommendation.task === 'shop_choice') {
     if (!['BUY_ITEM', 'REMOVE_CARD', 'SAVE_GOLD'].includes(primary.action)) {
       return { ok: false, reason: 'shop_choice action must be BUY_ITEM, REMOVE_CARD, or SAVE_GOLD' };
