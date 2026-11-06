@@ -497,7 +497,6 @@ module.exports = {
   shopSignature,
   removeTarget,
   removeTargets,
-  isRemovableCard,
   analyzeItems,
   buildPlans,
   recommendShop
