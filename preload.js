@@ -55,6 +55,7 @@ contextBridge.exposeInMainWorld('gamebuddyBridge', {
   getRunRecapPreview: runId => ipcRenderer.invoke('review:getRunRecapPreview', runId),
   getRunRecap: runId => ipcRenderer.invoke('review:getRunRecap', runId),
   getRunMetrics: runId => ipcRenderer.invoke('review:getRunMetrics', runId),
+  getRunDetails: runId => ipcRenderer.invoke('review:getRunDetails', runId),
   getPlayerProfile: () => ipcRenderer.invoke('review:getPlayerProfile'),
   savePlayerProfile: displayName => ipcRenderer.invoke('review:savePlayerProfile', displayName),
   onReviewChanged: callback => ipcRenderer.on('review:changed', (_event, dashboard) => callback(dashboard)),

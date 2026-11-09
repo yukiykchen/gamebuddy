@@ -206,6 +206,7 @@ function createRoot() {
 }
 
 const windowScope = {};
+vm.runInNewContext(fs.readFileSync(path.join(__dirname, '..', 'src', 'run-details-ui.js'), 'utf8'), { window: windowScope });
 vm.runInNewContext(
   fs.readFileSync(path.join(__dirname, '..', 'src', 'review-ui.js'), 'utf8'),
   { window: windowScope }
@@ -297,3 +298,43 @@ assert.doesNotMatch(root.innerHTML, /燃烧之血/);
 assert.doesNotMatch(root.innerHTML, /aria-expanded="true"/);
 
 console.log('Review renderer interaction tests passed.');
+
+const test = require('node:test');
+function setup() {
+  const pending = [], renders = [], listeners = {}, list = { addEventListener() {} }, region = { outerHTML: '' };
+  const root = { innerHTML: '', querySelector: selector => selector === '.review-run-details' ? region : selector === '.review-run-list' ? list
+    : selector === '#review-clear' ? { addEventListener: (type, fn) => { listeners.clear = fn; } } : null };
+  const window = { GameBuddyRunDetailsUi: { render: d => `detail:${d?.runId || d?.status}` }, setTimeout, clearTimeout };
+  vm.runInNewContext(fs.readFileSync('src/review-renderer.js', 'utf8'), { window });
+  const bridge = { getRunDetails: runId => new Promise(resolve => pending.push({ runId, resolve })),
+    getRunRecap: async () => null, requestReviewClear: async () => 'token', clearReview: async () => ({ ok: true, dashboard: { recentRuns: [] } }) };
+  const controller = window.GameBuddyReviewRenderer.createReviewController({ root, bridge, confirm: () => true,
+    ui: { render: (dashboard, expanded, profile, recaps, details) => { renders.push(details[expanded]); return ''; } } });
+  controller.setDashboard({ recentRuns: [{ runId: 'a' }, { runId: 'b' }] });
+  return { controller, pending, region, renders, listeners };
+}
+const settle = () => new Promise(resolve => setImmediate(resolve));
+test('independent detail cache is reused and switching runs ignores stale UI updates', async () => {
+  const f = setup(); f.controller.activateRun('a'); await settle(); assert.equal(f.pending.length, 1);
+  f.controller.activateRun('b'); await settle(); f.pending[0].resolve({ runId: 'a', status: 'ready' }); await settle();
+  assert.equal(f.region.outerHTML, '');
+  f.pending[1].resolve({ runId: 'b', status: 'ready' }); await settle(); assert.equal(f.region.outerHTML, 'detail:b');
+  f.controller.activateRun('a'); await settle(); assert.equal(f.pending.length, 2); assert.equal(f.renders.at(-1).runId, 'a');
+});
+test('dashboard invalidation ignores late responses from previous generation', async () => {
+  const f = setup(); f.controller.activateRun('a'); await settle();
+  f.controller.setDashboard({ recentRuns: [{ runId: 'a' }] }); await settle();
+  f.pending[0].resolve({ runId: 'old', status: 'ready' }); await settle(); assert.equal(f.region.outerHTML, '');
+  f.pending[1].resolve({ runId: 'a', status: 'ready' }); await settle(); assert.equal(f.region.outerHTML, 'detail:a');
+});
+test('clearing history invalidates in-flight detail request and leaves the run closed', async () => {
+  const f = setup(); f.controller.activateRun('a'); await settle(); await f.listeners.clear();
+  f.pending[0].resolve({ runId: 'a', status: 'ready' }); await settle();
+  assert.equal(f.region.outerHTML, ''); assert.equal(f.controller.getExpandedRunId(), null);
+});
+test('unavailable detail can retry when reopened', async () => {
+  const f = setup(); f.controller.activateRun('a'); await settle(); f.pending[0].resolve(null); await settle();
+  assert.equal(f.region.outerHTML, 'detail:unavailable');
+  f.controller.activateRun('a'); f.controller.activateRun('a'); await settle(); assert.equal(f.pending.length, 2);
+  f.pending[1].resolve({ runId: 'a', status: 'ready' }); await settle(); assert.equal(f.region.outerHTML, 'detail:a');
+});

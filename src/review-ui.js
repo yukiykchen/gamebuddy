@@ -91,31 +91,6 @@
     return result === 'loss' ? ['未通关', 'loss'] : ['结果未知', 'unknown'];
   }
 
-  function displayName(item) {
-    const name = String(item?.name || '').trim();
-    const id = String(item?.id || '').trim();
-    return name || id || '未知';
-  }
-
-  function buildCollection(title, items, emptyText, countUnit) {
-    const missing = !Array.isArray(items);
-    const count = missing ? '' : `<span>${items.length} ${countUnit}</span>`;
-    let body;
-    if (missing) body = `<p class="review-build-empty">旧记录未包含此数据</p>`;
-    else if (!items.length) body = `<p class="review-build-empty">${emptyText}</p>`;
-    else if (countUnit === '张') {
-      body = `<div class="review-build-grid">${items.map(card => `
-        <span class="review-card-chip"><span class="review-card-name">${escapeHtml(displayName(card))}</span>${card?.upgraded ? '<span class="review-card-upgrade" aria-label="已升级">+</span>' : ''}</span>`).join('')}</div>`;
-    } else {
-      body = `<div class="review-build-grid">${items.map(relic => `<span class="review-relic-badge">${escapeHtml(displayName(relic))}</span>`).join('')}</div>`;
-    }
-    return `
-      <section class="review-build-section">
-        <div class="review-build-heading"><strong>${title}</strong>${count}</div>
-        ${body}
-      </section>`;
-  }
-
   function renderRecap(recap, run = {}) {
     const labels = ['累计输出', '实际抗伤', '累计受伤', '实际恢复'];
     const metrics = labels.map(label => recap?.battleMetrics?.find(metric => metric.label === label) || { label, display: '未记录' });
@@ -148,16 +123,15 @@
     </section>`;
   }
 
-  function runBuild(run, panelId, recap) {
+  function runBuild(run, panelId, recap, details) {
     return `
-      <div class="review-run-build" id="${panelId}" role="region" aria-label="本局复盘与终局牌组" data-run-id="${escapeHtml(run.runId)}">
+      <div class="review-run-build" id="${panelId}" role="region" aria-label="本局复盘与单局详情" data-run-id="${escapeHtml(run.runId)}">
         ${renderRecap(recap, run)}
-        ${buildCollection('终局牌组', run.deck, '本局没有记录到牌组', '张')}
-        ${buildCollection('终局遗物', run.relics, '本局没有记录到遗物', '件')}
+        ${globalScope.GameBuddyRunDetailsUi.render(details, run)}
       </div>`;
   }
 
-  function recentRuns(runs, expandedRunId = null, recaps = {}) {
+  function recentRuns(runs, expandedRunId = null, recaps = {}, details = {}) {
     if (!runs?.length) {
       return `<div class="review-no-runs"><strong>还没有本地对局记录</strong><span>开始一局《杀戮尖塔 2》，GameBuddy 会自动记录到这里。</span></div>`;
     }
@@ -174,12 +148,12 @@
             <div><span>最终楼层</span><strong>${Number.isFinite(run.floor) ? `${run.floor} 层` : '未知'}</strong></div>
             <div><span>最高单回合伤害</span><strong>${Number.isFinite(run.maxTurnDamage) ? run.maxTurnDamage : '未知'}</strong></div>
           </div>
-          ${expanded ? runBuild(run, panelId, recaps[run.runId]) : ''}
+          ${expanded ? runBuild(run, panelId, recaps[run.runId], details[run.runId]) : ''}
         </div>`;
     }).join('');
   }
 
-  function render(dashboard, expandedRunId = null, profile = null, recaps = {}) {
+  function render(dashboard, expandedRunId = null, profile = null, recaps = {}, details = {}) {
     const displayName = profile?.displayName || '匿名人士';
     const safe = dashboard || { window: {}, axes: [], stats: [], recentRuns: [] };
     const character = safe.mainCharacter || 'ironclad';
@@ -230,7 +204,7 @@
 
         <section class="review-history">
           <div class="review-history-heading"><strong>最近游戏记录</strong><span>角色 · 通关状态 · BOSS · 楼层 · 单回合伤害</span></div>
-          <div class="review-run-list">${recentRuns(safe.recentRuns, expandedRunId, recaps)}</div>
+          <div class="review-run-list">${recentRuns(safe.recentRuns, expandedRunId, recaps, details)}</div>
         </section>
       </section>`;
   }

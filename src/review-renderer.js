@@ -11,7 +11,8 @@
     let profile = { displayName: '匿名人士' };
     let expandedRunId = null;
     const recaps = Object.create(null);
-    let recapGeneration = 0;
+    const details = Object.create(null);
+    let dataGeneration = 0;
     let toastTimer;
 
     function runs() {
@@ -43,7 +44,7 @@
 
     function render(renderOptions = {}) {
       retainExpanded();
-      root.innerHTML = ui?.render(dashboard, expandedRunId, profile, recaps) || '';
+      root.innerHTML = ui?.render(dashboard, expandedRunId, profile, recaps, details) || '';
       bindActions();
       if (renderOptions.restoreFocus && expandedRunId) focusRun(expandedRunId);
     }
@@ -57,22 +58,22 @@
 
     function loadRecap(runId) {
       if (runId && (!recaps[runId] || ['retryable', 'cancelled', 'stale', 'unavailable'].includes(recaps[runId].status))) {
-        const generation = recapGeneration;
+        const generation = dataGeneration;
         recaps[runId] = { status: 'loading' };
         refreshRecap(runId);
         Promise.resolve(bridge?.getRunRecapPreview ? bridge.getRunRecapPreview(runId) : bridge?.getRunMetrics?.(runId)).then(preview => {
-          if (generation === recapGeneration && recaps[runId]?.status === 'loading') {
+          if (generation === dataGeneration && recaps[runId]?.status === 'loading') {
             if (Array.isArray(preview)) recaps[runId].fixedMetrics = preview;
             else if (preview) Object.assign(recaps[runId], preview, { status: 'loading' });
             if (expandedRunId === runId) refreshRecap(runId);
           }
         }).catch(() => {});
         Promise.resolve(bridge?.getRunRecap?.(runId)).then(recap => {
-          if (generation !== recapGeneration) return;
+          if (generation !== dataGeneration) return;
           recaps[runId] = recap || { status: 'unavailable' };
           if (expandedRunId === runId) refreshRecap(runId);
         }).catch(() => {
-          if (generation !== recapGeneration) return;
+          if (generation !== dataGeneration) return;
           recaps[runId] = { status: 'unavailable' };
           if (expandedRunId === runId) refreshRecap(runId);
         });
@@ -83,7 +84,30 @@
       if (!runId) return;
       expandedRunId = expandedRunId === runId ? null : runId;
       render({ restoreFocus: true });
-      if (expandedRunId) loadRecap(runId);
+      if (expandedRunId) { loadRecap(runId); loadDetails(runId); }
+    }
+
+    function loadDetails(runId) {
+      if (!bridge?.getRunDetails || (details[runId] && details[runId].status !== 'unavailable')) return;
+      const generation = dataGeneration;
+      details[runId] = { status: 'loading' };
+      Promise.resolve().then(() => bridge.getRunDetails(runId)).then(result => {
+        if (generation !== dataGeneration) return;
+        details[runId] = result || { status: 'unavailable' };
+        refreshDetails(runId);
+      }).catch(() => {
+        if (generation !== dataGeneration) return;
+        details[runId] = { status: 'unavailable' };
+        refreshDetails(runId);
+      });
+    }
+
+    function refreshDetails(runId) {
+      if (expandedRunId !== runId) return;
+      const region = root.querySelector?.('.review-run-details');
+      if (region && 'outerHTML' in region && globalScope.GameBuddyRunDetailsUi) {
+        region.outerHTML = globalScope.GameBuddyRunDetailsUi.render(details[runId], runs().find(run => run.runId === runId));
+      }
     }
 
     function runCardFromEvent(event) {
@@ -131,8 +155,9 @@
           return;
         }
         expandedRunId = null;
-        recapGeneration++;
+        dataGeneration++;
         for (const key of Object.keys(recaps)) delete recaps[key];
+        for (const key of Object.keys(details)) delete details[key];
         dashboard = result.dashboard;
         render();
         showToast('本机个人数据已清空');
@@ -140,14 +165,25 @@
       const list = root.querySelector('.review-run-list');
       list?.addEventListener('click', onRunListClick);
       list?.addEventListener('keydown', onRunListKeydown);
+      list?.addEventListener('click', event => {
+        const button = event.target?.closest?.('[data-floor-target]');
+        const id = button?.getAttribute('data-floor-target');
+        const floor = id && root.querySelector(`#${id}`);
+        if (floor) {
+          floor.open = true;
+          floor.scrollIntoView({ block: 'start', behavior: 'smooth' });
+          floor.querySelector('summary')?.focus({ preventScroll: true });
+        }
+      });
     }
 
     function setDashboard(nextDashboard) {
       dashboard = nextDashboard;
-      recapGeneration++;
+      dataGeneration++;
       for (const key of Object.keys(recaps)) delete recaps[key];
+      for (const key of Object.keys(details)) delete details[key];
       render();
-      if (expandedRunId) loadRecap(expandedRunId);
+      if (expandedRunId) { loadRecap(expandedRunId); loadDetails(expandedRunId); }
     }
 
     function setProfile(nextProfile) {

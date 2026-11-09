@@ -4,6 +4,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const window = {};
+vm.runInNewContext(fs.readFileSync(path.join(__dirname, '..', 'src', 'run-details-ui.js'), 'utf8'), { window: window });
 vm.runInNewContext(
   fs.readFileSync(path.join(__dirname, '..', 'src', 'review-ui.js'), 'utf8'),
   { window }

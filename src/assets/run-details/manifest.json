@@ -1,0 +1,1936 @@
+{
+  "source": "https://spire-codex.com/zhs/developers",
+  "assets": {
+    "cards/attack_portrait.png": {
+      "source": "https://spire-codex.com/static/images/ui/run_history_card/attack_portrait.png",
+      "bytes": 1169,
+      "sha256": "84b7ef5d386e41ba50a8074f5a78c425b931176d0b9e1e5bcde95b8f4490156c"
+    },
+    "cards/attack_portrait_shadow.png": {
+      "source": "https://spire-codex.com/static/images/ui/run_history_card/attack_portrait_shadow.png",
+      "bytes": 1052,
+      "sha256": "bc0469f40eb5066904703a9dab9921012730fa338e0f61b15d4ac9bfee151664"
+    },
+    "cards/banner.png": {
+      "source": "https://spire-codex.com/static/images/ui/run_history_card/banner.png",
+      "bytes": 1761,
+      "sha256": "c409624904c81b1a159313d2e1f215e7e3cd2eb28db18e4a22c04bc23c8f0569"
+    },
+    "cards/banner_shadow.png": {
+      "source": "https://spire-codex.com/static/images/ui/run_history_card/banner_shadow.png",
+      "bytes": 622,
+      "sha256": "f11d52b4a7872ba21c515d0c07838df17e34026b885778894658070c7f5405d5"
+    },
+    "cards/card_back.png": {
+      "source": "https://spire-codex.com/static/images/ui/run_history_card/card_back.png",
+      "bytes": 1443,
+      "sha256": "877a815532bc959fb9fba50b0164df57435aa781118093e9888df6d4270e361d"
+    },
+    "cards/desc_box.png": {
+      "source": "https://spire-codex.com/static/images/ui/run_history_card/desc_box.png",
+      "bytes": 539,
+      "sha256": "fe60441ed7e768eda7b316a7201dfd32b8a136b75baabf4bf9fd97498dcbf9a9"
+    },
+    "cards/power_portrait.png": {
+      "source": "https://spire-codex.com/static/images/ui/run_history_card/power_portrait.png",
+      "bytes": 983,
+      "sha256": "88975bbb3592007c29853e186c5610840effcb374e0b38e5483ec486ec26664d"
+    },
+    "cards/power_portrait_shadow.png": {
+      "source": "https://spire-codex.com/static/images/ui/run_history_card/power_portrait_shadow.png",
+      "bytes": 971,
+      "sha256": "65b0ffb0b67a1bf986d3de8fc081fd14f4aa6a818a32c2d58cb0625e47306619"
+    },
+    "cards/skill_portrait.png": {
+      "source": "https://spire-codex.com/static/images/ui/run_history_card/skill_portrait.png",
+      "bytes": 752,
+      "sha256": "966c9500e94014b1c4f0be41348324c5632f0195f29be290cf7887e38792e207"
+    },
+    "cards/skill_portrait_shadow.png": {
+      "source": "https://spire-codex.com/static/images/ui/run_history_card/skill_portrait_shadow.png",
+      "bytes": 461,
+      "sha256": "2150424e8d81fdf7992bae3305d889b6ae78ecbaf278c39144d4cc3892a2df99"
+    },
+    "characters/ironclad.webp": {
+      "source": "https://cdn.spire-codex.com/characters/character_icon_ironclad.webp",
+      "bytes": 2216,
+      "sha256": "b5da6779524352fb9ff70109cad5de92e58a1e8f0ba8c36101bb83fb83a63ec3"
+    },
+    "potions/ashwater.webp": {
+      "source": "https://spire-codex.com/static/images/potions/ashwater.webp",
+      "bytes": 15656,
+      "sha256": "24421e99853d40c16d73076b05eb902bb2010bf43b8aca4ef2a08a6f77368755"
+    },
+    "potions/attack_potion.webp": {
+      "source": "https://spire-codex.com/static/images/potions/attack_potion.webp",
+      "bytes": 19636,
+      "sha256": "077b1e6843cd2cc996696570b3e208030e2288d9ffd4882bdf1ffb2ae34ce8cb"
+    },
+    "potions/beetle_juice.webp": {
+      "source": "https://spire-codex.com/static/images/potions/beetle_juice.webp",
+      "bytes": 14716,
+      "sha256": "bee7ffacb5618ccd486eb8453344fa262071128d1ec9da9fbba1d36cc6a4b59a"
+    },
+    "potions/blessing_of_the_forge.webp": {
+      "source": "https://spire-codex.com/static/images/potions/blessing_of_the_forge.webp",
+      "bytes": 18614,
+      "sha256": "b14a62a7a76d4c26514ec20f9b457410bccf4df8d2ab35a33afdbd67ce5909f7"
+    },
+    "potions/block_potion.webp": {
+      "source": "https://spire-codex.com/static/images/potions/block_potion.webp",
+      "bytes": 17314,
+      "sha256": "a9ab67175f294ab5453592dabb0fcd9ecfc6d82ce94280acbc3afc105d649e9c"
+    },
+    "potions/blood_potion.webp": {
+      "source": "https://spire-codex.com/static/images/potions/blood_potion.webp",
+      "bytes": 18366,
+      "sha256": "d8a06b227b1436a6b911657c4457a9b1d9fd318d99c6be6bb60bc19a47931cfc"
+    },
+    "potions/bone_brew.webp": {
+      "source": "https://spire-codex.com/static/images/potions/bone_brew.webp",
+      "bytes": 15440,
+      "sha256": "bd727d8ef085f026dda5383c4c1795ecd5a8542428dea2d30c914468a3a6b597"
+    },
+    "potions/bottled_potential.webp": {
+      "source": "https://spire-codex.com/static/images/potions/bottled_potential.webp",
+      "bytes": 21592,
+      "sha256": "5b81339c1a4455a231d88ae9d67bf3651f95afc7f75f2e02440b04580bacf2b4"
+    },
+    "potions/clarity.webp": {
+      "source": "https://spire-codex.com/static/images/potions/clarity.webp",
+      "bytes": 18044,
+      "sha256": "21c4767447b7941d18d4f64253c332d53f6187a364e148e8625d14553db9d369"
+    },
+    "potions/colorless_potion.webp": {
+      "source": "https://spire-codex.com/static/images/potions/colorless_potion.webp",
+      "bytes": 17646,
+      "sha256": "cd7f080eb185ac0b39d8ca4ce9b9c355665428125bdb8929acd0e5010cea2dd7"
+    },
+    "potions/cosmic_concoction.webp": {
+      "source": "https://spire-codex.com/static/images/potions/cosmic_concoction.webp",
+      "bytes": 18294,
+      "sha256": "1318fa8aa5bfa51453cc8222cb14002f724c0bc5ce52c875048821a0013beb90"
+    },
+    "potions/cunning_potion.webp": {
+      "source": "https://spire-codex.com/static/images/potions/cunning_potion.webp",
+      "bytes": 13170,
+      "sha256": "7c20f480eaf528e223292b797b9a3bb6b24a5e8358ca07803a1b465beea1930d"
+    },
+    "potions/cure_all.webp": {
+      "source": "https://spire-codex.com/static/images/potions/cure_all.webp",
+      "bytes": 22460,
+      "sha256": "c11a17fe3b2e815128a4edd6f13cbd85c5b533ed1462f1302965a3f3c1fff8ab"
+    },
+    "potions/dexterity_potion.webp": {
+      "source": "https://spire-codex.com/static/images/potions/dexterity_potion.webp",
+      "bytes": 17970,
+      "sha256": "81a37e32ce8371a1e2fddb16bbc028f5b5df1e3ffc40023fc0114156ebce888a"
+    },
+    "potions/distilled_chaos.webp": {
+      "source": "https://spire-codex.com/static/images/potions/distilled_chaos.webp",
+      "bytes": 16484,
+      "sha256": "0bcf0293b706175554b8d7b026e541f39238784b01df4833a4b3f6a572680c13"
+    },
+    "potions/droplet_of_precognition.webp": {
+      "source": "https://spire-codex.com/static/images/potions/droplet_of_precognition.webp",
+      "bytes": 17786,
+      "sha256": "d270b01630c34c8e33147bf47bfe0bebe3a517443beef0ab1bf96b0f37b16f6c"
+    },
+    "potions/duplicator.webp": {
+      "source": "https://spire-codex.com/static/images/potions/duplicator.webp",
+      "bytes": 19656,
+      "sha256": "1323e7492ecf71146a132a95149ebedad5d55c7bab213d79478a594c65ff559c"
+    },
+    "potions/energy_potion.webp": {
+      "source": "https://spire-codex.com/static/images/potions/energy_potion.webp",
+      "bytes": 20724,
+      "sha256": "d17fd519922eaf939b81c8823ce2881286a208a1b02c73ec6737d382662295b1"
+    },
+    "potions/entropic_brew.webp": {
+      "source": "https://spire-codex.com/static/images/potions/entropic_brew.webp",
+      "bytes": 18826,
+      "sha256": "c20e0d3234bbab729109c4fbb05d60ae8cd07355f4042a32ae47840bf0c95740"
+    },
+    "potions/essence_of_darkness.webp": {
+      "source": "https://spire-codex.com/static/images/potions/essence_of_darkness.webp",
+      "bytes": 19146,
+      "sha256": "d17a5bf207dd61ce80118bff52834c1787f8e487c5d7d95a71754f3601a173ea"
+    },
+    "potions/explosive_ampoule.webp": {
+      "source": "https://spire-codex.com/static/images/potions/explosive_ampoule.webp",
+      "bytes": 16808,
+      "sha256": "3ab7903ce8264baad83eb1fea2f6cd3239166a61d2dab160f8bdedc4c9fcba3b"
+    },
+    "potions/fairy_in_a_bottle.webp": {
+      "source": "https://spire-codex.com/static/images/potions/fairy_in_a_bottle.webp",
+      "bytes": 23228,
+      "sha256": "35c6b2e3316d2aee4ab075c0ac725ade2efbd08eddda7c7d005015c31e9a447e"
+    },
+    "potions/fire_potion.webp": {
+      "source": "https://spire-codex.com/static/images/potions/fire_potion.webp",
+      "bytes": 20154,
+      "sha256": "a231576223d923a426350642e4817005ff6392365a3a8994c45723426ba9ae4e"
+    },
+    "potions/flex_potion.webp": {
+      "source": "https://spire-codex.com/static/images/potions/flex_potion.webp",
+      "bytes": 23508,
+      "sha256": "055e49a3336ef9e53d36bc6c21e64de6a672e8d1cc26d02118ff8f0c5e69320b"
+    },
+    "potions/focus_potion.webp": {
+      "source": "https://spire-codex.com/static/images/potions/focus_potion.webp",
+      "bytes": 15356,
+      "sha256": "43f8ce77ba5c899a6f78a6a35bc45ba16610f6c8e111d7877c3af583ec4c1145"
+    },
+    "potions/fortifier.webp": {
+      "source": "https://spire-codex.com/static/images/potions/fortifier.webp",
+      "bytes": 14098,
+      "sha256": "c90315f9edd1796083e15861e99e826f18f5033af87bfa2e5aa2856edb7f4257"
+    },
+    "potions/foul_potion.webp": {
+      "source": "https://spire-codex.com/static/images/potions/foul_potion.webp",
+      "bytes": 14526,
+      "sha256": "c8209fc4eaa46a5acf40be87671448d62ef7352c0fd84979e123d78c84a44f7a"
+    },
+    "potions/fruit_juice.webp": {
+      "source": "https://spire-codex.com/static/images/potions/fruit_juice.webp",
+      "bytes": 18620,
+      "sha256": "f0d31fb048febe2d560aa37b3433a7b4d759fae15a8ffeec02d28903bd2547ef"
+    },
+    "potions/fysh_oil.webp": {
+      "source": "https://spire-codex.com/static/images/potions/fysh_oil.webp",
+      "bytes": 19404,
+      "sha256": "a9be72da51877c3363e821ef4a666ec68bdd8eba9067ad37253ff47a5fe45c65"
+    },
+    "potions/gamblers_brew.webp": {
+      "source": "https://spire-codex.com/static/images/potions/gamblers_brew.webp",
+      "bytes": 20382,
+      "sha256": "05a1289276898fc76ef57ba88e96625eac654eda8be21a84d33cb35e71f97605"
+    },
+    "potions/ghost_in_a_jar.webp": {
+      "source": "https://spire-codex.com/static/images/potions/ghost_in_a_jar.webp",
+      "bytes": 21712,
+      "sha256": "144f3bd0da35da7559356afd6eb2bab23cfbac8a35463f798a1477c2b4daaa7b"
+    },
+    "potions/gigantification_potion.webp": {
+      "source": "https://spire-codex.com/static/images/potions/gigantification_potion.webp",
+      "bytes": 23014,
+      "sha256": "136032a88d2ab6e6d2ccf7f27adcd15783fcf41eea01d040da305cc316c3d02a"
+    },
+    "potions/glowwater_potion.webp": {
+      "source": "https://spire-codex.com/static/images/potions/glowwater_potion.webp",
+      "bytes": 20998,
+      "sha256": "41ec9596340410d8ac716cdc73f4d37db9e0365c272edd3d6a6e1fc433fb4fe6"
+    },
+    "potions/heart_of_iron.webp": {
+      "source": "https://spire-codex.com/static/images/potions/heart_of_iron.webp",
+      "bytes": 15614,
+      "sha256": "6d712b964bfdfe94b141e5e502077c45244e9612bfb35cb6e13fae805577aa42"
+    },
+    "potions/kings_courage.webp": {
+      "source": "https://spire-codex.com/static/images/potions/kings_courage.webp",
+      "bytes": 18294,
+      "sha256": "19e7abc4acbb474194976b0b637249cf4179a41ea79e79ace56b5698b5674b5b"
+    },
+    "potions/liquid_bronze.webp": {
+      "source": "https://spire-codex.com/static/images/potions/liquid_bronze.webp",
+      "bytes": 21412,
+      "sha256": "02d33c273fe4d3e0741f323da39046bde46580d0bb281ce4ec1b0d4812849fb2"
+    },
+    "potions/liquid_memories.webp": {
+      "source": "https://spire-codex.com/static/images/potions/liquid_memories.webp",
+      "bytes": 17074,
+      "sha256": "b0cb72b22c8f4601055bd712d0be95a4e0861d8140f4f3e8a63b9a4e3c6e8bb6"
+    },
+    "potions/lucky_tonic.webp": {
+      "source": "https://spire-codex.com/static/images/potions/lucky_tonic.webp",
+      "bytes": 19030,
+      "sha256": "dd18520cfb5329522f7875a546b44a5e421cf5abc918b86161f377c293ce407e"
+    },
+    "potions/mazaleths_gift.webp": {
+      "source": "https://spire-codex.com/static/images/potions/mazaleths_gift.webp",
+      "bytes": 20300,
+      "sha256": "957156a17bc11ad5df70fcefd1a78858d99ee0b92d5c25b1f66a343f5ee8fbc2"
+    },
+    "potions/orobic_acid.webp": {
+      "source": "https://spire-codex.com/static/images/potions/orobic_acid.webp",
+      "bytes": 18284,
+      "sha256": "f99d7e4ee4ab0cba17ec0844b2b2e80181b2b7d7ae96d789bb3f7ef506c921b5"
+    },
+    "potions/poison_potion.webp": {
+      "source": "https://spire-codex.com/static/images/potions/poison_potion.webp",
+      "bytes": 15134,
+      "sha256": "113829d2b15dca7a6eb81e82e9e448586d84d58c2cb9cf64f61a4f6a03f30b73"
+    },
+    "potions/pot_of_ghouls.webp": {
+      "source": "https://spire-codex.com/static/images/potions/pot_of_ghouls.webp",
+      "bytes": 16358,
+      "sha256": "394d5c6b11c5b53b373210de511eafbd96ae0c79f52d678589fde3b92ef77e1c"
+    },
+    "potions/potion_of_binding.webp": {
+      "source": "https://spire-codex.com/static/images/potions/potion_of_binding.webp",
+      "bytes": 19138,
+      "sha256": "7946aade8c0c9c82a2febad41e7f8c3d97ea8771ad0ce23bb3d0a60cfc35f24f"
+    },
+    "potions/potion_of_capacity.webp": {
+      "source": "https://spire-codex.com/static/images/potions/potion_of_capacity.webp",
+      "bytes": 17530,
+      "sha256": "18f866a664e49bc6b0e584016f61b05b0a2503404cb1193bfe956dffa4a054d2"
+    },
+    "potions/potion_of_doom.webp": {
+      "source": "https://spire-codex.com/static/images/potions/potion_of_doom.webp",
+      "bytes": 18128,
+      "sha256": "02afdb051a5e3394c0c65aadbde97d65c6514bbd373f49effb9774413563a6ff"
+    },
+    "potions/potion_shaped_rock.webp": {
+      "source": "https://spire-codex.com/static/images/potions/potion_shaped_rock.webp",
+      "bytes": 8094,
+      "sha256": "5a8e482b88506e955bb6f2821f88c87db6705a7e5c801cbd20782ba77a6fefcd"
+    },
+    "potions/powdered_demise.webp": {
+      "source": "https://spire-codex.com/static/images/potions/powdered_demise.webp",
+      "bytes": 17358,
+      "sha256": "252f62bb9fcb946af3eaf58dd9dc79d62e317783426ddcd54c438fa455768d08"
+    },
+    "potions/power_potion.webp": {
+      "source": "https://spire-codex.com/static/images/potions/power_potion.webp",
+      "bytes": 19234,
+      "sha256": "43206bae4c02cfadbf3e321c9c81f431ad3e8b7dbde528fe70f11e626484c54c"
+    },
+    "potions/radiant_tincture.webp": {
+      "source": "https://spire-codex.com/static/images/potions/radiant_tincture.webp",
+      "bytes": 11194,
+      "sha256": "66ced1e18aca3e71c31b052b2c66b03ad40d9dce14c65c0b55c44058105e1851"
+    },
+    "potions/regen_potion.webp": {
+      "source": "https://spire-codex.com/static/images/potions/regen_potion.webp",
+      "bytes": 17566,
+      "sha256": "00e22909cfd53bdcdbb38d08009993305a03c5ee8264f4f451cf7c37d973c445"
+    },
+    "potions/shackling_potion.webp": {
+      "source": "https://spire-codex.com/static/images/potions/shackling_potion.webp",
+      "bytes": 23916,
+      "sha256": "2d1064f4aa50352e4806627735b01642574859759e89c45e0b7b827c344c27a2"
+    },
+    "potions/ship_in_a_bottle.webp": {
+      "source": "https://spire-codex.com/static/images/potions/ship_in_a_bottle.webp",
+      "bytes": 22536,
+      "sha256": "837d653684564bc0aecc63064c30ae614fc75cda2ddde46fcce41c6da2eed0c9"
+    },
+    "potions/skill_potion.webp": {
+      "source": "https://spire-codex.com/static/images/potions/skill_potion.webp",
+      "bytes": 18246,
+      "sha256": "69c42755e7cbbf6dabe52f8527f6cf395272bb9bba361c28a07c1034071c77e3"
+    },
+    "potions/snecko_oil.webp": {
+      "source": "https://spire-codex.com/static/images/potions/snecko_oil.webp",
+      "bytes": 21132,
+      "sha256": "dd6c68cf30fc5a75990ad01c1a9e481378a43fe5af204c9831c33d226bf98952"
+    },
+    "potions/soldiers_stew.webp": {
+      "source": "https://spire-codex.com/static/images/potions/soldiers_stew.webp",
+      "bytes": 16534,
+      "sha256": "85443ea8a9a6fe3506920fbf77a676f5b0c8a4f9073396e5846bd72b7e789f7a"
+    },
+    "potions/speed_potion.webp": {
+      "source": "https://spire-codex.com/static/images/potions/speed_potion.webp",
+      "bytes": 18760,
+      "sha256": "2cbdab1b3d1b2c84b7a613704256fe8d78ec3bba84a1ca96c67f86b928fc6e11"
+    },
+    "potions/stable_serum.webp": {
+      "source": "https://spire-codex.com/static/images/potions/stable_serum.webp",
+      "bytes": 15564,
+      "sha256": "900222388c7e52a0ae33fd5daa77419224ab86de0f52a021c316efc3cfa7530a"
+    },
+    "potions/star_potion.webp": {
+      "source": "https://spire-codex.com/static/images/potions/star_potion.webp",
+      "bytes": 18200,
+      "sha256": "66af9add36f066dfd6ff033ceebf3c55e3e5c734d44109bc13feb5e4722baa47"
+    },
+    "potions/strength_potion.webp": {
+      "source": "https://spire-codex.com/static/images/potions/strength_potion.webp",
+      "bytes": 20428,
+      "sha256": "975d5b17956244c0513f57bb8154b4ffd68975b38464eff518657bd7785f518f"
+    },
+    "potions/swift_potion.webp": {
+      "source": "https://spire-codex.com/static/images/potions/swift_potion.webp",
+      "bytes": 21412,
+      "sha256": "14fffd648b0b1b642aa854ac546ed26dbd01c0e6093f7b794ec443b11239d0f1"
+    },
+    "potions/touch_of_insanity.webp": {
+      "source": "https://spire-codex.com/static/images/potions/touch_of_insanity.webp",
+      "bytes": 14332,
+      "sha256": "210e157607f7b05b30846482a0212cbaee33cd0c790eec1d851a25a12e14e71a"
+    },
+    "potions/vulnerable_potion.webp": {
+      "source": "https://spire-codex.com/static/images/potions/vulnerable_potion.webp",
+      "bytes": 19968,
+      "sha256": "3454c07994beff3baf9c22f1fd427be5c00378e98dec1bb14db6cc1660fea1c9"
+    },
+    "potions/weak_potion.webp": {
+      "source": "https://spire-codex.com/static/images/potions/weak_potion.webp",
+      "bytes": 18784,
+      "sha256": "17315fb6086a8cd8ea31f285bf31c03b0f0a11000b2fd356b384c5f4ea85f80f"
+    },
+    "relics/akabeko.webp": {
+      "source": "https://spire-codex.com/static/images/relics/akabeko.webp",
+      "bytes": 12576,
+      "sha256": "53cb0adcc662296bbfc2dcba76f2aac6184451336ced5e1bd6c45de936d06aa6"
+    },
+    "relics/alchemical_coffer.webp": {
+      "source": "https://spire-codex.com/static/images/relics/alchemical_coffer.webp",
+      "bytes": 17476,
+      "sha256": "503f7c417b90341a0fe058f342d4efc4b689ca95581008945267790d6230dae1"
+    },
+    "relics/amethyst_aubergine.webp": {
+      "source": "https://spire-codex.com/static/images/relics/amethyst_aubergine.webp",
+      "bytes": 12596,
+      "sha256": "acdccd352fd4ed581605a6b918f9e87348cb5aada6ec0d5f5413607bd0612ac5"
+    },
+    "relics/anchor.webp": {
+      "source": "https://spire-codex.com/static/images/relics/anchor.webp",
+      "bytes": 15704,
+      "sha256": "3fe2043d7576011ed07f9b94ffed40bd26b07af6c662d8167454487da8865e67"
+    },
+    "relics/arcane_scroll.webp": {
+      "source": "https://spire-codex.com/static/images/relics/arcane_scroll.webp",
+      "bytes": 11248,
+      "sha256": "76136bfb90ab2ccd34f4bb0fce735586c500d3bc46c12391a30d01dc115ac164"
+    },
+    "relics/archaic_tooth.webp": {
+      "source": "https://spire-codex.com/static/images/relics/archaic_tooth.webp",
+      "bytes": 15728,
+      "sha256": "b71b32a2ffba8c1811487f3aeeb39850865cfe8c6a22cef93cae2fe7bcd18c10"
+    },
+    "relics/art_of_war.webp": {
+      "source": "https://spire-codex.com/static/images/relics/art_of_war.webp",
+      "bytes": 13706,
+      "sha256": "bb1f4097fefecf97cbc57086f3d091b5859978cf28a129b2b23475ef1aa08ba6"
+    },
+    "relics/astrolabe.webp": {
+      "source": "https://spire-codex.com/static/images/relics/astrolabe.webp",
+      "bytes": 20210,
+      "sha256": "5180328d9cd0df4b7b8ce84bcf201a2a5c75cb2ad258c58aba428f9b1001a96f"
+    },
+    "relics/bag_of_marbles.webp": {
+      "source": "https://spire-codex.com/static/images/relics/bag_of_marbles.webp",
+      "bytes": 12838,
+      "sha256": "7581b2616e5f3cdf06dbd1b55da46e3fe6e1ef2c60738eda6eea71807b9062b1"
+    },
+    "relics/bag_of_preparation.webp": {
+      "source": "https://spire-codex.com/static/images/relics/bag_of_preparation.webp",
+      "bytes": 16316,
+      "sha256": "1a3b5d5793121ecaf9506799475846a5166e8cb2b43c40e50236559221051ec8"
+    },
+    "relics/beating_remnant.webp": {
+      "source": "https://spire-codex.com/static/images/relics/beating_remnant.webp",
+      "bytes": 16086,
+      "sha256": "bafac2dc6cf3a2ba9d63ca173943e9d35bc684339e452a1e14f5545532b7c875"
+    },
+    "relics/beautiful_bracelet.webp": {
+      "source": "https://spire-codex.com/static/images/relics/beautiful_bracelet.webp",
+      "bytes": 22288,
+      "sha256": "5079713f4901ed3725b5da4f9d3996f1176e5652a913df84751974a0468f64d2"
+    },
+    "relics/bellows.webp": {
+      "source": "https://spire-codex.com/static/images/relics/bellows.webp",
+      "bytes": 12206,
+      "sha256": "0f61c0b771333feff207334c438f580f8db5a8a202dfb57a1f74544970cd79fd"
+    },
+    "relics/belt_buckle.webp": {
+      "source": "https://spire-codex.com/static/images/relics/belt_buckle.webp",
+      "bytes": 11182,
+      "sha256": "3b27283b4a20b8a54e07b45ddac76b198afe613cb55036bf5e4004aa011273af"
+    },
+    "relics/big_hat.webp": {
+      "source": "https://spire-codex.com/static/images/relics/big_hat.webp",
+      "bytes": 9784,
+      "sha256": "0102887995269de128f2dfd6a48b9539b91843139c1b71a1bca5920ff3b9fd1a"
+    },
+    "relics/big_mushroom.webp": {
+      "source": "https://spire-codex.com/static/images/relics/big_mushroom.webp",
+      "bytes": 14426,
+      "sha256": "bdc2bdc12e7aa3c1f83d7fb2585934c94702e93f0c66f8e2d3789f9ace078aea"
+    },
+    "relics/biiig_hug.webp": {
+      "source": "https://spire-codex.com/static/images/relics/biiig_hug.webp",
+      "bytes": 15256,
+      "sha256": "87de7d6362f1408c6da87f735eb2efe983b7f6640863aab789f38db4ba037023"
+    },
+    "relics/bing_bong.webp": {
+      "source": "https://spire-codex.com/static/images/relics/bing_bong.webp",
+      "bytes": 16720,
+      "sha256": "214c771fdeaefe0533a45d397f5598904afe5b878ff4974f04699b9eaf3a2fae"
+    },
+    "relics/black_blood.webp": {
+      "source": "https://spire-codex.com/static/images/relics/black_blood.webp",
+      "bytes": 11668,
+      "sha256": "c1f8e77bdb5932243573755a4792beb6f27a78896c699b93be075bb0df889796"
+    },
+    "relics/black_star.webp": {
+      "source": "https://spire-codex.com/static/images/relics/black_star.webp",
+      "bytes": 9944,
+      "sha256": "29c7a025b2a80cac080cd81eddea879888bae302f2baf1fe4078b1c075e8300a"
+    },
+    "relics/blessed_antler.webp": {
+      "source": "https://spire-codex.com/static/images/relics/blessed_antler.webp",
+      "bytes": 17784,
+      "sha256": "ed57d3e76ffe62ddc5cd60bf56d50f854a53eaaeae15ece1c1f90fbf755741ee"
+    },
+    "relics/blood_soaked_rose.webp": {
+      "source": "https://spire-codex.com/static/images/relics/blood_soaked_rose.webp",
+      "bytes": 14162,
+      "sha256": "5fc1bf6c09a5528e7cf229bdb3fcab947366ca671792b6e78f47d61196da3d20"
+    },
+    "relics/blood_vial.webp": {
+      "source": "https://spire-codex.com/static/images/relics/blood_vial.webp",
+      "bytes": 22060,
+      "sha256": "a71508d121a50ee19f46f52701f37477902d591c501c9f4665b6a9fc78525114"
+    },
+    "relics/bone_flute.webp": {
+      "source": "https://spire-codex.com/static/images/relics/bone_flute.webp",
+      "bytes": 9568,
+      "sha256": "9b6312136bcb4ac100665c24bbd41eca23ce07812285c74311d96a56aeca4522"
+    },
+    "relics/bone_tea.webp": {
+      "source": "https://spire-codex.com/static/images/relics/bone_tea.webp",
+      "bytes": 13986,
+      "sha256": "0a5121152c30d49053186cebb9272b7c41bb808bd41420e7054e61eb29b0f3cb"
+    },
+    "relics/book_of_five_rings.webp": {
+      "source": "https://spire-codex.com/static/images/relics/book_of_five_rings.webp",
+      "bytes": 15904,
+      "sha256": "3d5fe134dbefaba0554b6ed03c58362614dc5549f7106ef75d8ad370f03c482f"
+    },
+    "relics/book_repair_knife.webp": {
+      "source": "https://spire-codex.com/static/images/relics/book_repair_knife.webp",
+      "bytes": 8954,
+      "sha256": "e526168e46d6eb73bd497e9d0a9655736276d51436a2ead6d4460e0bd2d1ec57"
+    },
+    "relics/bookmark.webp": {
+      "source": "https://spire-codex.com/static/images/relics/bookmark.webp",
+      "bytes": 18358,
+      "sha256": "b73cf1dc5c6114e002b73bec73228ebb582a94ac56e508cc1990be7928da4c7d"
+    },
+    "relics/booming_conch.webp": {
+      "source": "https://spire-codex.com/static/images/relics/booming_conch.webp",
+      "bytes": 18104,
+      "sha256": "e10d4b3163b8b99ffe6841947fe992ca1d63b18ddf5f287d1dc8c8b7fde483a5"
+    },
+    "relics/bound_phylactery.webp": {
+      "source": "https://spire-codex.com/static/images/relics/bound_phylactery.webp",
+      "bytes": 19504,
+      "sha256": "da149a076f7c4702f8a39ffc8485f8c34b399723dcaf3d656deee62e011918ef"
+    },
+    "relics/bowler_hat.webp": {
+      "source": "https://spire-codex.com/static/images/relics/bowler_hat.webp",
+      "bytes": 9076,
+      "sha256": "28b83a504bc7e458f9bb199b5b04f9015b7ba955e5337de0d85f98389ffb0757"
+    },
+    "relics/bread.webp": {
+      "source": "https://spire-codex.com/static/images/relics/bread.webp",
+      "bytes": 12658,
+      "sha256": "48407be31ee3529ba47e591523c90f20dfc7d73b6cf92902ea435566fce1a217"
+    },
+    "relics/brilliant_scarf.webp": {
+      "source": "https://spire-codex.com/static/images/relics/brilliant_scarf.webp",
+      "bytes": 12810,
+      "sha256": "be6db488eaa2deeb3eb8fe5106bcf33f56ac3aad0a71a5ef0c0c780329a58fbe"
+    },
+    "relics/brimstone.webp": {
+      "source": "https://spire-codex.com/static/images/relics/brimstone.webp",
+      "bytes": 13968,
+      "sha256": "22444c32030492effeaed8b48ba5368fc652d8a1c7b171fcdcb95091f88c0eba"
+    },
+    "relics/bronze_scales.webp": {
+      "source": "https://spire-codex.com/static/images/relics/bronze_scales.webp",
+      "bytes": 11848,
+      "sha256": "8bd4f4eeb9e32a939d5fb87bda61b04d10fd98bda89a03ec86330403eb58122c"
+    },
+    "relics/burning_blood.webp": {
+      "source": "https://spire-codex.com/static/images/relics/burning_blood.webp",
+      "bytes": 14868,
+      "sha256": "8da9e42d48e08355ffafc75637b681b398e3e4d307dcf660d93da7795b364647"
+    },
+    "relics/burning_sticks.webp": {
+      "source": "https://spire-codex.com/static/images/relics/burning_sticks.webp",
+      "bytes": 14860,
+      "sha256": "545adce2e4e6a7463e5f22f0e51fecb845f4a7a68ccfed9ceaae46fec2cee6d4"
+    },
+    "relics/byrdpip.webp": {
+      "source": "https://spire-codex.com/static/images/relics/byrdpip.webp",
+      "bytes": 12972,
+      "sha256": "f5cb12d8251d6f8afcd9c466ce399b131ff4e0b9617fc979dd1ebe4f71ca43cc"
+    },
+    "relics/calling_bell.webp": {
+      "source": "https://spire-codex.com/static/images/relics/calling_bell.webp",
+      "bytes": 13684,
+      "sha256": "cf01738acf9e9b7da6a4437bb3da428df689b1599300a4bf3bd6160f3cea05ac"
+    },
+    "relics/candelabra.webp": {
+      "source": "https://spire-codex.com/static/images/relics/candelabra.webp",
+      "bytes": 12824,
+      "sha256": "b63fd9ab0a909e60b1ccee3efe9bb115475e6362650dcd04b605d405e40bfd73"
+    },
+    "relics/captains_wheel.webp": {
+      "source": "https://spire-codex.com/static/images/relics/captains_wheel.webp",
+      "bytes": 18956,
+      "sha256": "7cd65ac87be9465c0c79b3edefae9435da6f8b99d4d67ce9723c3ad608dd87f0"
+    },
+    "relics/cauldron.webp": {
+      "source": "https://spire-codex.com/static/images/relics/cauldron.webp",
+      "bytes": 10890,
+      "sha256": "9f09c6fa36a30dce8f49c9dc4a9cb34b9634a7a1171bc7afea46149b7f1bc7a6"
+    },
+    "relics/centennial_puzzle.webp": {
+      "source": "https://spire-codex.com/static/images/relics/centennial_puzzle.webp",
+      "bytes": 12460,
+      "sha256": "3ab52bd5e8d457b1b06dbb9c20d2cafd56e14a317e102bc86b0aafd5785bc72d"
+    },
+    "relics/chandelier.webp": {
+      "source": "https://spire-codex.com/static/images/relics/chandelier.webp",
+      "bytes": 15884,
+      "sha256": "31e861de6c1be620e98d60a0e556429b605b9293d053eef3e0dfcfa56add706f"
+    },
+    "relics/charons_ashes.webp": {
+      "source": "https://spire-codex.com/static/images/relics/charons_ashes.webp",
+      "bytes": 18952,
+      "sha256": "5377f4f6cf375344812d4eec597b8c40da225df67050b53c93f0f56f0b551baa"
+    },
+    "relics/chemical_x.webp": {
+      "source": "https://spire-codex.com/static/images/relics/chemical_x.webp",
+      "bytes": 11036,
+      "sha256": "7db53935c3dfad875f9187739504ba32576fef5de55de4325e07d1123b5f2929"
+    },
+    "relics/choices_paradox.webp": {
+      "source": "https://spire-codex.com/static/images/relics/choices_paradox.webp",
+      "bytes": 16386,
+      "sha256": "3adefa01abaec08faf8a6207e08a0047d4cb3242e089e535dbd3499918c06c57"
+    },
+    "relics/chosen_cheese.webp": {
+      "source": "https://spire-codex.com/static/images/relics/chosen_cheese.webp",
+      "bytes": 10496,
+      "sha256": "b41f45cad99802c38f937c35933df8c0676255187a63d13c18a30d88af91e1a0"
+    },
+    "relics/circlet.webp": {
+      "source": "https://spire-codex.com/static/images/relics/circlet.webp",
+      "bytes": 14094,
+      "sha256": "3a491f850bb19f5358f3cf61013bdbd75291ac519d8fd24d1469d89111db5b28"
+    },
+    "relics/claws.webp": {
+      "source": "https://spire-codex.com/static/images/relics/claws.webp",
+      "bytes": 13528,
+      "sha256": "e99be0603ca978798531947748798d52b53129ce9d07285c2ca5cff2d6d1615a"
+    },
+    "relics/cloak_clasp.webp": {
+      "source": "https://spire-codex.com/static/images/relics/cloak_clasp.webp",
+      "bytes": 11610,
+      "sha256": "03cc0184fd48937f93f59fa0a763ab4108f743c0b3c822557191e73ae12594c6"
+    },
+    "relics/cracked_core.webp": {
+      "source": "https://spire-codex.com/static/images/relics/cracked_core.webp",
+      "bytes": 15170,
+      "sha256": "e6e2215905366b0169a9e655be7ad0995b68fe5278a04a81b40c4e3aae3a5b4e"
+    },
+    "relics/crossbow.webp": {
+      "source": "https://spire-codex.com/static/images/relics/crossbow.webp",
+      "bytes": 14146,
+      "sha256": "26b1d1e6c55cbe07a2e95b4df1f1803e7d903eff4764d1a73ef0d0cab8231ffe"
+    },
+    "relics/cursed_pearl.webp": {
+      "source": "https://spire-codex.com/static/images/relics/cursed_pearl.webp",
+      "bytes": 10858,
+      "sha256": "f8cedbd8cc3d03df55c3a466901242796cf51a009382125d6795f9b093f8d232"
+    },
+    "relics/darkstone_periapt.webp": {
+      "source": "https://spire-codex.com/static/images/relics/darkstone_periapt.webp",
+      "bytes": 19056,
+      "sha256": "83fc2514dfb48cdc314e01cf92d32a644ba7a5cdcbc39c6bf4409b4af1224c68"
+    },
+    "relics/data_disk.webp": {
+      "source": "https://spire-codex.com/static/images/relics/data_disk.webp",
+      "bytes": 13110,
+      "sha256": "896d64a46cc7668acd7d3b73191a9a40555a54a47884002287cecdbad2c3cf27"
+    },
+    "relics/daughter_of_the_wind.webp": {
+      "source": "https://spire-codex.com/static/images/relics/daughter_of_the_wind.webp",
+      "bytes": 17016,
+      "sha256": "1a2db12535b70f7900c337cd0af428a11c1dcac10f08846047c7122e8b0ea02e"
+    },
+    "relics/delicate_frond.webp": {
+      "source": "https://spire-codex.com/static/images/relics/delicate_frond.webp",
+      "bytes": 21744,
+      "sha256": "f14acd70710bc8c1e6bb9b940f7c66e44b87141c327d6d100ea8418fafb7383c"
+    },
+    "relics/demon_tongue.webp": {
+      "source": "https://spire-codex.com/static/images/relics/demon_tongue.webp",
+      "bytes": 10404,
+      "sha256": "e5c8ab734875385609ea48f72d5e4fd7782a9be735d5fd8113fe8fd7987f02ee"
+    },
+    "relics/diamond_diadem.webp": {
+      "source": "https://spire-codex.com/static/images/relics/diamond_diadem.webp",
+      "bytes": 16720,
+      "sha256": "3e69627fd7e063dce6ad3d61cff979a69c851c969e39a1fa61f6b9c73102c24e"
+    },
+    "relics/dingy_rug.webp": {
+      "source": "https://spire-codex.com/static/images/relics/dingy_rug.webp",
+      "bytes": 16180,
+      "sha256": "c39a024fcf8b5d6b3245316716b268f10fa413efa06d250cfdd1e8bdcf12d50d"
+    },
+    "relics/distinguished_cape.webp": {
+      "source": "https://spire-codex.com/static/images/relics/distinguished_cape.webp",
+      "bytes": 8880,
+      "sha256": "4bdeec2b1756421ba243135ac49074ed931497d953f9af3378c0f7bcb99d2bc2"
+    },
+    "relics/divine_destiny.webp": {
+      "source": "https://spire-codex.com/static/images/relics/divine_destiny.webp",
+      "bytes": 12230,
+      "sha256": "12095076ee8580db82c28576142e25011298dcc13650643768853cb463b84bc7"
+    },
+    "relics/divine_right.webp": {
+      "source": "https://spire-codex.com/static/images/relics/divine_right.webp",
+      "bytes": 12582,
+      "sha256": "8dee2df18e9e6ec6437b374deb040ad60a73361fa1ed35d6ad7eea0b9cea5f8a"
+    },
+    "relics/dollys_mirror.webp": {
+      "source": "https://spire-codex.com/static/images/relics/dollys_mirror.webp",
+      "bytes": 11150,
+      "sha256": "d85942a4dab9ef3cc12066dfee661c3135931855810052814713de77e9384e10"
+    },
+    "relics/dragon_fruit.webp": {
+      "source": "https://spire-codex.com/static/images/relics/dragon_fruit.webp",
+      "bytes": 18552,
+      "sha256": "d39b0c963d5f55986961589e7864ec530de89bfd3cabae54923f107db9818cc3"
+    },
+    "relics/dream_catcher.webp": {
+      "source": "https://spire-codex.com/static/images/relics/dream_catcher.webp",
+      "bytes": 24208,
+      "sha256": "8fbe1d62d83295b411b9df7c3d2d3ed2b31b1f6663819441adb84943e2d408b3"
+    },
+    "relics/driftwood.webp": {
+      "source": "https://spire-codex.com/static/images/relics/driftwood.webp",
+      "bytes": 12058,
+      "sha256": "417f5dd85fcc6bbb0d4204357df7c3c655db40c73fa655422a1479c82499ff80"
+    },
+    "relics/dusty_tome.webp": {
+      "source": "https://spire-codex.com/static/images/relics/dusty_tome.webp",
+      "bytes": 12666,
+      "sha256": "3eff607f8b9134847f86d7c54520123bfda5e70302ec140e00349f1022dc46c9"
+    },
+    "relics/ectoplasm.webp": {
+      "source": "https://spire-codex.com/static/images/relics/ectoplasm.webp",
+      "bytes": 10264,
+      "sha256": "4c165cc4287edc571940f9961286cf470750fe3cd6579a71c90a375081699fee"
+    },
+    "relics/electric_shrymp.webp": {
+      "source": "https://spire-codex.com/static/images/relics/electric_shrymp.webp",
+      "bytes": 23630,
+      "sha256": "109d166b2e02a39be59254eba32c845a1191bf7beb65422a2d8f9f74ebda895f"
+    },
+    "relics/ember_tea.webp": {
+      "source": "https://spire-codex.com/static/images/relics/ember_tea.webp",
+      "bytes": 13468,
+      "sha256": "e959cc608d34e9973bda303987a249b9dcb5569865fec64b54f5f5c14ec0076b"
+    },
+    "relics/emotion_chip.webp": {
+      "source": "https://spire-codex.com/static/images/relics/emotion_chip.webp",
+      "bytes": 10822,
+      "sha256": "50998fbf7d75629d152090672a0c2bf9502c8fb756666c0195f37f7e8c988f7e"
+    },
+    "relics/empty_cage.webp": {
+      "source": "https://spire-codex.com/static/images/relics/empty_cage.webp",
+      "bytes": 19016,
+      "sha256": "65fbb36b3b345ed7b47b8482f640aaaaaf88cf353f497f066f27d56cd95baf32"
+    },
+    "relics/eternal_feather.webp": {
+      "source": "https://spire-codex.com/static/images/relics/eternal_feather.webp",
+      "bytes": 17826,
+      "sha256": "5b7588654936518a4a42eec3652a71696451e8fb1c7ff2c206e918e1a224213b"
+    },
+    "relics/fake_anchor.webp": {
+      "source": "https://spire-codex.com/static/images/relics/fake_anchor.webp",
+      "bytes": 15824,
+      "sha256": "e098aa233e17f8d1befe2905ee654f7b065464c81ac6b6c6986060c11e15b292"
+    },
+    "relics/fake_blood_vial.webp": {
+      "source": "https://spire-codex.com/static/images/relics/fake_blood_vial.webp",
+      "bytes": 18278,
+      "sha256": "bd21576e6537a6b5347fad82830bf707639d29df2c9271595934660bcd30e8a4"
+    },
+    "relics/fake_happy_flower.webp": {
+      "source": "https://spire-codex.com/static/images/relics/fake_happy_flower.webp",
+      "bytes": 13576,
+      "sha256": "5d0bbd1e84b46b6e63b78ba983df258de36f06ad8fc5849460b01f6300c13799"
+    },
+    "relics/fake_lees_waffle.webp": {
+      "source": "https://spire-codex.com/static/images/relics/fake_lees_waffle.webp",
+      "bytes": 17204,
+      "sha256": "9f1fe34d3afea3297dbfb44ff39737ccd65a07803e2fbea547cd85c8578728e4"
+    },
+    "relics/fake_mango.webp": {
+      "source": "https://spire-codex.com/static/images/relics/fake_mango.webp",
+      "bytes": 14744,
+      "sha256": "1fa987bbd93cbabceb7f6f3867554381939cdaacd76b986b9c498d63c7b9341d"
+    },
+    "relics/fake_merchants_rug.webp": {
+      "source": "https://spire-codex.com/static/images/relics/fake_merchants_rug.webp",
+      "bytes": 12232,
+      "sha256": "5240485cacd2d4521069dedfc9c91e654960ab5f4799175e97a3fe77750fdf95"
+    },
+    "relics/fake_orichalcum.webp": {
+      "source": "https://spire-codex.com/static/images/relics/fake_orichalcum.webp",
+      "bytes": 9536,
+      "sha256": "b3938eef56ace15e2ae755287e28852e70d6f3a7e2b5bb9266f5518f3fd8d8e1"
+    },
+    "relics/fake_snecko_eye.webp": {
+      "source": "https://spire-codex.com/static/images/relics/fake_snecko_eye.webp",
+      "bytes": 15816,
+      "sha256": "c76666014ca1b1118be07a54ae233c249e80e380621415405f5f82e16760c780"
+    },
+    "relics/fake_strike_dummy.webp": {
+      "source": "https://spire-codex.com/static/images/relics/fake_strike_dummy.webp",
+      "bytes": 16200,
+      "sha256": "6707fac63f1d076b527df1448bf9c4809746a8d612754cc35ba768bd7184b79e"
+    },
+    "relics/fake_venerable_tea_set.webp": {
+      "source": "https://spire-codex.com/static/images/relics/fake_venerable_tea_set.webp",
+      "bytes": 15646,
+      "sha256": "87c2cac20647c96234683195c3944fe19a7302dc3e34416b16ac1e045e4d71a7"
+    },
+    "relics/fencing_manual.webp": {
+      "source": "https://spire-codex.com/static/images/relics/fencing_manual.webp",
+      "bytes": 11550,
+      "sha256": "50d1275e443067e2924a72911d11a0a868fd1356d6cdc1b3ceb8edf9be26b754"
+    },
+    "relics/festive_popper.webp": {
+      "source": "https://spire-codex.com/static/images/relics/festive_popper.webp",
+      "bytes": 15114,
+      "sha256": "eefeaf8f6cefa814a5d3cc2b4efc802e8cb8bb4ebf757d83dda9f0afabb6e8c2"
+    },
+    "relics/fiddle.webp": {
+      "source": "https://spire-codex.com/static/images/relics/fiddle.webp",
+      "bytes": 11326,
+      "sha256": "ef2a214b1152fcf530cc6f9801166d9668730c7eb843e36ee737dcf11ac6cf10"
+    },
+    "relics/fishing_rod.webp": {
+      "source": "https://spire-codex.com/static/images/relics/fishing_rod.webp",
+      "bytes": 12468,
+      "sha256": "9d090444fa8e7cc7fec69a09cbce37cdb5f6ff4e15e740265c837012626214cb"
+    },
+    "relics/forgotten_soul.webp": {
+      "source": "https://spire-codex.com/static/images/relics/forgotten_soul.webp",
+      "bytes": 14206,
+      "sha256": "a31d5fcb2dca919d1fc21e6a58f3811af388fc2ac86f073f45da6d041f80e6e1"
+    },
+    "relics/fragrant_mushroom.webp": {
+      "source": "https://spire-codex.com/static/images/relics/fragrant_mushroom.webp",
+      "bytes": 13166,
+      "sha256": "61c95f65977208c8371934d634a9459813126132ede73d1973659d27dab8711b"
+    },
+    "relics/fresnel_lens.webp": {
+      "source": "https://spire-codex.com/static/images/relics/fresnel_lens.webp",
+      "bytes": 20002,
+      "sha256": "87eb0c912047298306060a679aad817396d81ab53c00b8ab94266e1c9755a0a7"
+    },
+    "relics/frozen_egg.webp": {
+      "source": "https://spire-codex.com/static/images/relics/frozen_egg.webp",
+      "bytes": 10800,
+      "sha256": "b3b535f75e63e73a3cbd8a8fda776e076fe64e6c86a63cbe133f713cd6ec06a1"
+    },
+    "relics/funerary_mask.webp": {
+      "source": "https://spire-codex.com/static/images/relics/funerary_mask.webp",
+      "bytes": 16716,
+      "sha256": "55d26d3e34f05373a65b199f3a3f894e3543aa34acbccc30611020b589072396"
+    },
+    "relics/fur_coat.webp": {
+      "source": "https://spire-codex.com/static/images/relics/fur_coat.webp",
+      "bytes": 20302,
+      "sha256": "ad6a8239e6b9c8f61a5b8db12ce98553e201b22823a7ec425382b606bccc1c2a"
+    },
+    "relics/galactic_dust.webp": {
+      "source": "https://spire-codex.com/static/images/relics/galactic_dust.webp",
+      "bytes": 13826,
+      "sha256": "607b333e4a31e3eb6695b715bda235a635ca56a3571ab4033dc688a83146bbb0"
+    },
+    "relics/gambling_chip.webp": {
+      "source": "https://spire-codex.com/static/images/relics/gambling_chip.webp",
+      "bytes": 13720,
+      "sha256": "f9df055692c8a9062a8c8aa53563e35dab2fb7689c2902e53f57bba58ede5b81"
+    },
+    "relics/game_piece.webp": {
+      "source": "https://spire-codex.com/static/images/relics/game_piece.webp",
+      "bytes": 12648,
+      "sha256": "8fe54d2ac4e6aaef09946751cdd7df288c4c20ee4995481a774aebd253dc7035"
+    },
+    "relics/ghost_seed.webp": {
+      "source": "https://spire-codex.com/static/images/relics/ghost_seed.webp",
+      "bytes": 10514,
+      "sha256": "96b51e32971f04952a27adea2d24ba3e668f36fc46f02459987158afef711b11"
+    },
+    "relics/girya.webp": {
+      "source": "https://spire-codex.com/static/images/relics/girya.webp",
+      "bytes": 12670,
+      "sha256": "04b85a670f6fcb42d949976005d86b3f8b509499640991db8c1253b187aa7ddb"
+    },
+    "relics/glass_eye.webp": {
+      "source": "https://spire-codex.com/static/images/relics/glass_eye.webp",
+      "bytes": 9406,
+      "sha256": "124b7abc14e9654b6bce4893054de0b4988793912d7635f2236c0bfd77b6550d"
+    },
+    "relics/glitter.webp": {
+      "source": "https://spire-codex.com/static/images/relics/glitter.webp",
+      "bytes": 17522,
+      "sha256": "787c971cc172f2b7a99ff0630bedbe242c660e6942756201619910f9eb9f230b"
+    },
+    "relics/gnarled_hammer.webp": {
+      "source": "https://spire-codex.com/static/images/relics/gnarled_hammer.webp",
+      "bytes": 11204,
+      "sha256": "c61d1615f64c7c1300eb7fa40ae9ceb11cafcd189869a77b9c92da69dd2f6938"
+    },
+    "relics/gold_plated_cables.webp": {
+      "source": "https://spire-codex.com/static/images/relics/gold_plated_cables.webp",
+      "bytes": 13410,
+      "sha256": "2910a1060d300cf0a5ce2c6154fb83428ec7a94f9bea4eb7ff44ce1df7994be7"
+    },
+    "relics/golden_compass.webp": {
+      "source": "https://spire-codex.com/static/images/relics/golden_compass.webp",
+      "bytes": 15814,
+      "sha256": "c97f7f4491043e782cc7160e589eb76294362094a2d926e230f2c945391c9175"
+    },
+    "relics/golden_pearl.webp": {
+      "source": "https://spire-codex.com/static/images/relics/golden_pearl.webp",
+      "bytes": 11388,
+      "sha256": "71b3d5c6a65ac800ccaebc2f2bb5899a34cb014a1ebf28b5d0277ed02e2180b1"
+    },
+    "relics/gorget.webp": {
+      "source": "https://spire-codex.com/static/images/relics/gorget.webp",
+      "bytes": 13326,
+      "sha256": "5b9d1ffd05c0fc6c3e69ea299074889c2d1957651d62ca127592d53388e641dd"
+    },
+    "relics/gremlin_horn.webp": {
+      "source": "https://spire-codex.com/static/images/relics/gremlin_horn.webp",
+      "bytes": 15790,
+      "sha256": "18f7b6ba41d6e74f694d1fd801af9bbfd1151baa733131f5d7db2597f4309ac8"
+    },
+    "relics/hand_drill.webp": {
+      "source": "https://spire-codex.com/static/images/relics/hand_drill.webp",
+      "bytes": 14422,
+      "sha256": "0813d5ddf9d115c61e75032a1270d20b2976544f77369343ae4ece64872a5e2c"
+    },
+    "relics/happy_flower.webp": {
+      "source": "https://spire-codex.com/static/images/relics/happy_flower.webp",
+      "bytes": 15282,
+      "sha256": "9db5b9c68135bf802f7a6acc1d54c5db0e99963192b7c31433c1806e8409153b"
+    },
+    "relics/hefty_tablet.webp": {
+      "source": "https://spire-codex.com/static/images/relics/hefty_tablet.webp",
+      "bytes": 15166,
+      "sha256": "8cd103f04250848e0d8fb2f5efce6277a731da1a43dc665db5bad03373cfa6e2"
+    },
+    "relics/helical_dart.webp": {
+      "source": "https://spire-codex.com/static/images/relics/helical_dart.webp",
+      "bytes": 11210,
+      "sha256": "49f1fd26c4e2032a36c6ad7a44ca75359b667cfde39cea8ab34db1f5022bdb6c"
+    },
+    "relics/history_course.webp": {
+      "source": "https://spire-codex.com/static/images/relics/history_course.webp",
+      "bytes": 14528,
+      "sha256": "854e66c0b26c20cedb7dba5a9365dee74217cc771d7bdf507de96ca87b377647"
+    },
+    "relics/horn_cleat.webp": {
+      "source": "https://spire-codex.com/static/images/relics/horn_cleat.webp",
+      "bytes": 9008,
+      "sha256": "3a4d130771ba5e422273753ac9e224f7320417801f8e21e2b5b816ed3f467658"
+    },
+    "relics/ice_cream.webp": {
+      "source": "https://spire-codex.com/static/images/relics/ice_cream.webp",
+      "bytes": 13858,
+      "sha256": "c6a9cf76b46014ce46e700bfc850cf87eed416317631e043332f0022d97880c0"
+    },
+    "relics/infused_core.webp": {
+      "source": "https://spire-codex.com/static/images/relics/infused_core.webp",
+      "bytes": 14926,
+      "sha256": "9be8b5e668ebc42cc183645567f83bf0311a6b79ee44491b07bcbb6e94d5edcd"
+    },
+    "relics/intimidating_helmet.webp": {
+      "source": "https://spire-codex.com/static/images/relics/intimidating_helmet.webp",
+      "bytes": 17660,
+      "sha256": "51a81814fcb142874ef8bf2f0babc0b97ad589b7861cbd3227f4e7b6a4c1b998"
+    },
+    "relics/iron_club.webp": {
+      "source": "https://spire-codex.com/static/images/relics/iron_club.webp",
+      "bytes": 10712,
+      "sha256": "970a8002601f98d0d61e0a5ccc981ebe0871f6465e0850dd4ea4cb72b63ed9da"
+    },
+    "relics/ivory_tile.webp": {
+      "source": "https://spire-codex.com/static/images/relics/ivory_tile.webp",
+      "bytes": 9034,
+      "sha256": "da91d1653bb48e1f202829efbc8b367a4bb8e4f04edb98ff055dd6bf7cf7d95d"
+    },
+    "relics/jeweled_mask.webp": {
+      "source": "https://spire-codex.com/static/images/relics/jeweled_mask.webp",
+      "bytes": 16434,
+      "sha256": "88e4cb08c7d221cb9185ecfbf3b93b29048ac34aab940cc3c002eb64860ac912"
+    },
+    "relics/jewelry_box.webp": {
+      "source": "https://spire-codex.com/static/images/relics/jewelry_box.webp",
+      "bytes": 12692,
+      "sha256": "51770038ec4fa4c1bca0955be7b08fa9a0421e62f3c352d6c95ff515a073a8c0"
+    },
+    "relics/joss_paper.webp": {
+      "source": "https://spire-codex.com/static/images/relics/joss_paper.webp",
+      "bytes": 18402,
+      "sha256": "5a90a801e50de5dc071c2a12511138d3d7ca2915206f078f4c6bf29b11c124f4"
+    },
+    "relics/juzu_bracelet.webp": {
+      "source": "https://spire-codex.com/static/images/relics/juzu_bracelet.webp",
+      "bytes": 22410,
+      "sha256": "4f8be200f678e5e77e810013121481e3bc1f913a2591884a42d254d39a1d2678"
+    },
+    "relics/kaleidoscope.webp": {
+      "source": "https://spire-codex.com/static/images/relics/kaleidoscope.webp",
+      "bytes": 13352,
+      "sha256": "d535f0bc19bb32f207447a39f1f9b83a4cb3a7d19aa474f904b96cc4091ab682"
+    },
+    "relics/kifuda.webp": {
+      "source": "https://spire-codex.com/static/images/relics/kifuda.webp",
+      "bytes": 16492,
+      "sha256": "1d750ef238b0f1afc20b44d5a63b9d125881c5463e8004aa55d1280ccef45364"
+    },
+    "relics/kunai.webp": {
+      "source": "https://spire-codex.com/static/images/relics/kunai.webp",
+      "bytes": 10574,
+      "sha256": "84e6cc26524bc0ffbadb42a62fcfdb07c16d38872886a2d383a27a9558591a8e"
+    },
+    "relics/kusarigama.webp": {
+      "source": "https://spire-codex.com/static/images/relics/kusarigama.webp",
+      "bytes": 20680,
+      "sha256": "8fb885519f14abca91e98204e24a805c75b392c9d111ca2767b43f0e8a4a2962"
+    },
+    "relics/lantern.webp": {
+      "source": "https://spire-codex.com/static/images/relics/lantern.webp",
+      "bytes": 12982,
+      "sha256": "fbd7f58c0b20f023cd7d9d63536513248c7e5d049f9e25eb1e9e7319ea624bca"
+    },
+    "relics/large_capsule.webp": {
+      "source": "https://spire-codex.com/static/images/relics/large_capsule.webp",
+      "bytes": 19680,
+      "sha256": "c655940b52702acddb032718aea3d44b5d7786d4d6caf383f55fb0caf06b3c91"
+    },
+    "relics/lasting_candy.webp": {
+      "source": "https://spire-codex.com/static/images/relics/lasting_candy.webp",
+      "bytes": 21256,
+      "sha256": "7ad013f935b7e234596d09ba89d9dec909a21379b17a45e817d65dab0d87fe48"
+    },
+    "relics/lava_lamp.webp": {
+      "source": "https://spire-codex.com/static/images/relics/lava_lamp.webp",
+      "bytes": 9296,
+      "sha256": "2864982cfdd867967e6c0a929098d183497e9d211fcdb9b475c95922191c98b2"
+    },
+    "relics/lava_rock.webp": {
+      "source": "https://spire-codex.com/static/images/relics/lava_rock.webp",
+      "bytes": 16136,
+      "sha256": "3f4052ed0a8eaa397685571dd64b61bf76e1e8a4fa8f16ec1a83acef523875f9"
+    },
+    "relics/lead_paperweight.webp": {
+      "source": "https://spire-codex.com/static/images/relics/lead_paperweight.webp",
+      "bytes": 12670,
+      "sha256": "df07fc5a5c94c322f156f9444dde22e6da855fedfa2406a44cc28ba9177e9722"
+    },
+    "relics/leafy_poultice.webp": {
+      "source": "https://spire-codex.com/static/images/relics/leafy_poultice.webp",
+      "bytes": 14880,
+      "sha256": "7891ef7299b99608eaf6332167e3651df81ec326b90e9b300b363452ebfa6e78"
+    },
+    "relics/lees_waffle.webp": {
+      "source": "https://spire-codex.com/static/images/relics/lees_waffle.webp",
+      "bytes": 17832,
+      "sha256": "6d19937405b8bf6a5b58a734eeeccdaf0b7a97f8bd0ecbb9d0fa1d930e30618d"
+    },
+    "relics/letter_opener.webp": {
+      "source": "https://spire-codex.com/static/images/relics/letter_opener.webp",
+      "bytes": 14574,
+      "sha256": "dae93f25d80384ba4547fa70bbc8d1fe4d775e578eba1b3cf35e61de4eb9c78b"
+    },
+    "relics/lizard_tail.webp": {
+      "source": "https://spire-codex.com/static/images/relics/lizard_tail.webp",
+      "bytes": 18082,
+      "sha256": "529e7c8f06387d5b0e1d465ca3ad782ec2704fdf17f07c3ff056b3f9ff2d0de6"
+    },
+    "relics/looming_fruit.webp": {
+      "source": "https://spire-codex.com/static/images/relics/looming_fruit.webp",
+      "bytes": 19256,
+      "sha256": "aaddbb8e5a15031637430fe958c37817ddd431faab2bdd747645aa218b02297a"
+    },
+    "relics/lords_parasol.webp": {
+      "source": "https://spire-codex.com/static/images/relics/lords_parasol.webp",
+      "bytes": 18746,
+      "sha256": "94d7d2e1f28308c039d5dfd36b36ddcbaf901350f20b8f0605bc790ce4ea006b"
+    },
+    "relics/lost_coffer.webp": {
+      "source": "https://spire-codex.com/static/images/relics/lost_coffer.webp",
+      "bytes": 12522,
+      "sha256": "30073a6d8a5486b836b1f327370f2947be2215bf436444d1be759439612519fe"
+    },
+    "relics/lost_wisp.webp": {
+      "source": "https://spire-codex.com/static/images/relics/lost_wisp.webp",
+      "bytes": 13632,
+      "sha256": "7e29ff00507fef4c55df1ee66f511348020ee5db9406519cf5df3b4907499b09"
+    },
+    "relics/lucky_fysh.webp": {
+      "source": "https://spire-codex.com/static/images/relics/lucky_fysh.webp",
+      "bytes": 22240,
+      "sha256": "1d990042f00ccb28a37b9d84e34385139cb0a238dc22d98608766396385ed160"
+    },
+    "relics/lunar_pastry.webp": {
+      "source": "https://spire-codex.com/static/images/relics/lunar_pastry.webp",
+      "bytes": 14420,
+      "sha256": "317c74047b4885a4f29e6a91d5ef84dea5144bdd5537cda63516aef5a0d23e1f"
+    },
+    "relics/mango.webp": {
+      "source": "https://spire-codex.com/static/images/relics/mango.webp",
+      "bytes": 17430,
+      "sha256": "04256dcc0002a2b5896827ccfacfea7eb45aedd900906755643f05dfabcb8cf8"
+    },
+    "relics/massive_scroll.webp": {
+      "source": "https://spire-codex.com/static/images/relics/massive_scroll.webp",
+      "bytes": 12288,
+      "sha256": "05b4640bd5c2ce80da78714a40327697225a6a77ef312e315c4907ecb2fa8e29"
+    },
+    "relics/maw_bank.webp": {
+      "source": "https://spire-codex.com/static/images/relics/maw_bank.webp",
+      "bytes": 11838,
+      "sha256": "5751b4532b9b66f2f9a469e87f232a364829e85d191e0a6d7ab895b86f0aca68"
+    },
+    "relics/meal_ticket.webp": {
+      "source": "https://spire-codex.com/static/images/relics/meal_ticket.webp",
+      "bytes": 16664,
+      "sha256": "0757d3b81d3a805fd2c8a5386795a73fa6b7b39e937e686c2e29e85fcb9a43a5"
+    },
+    "relics/meat_cleaver.webp": {
+      "source": "https://spire-codex.com/static/images/relics/meat_cleaver.webp",
+      "bytes": 8690,
+      "sha256": "49235398ffd0e517d63082734bcb12dc0d2410eda848331380ff47cbd7c4f362"
+    },
+    "relics/meat_on_the_bone.webp": {
+      "source": "https://spire-codex.com/static/images/relics/meat_on_the_bone.webp",
+      "bytes": 12886,
+      "sha256": "91bbfee0763b00382194a2cae4f0740f22424cc76722a115a9cad9c111ca2aff"
+    },
+    "relics/membership_card.webp": {
+      "source": "https://spire-codex.com/static/images/relics/membership_card.webp",
+      "bytes": 13856,
+      "sha256": "3169e66da6abbdd423b288616c997a4d3d5d681dde600d0fc563622550830f99"
+    },
+    "relics/mercury_hourglass.webp": {
+      "source": "https://spire-codex.com/static/images/relics/mercury_hourglass.webp",
+      "bytes": 12936,
+      "sha256": "a7ef93e1b5431c545ca6c4d60aa2217946c36d8bc0f47aadf7877bd30a398a27"
+    },
+    "relics/metronome.webp": {
+      "source": "https://spire-codex.com/static/images/relics/metronome.webp",
+      "bytes": 11640,
+      "sha256": "a8464577239ac3a7ad38f1b62e1c83f658c452f1170caadea0e8e7284b595641"
+    },
+    "relics/mini_regent.webp": {
+      "source": "https://spire-codex.com/static/images/relics/mini_regent.webp",
+      "bytes": 12184,
+      "sha256": "fdd10dd1c0ff6426685cc0682a70c057129dec527ce82aa358d98998a85f87f9"
+    },
+    "relics/miniature_cannon.webp": {
+      "source": "https://spire-codex.com/static/images/relics/miniature_cannon.webp",
+      "bytes": 13768,
+      "sha256": "ace38ff3feb96e37425317c4c03f9e2479d0e807b117fbcbc34070132eb61bc7"
+    },
+    "relics/miniature_tent.webp": {
+      "source": "https://spire-codex.com/static/images/relics/miniature_tent.webp",
+      "bytes": 12790,
+      "sha256": "18ac2967e66f7435d2b68010c5ebefa87ae7d1c058abb0a5458574feef65599c"
+    },
+    "relics/molten_egg.webp": {
+      "source": "https://spire-codex.com/static/images/relics/molten_egg.webp",
+      "bytes": 14734,
+      "sha256": "d8a3984c23a0e9f6f9630cec53fe013d0c6177d44037f587f2752d06be901717"
+    },
+    "relics/mr_struggles.webp": {
+      "source": "https://spire-codex.com/static/images/relics/mr_struggles.webp",
+      "bytes": 17814,
+      "sha256": "1ab6b143c54d180fb71c1365204efb6cbbfc1c5643b60d608ef10928dadb0f39"
+    },
+    "relics/mummified_hand.webp": {
+      "source": "https://spire-codex.com/static/images/relics/mummified_hand.webp",
+      "bytes": 17710,
+      "sha256": "475c790845c8d8b147de862da0429a907279f143aba943221c4182c93831bbdd"
+    },
+    "relics/music_box.webp": {
+      "source": "https://spire-codex.com/static/images/relics/music_box.webp",
+      "bytes": 13594,
+      "sha256": "553f452033c251542d4a06fbc90f155fea73f4fad50c7e9aa5cec248cd167a7c"
+    },
+    "relics/mystic_lighter.webp": {
+      "source": "https://spire-codex.com/static/images/relics/mystic_lighter.webp",
+      "bytes": 15096,
+      "sha256": "8c0bcb1d79fa0ef1626f995e5eff1ad9b1dff7166fe05990744a2c9c60561d5a"
+    },
+    "relics/neows_bones.webp": {
+      "source": "https://spire-codex.com/static/images/relics/neows_bones.webp",
+      "bytes": 14134,
+      "sha256": "04ea652b15b59fec27c49eb2674c338262a5677a5184c76836067dbf3c0102be"
+    },
+    "relics/neows_talisman.webp": {
+      "source": "https://spire-codex.com/static/images/relics/neows_talisman.webp",
+      "bytes": 16158,
+      "sha256": "f648be926a4ec5664f4fe5669d22f5353e57a3e0d5f8e20f83f92356526316ef"
+    },
+    "relics/neows_torment.webp": {
+      "source": "https://spire-codex.com/static/images/relics/neows_torment.webp",
+      "bytes": 20152,
+      "sha256": "6665d6e772d043180432e4a1ad90f61dec1d84824f351e3c4caf034194ff9174"
+    },
+    "relics/new_leaf.webp": {
+      "source": "https://spire-codex.com/static/images/relics/new_leaf.webp",
+      "bytes": 12738,
+      "sha256": "789c9349e9352508a87906cbea28dcabac77118b059fd1270afbf5dd58fa9781"
+    },
+    "relics/ninja_scroll.webp": {
+      "source": "https://spire-codex.com/static/images/relics/ninja_scroll.webp",
+      "bytes": 12944,
+      "sha256": "b1c1a634887a0ed29d9d085082d97fd3db667c02a1e84d8312b18e4cc04b4dca"
+    },
+    "relics/nunchaku.webp": {
+      "source": "https://spire-codex.com/static/images/relics/nunchaku.webp",
+      "bytes": 16670,
+      "sha256": "3ce5aaffbfbb87527448bd54c6419a2353cea97629a8c4713ae86910f28b7738"
+    },
+    "relics/nutritious_oyster.webp": {
+      "source": "https://spire-codex.com/static/images/relics/nutritious_oyster.webp",
+      "bytes": 11306,
+      "sha256": "eab0b672a24bbcea910fc6d1ec0a643172c1723534972ff9c8faa3098063d81e"
+    },
+    "relics/nutritious_soup.webp": {
+      "source": "https://spire-codex.com/static/images/relics/nutritious_soup.webp",
+      "bytes": 12960,
+      "sha256": "6f8b30b0f36adf77810985ef87443567216ee9a64ccc1b6f5e1cc349494061cb"
+    },
+    "relics/oddly_smooth_stone.webp": {
+      "source": "https://spire-codex.com/static/images/relics/oddly_smooth_stone.webp",
+      "bytes": 9346,
+      "sha256": "64eba78f4425d400a1f45ef2d1ee0bb1251c46e814a547fd9dcef7a528c4770b"
+    },
+    "relics/old_coin.webp": {
+      "source": "https://spire-codex.com/static/images/relics/old_coin.webp",
+      "bytes": 15920,
+      "sha256": "6aa2837d251ee254e1d3b3284c0147668a59cd0cfd8a26f287dd012e5159d0aa"
+    },
+    "relics/orange_dough.webp": {
+      "source": "https://spire-codex.com/static/images/relics/orange_dough.webp",
+      "bytes": 15792,
+      "sha256": "19a2f7d77e7ede9a510b6df16af2111c77660fc553c9b936f602c645eacda6ae"
+    },
+    "relics/orichalcum.webp": {
+      "source": "https://spire-codex.com/static/images/relics/orichalcum.webp",
+      "bytes": 13100,
+      "sha256": "ca1b7901fed876e64b428c976c0f7d0a2c3f588f6cb7bfac3086ea895ff66fe6"
+    },
+    "relics/ornamental_fan.webp": {
+      "source": "https://spire-codex.com/static/images/relics/ornamental_fan.webp",
+      "bytes": 14654,
+      "sha256": "7ff70a527538660d437a5bc313841fd728971901808642e0071f2487f6ba8a4b"
+    },
+    "relics/orrery.webp": {
+      "source": "https://spire-codex.com/static/images/relics/orrery.webp",
+      "bytes": 18050,
+      "sha256": "3b0344599a9241a1598704a7a5d52fae945063c46e67836c9423b845845c4790"
+    },
+    "relics/paels_blood.webp": {
+      "source": "https://spire-codex.com/static/images/relics/paels_blood.webp",
+      "bytes": 12468,
+      "sha256": "b7711a7af83570e72a8f21fc3b3a2c316f68d091a0f008ed5eab96b84062c2d7"
+    },
+    "relics/paels_claw.webp": {
+      "source": "https://spire-codex.com/static/images/relics/paels_claw.webp",
+      "bytes": 9622,
+      "sha256": "6d8e3a78841bb4cd6aab8e96d5c358df25e906024cf6e13b46b3ac010c8b83c4"
+    },
+    "relics/paels_eye.webp": {
+      "source": "https://spire-codex.com/static/images/relics/paels_eye.webp",
+      "bytes": 8314,
+      "sha256": "5a2d969178608b24128060efeec5d4df1b39f60ec105a2cec42c361e3cb011ca"
+    },
+    "relics/paels_flesh.webp": {
+      "source": "https://spire-codex.com/static/images/relics/paels_flesh.webp",
+      "bytes": 15038,
+      "sha256": "d35605a271afdc36bc978008443a2804755fd850cb4f953d5fce63dfc1780d22"
+    },
+    "relics/paels_growth.webp": {
+      "source": "https://spire-codex.com/static/images/relics/paels_growth.webp",
+      "bytes": 12648,
+      "sha256": "a279dcfaa14ed0db6bcc33e209add4767d6fd0a10c187dfb1205ee787606f898"
+    },
+    "relics/paels_horn.webp": {
+      "source": "https://spire-codex.com/static/images/relics/paels_horn.webp",
+      "bytes": 10496,
+      "sha256": "e461189b6ed72b72190b842c790b3dbd2aa054874c47badefac70038ee7c9a90"
+    },
+    "relics/paels_legion.webp": {
+      "source": "https://spire-codex.com/static/images/relics/paels_legion.webp",
+      "bytes": 10646,
+      "sha256": "21ade067ac548c2c7bc0d0d68f3823b42f04daaa6d782bd28a0bdd1ba1c308ee"
+    },
+    "relics/paels_tears.webp": {
+      "source": "https://spire-codex.com/static/images/relics/paels_tears.webp",
+      "bytes": 13554,
+      "sha256": "3bdacdda0d9e675dcf52319090c2b4c40c1d87dcfba1c490d929262152b5456f"
+    },
+    "relics/paels_tooth.webp": {
+      "source": "https://spire-codex.com/static/images/relics/paels_tooth.webp",
+      "bytes": 10694,
+      "sha256": "fb0074ac53413926b647317d7c6d09f24f7bfc8e8343cb6d275ee8700f6452e5"
+    },
+    "relics/paels_wing.webp": {
+      "source": "https://spire-codex.com/static/images/relics/paels_wing.webp",
+      "bytes": 12310,
+      "sha256": "0d2ca6e214903d25cdb8b1b2c46b68bbeb4a6a7ec40dc0c51ee6e795508b533d"
+    },
+    "relics/pandoras_box.webp": {
+      "source": "https://spire-codex.com/static/images/relics/pandoras_box.webp",
+      "bytes": 17692,
+      "sha256": "b7760003aec5bd21f9d84313ce606b678353f11d33a105283926db21ddca26e8"
+    },
+    "relics/pantograph.webp": {
+      "source": "https://spire-codex.com/static/images/relics/pantograph.webp",
+      "bytes": 11746,
+      "sha256": "62b771e5be8398397a3db73c29ef064d1dd335c03c2455092e1f3da7fdfdf6f0"
+    },
+    "relics/paper_krane.webp": {
+      "source": "https://spire-codex.com/static/images/relics/paper_krane.webp",
+      "bytes": 12380,
+      "sha256": "39e194d3424d34ed292e3794a78259e31b53b25ede8724bb0012cac5d3b99f94"
+    },
+    "relics/paper_phrog.webp": {
+      "source": "https://spire-codex.com/static/images/relics/paper_phrog.webp",
+      "bytes": 14398,
+      "sha256": "39d12dde39e905d8d84c738628f4ab2bc100797bdcad59abaf5349dca17cd027"
+    },
+    "relics/parrying_shield.webp": {
+      "source": "https://spire-codex.com/static/images/relics/parrying_shield.webp",
+      "bytes": 13600,
+      "sha256": "47c9faa9b9bed0862a0b7480ef841de56ab581c1466edebc01e001cfcabab921"
+    },
+    "relics/pear.webp": {
+      "source": "https://spire-codex.com/static/images/relics/pear.webp",
+      "bytes": 11332,
+      "sha256": "e1a7541ba2f9cd7a4a87fd2ea21bd1aa0b90b80b0ca1c89c055a85cfaefaa5be"
+    },
+    "relics/pen_nib.webp": {
+      "source": "https://spire-codex.com/static/images/relics/pen_nib.webp",
+      "bytes": 14398,
+      "sha256": "7640bda4d0ab41b1bc02ab29ea0f29b1f780151ecae9712174731f803118d4b5"
+    },
+    "relics/pendulum.webp": {
+      "source": "https://spire-codex.com/static/images/relics/pendulum.webp",
+      "bytes": 25572,
+      "sha256": "b88492152387e927714702ae282eb56b26c5a91fb78efbec54a4f2709c71435a"
+    },
+    "relics/permafrost.webp": {
+      "source": "https://spire-codex.com/static/images/relics/permafrost.webp",
+      "bytes": 15494,
+      "sha256": "1e3b4f3559cf297ac75ffcd95941d73fe33a9aebfda319fa5f8d1d94b260ea05"
+    },
+    "relics/petrified_toad.webp": {
+      "source": "https://spire-codex.com/static/images/relics/petrified_toad.webp",
+      "bytes": 17384,
+      "sha256": "ef8b2c7b79a7a210dc6f923267a2fac3e43d3596a3e8880e3cb760b5fcef1c28"
+    },
+    "relics/phial_holster.webp": {
+      "source": "https://spire-codex.com/static/images/relics/phial_holster.webp",
+      "bytes": 12630,
+      "sha256": "6b97495e3fc41bbdcc512a70d442356da90143e5d595a40a6adf679c549815f0"
+    },
+    "relics/philosophers_stone.webp": {
+      "source": "https://spire-codex.com/static/images/relics/philosophers_stone.webp",
+      "bytes": 10720,
+      "sha256": "77ff4afa3181c8183b2f6b18ba0b339487eea3990f94bf38e6a5fd27272e904a"
+    },
+    "relics/phylactery_unbound.webp": {
+      "source": "https://spire-codex.com/static/images/relics/phylactery_unbound.webp",
+      "bytes": 17292,
+      "sha256": "22b6f05440f90ff201bcebbe0c9dd12a992e5f768d2077eb8077927128c5a31d"
+    },
+    "relics/planisphere.webp": {
+      "source": "https://spire-codex.com/static/images/relics/planisphere.webp",
+      "bytes": 18526,
+      "sha256": "411453b048af574426f8b7a42672cadd9a3e2cfa44808b339ed9512d78e5e55c"
+    },
+    "relics/pocketwatch.webp": {
+      "source": "https://spire-codex.com/static/images/relics/pocketwatch.webp",
+      "bytes": 21636,
+      "sha256": "e1a7b419e3aadabe064cca6516e8733f45903b506b38d66e16d28cbd55d83bfe"
+    },
+    "relics/pollinous_core.webp": {
+      "source": "https://spire-codex.com/static/images/relics/pollinous_core.webp",
+      "bytes": 13372,
+      "sha256": "d29362935a3159d6970635fa7d14d9ee82f61528a88b79214bb52483abce3483"
+    },
+    "relics/pomander.webp": {
+      "source": "https://spire-codex.com/static/images/relics/pomander.webp",
+      "bytes": 13358,
+      "sha256": "e546fab759e79bcf1b1dcce847ce81377329f396cf6d7c07aa164d8414901243"
+    },
+    "relics/potion_belt.webp": {
+      "source": "https://spire-codex.com/static/images/relics/potion_belt.webp",
+      "bytes": 18542,
+      "sha256": "2c33c5f4595e034b594013f845d6f356020dc4af3e1fc9e8df41b54edd23073f"
+    },
+    "relics/power_cell.webp": {
+      "source": "https://spire-codex.com/static/images/relics/power_cell.webp",
+      "bytes": 12744,
+      "sha256": "2623bef371ec1fa400c96abf91baa6677d3caf96ca7c0d9d1e0c097d33bf797a"
+    },
+    "relics/prayer_wheel.webp": {
+      "source": "https://spire-codex.com/static/images/relics/prayer_wheel.webp",
+      "bytes": 12742,
+      "sha256": "5b5fd71282b6d47105fb85d98df610b037df0b99419f643c094ee66a7f731442"
+    },
+    "relics/precarious_shears.webp": {
+      "source": "https://spire-codex.com/static/images/relics/precarious_shears.webp",
+      "bytes": 9860,
+      "sha256": "cb1c04917cdea043476a08e8042a8968e69fd1a292023a33708b7203fbf13e4b"
+    },
+    "relics/precise_scissors.webp": {
+      "source": "https://spire-codex.com/static/images/relics/precise_scissors.webp",
+      "bytes": 14390,
+      "sha256": "e76c932af0d0cabded23fa764960b8cbdb832625a045fa4c1b704ba52fc79bae"
+    },
+    "relics/preserved_fog.webp": {
+      "source": "https://spire-codex.com/static/images/relics/preserved_fog.webp",
+      "bytes": 16208,
+      "sha256": "0bd5ee4605bccab8064f6881b2b2c1559495d27850f282212d74f0bf66cf1242"
+    },
+    "relics/prismatic_gem.webp": {
+      "source": "https://spire-codex.com/static/images/relics/prismatic_gem.webp",
+      "bytes": 13008,
+      "sha256": "eb4a435e3e75601b27de898a39f4e20b6344e1d4cc4d8879c954e3a315fefc19"
+    },
+    "relics/pumpkin_candle.webp": {
+      "source": "https://spire-codex.com/static/images/relics/pumpkin_candle.webp",
+      "bytes": 11892,
+      "sha256": "4f2c496351571b7083cd89305d4bbe4a86238d40772e63408aa39f90a4d77368"
+    },
+    "relics/punch_dagger.webp": {
+      "source": "https://spire-codex.com/static/images/relics/punch_dagger.webp",
+      "bytes": 9716,
+      "sha256": "732b45218f6e73879515f66db62c903c0c374603f0b013b65959dca347c501b1"
+    },
+    "relics/radiant_pearl.webp": {
+      "source": "https://spire-codex.com/static/images/relics/radiant_pearl.webp",
+      "bytes": 10128,
+      "sha256": "d9fc11d33e30b980739274bdea52469395ce1b5e9c804253793c80ef779eeba9"
+    },
+    "relics/rainbow_ring.webp": {
+      "source": "https://spire-codex.com/static/images/relics/rainbow_ring.webp",
+      "bytes": 17542,
+      "sha256": "52264c4da0e0afac425883a9ce9f8d2d798965ce00147b3b94ad6507583a789f"
+    },
+    "relics/razor_tooth.webp": {
+      "source": "https://spire-codex.com/static/images/relics/razor_tooth.webp",
+      "bytes": 12152,
+      "sha256": "81fa1586b353250da8b137980995e61611c04ca5eb0212a6002c1a245e0a6d12"
+    },
+    "relics/red_mask.webp": {
+      "source": "https://spire-codex.com/static/images/relics/red_mask.webp",
+      "bytes": 10968,
+      "sha256": "98ab4fa67f65816e2bd85d96853cc89db62c23bd73891e00fea4863a7f250fa4"
+    },
+    "relics/red_skull.webp": {
+      "source": "https://spire-codex.com/static/images/relics/red_skull.webp",
+      "bytes": 15548,
+      "sha256": "9c0953117f8ef52285ab3b7b5b2b1d099e294b03c34d13c8f93e07b6b49dc963"
+    },
+    "relics/regal_pillow.webp": {
+      "source": "https://spire-codex.com/static/images/relics/regal_pillow.webp",
+      "bytes": 13922,
+      "sha256": "2bc7456b3370af51bb46892495fcdd3b25c97fd34aad7e5e5023afcab818e7e1"
+    },
+    "relics/regalite.webp": {
+      "source": "https://spire-codex.com/static/images/relics/regalite.webp",
+      "bytes": 17326,
+      "sha256": "6caa05503852599ebe0c961ce967e50f8934e66c8b0b5a138b88ba5518c2112a"
+    },
+    "relics/reptile_trinket.webp": {
+      "source": "https://spire-codex.com/static/images/relics/reptile_trinket.webp",
+      "bytes": 14158,
+      "sha256": "687e1361a060620bb94256ff9346e68d5f39762112688ce9f3b7c80cc05fad5c"
+    },
+    "relics/ring_of_the_drake.webp": {
+      "source": "https://spire-codex.com/static/images/relics/ring_of_the_drake.webp",
+      "bytes": 17170,
+      "sha256": "0d34999a4ed3b05e9abfb6f3cf72e11fa40bd71e85a0c43aab1207cf1cb2110d"
+    },
+    "relics/ring_of_the_snake.webp": {
+      "source": "https://spire-codex.com/static/images/relics/ring_of_the_snake.webp",
+      "bytes": 20576,
+      "sha256": "910eada1f57632e4128b799fcf1afeb4ead56d48cba1173520cb6180243d7475"
+    },
+    "relics/ringing_triangle.webp": {
+      "source": "https://spire-codex.com/static/images/relics/ringing_triangle.webp",
+      "bytes": 15450,
+      "sha256": "69a2a1d7d3b22f53fd1dd83bb9be085f55bfc2784a90fde296195a292e9207c9"
+    },
+    "relics/ripple_basin.webp": {
+      "source": "https://spire-codex.com/static/images/relics/ripple_basin.webp",
+      "bytes": 11042,
+      "sha256": "36b4449cf1ffa6772760d50b008aad330f15ad5b1162d0ef44be7c0bb8daa59a"
+    },
+    "relics/royal_poison.webp": {
+      "source": "https://spire-codex.com/static/images/relics/royal_poison.webp",
+      "bytes": 12424,
+      "sha256": "d1d903e41581644fe198f8148d904d9e12f5fdba03f981816b04f08629010ccd"
+    },
+    "relics/royal_stamp.webp": {
+      "source": "https://spire-codex.com/static/images/relics/royal_stamp.webp",
+      "bytes": 12264,
+      "sha256": "a029d2f005af9bb372c4bae5eebc9f277cd3d3743851a7d0d67a20410605c93e"
+    },
+    "relics/ruined_helmet.webp": {
+      "source": "https://spire-codex.com/static/images/relics/ruined_helmet.webp",
+      "bytes": 11968,
+      "sha256": "8e2082df542ea3f4ec1a2a0a173af3e3bd5728f4e20807154426737cc1a45c7b"
+    },
+    "relics/runic_capacitor.webp": {
+      "source": "https://spire-codex.com/static/images/relics/runic_capacitor.webp",
+      "bytes": 10660,
+      "sha256": "5cb34ef383a06a13bfe7b19519687acba30351dbe884dbd7d29f6d027960e22d"
+    },
+    "relics/runic_pyramid.webp": {
+      "source": "https://spire-codex.com/static/images/relics/runic_pyramid.webp",
+      "bytes": 14102,
+      "sha256": "c1c2f43a4e49b50998844656953663e259143764d7f183470d05d8665ceacdf8"
+    },
+    "relics/sai.webp": {
+      "source": "https://spire-codex.com/static/images/relics/sai.webp",
+      "bytes": 13094,
+      "sha256": "8c1c7d00a91012e5663c85c4c6bf83702e29d2bd88e7a341727b8b064ca2b0f4"
+    },
+    "relics/sand_castle.webp": {
+      "source": "https://spire-codex.com/static/images/relics/sand_castle.webp",
+      "bytes": 10524,
+      "sha256": "09c3509582c4ee07ef3382a0295992e17ff2cc284e1020f3035803767fc11e67"
+    },
+    "relics/screaming_flagon.webp": {
+      "source": "https://spire-codex.com/static/images/relics/screaming_flagon.webp",
+      "bytes": 15746,
+      "sha256": "5339ca00ddaced31098bc1efa5355240d0deee862ed677e67542d23f8842f0d1"
+    },
+    "relics/scroll_boxes.webp": {
+      "source": "https://spire-codex.com/static/images/relics/scroll_boxes.webp",
+      "bytes": 15160,
+      "sha256": "ed8b866f7cb8235b9a602f58f80f7244b31f0b086078b1e7c307c524be1a93b2"
+    },
+    "relics/sea_glass.webp": {
+      "source": "https://spire-codex.com/static/images/relics/sea_glass.webp",
+      "bytes": 10208,
+      "sha256": "514cb6a952d74ee23b190af4a9338b9d10b94bc8c390958054a03e56f75a2121"
+    },
+    "relics/seal_of_gold.webp": {
+      "source": "https://spire-codex.com/static/images/relics/seal_of_gold.webp",
+      "bytes": 15384,
+      "sha256": "a3dad526b871a1e0709a1cce369b4585df91121c69f3c82ca336741ef86c6e99"
+    },
+    "relics/self_forming_clay.webp": {
+      "source": "https://spire-codex.com/static/images/relics/self_forming_clay.webp",
+      "bytes": 13836,
+      "sha256": "da61b068a9f79d1f0e794be6a6a44746c53ad5a8312b5b14c31ffa131dbcbb26"
+    },
+    "relics/sere_talon.webp": {
+      "source": "https://spire-codex.com/static/images/relics/sere_talon.webp",
+      "bytes": 16458,
+      "sha256": "561558cf4c1e64c1bdab1cb60f094babf9d4cf2b37709680458ecb4d5a192799"
+    },
+    "relics/shovel.webp": {
+      "source": "https://spire-codex.com/static/images/relics/shovel.webp",
+      "bytes": 12714,
+      "sha256": "965d0f01f8b7e055aed83585627e87343a3a258c37b31ef6f7ed478f286b2ad6"
+    },
+    "relics/shuriken.webp": {
+      "source": "https://spire-codex.com/static/images/relics/shuriken.webp",
+      "bytes": 11764,
+      "sha256": "5498fca62cea451342305cc63334a364d224ba98ce060253bad2fe7528ee944b"
+    },
+    "relics/signet_ring.webp": {
+      "source": "https://spire-codex.com/static/images/relics/signet_ring.webp",
+      "bytes": 13186,
+      "sha256": "57ada5f6c16ed57151a13fc1880a327e526f1ed15ebbd3b2194ed56f33086d06"
+    },
+    "relics/silken_tress.webp": {
+      "source": "https://spire-codex.com/static/images/relics/silken_tress.webp",
+      "bytes": 11062,
+      "sha256": "3b54be8878af1a20faa536e3737c523ee46effa01ffaf03f1e9881b268e6f060"
+    },
+    "relics/silver_crucible.webp": {
+      "source": "https://spire-codex.com/static/images/relics/silver_crucible.webp",
+      "bytes": 19528,
+      "sha256": "0d9a019f868fb22395a535c1c477e459d408a5445f6b9415395694c5dc43451f"
+    },
+    "relics/sling_of_courage.webp": {
+      "source": "https://spire-codex.com/static/images/relics/sling_of_courage.webp",
+      "bytes": 18332,
+      "sha256": "3c94378affa5ff87341f0ff965d0026ea9dceeee700b25ea0f2a79d4245bebf5"
+    },
+    "relics/small_capsule.webp": {
+      "source": "https://spire-codex.com/static/images/relics/small_capsule.webp",
+      "bytes": 19918,
+      "sha256": "c07e3b0514b6293193a07ee51b7f38e729b12710684d1b062570d26f2e15b3b3"
+    },
+    "relics/snecko_eye.webp": {
+      "source": "https://spire-codex.com/static/images/relics/snecko_eye.webp",
+      "bytes": 13246,
+      "sha256": "76e7198496b76e178f03441bc7cd75358ecd24e742dc183e20622d71a59e60c5"
+    },
+    "relics/snecko_skull.webp": {
+      "source": "https://spire-codex.com/static/images/relics/snecko_skull.webp",
+      "bytes": 14266,
+      "sha256": "a138f40365889c75b5f4fe06cf496423161dab8ad527277eabafbc69b1056059"
+    },
+    "relics/sozu.webp": {
+      "source": "https://spire-codex.com/static/images/relics/sozu.webp",
+      "bytes": 12126,
+      "sha256": "b7ad074cc4d454e405eba43550fc969dd7f8301ac6c8473b091244019fdc6a0b"
+    },
+    "relics/sparkling_rouge.webp": {
+      "source": "https://spire-codex.com/static/images/relics/sparkling_rouge.webp",
+      "bytes": 11878,
+      "sha256": "0d696a2bae798e7880209d0a1ea0faca3f02a7bf4b940cbdca834897ae9c195d"
+    },
+    "relics/spiked_gauntlets.webp": {
+      "source": "https://spire-codex.com/static/images/relics/spiked_gauntlets.webp",
+      "bytes": 13468,
+      "sha256": "e56a925b33e521c15bb7c6c6f0c432773a61f3fc34244dfe32ac12ee828c9c97"
+    },
+    "relics/stone_calendar.webp": {
+      "source": "https://spire-codex.com/static/images/relics/stone_calendar.webp",
+      "bytes": 14292,
+      "sha256": "0915d3f5447112928c5023d6655ecbd6b253c1058f5a424053e58c1b55fe63dd"
+    },
+    "relics/stone_cracker.webp": {
+      "source": "https://spire-codex.com/static/images/relics/stone_cracker.webp",
+      "bytes": 10808,
+      "sha256": "0f276f5aee70362335e36336bb2b2061a699039bb9a572cd2ba1560d602e394b"
+    },
+    "relics/stone_humidifier.webp": {
+      "source": "https://spire-codex.com/static/images/relics/stone_humidifier.webp",
+      "bytes": 20100,
+      "sha256": "efda0daed827173ec6e859835671a736ea835109961b63176e7549dab157121b"
+    },
+    "relics/storybook.webp": {
+      "source": "https://spire-codex.com/static/images/relics/storybook.webp",
+      "bytes": 11850,
+      "sha256": "20b967442f7a057cae948e371eba09ac4d1f1ef42ed244edc93a3aa78d38b372"
+    },
+    "relics/strawberry.webp": {
+      "source": "https://spire-codex.com/static/images/relics/strawberry.webp",
+      "bytes": 17728,
+      "sha256": "a575c798ae9d3c1ef80d95b87a278862b0317d858a1fc96ed31451594739c6ec"
+    },
+    "relics/strike_dummy.webp": {
+      "source": "https://spire-codex.com/static/images/relics/strike_dummy.webp",
+      "bytes": 15404,
+      "sha256": "f4bff4ce49872f0f70b7f0ff2f8c02771c62a2fed853f11c46df29d29019f441"
+    },
+    "relics/sturdy_clamp.webp": {
+      "source": "https://spire-codex.com/static/images/relics/sturdy_clamp.webp",
+      "bytes": 12352,
+      "sha256": "b5499f7cbd0665b2a7923cb228a17c29492fb442c2c8652be64ea66f32bfd439"
+    },
+    "relics/sword_of_jade.webp": {
+      "source": "https://spire-codex.com/static/images/relics/sword_of_jade.webp",
+      "bytes": 15392,
+      "sha256": "7283ce9dfc4c9095d9ae5b00c2a1fcea2fde3f28d710c3d2d2d5c2c83c630371"
+    },
+    "relics/sword_of_stone.webp": {
+      "source": "https://spire-codex.com/static/images/relics/sword_of_stone.webp",
+      "bytes": 13858,
+      "sha256": "efc17703237d14d4e0a5d0922ae31dd31114498bedb0e69f199e4f1cb18ade55"
+    },
+    "relics/symbiotic_virus.webp": {
+      "source": "https://spire-codex.com/static/images/relics/symbiotic_virus.webp",
+      "bytes": 17644,
+      "sha256": "24516736c59f7da8b426a857ba705060a5e5f5fb7d3014221d5cc2ddaad0a5f5"
+    },
+    "relics/tanxs_whistle.webp": {
+      "source": "https://spire-codex.com/static/images/relics/tanxs_whistle.webp",
+      "bytes": 10230,
+      "sha256": "bdde1cc4d211d01c65285a1325cfe5d45a24c0b5ff9a23cad72b05d9ea989b7d"
+    },
+    "relics/tea_of_discourtesy.webp": {
+      "source": "https://spire-codex.com/static/images/relics/tea_of_discourtesy.webp",
+      "bytes": 13878,
+      "sha256": "e6f2d84983b4199fabcde5a378c1aac6db352e6e24cb7af911e155f227290303"
+    },
+    "relics/the_abacus.webp": {
+      "source": "https://spire-codex.com/static/images/relics/the_abacus.webp",
+      "bytes": 19476,
+      "sha256": "a93e60e11a1e7daa5f0a14dd451b1564582fc61badee23ce2bbd6350301ac004"
+    },
+    "relics/the_boot.webp": {
+      "source": "https://spire-codex.com/static/images/relics/the_boot.webp",
+      "bytes": 11844,
+      "sha256": "ba6231e8061fbdc40c0fefaf9676fe73119f97a32e325fe50297436523992029"
+    },
+    "relics/the_courier.webp": {
+      "source": "https://spire-codex.com/static/images/relics/the_courier.webp",
+      "bytes": 18294,
+      "sha256": "c2d7c9907a1c81dd8abd7b455233d3470fbf83caeea52f1e8c61d6f3a9f10fb5"
+    },
+    "relics/throwing_axe.webp": {
+      "source": "https://spire-codex.com/static/images/relics/throwing_axe.webp",
+      "bytes": 9444,
+      "sha256": "d0e6e48b6d2f3d7cfb9792e5a27ee57b5e1626444d107746a2638417493ab375"
+    },
+    "relics/tingsha.webp": {
+      "source": "https://spire-codex.com/static/images/relics/tingsha.webp",
+      "bytes": 13034,
+      "sha256": "00987b708230bdf88cd25ff4afa398c079b0eb4c22f0d024e6b75f354e343292"
+    },
+    "relics/tiny_mailbox.webp": {
+      "source": "https://spire-codex.com/static/images/relics/tiny_mailbox.webp",
+      "bytes": 12530,
+      "sha256": "6655e30c927420cbb6db940a6a672094006234b578a7de04a958bd4094f108ee"
+    },
+    "relics/toasty_mittens.webp": {
+      "source": "https://spire-codex.com/static/images/relics/toasty_mittens.webp",
+      "bytes": 14776,
+      "sha256": "4de82eff9f5a99d88a500a0a3e9bea85f25434c81eebc90d2beebf3d32a096ed"
+    },
+    "relics/toolbox.webp": {
+      "source": "https://spire-codex.com/static/images/relics/toolbox.webp",
+      "bytes": 12546,
+      "sha256": "86d9b0daea34896293880208b99308392b6ed89235236ef9c876576a681f1ff0"
+    },
+    "relics/touch_of_orobas.webp": {
+      "source": "https://spire-codex.com/static/images/relics/touch_of_orobas.webp",
+      "bytes": 11492,
+      "sha256": "ff4224f6bc03317af4bbca98f3b154fda1e2f30f0702d5faf0b15d8fc624f897"
+    },
+    "relics/tough_bandages.webp": {
+      "source": "https://spire-codex.com/static/images/relics/tough_bandages.webp",
+      "bytes": 13168,
+      "sha256": "a9959d3189e66939469992f1ae7e2820d021c65e55848f2c3744ddbb757ce7a6"
+    },
+    "relics/toxic_egg.webp": {
+      "source": "https://spire-codex.com/static/images/relics/toxic_egg.webp",
+      "bytes": 14946,
+      "sha256": "649af2619694afe01e3df0002422a7b5e1ba7d537c0a899c9aa1e4aba3226e3b"
+    },
+    "relics/toy_box.webp": {
+      "source": "https://spire-codex.com/static/images/relics/toy_box.webp",
+      "bytes": 15304,
+      "sha256": "7feacb87d50d76b7d446c22d867a0cc157d53eaafe07646fe5266cdfcd683842"
+    },
+    "relics/tri_boomerang.webp": {
+      "source": "https://spire-codex.com/static/images/relics/tri_boomerang.webp",
+      "bytes": 11438,
+      "sha256": "b72cec71fa1cdf10a94c49904154dfc40bb4d48a72fe9435f87147085312e08d"
+    },
+    "relics/tungsten_rod.webp": {
+      "source": "https://spire-codex.com/static/images/relics/tungsten_rod.webp",
+      "bytes": 12752,
+      "sha256": "a9ecc05e44870b243043ec50a637c35e7e04f020eb6b139ddeccbcbee8c1a5ca"
+    },
+    "relics/tuning_fork.webp": {
+      "source": "https://spire-codex.com/static/images/relics/tuning_fork.webp",
+      "bytes": 10854,
+      "sha256": "eb8d1680c36410bde5f52f1603ebc522c638b340ebe47245703332d99a158abc"
+    },
+    "relics/twisted_funnel.webp": {
+      "source": "https://spire-codex.com/static/images/relics/twisted_funnel.webp",
+      "bytes": 12336,
+      "sha256": "dabf3c288ab1d34d08da78dc5ea857feea6b7e3678dcf16ecca7dee28ef78f8e"
+    },
+    "relics/unceasing_top.webp": {
+      "source": "https://spire-codex.com/static/images/relics/unceasing_top.webp",
+      "bytes": 14290,
+      "sha256": "de20d7b05a91d80c171bcf17ebeab50615f082eee379e71e7bd90433ee5a2ade"
+    },
+    "relics/undying_sigil.webp": {
+      "source": "https://spire-codex.com/static/images/relics/undying_sigil.webp",
+      "bytes": 18412,
+      "sha256": "179d7dd05fa98b8b90bb43cafc884ed2fa8b246b02f2041916c68d1e99b3cb03"
+    },
+    "relics/unsettling_lamp.webp": {
+      "source": "https://spire-codex.com/static/images/relics/unsettling_lamp.webp",
+      "bytes": 15080,
+      "sha256": "d295f19688d3ca9ab6fe7563340b67b57704137f1b5b8053f2dc54f712812fae"
+    },
+    "relics/vajra.webp": {
+      "source": "https://spire-codex.com/static/images/relics/vajra.webp",
+      "bytes": 19818,
+      "sha256": "58e92c347b08581bec5e0ceed8de97879d81cb42e99e86fb1081de24a9ebcd7b"
+    },
+    "relics/vambrace.webp": {
+      "source": "https://spire-codex.com/static/images/relics/vambrace.webp",
+      "bytes": 11286,
+      "sha256": "48ad83558ec76efb8cf12cd7f0fd10bc6258c8aadaef78375e987476b2b42f0f"
+    },
+    "relics/velvet_choker.webp": {
+      "source": "https://spire-codex.com/static/images/relics/velvet_choker.webp",
+      "bytes": 11612,
+      "sha256": "6a0bbb703207bbd058e1ebfa8be4fc743f01a48cbbb22d030f3febccf2d9291f"
+    },
+    "relics/venerable_tea_set.webp": {
+      "source": "https://spire-codex.com/static/images/relics/venerable_tea_set.webp",
+      "bytes": 16244,
+      "sha256": "463611da0004d64c0d72b6167a6d5639d8a3940f9c5968a5b0e4252a27d15b1b"
+    },
+    "relics/very_hot_cocoa.webp": {
+      "source": "https://spire-codex.com/static/images/relics/very_hot_cocoa.webp",
+      "bytes": 14408,
+      "sha256": "5d474964189901143b6bf3702224b9c2c84abc521b84439e0050707929945d7b"
+    },
+    "relics/vexing_puzzlebox.webp": {
+      "source": "https://spire-codex.com/static/images/relics/vexing_puzzlebox.webp",
+      "bytes": 17692,
+      "sha256": "2fa73c8b12fcbe947a8fd48f08198e5954f2707916e538834146ecfed53040c2"
+    },
+    "relics/vitruvian_minion.webp": {
+      "source": "https://spire-codex.com/static/images/relics/vitruvian_minion.webp",
+      "bytes": 22044,
+      "sha256": "c27647a1c9abb6f82906be3592376276e19ce5a1895516904d348a9f5123b213"
+    },
+    "relics/war_hammer.webp": {
+      "source": "https://spire-codex.com/static/images/relics/war_hammer.webp",
+      "bytes": 9960,
+      "sha256": "f00aa786398a9594c16b7659058a97edaef634f75a1ca8c65f7917eac14b76d3"
+    },
+    "relics/war_paint.webp": {
+      "source": "https://spire-codex.com/static/images/relics/war_paint.webp",
+      "bytes": 14154,
+      "sha256": "6c0b970316207b4f33179312de7b6bb75e02460c9a9299e10dbaceca5e190c08"
+    },
+    "relics/whetstone.webp": {
+      "source": "https://spire-codex.com/static/images/relics/whetstone.webp",
+      "bytes": 15224,
+      "sha256": "a41be6a8a829ad5672128195fd544ba3ec5ce2206a440028d28cd0dd3a3671ca"
+    },
+    "relics/whispering_earring.webp": {
+      "source": "https://spire-codex.com/static/images/relics/whispering_earring.webp",
+      "bytes": 15996,
+      "sha256": "f355c95a3496230f1e12bf528e26c8f317ac5afa074ab819b46166fa3bb175f1"
+    },
+    "relics/white_beast_statue.webp": {
+      "source": "https://spire-codex.com/static/images/relics/white_beast_statue.webp",
+      "bytes": 17708,
+      "sha256": "c1e021df9947063d1521a1fdf73343849ed2d868b207e3863724e6c325064362"
+    },
+    "relics/white_star.webp": {
+      "source": "https://spire-codex.com/static/images/relics/white_star.webp",
+      "bytes": 9366,
+      "sha256": "72b87e9c198e3cd9e6fc642dae73464eef3cfea645465ef863f0d90d57941ebc"
+    },
+    "relics/wing_charm.webp": {
+      "source": "https://spire-codex.com/static/images/relics/wing_charm.webp",
+      "bytes": 14932,
+      "sha256": "2581426178bada8652e52afdf91c39fa6768fe33061ddfa00e4b60729fab90b9"
+    },
+    "relics/winged_boots.webp": {
+      "source": "https://spire-codex.com/static/images/relics/winged_boots.webp",
+      "bytes": 12592,
+      "sha256": "96c3d838d50eeb4d6c09948ce466a526547446f6e713947380d2e1f81985fb23"
+    },
+    "relics/wongo_customer_appreciation_badge.webp": {
+      "source": "https://spire-codex.com/static/images/relics/wongo_customer_appreciation_badge.webp",
+      "bytes": 10854,
+      "sha256": "ff8cf8c35508bd57e25c2e162cbb426680d631baf408fb5aab46419e4a163940"
+    },
+    "relics/wongos_mystery_ticket.webp": {
+      "source": "https://spire-codex.com/static/images/relics/wongos_mystery_ticket.webp",
+      "bytes": 13954,
+      "sha256": "93038c89ec969f896a35d87043d2eb4d60f1a128266a149aaad0011932605adc"
+    },
+    "relics/yummy_cookie.webp": {
+      "source": "https://spire-codex.com/static/images/relics/yummy_cookie.webp",
+      "bytes": 13606,
+      "sha256": "e5e108bdf49d1ac10d796b51df31f0d91a69ef7b4e395a73e6a8cee27495a7ba"
+    },
+    "rooms/elite.webp": {
+      "source": "https://cdn.spire-codex.com/ui/run_history/elite.webp",
+      "bytes": 6338,
+      "sha256": "c17d25bf30568d0d11b3f6ef834559d1bc545479d893d62c4b6f063428289f3c"
+    },
+    "rooms/event.webp": {
+      "source": "https://cdn.spire-codex.com/ui/run_history/event.webp",
+      "bytes": 3772,
+      "sha256": "8f7b4ee2112dc50073f8adb0438b82a9abed26a0e3cfda6b2d9548f2ea9453d9"
+    },
+    "rooms/knowledge_demon_boss.webp": {
+      "source": "https://cdn.spire-codex.com/ui/run_history/knowledge_demon_boss.webp",
+      "bytes": 3172,
+      "sha256": "2502419f79b8c313daa9936c11a733cca0d54341981bf2d003d99eb448fc3de8"
+    },
+    "rooms/monster.webp": {
+      "source": "https://cdn.spire-codex.com/ui/run_history/monster.webp",
+      "bytes": 4168,
+      "sha256": "b1a25a179d111e1a978e92ea0cdab0d79a9d3f540cac427b7015878fc6d99091"
+    },
+    "rooms/neow.webp": {
+      "source": "https://cdn.spire-codex.com/ui/run_history/neow.webp",
+      "bytes": 2958,
+      "sha256": "8dbf2cf363d3672d8a730b44ad430ea98091e4f01db0afe50ab827dc29fe23ca"
+    },
+    "rooms/queen_boss.webp": {
+      "source": "https://cdn.spire-codex.com/ui/run_history/queen_boss.webp",
+      "bytes": 2962,
+      "sha256": "d9bf412e47008d97c811a8b75572997820c22b80f81bfc020309613e3f556cef"
+    },
+    "rooms/rest_site.webp": {
+      "source": "https://cdn.spire-codex.com/ui/run_history/rest_site.webp",
+      "bytes": 4962,
+      "sha256": "4620b81523ff4a0daddfc0c47c19eaa2c19eacab843f3c65aeba1646c46f1fe8"
+    },
+    "rooms/shop.webp": {
+      "source": "https://cdn.spire-codex.com/ui/run_history/shop.webp",
+      "bytes": 5958,
+      "sha256": "f4d5147ddd2071de184620954548bcd1ce0ad1780a47f646f8b217dacef3043a"
+    },
+    "rooms/test_subject_boss.webp": {
+      "source": "https://cdn.spire-codex.com/ui/run_history/test_subject_boss.webp",
+      "bytes": 2740,
+      "sha256": "f92dee2a0525085d6a0e4f5cc1756f3c4fad747ea5014c931d3ed8f516732d7f"
+    },
+    "rooms/the_kin_boss.webp": {
+      "source": "https://cdn.spire-codex.com/ui/run_history/the_kin_boss.webp",
+      "bytes": 3202,
+      "sha256": "37927bd72a2241d5a08f481f6f00ae427d51ee6ab81f4ae7dae98135bb27f99e"
+    },
+    "rooms/treasure.webp": {
+      "source": "https://cdn.spire-codex.com/ui/run_history/treasure.webp",
+      "bytes": 2808,
+      "sha256": "e225ba9c86b8f2ba8a8058ccb018972a63f5be3a5dbdba7b6b3ad85ae8cda7a5"
+    },
+    "stats/timer_icon.webp": {
+      "source": "https://cdn.spire-codex.com/ui/top_bar/timer_icon.webp",
+      "bytes": 3628,
+      "sha256": "0496a5ddfddf8d6f2b62f5f25a7aff808625f3d5584622e5ca115e1840632687"
+    },
+    "stats/top_bar_ascension.webp": {
+      "source": "https://cdn.spire-codex.com/ui/top_bar/top_bar_ascension.webp",
+      "bytes": 4180,
+      "sha256": "a04ac0ba9801350139527c66fe938807863d49d5372a496e228e101e27952b46"
+    },
+    "stats/top_bar_gold.webp": {
+      "source": "https://cdn.spire-codex.com/ui/top_bar/top_bar_gold.webp",
+      "bytes": 3412,
+      "sha256": "509e5a01b5d8e74267008b0da7f97c878355b96d6da941f6c37006f44903c7c3"
+    },
+    "stats/top_bar_heart.webp": {
+      "source": "https://cdn.spire-codex.com/ui/top_bar/top_bar_heart.webp",
+      "bytes": 2566,
+      "sha256": "f76eb4d6052021bdaceacc7712432a9b45973989e0db4e954420ced7aaa56df9"
+    },
+    "stats/top_bar_map.webp": {
+      "source": "https://cdn.spire-codex.com/ui/top_bar/top_bar_map.webp",
+      "bytes": 4954,
+      "sha256": "d32e0ec4b6c1f16ccca97a7437dfe8d295315b246de4ca452a646ae00ab1ab1a"
+    }
+  },
+  "failures": []
+}

@@ -41,6 +41,7 @@ const { DanmakuBridgeAdapter } = require('./agent/danmaku/bridge-adapter');
 const { SharedDanmakuClient } = require('./agent/danmaku/shared-client');
 const { DanmakuLlmAtmosphere } = require('./agent/danmaku/llm-atmosphere');
 const { createFactReviewService } = require('./review/fact-service');
+const { readRunDetails } = require('./review/run-details');
 const { createRecapStore } = require('./review/recap/store');
 const { makeTimeline, fixedMetrics } = require('./review/recap/facts');
 const { localRecap } = require('./review/recap/runner');
@@ -1381,6 +1382,7 @@ ipcMain.handle('review:listLeaderboard', (_event, input) => (
   leaderboardClient.list(projectLeaderboardRequest(input))
 ));
 ipcMain.handle('review:getDashboard', () => reviewService.getDashboard());
+ipcMain.handle('review:getRunDetails', (_event, runId) => readRunDetails(runId, reviewService.getHistory(), factStore));
 ipcMain.handle('review:getRunMetrics', (_event, runId) => {
   if (typeof runId !== 'string' || !reviewService.getHistory().runs.some(run => run.runId === runId)) return [];
   const timeline = makeTimeline(runId, factStore.getEffectiveFacts(runId), factStore.getCoverage(runId));

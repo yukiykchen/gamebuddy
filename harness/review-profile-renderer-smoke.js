@@ -4,6 +4,7 @@ const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),asse
 const {buildDashboard}=require('../review/service');
 const {makeTimeline}=require('../review/recap/facts');
 const {localRecap}=require('../review/recap/runner');
+const {buildRunDetails}=require('../review/run-details');
 function readRealRecap() {
  if(!process.argv.includes('--real-long-recap'))return null;
  const directory=path.join(__dirname,'..','.runtime','recap-real','inputs');
@@ -17,15 +18,27 @@ function readRealRecap() {
  const run=history.runs.find(run=>run.runId===selected.input.runId&&run.result==='loss');
  assert.ok(run,'The selected run must be a real completed loss');
  const input=selected.input,recap=localRecap(makeTimeline(input.runId,input.facts,input.coverage,input.snapshots),run);
- return {run:buildDashboard({runs:[run]}).recentRuns[0],recap,inputFile:selected.name};
+ return {run:buildDashboard({runs:[run]}).recentRuns[0],recap,details:buildRunDetails(run,input.facts),inputFile:selected.name};
 }
 const real=readRealRecap();
 const counters={typedCardsPlayed:10,attacksPlayed:6,cardsTaken:2,rewardSkips:1,eliteEntries:1,normalCombats:3,shopsVisited:1,knownGoldSpent:60,smiths:1,heals:1,playerBlocked:6,playerHpLoss:4};
 let recapCalls=0;
+let detailCalls=0;
 let dashboard=buildDashboard({runs:['win','loss','abandoned'].map((result,i)=>({runId:'profile-'+i,character:i===2?'silent':'ironclad',endedAt:i+1,result,finalAct:1,finalFloor:10,initialDeckSize:10,finalState:{deckSize:12,gold:20,deck:[],relics:[]},counters}))});
 app.setPath('userData',fs.mkdtempSync(path.join(os.tmpdir(),'gamebuddy-profile-')));
 ipcMain.handle('review:getDashboard',()=>dashboard);
 ipcMain.handle('review:getPlayerProfile',()=>({displayName:'匿名人士'}));
+ipcMain.handle('review:getRunDetails',(_event,runId)=>{
+ detailCalls++;
+ if(real?.run.runId===runId)return real.details;
+ const run={runId,character:'ironclad',ascension:2,result:'loss',finalFloor:5,startedAt:1000,endedAt:65000,
+  finalState:{hp:4,maxHp:80,gold:51,deck:[{id:'BASH',upgraded:true},{id:'STRIKE_IRONCLAD'},{id:'STRIKE_IRONCLAD'}],relics:[{id:'BURNING_BLOOD'}],potions:[]}};
+ const facts=[{eventType:'run.observed',payload:{act:1,floor:5,hp:24,maxHp:80,gold:100}},
+  {eventType:'combat.started',combatId:'c',payload:{roomType:'Elite',enemies:[{name:'骇鳗'}]}},
+  {eventType:'run.observed',payload:{act:1,floor:5,hp:4,maxHp:80,gold:51}}]
+  .map((f,i)=>({...f,runId,eventId:'detail-'+i,sourceSeq:i,sourceSessionId:'detail',occurredAt:i*1000}));
+ return buildRunDetails(run,facts);
+});
 const recapMetrics=['最高回合实际爆发','最高斩杀','实际抗伤','SL次数'].map((label,i)=>({label,display:['10','9999','120','2'][i]}));
 const battleMetrics=['累计输出','实际抗伤','累计受伤','实际恢复'].map((label,i)=>({label,display:['1200','480','80','60'][i]}));
 ipcMain.handle('review:getRunRecapPreview',(_event,runId)=>real?.run.runId===runId?real.recap:({fixedMetrics:recapMetrics,battleMetrics,cards:[{title:'有点用力过猛',body:'目标只剩十血，这次命中结算远远超出了它的生命。'}]}));
@@ -37,7 +50,7 @@ ipcMain.handle('review:getRunRecap',async(_event,runId)=>{
   {title:'升级了，没用上',body:'刚升级的痛击，下一场战斗直到结束也没上手。'},
   {title:'终于运转起来',body:'前面攒下的组件，在这场战斗里接上了配合。'}],closing:'这一局有用力过猛的高光，也留下升级未兑现的遗憾。'};
 });
-const timer=setTimeout(()=>{console.error('Profile renderer timed out');app.exit(1);},20000);
+const timer=setTimeout(()=>{console.error('Profile renderer timed out');app.exit(1);},30000);
 app.whenReady().then(async()=>{
  const win=new BrowserWindow({show:false,width:1400,height:1050,webPreferences:{preload:path.join(__dirname,'..','preload.js'),contextIsolation:true,nodeIntegration:false,backgroundThrottling:false}});
  await win.loadFile(path.join(__dirname,'..','src','review.html'));
@@ -54,6 +67,7 @@ app.whenReady().then(async()=>{
  for(const size of [[1120,720],[850,900]]){win.setSize(...size);await settle();assert.ok(await win.webContents.executeJavaScript('document.documentElement.scrollWidth<=innerWidth'));}
  if(real){dashboard={...dashboard,recentRuns:[real.run,...dashboard.recentRuns]};win.webContents.send('review:changed',dashboard);await settle();}
  await win.webContents.executeJavaScript("document.querySelector('.review-run-card').click()");
+ await win.webContents.executeJavaScript(`new Promise(resolve=>{const check=()=>{const floor=document.querySelector('.rd-floor');if(floor){floor.open=true;resolve();}else setTimeout(check,5);};check();})`);
  await win.webContents.executeJavaScript('new Promise(resolve=>setTimeout(resolve,150))');await settle();
  const recapState=await win.webContents.executeJavaScript(`({cards:document.querySelectorAll('.review-recap-cards article').length,
   slots:document.querySelectorAll('.review-recap-metrics>div').length,
@@ -64,6 +78,9 @@ app.whenReady().then(async()=>{
  assert.match(recapState.text,/累计输出/);assert.match(recapState.text,/实际恢复/);
  assert.doesNotMatch(recapState.text,/evidenceIds|tool_calls|snapshotId|时间线|展开战报/);
  assert.ok(recapState.width<=recapState.viewport);
+ assert.equal(await win.webContents.executeJavaScript("document.querySelector('.rd-floor').open"),true,'Recap completion must preserve floor disclosure state');
+ assert.equal(await win.webContents.executeJavaScript("document.querySelector('.review-recap').nextElementSibling.className"),'review-run-details');
+ assert.equal(await win.webContents.executeJavaScript("document.querySelector('.review-run-details').querySelector('.review-recap')"),null);
  await win.webContents.executeJavaScript("document.querySelector('.review-recap').scrollIntoView({block:'center'})");await settle();
  fs.writeFileSync(path.join(output,'run-recap-narrow.png'),(await win.webContents.capturePage()).toPNG());
  if(real){
@@ -81,8 +98,27 @@ app.whenReady().then(async()=>{
    summary:real.recap.runSummary,metrics:real.recap.battleMetrics,portrait:real.recap.portrait,
    cards:real.recap.cards.map(({title,body})=>({title,body})),closing:real.recap.closing},null,2));
  }
+ const detailScreens=[];
+ for(const [width,height,suffix] of [[1400,1050,'wide'],[850,1000,'narrow']]){
+  win.setSize(width,height);await settle();
+  await win.webContents.executeJavaScript(`(async()=>{const d=document.querySelector('.review-run-details');d.scrollIntoView({block:'start'});await Promise.all([...d.querySelectorAll('img')].map(i=>{i.loading='eager';return i.decode().catch(()=>{});}));})()`);await settle();
+  const check=await win.webContents.executeJavaScript(`(()=>{const d=document.querySelector('.review-run-details');return {width:document.documentElement.scrollWidth,viewport:innerWidth,broken:[...d.querySelectorAll('img')].filter(i=>!i.naturalWidth).map(i=>i.src),floors:d.querySelectorAll('.rd-floor').length,deckColumns:getComputedStyle(d.querySelector('.rd-deck')).gridTemplateColumns};})()`);
+  assert.ok(check.width<=check.viewport);assert.deepEqual(check.broken,[]);assert.ok(check.floors>0);
+  const file=(real?'real-':'')+'run-details-'+suffix+'.png';fs.writeFileSync(path.join(output,file),(await win.webContents.capturePage()).toPNG());detailScreens.push({file,...check});
+ }
+ await win.webContents.executeJavaScript("document.querySelector('[data-floor-target]').click()");await settle();
+ await win.webContents.executeJavaScript(`new Promise((resolve,reject)=>{let frames=0,previous=null,stable=0;const check=()=>{const r=document.querySelector('.rd-floor').getBoundingClientRect();stable=previous!==null&&Math.abs(previous-r.top)<.5?stable+1:0;previous=r.top;if(stable>=3&&r.top>=-1&&r.bottom<=innerHeight){resolve();return;}if(++frames>180){reject(new Error('Route did not scroll to floor'));return;}requestAnimationFrame(check);};check();})`);
+ assert.equal(await win.webContents.executeJavaScript("document.querySelector('.rd-floor').open"),true);
+ assert.equal(await win.webContents.executeJavaScript("document.activeElement.tagName"),'SUMMARY');
+ fs.writeFileSync(path.join(output,(real?'real-':'')+'run-details-history.png'),(await win.webContents.capturePage()).toPNG());
+ win.webContents.focus();
+ await win.webContents.executeJavaScript("document.querySelector('.rd-item').focus();document.querySelector('.rd-item').scrollIntoView({block:'center'})");await settle();
+ assert.equal(await win.webContents.executeJavaScript("getComputedStyle(document.querySelector('.rd-item .rd-tooltip')).display"),'block');
+ fs.writeFileSync(path.join(output,(real?'real-':'')+'run-details-tooltip.png'),(await win.webContents.capturePage()).toPNG());
+ fs.writeFileSync(path.join(output,(real?'real-':'')+'run-details-checks.json'),JSON.stringify({input:real?.inputFile||'synthetic UI fixture',detailScreens,recapPreservedFloor:true,routeFocus:true,keyboardTooltip:true},null,2));
  await win.webContents.executeJavaScript("document.querySelector('.review-run-card').click();document.querySelector('.review-run-card').click()");
  await settle();assert.equal(recapCalls,1,'Reopening must read the same recap cache');
+ assert.equal(detailCalls,1,'Reopening must read the same independent detail cache');
  win.setSize(1400,1050);await settle();
  const recapMarkup=await win.webContents.executeJavaScript("document.querySelector('.review-recap').outerHTML");
  await win.webContents.executeJavaScript("document.querySelectorAll('.review-recap-cards article').forEach((node,index)=>{if(index>0)node.remove()})");await settle();
