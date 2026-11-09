@@ -46,6 +46,8 @@
 ### Requirement: Real card thumbnails
 系统 SHALL 在终局牌组中优先展示本地真实小卡面，按普通／升级状态匹配图片，保留名称、数量和变体分组。缺失完整图时 SHALL 降级到插画或通用图标。系统 SHALL 不增加悬停大卡面、点击放大或路线上的事件选项标注。
 
+牌组 SHALL 使用紧凑的按内容宽度排列的标签，真实卡面不超过32×46 CSS像素，宽窄屏均 SHALL 保持名称、数量和升级标记可读且不产生横向溢出。
+
 #### Scenario: Upgraded card displayed offline
 - **WHEN** 玩家离线查看已升级卡牌
 - **THEN** 显示本地升级卡面缩略图及升级名称，页面没有放大卡面交互

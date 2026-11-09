@@ -195,8 +195,12 @@
   object-fit:contain;
 }
 .rd-deck {
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+  gap:6px;
+}
+.rd-deck .rd-item {
+  justify-content:flex-start;
+  padding:4px 8px;
+  gap:6px;
 }
 .review-run-details .review-card-chip,.review-run-details .review-relic-badge {
   background:#ffffff04;
@@ -222,9 +226,9 @@
   height:100%;
   object-fit:contain;
 }
-.rd-card-art.is-face {
-  width:60px;
-  height:86px;
+.rd-deck .rd-card-art {
+  width:32px;
+  height:46px;
 }
 .rd-card-back {
   background:var(--rd-pool);
@@ -449,9 +453,6 @@
   .rd-floor-heading {
     gap:8px;
     padding:10px;
-  }
-  .rd-deck {
-    grid-template-columns:repeat(2,minmax(0,1fr));
   }
   .rd-item {
     padding:6px;
