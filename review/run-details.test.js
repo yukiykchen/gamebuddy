@@ -52,6 +52,10 @@ test('groups identical cards but preserves upgrade, enchantment and runtime desc
     { id: 'BASH', enchantment: '黏糊' }, { id: 'BASH', description: '造成999点伤害。' }, { id: 'BASH', cost: 0 }], relics: [] };
   const d = f.build(); assert.equal(d.deck.length, 5); assert.equal(d.deck[0].count, 2); assert.equal(d.deck[1].name, '痛击+');
   assert.match(d.deck[1].description, /10/); assert.equal(d.relics.length, 0); assert.equal(d.potions, null);
+  assert.equal(d.deck[0].image, './assets/run-details/cards/faces/bash.webp');
+  assert.equal(d.deck[1].image, './assets/run-details/cards/faces/bash_upg.webp');
+  f.run.finalState.deck = [{ id: 'WITHER', upgraded: true }];
+  assert.equal(f.build().deck[0].image, './assets/run-details/cards/portraits/wither.webp');
 });
 test('does not bridge resource deltas across reloads and does not invent missing floors', () => {
   const f = fixture(); f.state(2, { hp: 24 }); f.add('run.resumed'); f.state(2, { hp: 80 }); f.state(5, { hp: 40 });
@@ -92,4 +96,8 @@ test('renders independent, escaped detail section with local assets and accessib
   assert.doesNotMatch(html, /src="https?:/); assert.doesNotMatch(fs.readFileSync('review/run-details.js', 'utf8'), /require\(['"].*recap/);
   const failed = window.GameBuddyRunDetailsUi.render({ status: 'unavailable' }, { deck: [{ name: '已保存的痛击' }], relics: [] });
   assert.match(failed, /已保存的痛击/); assert.match(failed, /重新打开可重试/);
+  f.run.finalState = { deck: [{ id: 'BASH' }, { id: 'BASH', upgraded: true }, { id: 'UNKNOWN_MOD_CARD', name: '未知扩展卡' }] };
+  const withCards = window.GameBuddyRunDetailsUi.render(f.build());
+  assert.match(withCards, /cards\/faces\/bash.webp/); assert.match(withCards, /cards\/faces\/bash_upg.webp/);
+  assert.match(withCards, /未知扩展卡/); assert.match(withCards, /rd-card-back/);
 });

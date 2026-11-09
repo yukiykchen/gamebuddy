@@ -105,6 +105,12 @@ app.whenReady().then(async()=>{
   const check=await win.webContents.executeJavaScript(`(()=>{const d=document.querySelector('.review-run-details');return {width:document.documentElement.scrollWidth,viewport:innerWidth,broken:[...d.querySelectorAll('img')].filter(i=>!i.naturalWidth).map(i=>i.src),floors:d.querySelectorAll('.rd-floor').length,deckColumns:getComputedStyle(d.querySelector('.rd-deck')).gridTemplateColumns};})()`);
   assert.ok(check.width<=check.viewport);assert.deepEqual(check.broken,[]);assert.ok(check.floors>0);
   const file=(real?'real-':'')+'run-details-'+suffix+'.png';fs.writeFileSync(path.join(output,file),(await win.webContents.capturePage()).toPNG());detailScreens.push({file,...check});
+  await win.webContents.executeJavaScript("document.querySelector('.rd-deck').scrollIntoView({block:'center',behavior:'instant'})");await settle();
+  const thumbnails=await win.webContents.executeJavaScript(`(()=>{const cards=[...document.querySelectorAll('.rd-deck .rd-card-face')];return cards.map(i=>({src:i.getAttribute('src'),width:i.getBoundingClientRect().width,height:i.getBoundingClientRect().height,loaded:i.naturalWidth>0}));})()`);
+  assert.ok(thumbnails.length>0);assert.ok(thumbnails.every(i=>i.loaded&&i.width<=60&&i.height<=86));
+  assert.ok(thumbnails.some(i=>i.src.endsWith('_upg.webp')),'Upgraded cards should use an upgraded face');
+  fs.writeFileSync(path.join(output,(real?'real-':'')+'run-card-faces-'+suffix+'.png'),(await win.webContents.capturePage()).toPNG());
+  detailScreens.at(-1).cardFaces=thumbnails.length;
  }
  await win.webContents.executeJavaScript("document.querySelector('[data-floor-target]').click()");await settle();
  await win.webContents.executeJavaScript(`new Promise((resolve,reject)=>{let frames=0,previous=null,stable=0;const check=()=>{const r=document.querySelector('.rd-floor').getBoundingClientRect();stable=previous!==null&&Math.abs(previous-r.top)<.5?stable+1:0;previous=r.top;if(stable>=3&&r.top>=-1&&r.bottom<=innerHeight){resolve();return;}if(++frames>180){reject(new Error('Route did not scroll to floor'));return;}requestAnimationFrame(check);};check();})`);
@@ -114,6 +120,9 @@ app.whenReady().then(async()=>{
  win.webContents.focus();
  await win.webContents.executeJavaScript("document.querySelector('.rd-item').focus();document.querySelector('.rd-item').scrollIntoView({block:'center'})");await settle();
  assert.equal(await win.webContents.executeJavaScript("getComputedStyle(document.querySelector('.rd-item .rd-tooltip')).display"),'block');
+ await win.webContents.executeJavaScript("document.querySelector('.rd-deck .rd-item').focus()");await settle();
+ assert.equal(await win.webContents.executeJavaScript("document.querySelector('.rd-deck .rd-tooltip img')"),null,'Card text tooltips must not contain enlarged card images');
+ assert.ok(await win.webContents.executeJavaScript("document.querySelector('.rd-deck .rd-card-face').getBoundingClientRect().width<=60"));
  fs.writeFileSync(path.join(output,(real?'real-':'')+'run-details-tooltip.png'),(await win.webContents.capturePage()).toPNG());
  fs.writeFileSync(path.join(output,(real?'real-':'')+'run-details-checks.json'),JSON.stringify({input:real?.inputFile||'synthetic UI fixture',detailScreens,recapPreservedFloor:true,routeFocus:true,keyboardTooltip:true},null,2));
  await win.webContents.executeJavaScript("document.querySelector('.review-run-card').click();document.querySelector('.review-run-card').click()");

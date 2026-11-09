@@ -196,7 +196,7 @@
 }
 .rd-deck {
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(155px,1fr));
+  grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
 }
 .review-run-details .review-card-chip,.review-run-details .review-relic-badge {
   background:#ffffff04;
@@ -221,6 +221,10 @@
   width:100%;
   height:100%;
   object-fit:contain;
+}
+.rd-card-art.is-face {
+  width:60px;
+  height:86px;
 }
 .rd-card-back {
   background:var(--rd-pool);

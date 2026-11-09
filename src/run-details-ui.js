@@ -12,6 +12,7 @@
   const roomSymbol = kind => kind === 'boss' ? '♛' : '?';
   function icon(src, className = '') { return src ? `<img class="${className}" src="${escape(src)}" alt="" loading="lazy">` : ''; }
   function cardImage(card) {
+    if (card.image) return `<span class="rd-card-art is-face" aria-hidden="true">${icon(card.image, 'rd-card-face')}</span>`;
     const type = /attack|攻击/i.test(card.type) ? 'attack' : /power|能力/i.test(card.type) ? 'power' : 'skill';
     return `<span class="rd-card-art" style="--rd-pool:${colors[card.color] || '#a3a3a3'};--rd-rarity:${rarity[card.rarity] || '#9c9c9c'}" aria-hidden="true"><i class="rd-card-back"></i>${icon(`${ROOT}cards/desc_box.png`, 'rd-card-desc')}${icon(`${ROOT}cards/${type}_portrait_shadow.png`, 'rd-card-shadow')}${icon(`${ROOT}cards/${type}_portrait.png`, 'rd-card-portrait')}<i class="rd-card-banner"></i></span>`;
   }

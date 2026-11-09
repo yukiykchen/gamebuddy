@@ -38,3 +38,14 @@
 #### Scenario: Stale response
 - **WHEN** 详情请求返回前历史已被清空
 - **THEN** 旧响应不重新显示被清空的对局
+
+### Requirement: Real card thumbnails
+系统 SHALL 在终局牌组中优先展示本地真实小卡面，按普通／升级状态匹配图片，保留名称、数量和变体分组。缺失完整图时 SHALL 降级到插画或通用图标。系统 SHALL 不增加悬停大卡面或点击放大，不改变现有事件选项展示。
+
+#### Scenario: Upgraded card displayed offline
+- **WHEN** 玩家离线查看已升级卡牌
+- **THEN** 显示本地升级卡面缩略图及升级名称，页面没有放大卡面交互
+
+#### Scenario: Missing card face
+- **WHEN** 某张卡没有可用的完整卡面
+- **THEN** 使用插画或通用图标并保留可读名称和数量，不出现破图

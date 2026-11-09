@@ -22,7 +22,8 @@ function item(value, family = 'cards') {
   return { id, name: upgraded && !baseName.endsWith('+') ? `${baseName}+` : baseName, upgraded,
     type: known?.type_key || value?.type || 'Skill', color: known?.color || 'colorless', rarity: known?.rarity_key || 'Common',
     cost: value?.cost ?? known?.cost ?? null, description: /[{}]/.test(description) ? '' : description,
-    image: family === 'cards' ? null : asset(`${family}/${id.toLowerCase()}.webp`),
+    image: family === 'cards' ? asset(`cards/faces/${id.toLowerCase()}${upgraded ? '_upg' : ''}.webp`)
+      || asset(`cards/portraits/${id.toLowerCase()}.webp`) : asset(`${family}/${id.toLowerCase()}.webp`),
     // 变体保留在分组键与可见说明中，不能把附魔和普通卡合并。
     variant: [value?.enchantment, value?.affliction].filter(Boolean).map(v => typeof v === 'string' ? clean(v)
       : [clean(v.name || v.id), number(v.amount) != null ? `×${v.amount}` : ''].filter(Boolean).join(' ')).filter(Boolean).join(' · '),
