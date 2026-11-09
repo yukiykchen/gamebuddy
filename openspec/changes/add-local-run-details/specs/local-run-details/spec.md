@@ -18,15 +18,19 @@
 - **WHEN** 旧局只有未通关和最后遭遇信息
 - **THEN** 页面显示未通关及最后遭遇，不推断死因，不把缺失统计显示为零
 
-### Requirement: Act route and floor history
-系统 SHALL 按幕与楼层展示实际记录的路线和可展开履历，包含已知战斗遭遇、选牌、事件、火堆、商店及资源变化；不提供逐回合操作回放。重复通知 SHALL 合并，SL淘汰战斗 SHALL 不重复计算，缺失楼层 SHALL 不补造。
+### Requirement: Act route and selected floor
+系统 SHALL 按幕与楼层展示实际记录的路线，默认不展示完整逐层履历列表。点击节点后 SHALL 在路线下方仅显示该层的简要信息；点击其他节点 SHALL 替换当前信息，再次点击同节点 SHALL 收起。信息包含已知遭遇、选择和资源变化，不提供逐回合回放。重复通知 SHALL 合并，SL淘汰战斗 SHALL 不重复计算，缺失楼层 SHALL 不补造。
+
+#### Scenario: Select and collapse a floor
+- **WHEN** 玩家依次点击两个不同路线节点后再次点击第二个节点
+- **THEN** 单层信息先替换为第二层，再收起；页面始终没有完整楼层列表
 
 #### Scenario: Repeated reward resolution
 - **WHEN** 同一奖励选择多次上报且后续通知补充选中卡牌
 - **THEN** 该层只展示一个选择并使用明确结果
 
 ### Requirement: Local accessible presentation
-系统 SHALL 使用本地保存的游戏图标、深色详情面板和可键盘操作的楼层展开控件。缺失图片 SHALL 以名称或通用图标降级；详情 SHALL 不展示工具或内部证据标识。
+系统 SHALL 使用本地保存的游戏图标、深色详情面板和可键盘操作的路线节点，节点 SHALL 提供选中展开状态，操作后焦点保留在节点。缺失图片 SHALL 以名称或通用图标降级；详情 SHALL 不展示工具或内部证据标识。
 
 #### Scenario: Offline viewing
 - **WHEN** 玩家离线重新打开已保存对局
@@ -40,7 +44,7 @@
 - **THEN** 旧响应不重新显示被清空的对局
 
 ### Requirement: Real card thumbnails
-系统 SHALL 在终局牌组中优先展示本地真实小卡面，按普通／升级状态匹配图片，保留名称、数量和变体分组。缺失完整图时 SHALL 降级到插画或通用图标。系统 SHALL 不增加悬停大卡面或点击放大，不改变现有事件选项展示。
+系统 SHALL 在终局牌组中优先展示本地真实小卡面，按普通／升级状态匹配图片，保留名称、数量和变体分组。缺失完整图时 SHALL 降级到插画或通用图标。系统 SHALL 不增加悬停大卡面、点击放大或路线上的事件选项标注。
 
 #### Scenario: Upgraded card displayed offline
 - **WHEN** 玩家离线查看已升级卡牌

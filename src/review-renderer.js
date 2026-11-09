@@ -10,6 +10,7 @@
     let dashboard = null;
     let profile = { displayName: '匿名人士' };
     let expandedRunId = null;
+    let selectedFloorKey = null;
     const recaps = Object.create(null);
     const details = Object.create(null);
     let dataGeneration = 0;
@@ -44,7 +45,7 @@
 
     function render(renderOptions = {}) {
       retainExpanded();
-      root.innerHTML = ui?.render(dashboard, expandedRunId, profile, recaps, details) || '';
+      root.innerHTML = ui?.render(dashboard, expandedRunId, profile, recaps, details, selectedFloorKey) || '';
       bindActions();
       if (renderOptions.restoreFocus && expandedRunId) focusRun(expandedRunId);
     }
@@ -83,6 +84,7 @@
     function activateRun(runId) {
       if (!runId) return;
       expandedRunId = expandedRunId === runId ? null : runId;
+      selectedFloorKey = null;
       render({ restoreFocus: true });
       if (expandedRunId) { loadRecap(runId); loadDetails(runId); }
     }
@@ -106,7 +108,7 @@
       if (expandedRunId !== runId) return;
       const region = root.querySelector?.('.review-run-details');
       if (region && 'outerHTML' in region && globalScope.GameBuddyRunDetailsUi) {
-        region.outerHTML = globalScope.GameBuddyRunDetailsUi.render(details[runId], runs().find(run => run.runId === runId));
+        region.outerHTML = globalScope.GameBuddyRunDetailsUi.render(details[runId], runs().find(run => run.runId === runId), selectedFloorKey);
       }
     }
 
@@ -155,6 +157,7 @@
           return;
         }
         expandedRunId = null;
+        selectedFloorKey = null;
         dataGeneration++;
         for (const key of Object.keys(recaps)) delete recaps[key];
         for (const key of Object.keys(details)) delete details[key];
@@ -166,19 +169,25 @@
       list?.addEventListener('click', onRunListClick);
       list?.addEventListener('keydown', onRunListKeydown);
       list?.addEventListener('click', event => {
-        const button = event.target?.closest?.('[data-floor-target]');
-        const id = button?.getAttribute('data-floor-target');
-        const floor = id && root.querySelector(`#${id}`);
-        if (floor) {
-          floor.open = true;
-          floor.scrollIntoView({ block: 'start', behavior: 'smooth' });
-          floor.querySelector('summary')?.focus({ preventScroll: true });
+        const button = event.target?.closest?.('[data-floor-key]');
+        if (!button || !list.contains(button)) return;
+        const key = button.getAttribute('data-floor-key');
+        const floor = details[expandedRunId]?.acts?.flatMap(act => act.floors).find(floor => floor.key === key);
+        const panel = root.querySelector('.rd-selected-floor');
+        if (!floor || !panel) return;
+        selectedFloorKey = selectedFloorKey === key ? null : key;
+        panel.outerHTML = globalScope.GameBuddyRunDetailsUi.renderSelectedFloor(selectedFloorKey ? floor : null);
+        for (const node of root.querySelectorAll('[data-floor-key]')) {
+          const selected = node.getAttribute('data-floor-key') === selectedFloorKey;
+          node.setAttribute('aria-expanded', String(selected));
+          node.classList.toggle('is-selected', selected);
         }
       });
     }
 
     function setDashboard(nextDashboard) {
       dashboard = nextDashboard;
+      selectedFloorKey = null;
       dataGeneration++;
       for (const key of Object.keys(recaps)) delete recaps[key];
       for (const key of Object.keys(details)) delete details[key];

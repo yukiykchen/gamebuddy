@@ -32,16 +32,19 @@
   function floorMarkup(floor) {
     const hp = known(floor.hpAfter) ? `${floor.hpAfter}${known(floor.maxHp) ? `/${floor.maxHp}` : ''}` : '未记录';
     const change = (before, after) => known(before) && known(after) && before !== after ? `${before} → ${after}` : format(after);
-    return `<details class="rd-floor" id="rd-floor-${escape(floor.key)}"><summary>
+    return `<section class="rd-floor" aria-label="第${floor.act}幕第${floor.floor}层简要信息"><header class="rd-floor-heading">
       <span class="rd-floor-number">${floor.floor}<small>层</small></span><span class="rd-floor-icon">${icon(roomImage(floor.kind)) || roomSymbol(floor.kind)}</span>
-      <span class="rd-floor-title"><strong>${escape(floor.title)}</strong><small>${escape(floor.label)}</small></span>
-      <span class="rd-floor-hp">${escape(hp)}<small>生命</small></span><span class="rd-disclosure" aria-hidden="true">⌄</span></summary>
+      <span class="rd-floor-title"><strong>${escape(floor.title)}</strong><small>第${floor.act}幕 · ${escape(floor.label)}</small></span>
+      <span class="rd-floor-hp">${escape(hp)}<small>生命</small></span></header>
       <div class="rd-floor-body"><div class="rd-floor-resources"><span>生命 <b>${escape(change(floor.hpBefore, floor.hpAfter))}${known(floor.maxHp) ? ` / ${floor.maxHp}` : ''}</b></span><span>金币 <b>${escape(change(floor.goldBefore, floor.goldAfter))}</b></span></div>
       ${floor.combats.map(combat => `<div class="rd-history-row"><span>战斗</span><div><strong>${escape(combat.enemies)}</strong><small>${combat.turns ? `已记录 ${combat.turns} 个玩家回合` : '回合数未记录'}${combat.outcome ? ` · ${escape(combat.outcome)}` : ''}</small></div></div>`).join('')}
       ${floor.rows.map(row => `<div class="rd-history-row"><span>${escape(row.label)}</span><div><strong>${escape(row.text)}</strong>${row.detail ? `<small>${escape(row.detail)}</small>` : ''}</div></div>`).join('')}
-      ${!floor.combats.length && !floor.rows.length ? '<p class="rd-empty">这一层没有留下具体选择。</p>' : ''}</div></details>`;
+      ${!floor.combats.length && !floor.rows.length ? '<p class="rd-empty">这一层没有留下具体选择。</p>' : ''}</div></section>`;
   }
-  function render(details, run = {}) {
+  function renderSelectedFloor(floor) {
+    return `<div class="rd-selected-floor" id="rd-selected-floor"${floor ? '' : ' hidden'}>${floor ? floorMarkup(floor) : ''}</div>`;
+  }
+  function render(details, run = {}, selectedFloorKey = null) {
     const s = details?.summary || { character: String(run.character || '').toLowerCase(), result: run.result, floor: run.floor };
     const result = ({ win: '通关', loss: '未通关', abandoned: '放弃' })[s.result] || '结果未记录';
     const duration = known(s.durationSeconds) ? `${Math.floor(s.durationSeconds / 60)}分${Math.floor(s.durationSeconds % 60)}秒` : '未记录';
@@ -55,14 +58,12 @@
       <div class="rd-character">${names[s.character] ? icon(s.character === 'ironclad' ? `${ROOT}characters/ironclad.webp` : `./assets/pets/${s.character}/advising.png`, 'rd-character-icon') : ''}<strong>${escape(names[s.character] || s.character || '角色未记录')}</strong>${s.lastEncounter ? `<span>最后遭遇 · ${escape(s.lastEncounter)}</span>` : ''}${known(s.endedAt) ? `<time>${escape(new Date(s.endedAt).toLocaleString('zh-CN'))}</time>` : ''}</div>
       <div class="rd-stats">${stats.map(([image, label, value]) => `<div>${icon(`${ROOT}stats/${image}.webp`)}<span><small>${label}</small><strong>${escape(value)}</strong></span></div>`).join('')}</div>
       ${s.gameMode || (known(s.act) && known(s.localFloor)) ? `<p class="rd-mode">${[s.gameMode, known(s.act) && known(s.localFloor) ? `终点 · 第${s.act}幕第${s.localFloor}层` : ''].filter(Boolean).map(escape).join(' · ')}</p>` : ''}
-      ${details?.acts?.length ? `<section class="rd-route"><h4>登塔路线<small>点击节点查看这一层</small></h4>${details.acts.map(act => `<div class="rd-act-route"><b>第 ${act.act} 幕</b><div>${act.floors.map(floor => `<button type="button" data-floor-target="rd-floor-${escape(floor.key)}" aria-label="第${act.act}幕第${floor.floor}层 ${escape(floor.title)}" title="${escape(floor.title)}">${icon(roomImage(floor.kind)) || `<span>${roomSymbol(floor.kind)}</span>`}<small>${floor.floor}</small></button>`).join('')}</div></div>`).join('')}</section>` : ''}
+      ${details?.acts?.length ? `<section class="rd-route"><h4>登塔路线<small>点击节点查看，再次点击收起</small></h4>${details.acts.map(act => `<div class="rd-act-route"><b>第 ${act.act} 幕</b><div>${act.floors.map(floor => `<button type="button" data-floor-key="${escape(floor.key)}" aria-expanded="${floor.key === selectedFloorKey}" aria-controls="rd-selected-floor"${floor.key === selectedFloorKey ? ' class="is-selected"' : ''} aria-label="第${act.act}幕第${floor.floor}层 ${escape(floor.title)}" title="${escape(floor.title)}">${icon(roomImage(floor.kind)) || `<span>${roomSymbol(floor.kind)}</span>`}<small>${floor.floor}</small></button>`).join('')}</div></div>`).join('')}${renderSelectedFloor(details.acts.flatMap(act => act.floors).find(floor => floor.key === selectedFloorKey))}</section>`
+        : `<p class="rd-empty" role="status">${details?.status === 'unavailable' ? '本局详情暂时无法读取，重新打开可重试。' : loaded ? '旧记录没有留下路线信息。' : '正在整理本局记录…'}</p>`}
       ${collections('终局遗物', loaded ? details.relics : fallback(run.relics), 'relics')}
       ${collections('终局牌组', loaded ? details.deck : fallback(run.deck), 'cards')}
       ${details?.potions ? collections('终局药水', details.potions, 'potions') : ''}
-      <section class="rd-history"><h4>逐层履历<small>${details?.acts?.reduce((n, act) => n + act.floors.length, 0) || 0} 个已记录楼层</small></h4>
-      ${details?.acts?.length ? details.acts.map(act => `<div class="rd-history-act"><h5>第 ${act.act} 幕</h5>${act.floors.map(floorMarkup).join('')}</div>`).join('')
-        : `<p class="rd-empty" role="status">${details?.status === 'unavailable' ? '本局详情暂时无法读取，重新打开可重试。' : details ? '旧记录没有留下逐层信息。' : '正在整理本局记录…'}</p>`}</section>
       <p class="rd-footnote">${escape(details?.coverageNote || '仅展示实际留下的记录。')}</p></section>`;
   }
-  globalScope.GameBuddyRunDetailsUi = { render };
+  globalScope.GameBuddyRunDetailsUi = { render, renderSelectedFloor };
 })(window);

@@ -67,18 +67,20 @@ app.whenReady().then(async()=>{
  for(const size of [[1120,720],[850,900]]){win.setSize(...size);await settle();assert.ok(await win.webContents.executeJavaScript('document.documentElement.scrollWidth<=innerWidth'));}
  if(real){dashboard={...dashboard,recentRuns:[real.run,...dashboard.recentRuns]};win.webContents.send('review:changed',dashboard);await settle();}
  await win.webContents.executeJavaScript("document.querySelector('.review-run-card').click()");
- await win.webContents.executeJavaScript(`new Promise(resolve=>{const check=()=>{const floor=document.querySelector('.rd-floor');if(floor){floor.open=true;resolve();}else setTimeout(check,5);};check();})`);
+ await win.webContents.executeJavaScript(`new Promise(resolve=>{const check=()=>{const node=document.querySelector('[data-floor-key]');if(node){if(document.querySelectorAll('.rd-floor').length)throw new Error('Floor list should start empty');node.focus();node.click();resolve();}else setTimeout(check,5);};check();})`);
  await win.webContents.executeJavaScript('new Promise(resolve=>setTimeout(resolve,150))');await settle();
  const recapState=await win.webContents.executeJavaScript(`({cards:document.querySelectorAll('.review-recap-cards article').length,
   slots:document.querySelectorAll('.review-recap-metrics>div').length,
-  focused:document.activeElement?.classList.contains('review-run-card'),
+  focused:document.activeElement?.hasAttribute('data-floor-key'),
   text:document.querySelector('.review-recap').textContent,width:document.documentElement.scrollWidth,viewport:innerWidth})`);
  assert.equal(recapState.cards,3);assert.equal(recapState.slots,4);assert.equal(recapState.focused,true);
  assert.match(recapState.text,/本局复盘/);assert.match(recapState.text,real?/惜命不惜债/:/升级未兑现/);
  assert.match(recapState.text,/累计输出/);assert.match(recapState.text,/实际恢复/);
  assert.doesNotMatch(recapState.text,/evidenceIds|tool_calls|snapshotId|时间线|展开战报/);
  assert.ok(recapState.width<=recapState.viewport);
- assert.equal(await win.webContents.executeJavaScript("document.querySelector('.rd-floor').open"),true,'Recap completion must preserve floor disclosure state');
+ assert.equal(await win.webContents.executeJavaScript("document.querySelectorAll('.rd-selected-floor .rd-floor').length"),1,'Recap completion must preserve the selected floor');
+ await win.webContents.executeJavaScript("document.querySelector('[data-floor-key][aria-expanded=true]').click()");
+ assert.equal(await win.webContents.executeJavaScript("document.querySelectorAll('.rd-floor').length"),0);
  assert.equal(await win.webContents.executeJavaScript("document.querySelector('.review-recap').nextElementSibling.className"),'review-run-details');
  assert.equal(await win.webContents.executeJavaScript("document.querySelector('.review-run-details').querySelector('.review-recap')"),null);
  await win.webContents.executeJavaScript("document.querySelector('.review-recap').scrollIntoView({block:'center'})");await settle();
@@ -102,8 +104,9 @@ app.whenReady().then(async()=>{
  for(const [width,height,suffix] of [[1400,1050,'wide'],[850,1000,'narrow']]){
   win.setSize(width,height);await settle();
   await win.webContents.executeJavaScript(`(async()=>{const d=document.querySelector('.review-run-details');d.scrollIntoView({block:'start'});await Promise.all([...d.querySelectorAll('img')].map(i=>{i.loading='eager';return i.decode().catch(()=>{});}));})()`);await settle();
-  const check=await win.webContents.executeJavaScript(`(()=>{const d=document.querySelector('.review-run-details');return {width:document.documentElement.scrollWidth,viewport:innerWidth,broken:[...d.querySelectorAll('img')].filter(i=>!i.naturalWidth).map(i=>i.src),floors:d.querySelectorAll('.rd-floor').length,deckColumns:getComputedStyle(d.querySelector('.rd-deck')).gridTemplateColumns};})()`);
-  assert.ok(check.width<=check.viewport);assert.deepEqual(check.broken,[]);assert.ok(check.floors>0);
+  const check=await win.webContents.executeJavaScript(`(()=>{const d=document.querySelector('.review-run-details');return {width:document.documentElement.scrollWidth,viewport:innerWidth,broken:[...d.querySelectorAll('img')].filter(i=>!i.naturalWidth).map(i=>i.src),floors:d.querySelectorAll('.rd-floor').length,routeNodes:d.querySelectorAll('[data-floor-key]').length,deckColumns:getComputedStyle(d.querySelector('.rd-deck')).gridTemplateColumns};})()`);
+  assert.ok(check.width<=check.viewport);assert.deepEqual(check.broken,[]);assert.equal(check.floors,0);assert.ok(check.routeNodes>0);
+  assert.doesNotMatch(await win.webContents.executeJavaScript("document.querySelector('.review-run-details').innerText"),/逐层履历/);
   const file=(real?'real-':'')+'run-details-'+suffix+'.png';fs.writeFileSync(path.join(output,file),(await win.webContents.capturePage()).toPNG());detailScreens.push({file,...check});
   await win.webContents.executeJavaScript("document.querySelector('.rd-deck').scrollIntoView({block:'center',behavior:'instant'})");await settle();
   const thumbnails=await win.webContents.executeJavaScript(`(()=>{const cards=[...document.querySelectorAll('.rd-deck .rd-card-face')];return cards.map(i=>({src:i.getAttribute('src'),width:i.getBoundingClientRect().width,height:i.getBoundingClientRect().height,loaded:i.naturalWidth>0}));})()`);
@@ -112,11 +115,25 @@ app.whenReady().then(async()=>{
   fs.writeFileSync(path.join(output,(real?'real-':'')+'run-card-faces-'+suffix+'.png'),(await win.webContents.capturePage()).toPNG());
   detailScreens.at(-1).cardFaces=thumbnails.length;
  }
- await win.webContents.executeJavaScript("document.querySelector('[data-floor-target]').click()");await settle();
- await win.webContents.executeJavaScript(`new Promise((resolve,reject)=>{let frames=0,previous=null,stable=0;const check=()=>{const r=document.querySelector('.rd-floor').getBoundingClientRect();stable=previous!==null&&Math.abs(previous-r.top)<.5?stable+1:0;previous=r.top;if(stable>=3&&r.top>=-1&&r.bottom<=innerHeight){resolve();return;}if(++frames>180){reject(new Error('Route did not scroll to floor'));return;}requestAnimationFrame(check);};check();})`);
- assert.equal(await win.webContents.executeJavaScript("document.querySelector('.rd-floor').open"),true);
- assert.equal(await win.webContents.executeJavaScript("document.activeElement.tagName"),'SUMMARY');
- fs.writeFileSync(path.join(output,(real?'real-':'')+'run-details-history.png'),(await win.webContents.capturePage()).toPNG());
+ win.show();win.focus();await settle();
+ win.webContents.focus();
+ await win.webContents.executeJavaScript("document.querySelector('[data-floor-key]').focus()");
+ win.webContents.sendInputEvent({type:'keyDown',keyCode:'Enter'});
+ win.webContents.sendInputEvent({type:'char',keyCode:'\r'});
+ win.webContents.sendInputEvent({type:'keyUp',keyCode:'Enter'});await settle();
+ assert.equal(await win.webContents.executeJavaScript("document.querySelectorAll('.rd-floor').length"),1);
+ assert.equal(await win.webContents.executeJavaScript("document.activeElement.hasAttribute('data-floor-key')"),true);
+ const nodes=await win.webContents.executeJavaScript("document.querySelectorAll('[data-floor-key]').length");
+ if(nodes>1){
+  await win.webContents.executeJavaScript("document.querySelectorAll('[data-floor-key]')[1].click()");
+  assert.equal(await win.webContents.executeJavaScript("document.querySelectorAll('.rd-floor').length"),1);
+  assert.equal(await win.webContents.executeJavaScript("document.querySelectorAll('[data-floor-key][aria-expanded=true]').length"),1);
+  assert.equal(await win.webContents.executeJavaScript("document.querySelectorAll('[data-floor-key]')[1].getAttribute('aria-expanded')"),'true');
+ }
+ await win.webContents.executeJavaScript("document.querySelector('[data-floor-key][aria-expanded=true]').click()");
+ assert.equal(await win.webContents.executeJavaScript("document.querySelectorAll('.rd-floor').length"),0);
+ await win.webContents.executeJavaScript("document.querySelector('[data-floor-key]').click();document.querySelector('.rd-route').scrollIntoView({block:'start',behavior:'instant'})");await settle();
+ fs.writeFileSync(path.join(output,(real?'real-':'')+'run-selected-floor.png'),(await win.webContents.capturePage()).toPNG());
  win.webContents.focus();
  await win.webContents.executeJavaScript("document.querySelector('.rd-item').focus();document.querySelector('.rd-item').scrollIntoView({block:'center'})");await settle();
  assert.equal(await win.webContents.executeJavaScript("getComputedStyle(document.querySelector('.rd-item .rd-tooltip')).display"),'block');
@@ -124,10 +141,11 @@ app.whenReady().then(async()=>{
  assert.equal(await win.webContents.executeJavaScript("document.querySelector('.rd-deck .rd-tooltip img')"),null,'Card text tooltips must not contain enlarged card images');
  assert.ok(await win.webContents.executeJavaScript("document.querySelector('.rd-deck .rd-card-face').getBoundingClientRect().width<=60"));
  fs.writeFileSync(path.join(output,(real?'real-':'')+'run-details-tooltip.png'),(await win.webContents.capturePage()).toPNG());
- fs.writeFileSync(path.join(output,(real?'real-':'')+'run-details-checks.json'),JSON.stringify({input:real?.inputFile||'synthetic UI fixture',detailScreens,recapPreservedFloor:true,routeFocus:true,keyboardTooltip:true},null,2));
+ fs.writeFileSync(path.join(output,(real?'real-':'')+'run-details-checks.json'),JSON.stringify({input:real?.inputFile||'synthetic UI fixture',detailScreens,recapPreservedFloor:true,routeFocus:true,singleFloorSelection:true,noFullHistory:true,keyboardTooltip:true},null,2));
  await win.webContents.executeJavaScript("document.querySelector('.review-run-card').click();document.querySelector('.review-run-card').click()");
  await settle();assert.equal(recapCalls,1,'Reopening must read the same recap cache');
  assert.equal(detailCalls,1,'Reopening must read the same independent detail cache');
+ assert.equal(await win.webContents.executeJavaScript("document.querySelectorAll('.rd-floor').length"),0,'Reopening starts with a compact route');
  win.setSize(1400,1050);await settle();
  const recapMarkup=await win.webContents.executeJavaScript("document.querySelector('.review-recap').outerHTML");
  await win.webContents.executeJavaScript("document.querySelectorAll('.review-recap-cards article').forEach((node,index)=>{if(index>0)node.remove()})");await settle();

@@ -301,17 +301,20 @@ console.log('Review renderer interaction tests passed.');
 
 const test = require('node:test');
 function setup() {
-  const pending = [], renders = [], listeners = {}, list = { addEventListener() {} }, region = { outerHTML: '' };
+  const pending = [], renders = [], selections = [], listeners = {}, region = { outerHTML: '' }, floorRegion = { outerHTML: '' };
+  const nodes = ['1-4', '1-5'].map(key => ({ key, selected: false, getAttribute: () => key, setAttribute(name, value) { this[name] = value; }, classList: { toggle() {} } }));
+  const list = { contains: () => true, addEventListener(type, fn) { if (type === 'click') listeners.route = fn; } };
   const root = { innerHTML: '', querySelector: selector => selector === '.review-run-details' ? region : selector === '.review-run-list' ? list
-    : selector === '#review-clear' ? { addEventListener: (type, fn) => { listeners.clear = fn; } } : null };
-  const window = { GameBuddyRunDetailsUi: { render: d => `detail:${d?.runId || d?.status}` }, setTimeout, clearTimeout };
+    : selector === '.rd-selected-floor' ? floorRegion : selector === '#review-clear' ? { addEventListener: (type, fn) => { listeners.clear = fn; } } : null,
+  querySelectorAll: selector => selector === '[data-floor-key]' ? nodes : [] };
+  const window = { GameBuddyRunDetailsUi: { render: d => `detail:${d?.runId || d?.status}`, renderSelectedFloor: f => `floor:${f?.key || 'closed'}` }, setTimeout, clearTimeout };
   vm.runInNewContext(fs.readFileSync('src/review-renderer.js', 'utf8'), { window });
   const bridge = { getRunDetails: runId => new Promise(resolve => pending.push({ runId, resolve })),
     getRunRecap: async () => null, requestReviewClear: async () => 'token', clearReview: async () => ({ ok: true, dashboard: { recentRuns: [] } }) };
   const controller = window.GameBuddyReviewRenderer.createReviewController({ root, bridge, confirm: () => true,
-    ui: { render: (dashboard, expanded, profile, recaps, details) => { renders.push(details[expanded]); return ''; } } });
+    ui: { render: (dashboard, expanded, profile, recaps, details, selected) => { renders.push(details[expanded]); selections.push(selected); return ''; } } });
   controller.setDashboard({ recentRuns: [{ runId: 'a' }, { runId: 'b' }] });
-  return { controller, pending, region, renders, listeners };
+  return { controller, pending, region, floorRegion, nodes, renders, selections, listeners };
 }
 const settle = () => new Promise(resolve => setImmediate(resolve));
 test('independent detail cache is reused and switching runs ignores stale UI updates', async () => {
@@ -337,4 +340,13 @@ test('unavailable detail can retry when reopened', async () => {
   assert.equal(f.region.outerHTML, 'detail:unavailable');
   f.controller.activateRun('a'); f.controller.activateRun('a'); await settle(); assert.equal(f.pending.length, 2);
   f.pending[1].resolve({ runId: 'a', status: 'ready' }); await settle(); assert.equal(f.region.outerHTML, 'detail:a');
+});
+test('route selection replaces a single floor, toggles closed and resets between runs', async () => {
+  const f = setup(); f.controller.activateRun('a'); await settle();
+  f.pending[0].resolve({ runId: 'a', status: 'ready', acts: [{ floors: f.nodes.map(node => ({ key: node.key })) }] }); await settle();
+  const click = node => f.listeners.route({ target: { closest: () => node } });
+  click(f.nodes[0]); assert.equal(f.floorRegion.outerHTML, 'floor:1-4'); assert.equal(f.nodes[0]['aria-expanded'], 'true');
+  click(f.nodes[1]); assert.equal(f.floorRegion.outerHTML, 'floor:1-5'); assert.equal(f.nodes[0]['aria-expanded'], 'false');
+  click(f.nodes[1]); assert.equal(f.floorRegion.outerHTML, 'floor:closed');
+  click(f.nodes[0]); f.controller.activateRun('b'); assert.equal(f.selections.at(-1), null);
 });

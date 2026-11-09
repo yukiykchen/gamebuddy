@@ -123,15 +123,15 @@
     </section>`;
   }
 
-  function runBuild(run, panelId, recap, details) {
+  function runBuild(run, panelId, recap, details, selectedFloorKey) {
     return `
       <div class="review-run-build" id="${panelId}" role="region" aria-label="本局复盘与单局详情" data-run-id="${escapeHtml(run.runId)}">
         ${renderRecap(recap, run)}
-        ${globalScope.GameBuddyRunDetailsUi.render(details, run)}
+        ${globalScope.GameBuddyRunDetailsUi.render(details, run, selectedFloorKey)}
       </div>`;
   }
 
-  function recentRuns(runs, expandedRunId = null, recaps = {}, details = {}) {
+  function recentRuns(runs, expandedRunId = null, recaps = {}, details = {}, selectedFloorKey = null) {
     if (!runs?.length) {
       return `<div class="review-no-runs"><strong>还没有本地对局记录</strong><span>开始一局《杀戮尖塔 2》，GameBuddy 会自动记录到这里。</span></div>`;
     }
@@ -148,12 +148,12 @@
             <div><span>最终楼层</span><strong>${Number.isFinite(run.floor) ? `${run.floor} 层` : '未知'}</strong></div>
             <div><span>最高单回合伤害</span><strong>${Number.isFinite(run.maxTurnDamage) ? run.maxTurnDamage : '未知'}</strong></div>
           </div>
-          ${expanded ? runBuild(run, panelId, recaps[run.runId], details[run.runId]) : ''}
+          ${expanded ? runBuild(run, panelId, recaps[run.runId], details[run.runId], selectedFloorKey) : ''}
         </div>`;
     }).join('');
   }
 
-  function render(dashboard, expandedRunId = null, profile = null, recaps = {}, details = {}) {
+  function render(dashboard, expandedRunId = null, profile = null, recaps = {}, details = {}, selectedFloorKey = null) {
     const displayName = profile?.displayName || '匿名人士';
     const safe = dashboard || { window: {}, axes: [], stats: [], recentRuns: [] };
     const character = safe.mainCharacter || 'ironclad';
@@ -204,7 +204,7 @@
 
         <section class="review-history">
           <div class="review-history-heading"><strong>最近游戏记录</strong><span>角色 · 通关状态 · BOSS · 楼层 · 单回合伤害</span></div>
-          <div class="review-run-list">${recentRuns(safe.recentRuns, expandedRunId, recaps, details)}</div>
+          <div class="review-run-list">${recentRuns(safe.recentRuns, expandedRunId, recaps, details, selectedFloorKey)}</div>
         </section>
       </section>`;
   }

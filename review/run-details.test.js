@@ -91,11 +91,16 @@ test('renders independent, escaped detail section with local assets and accessib
   f.add('event.option_selected', { label: '选择' }, { decisionId: 'd' });
   const window = {}; vm.runInNewContext(fs.readFileSync('src/run-details-ui.js', 'utf8'), { window });
   const html = window.GameBuddyRunDetailsUi.render(f.build());
-  assert.match(html, /aria-label="单局详情"/); assert.match(html, /<details class="rd-floor"/); assert.match(html, /data-floor-target="rd-floor-1-5"/);
-  assert.match(html, /&lt;script&gt;/); assert.doesNotMatch(html, /<script>|<img src=x>|死于|evidenceIds|工具|社区|搜索/);
+  assert.match(html, /aria-label="单局详情"/); assert.match(html, /data-floor-key="1-5"/);
+  assert.match(html, /id="rd-selected-floor" hidden/); assert.doesNotMatch(html, /class="rd-floor"|逐层履历/);
+  const selected = window.GameBuddyRunDetailsUi.render(f.build(), {}, '1-5');
+  assert.equal((selected.match(/class="rd-floor"/g) || []).length, 1); assert.match(selected, /aria-expanded="true"/);
+  assert.match(selected, /&lt;script&gt;/); assert.doesNotMatch(selected, /<script>|<img src=x>|死于|evidenceIds|工具|社区|搜索/);
   assert.doesNotMatch(html, /src="https?:/); assert.doesNotMatch(fs.readFileSync('review/run-details.js', 'utf8'), /require\(['"].*recap/);
   const failed = window.GameBuddyRunDetailsUi.render({ status: 'unavailable' }, { deck: [{ name: '已保存的痛击' }], relics: [] });
   assert.match(failed, /已保存的痛击/); assert.match(failed, /重新打开可重试/);
+  const empty = window.GameBuddyRunDetailsUi.render({ status: 'ready', acts: [], deck: [], relics: [] });
+  assert.match(empty, /旧记录没有留下路线信息/); assert.doesNotMatch(empty, /逐层履历|class="rd-floor"/);
   f.run.finalState = { deck: [{ id: 'BASH' }, { id: 'BASH', upgraded: true }, { id: 'UNKNOWN_MOD_CARD', name: '未知扩展卡' }] };
   const withCards = window.GameBuddyRunDetailsUi.render(f.build());
   assert.match(withCards, /cards\/faces\/bash.webp/); assert.match(withCards, /cards\/faces\/bash_upg.webp/);

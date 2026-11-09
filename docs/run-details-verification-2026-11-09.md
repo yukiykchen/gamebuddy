@@ -6,7 +6,7 @@
 
 - 历史列表交互保留，展开后依次显示本局复盘与单局详情两个兄弟区域。
 - 详情由独立事实投影和只读IPC提供，不导入复盘模块，不请求模型。支持结果、角色、进阶、到达楼层、记录时长、终局生命与金币。
-- 分幕路线可点击跳至对应楼层，原生展开控件支持键盘；逐层显示已知战斗、选牌及未拿候选、事件选择、火堆、购买与资源观测变化。
+- 分幕路线节点支持键盘与点击按需查看，默认不显示逐层列表；选中节点后仅显示该层的已知战斗、选择及资源观测变化，再次点击收起。
 - 终局遗物、牌组和药水使用中文名称及说明。相同牌合并数量，升级、附魔等变体分开。遗物获取楼层仅在明确获得或同层连续库存变化时展示，初次看到不等同在该层获得。
 - 386张公开游戏图片保存到本地，约5.47 MB，来源及文件哈希见`src/assets/run-details/manifest.json`。运行时不依赖图片站。
 - 详情独立缓存，复盘完成仅替换复盘区域；切换、清空、刷新后的迟到响应不会覆盖当前详情。
@@ -35,7 +35,7 @@
 - `npm run test:review-renderer`及`npm run test:review-renderer -- --real-long-recap`：Electron默认样例和最长真实局通过；检查宽窄屏无横向溢出、图片无损坏、路线跳转与焦点、键盘说明、重开缓存、复盘更新保留楼层展开。
 - `npx openspec validate add-local-run-details --strict`、`git diff --check`：通过。
 
-真实局界面截图及检查数据位于`.runtime/review-profile/`：`real-run-details-wide.png`、`real-run-details-narrow.png`、`real-run-details-history.png`、`real-run-details-tooltip.png`、`real-run-details-checks.json`。
+真实局界面截图及检查数据位于`.runtime/review-profile/`：`real-run-details-wide.png`、`real-run-details-narrow.png`、`real-run-selected-floor.png`、`real-run-details-tooltip.png`、`real-run-details-checks.json`。
 
 ## 记录边界
 
@@ -52,3 +52,9 @@
 详情测试验证了普通／升级图片匹配、缺图降级及未知卡可读性。Electron在1400和850宽度检查最长真实局：17组卡牌均加载真实卡面，无破图或横向溢出；聚焦卡牌后尺寸不变，文字说明中没有大图。新增截图为`.runtime/review-profile/real-run-card-faces-wide.png`与`real-run-card-faces-narrow.png`。
 
 本次`test:review`、`test:syntax`、`test:agent`、`harness:validate-all`（29项）、真实局详情验证、Electron真实局验证、OpenSpec严格验证及差异检查均通过；37个原始日志文件哈希仍与基线一致。
+
+## 紧凑路线补充
+
+取消完整逐层履历列表，默认只显示基础信息、登塔路线及终局收藏。点击节点后，在路线下方显示单层简要信息；换节点替换，再次点击收起。切换或重新展开对局时清除选择，复盘异步完成保留当前选择，焦点留在节点按钮。
+
+最长真实局在1400与850宽度下，路线仍有38个节点，默认楼层面板数量为0；操作后始终最多显示1层，无破图或横向溢出。验证了普通点击、选择替换、收起、复盘更新、切换重置和实际Enter键打开。卡面、遗物与原始事实投影不变。默认和真实局Electron验证、review、syntax、agent、harness检查及四把真实记录验证通过，37个源文件哈希未变。按需查看截图为`real-run-selected-floor.png`。
