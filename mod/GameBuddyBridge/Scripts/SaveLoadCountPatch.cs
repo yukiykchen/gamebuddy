@@ -23,6 +23,7 @@ public static class SaveLoadCountPatch
         }
 
         harmony.Patch(method, postfix: new HarmonyMethod(typeof(SaveLoadCountPatch), nameof(Postfix)));
+        GameBuddyHookCapabilityRegistry.Available("reload_observation");
         GameBuddyDiagnostics.Write(modDirectory, "save-load patch applied");
     }
 }

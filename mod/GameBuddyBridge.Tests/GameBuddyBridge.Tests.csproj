@@ -21,6 +21,9 @@
     <Compile Include="../GameBuddyBridge/Scripts/GameBuddyHookCapabilityRegistry.cs" Link="GameBuddyHookCapabilityRegistry.cs" />
     <Compile Include="../GameBuddyBridge/Scripts/GameBuddyRunIdentityStore.cs" Link="GameBuddyRunIdentityStore.cs" />
     <Compile Include="../GameBuddyBridge/Scripts/GameBuddyClearFacts.cs" Link="GameBuddyClearFacts.cs" />
+    <Compile Include="../GameBuddyBridge/Scripts/GameBuddyFactProjection.cs" Link="GameBuddyFactProjection.cs" />
+    <Compile Include="../GameBuddyBridge/Scripts/GameBuddyRecapCapture.cs" Link="GameBuddyRecapCapture.cs" />
+    <Compile Include="RecapCaptureTests.cs" />
     <Compile Include="Program.cs" />
   </ItemGroup>
 </Project>

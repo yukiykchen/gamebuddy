@@ -41,6 +41,10 @@ const { DanmakuBridgeAdapter } = require('./agent/danmaku/bridge-adapter');
 const { SharedDanmakuClient } = require('./agent/danmaku/shared-client');
 const { DanmakuLlmAtmosphere } = require('./agent/danmaku/llm-atmosphere');
 const { createFactReviewService } = require('./review/fact-service');
+const { createRecapStore } = require('./review/recap/store');
+const { makeTimeline, fixedMetrics } = require('./review/recap/facts');
+const { localRecap } = require('./review/recap/runner');
+const { fromObservedState } = require('./review/recap/snapshot');
 const { createClearUploadClient, submitClearedRun } = require('./review/clear-upload-client');
 const { createLeaderboardClient, projectLeaderboardRequest } = require('./review/leaderboard-client');
 const { loadPlayerProfile, saveDisplayName } = require('./review/player-profile');
@@ -87,6 +91,7 @@ const FACT_REVIEW_HISTORY_PATH = process.env.GAMEBUDDY_FACT_REVIEW_FILE || path.
 const FACTS_ROOT_PATH = process.env.GAMEBUDDY_FACTS_DIR || path.join(app.getPath('userData'), 'facts', 'v1');
 const reviewService = createFactReviewService({ filePath: FACT_REVIEW_HISTORY_PATH });
 const factStore = createLocalFactStore({ rootDir: FACTS_ROOT_PATH });
+const lastRecapSnapshot = new Map();
 reviewService.refreshFromFacts(factStore);
 let reviewClearToken = null;
 const llmConfig = readLlmConfig();
@@ -105,6 +110,11 @@ function makeLlmClient(overrides = {}, hooks = {}) {
     onFallback: detail => console.warn(`GameBuddy LLM preferred gateway failed, using original: ${redactSecrets(detail, llmConfig.apiKey)}`)
   });
 }
+const recapStore = createRecapStore({
+  directory: path.join(app.getPath('userData'), 'recap-cache.v1'),
+  factStore,
+  llmFactory: () => makeLlmClient({ thinking: 'disabled', temperature: 0.1, stream: false, maxTokens: 3500 }, { timeoutMs: 90_000 })
+});
 let rewardGuidanceInput = null;
 let guidanceRunKey = null;
 const cardGuidanceService = new CardGuidanceService({
@@ -928,6 +938,16 @@ function connectBridge() {
           const observation = currentObservation();
           void ingestCombatDanmaku(observation).catch(error => console.warn('GameBuddy danmaku observation skipped:', error.message));
           const routableState = withRoutableState(observation.state);
+          const recapSnapshot = fromObservedState(routableState, randomUUID());
+          if (recapSnapshot) {
+            const signature = JSON.stringify({ ...recapSnapshot, snapshotId: null, capturedAt: null });
+            if (lastRecapSnapshot.get(recapSnapshot.runId) !== signature) {
+              try {
+                factStore.appendSnapshot(recapSnapshot.runId, recapSnapshot);
+                lastRecapSnapshot.set(recapSnapshot.runId, signature);
+              } catch (error) { console.warn('GameBuddy recap snapshot skipped:', error.message); }
+            }
+          }
           applyCharacterSkin(routableState?.run?.character);
           if (!routableState.combat && routeChoiceCount(routableState) <= 1) clearAgentThinking('map_route');
           recordDecision({ runId: agentRunId, observation: { ...observation, state: routableState }, decision: observation.decision });
@@ -1361,6 +1381,30 @@ ipcMain.handle('review:listLeaderboard', (_event, input) => (
   leaderboardClient.list(projectLeaderboardRequest(input))
 ));
 ipcMain.handle('review:getDashboard', () => reviewService.getDashboard());
+ipcMain.handle('review:getRunMetrics', (_event, runId) => {
+  if (typeof runId !== 'string' || !reviewService.getHistory().runs.some(run => run.runId === runId)) return [];
+  const timeline = makeTimeline(runId, factStore.getEffectiveFacts(runId), factStore.getCoverage(runId));
+  return fixedMetrics(timeline);
+});
+ipcMain.handle('review:getRunRecapPreview', (_event, runId) => {
+  const run = typeof runId === 'string' && reviewService.getHistory().runs.find(run => run.runId === runId);
+  if (!run) return null;
+  const timeline = makeTimeline(runId, factStore.getEffectiveFacts(runId), factStore.getCoverage(runId), factStore.getSnapshots(runId));
+  return playerRecap(localRecap(timeline, run));
+});
+ipcMain.handle('review:getRunRecap', async (_event, runId) => {
+  const run = typeof runId === 'string' && reviewService.getHistory().runs.find(run => run.runId === runId);
+  if (!run) {
+    return { status: 'unavailable', fixedMetrics: [], cards: [], closing: '' };
+  }
+  return playerRecap(await recapStore.get(runId, run));
+});
+function playerRecap(recap) {
+  return { status: recap.status, fixedMetrics: recap.fixedMetrics, battleMetrics: recap.battleMetrics,
+    runSummary: recap.runSummary, choiceStats: recap.choiceStats, portrait: recap.portrait,
+    cards: recap.cards.map(card => ({ title: card.title, body: card.body })),
+    closing: recap.closing, coverageNote: recap.coverageNote };
+}
 ipcMain.handle('review:getPlayerProfile', () => {
   const profile = loadPlayerProfile(app.getPath('userData'));
   return { displayName: profile.displayName };
@@ -1387,6 +1431,9 @@ ipcMain.handle('review:clear', (_event, token) => {
   if (!reviewClearToken || token !== reviewClearToken) return { ok: false, reason: 'invalid_confirmation' };
   reviewClearToken = null;
   const dashboard = reviewService.clear();
+  factStore.clearAll();
+  lastRecapSnapshot.clear();
+  recapStore.clear();
   publishReviewChanged();
   return { ok: true, dashboard };
 });

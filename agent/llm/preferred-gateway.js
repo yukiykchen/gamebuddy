@@ -7,6 +7,7 @@ const DEFAULT_COMPANY_MODEL = 'deepseek-v4.1-flash';
 const KEYS_PAGE_URL = 'https://tencent.sso.codebuddy.cn/profile/keys';
 const COMPANY_GATEWAY_NAME = '公司个人 token 网关';
 const LLM_METHODS = [
+  'completeRecapTurn',
   'completeBuildGuidance',
   'completeRoute',
   'completeRest',
@@ -74,7 +75,7 @@ function callerAborted(args) {
 
 function createFallbackLlm(preferred, original, { onFallback, redactKey = '' } = {}) {
   if (!preferred?.enabled) return original || null;
-  const client = { enabled: true, preferred: true };
+  const client = { enabled: true, preferred: true, model: preferred.model, cacheKey: require('node:crypto').createHash('sha256').update(`${preferred.cacheKey || ''}:${original?.cacheKey || ''}`).digest('hex') };
   for (const name of LLM_METHODS) {
     if (typeof preferred[name] !== 'function') continue;
     client[name] = async (...args) => {

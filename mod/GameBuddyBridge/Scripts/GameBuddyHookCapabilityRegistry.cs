@@ -13,7 +13,9 @@ public static class GameBuddyHookCapabilityRegistry
         ["build"] = new("unavailable", "hooks not installed"),
         ["card_play"] = new("unavailable", "hook not installed"),
         ["card_movement"] = new("unavailable", "hooks not installed"),
+        ["damage"] = new("unavailable", "hook not installed"),
         ["combat_resolution"] = new("unavailable", "hooks not installed"),
+        ["reload_observation"] = new("unavailable", "hook not installed"),
         ["resources"] = new("unavailable", "hooks not installed")
     };
 

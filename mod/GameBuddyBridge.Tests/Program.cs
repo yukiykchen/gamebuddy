@@ -501,3 +501,4 @@ using (var selectedDocument = JsonDocument.Parse(selectedJson))
     Assert(selected.EnumerateObject().Count() == 3, "event.selected gained an extra field.");
 }
 Console.WriteLine("Cleared-run fact shape tests passed.");
+RecapCaptureTests.Run();

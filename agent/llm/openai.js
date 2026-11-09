@@ -285,6 +285,7 @@ function createOpenAiClient(config = readLlmConfig(), { fetchImpl = globalThis.f
           store: false
         };
         if (config.reasoningEffort) requestBody.reasoning = { effort: config.reasoningEffort };
+        if (Number.isInteger(config.maxTokens)) requestBody.max_output_tokens = config.maxTokens;
         try {
           body = await request(`${config.baseURL}/responses`, requestBody, options);
         } catch (error) {
@@ -295,6 +296,7 @@ function createOpenAiClient(config = readLlmConfig(), { fetchImpl = globalThis.f
       } else {
         body = await requestChat(resolveChatTemperature(config));
       }
+      try { options.onUsage?.({ model: body?.model || config.model, usage: body?.usage || null }); } catch { /* Diagnostics cannot interrupt a model result. */ }
       const text = extractResponseText(body);
       emitLog(detail.requestId, task, 'output', `原始输出 ${Date.now() - started}ms`, text || JSON.stringify(body, null, 2));
       const parsed = parseJsonObject(text);
@@ -318,6 +320,11 @@ function createOpenAiClient(config = readLlmConfig(), { fetchImpl = globalThis.f
 
   return {
     enabled,
+    model: config.model,
+    cacheKey: require('node:crypto').createHash('sha256').update(JSON.stringify({ ...config, apiKey: config.apiKey ? require('node:crypto').createHash('sha256').update(config.apiKey).digest('hex') : '' })).digest('hex'),
+    completeRecapTurn: (payload, options) => completeJson(
+      payload?.stage === 'closing' ? require('../../review/recap/runner').CLOSING_PROMPT : require('../../review/recap/runner').PROMPT, payload, 'run_recap', true, options
+    ),
     completeBuildGuidance: (payload, options) => completeJson(
       require('../knowledge/card-guidance-service').GUIDANCE_PROMPT, payload, 'build_guidance', true, options
     ),

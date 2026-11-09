@@ -1,0 +1,5178 @@
+{
+  "synthetic": true,
+  "game": "Slay the Spire 2",
+  "runId": "synthetic-sts2-overkill-confirmed",
+  "provenance": "hand-authored deterministic fixture; not captured from game",
+  "facts": [
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:1",
+      "eventType": "capture.capability_reported",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 1,
+      "occurredAt": 101000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "capabilities": {
+          "lifecycle": {
+            "state": "available"
+          },
+          "reload_observation": {
+            "state": "available"
+          },
+          "card_play": {
+            "state": "available"
+          },
+          "card_movement": {
+            "state": "available"
+          },
+          "combat_resolution": {
+            "state": "available"
+          }
+        }
+      },
+      "synthetic": true
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:2",
+      "eventType": "run.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 2,
+      "occurredAt": 102000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "character": "IRONCLAD",
+        "ascension": 0,
+        "game": "Slay the Spire 2"
+      },
+      "synthetic": true
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:3",
+      "eventType": "combat.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 3,
+      "occurredAt": 103000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "roomType": "Normal",
+        "encounterId": "BOWLBUGS_NORMAL",
+        "deckInstanceIds": [
+          "deck-bash",
+          "deck-strike-1",
+          "deck-strike-2",
+          "deck-defend"
+        ]
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:4",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 4,
+      "occurredAt": 104000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:5",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 5,
+      "occurredAt": 105000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:6",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 6,
+      "occurredAt": 106000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:7",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 7,
+      "occurredAt": 107000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-1",
+        "turn": 1,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 36,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:8",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 8,
+      "occurredAt": 108000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:9",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 9,
+      "occurredAt": 109000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:10",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 10,
+      "occurredAt": 110000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-1",
+        "turn": 1,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 30,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:11",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 11,
+      "occurredAt": 111000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:12",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 12,
+      "occurredAt": 112000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:13",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 13,
+      "occurredAt": 113000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 5,
+        "blocked": 2,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:14",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 14,
+      "occurredAt": 114000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:15",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 15,
+      "occurredAt": 115000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:16",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 16,
+      "occurredAt": 116000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:17",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 17,
+      "occurredAt": 117000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:18",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 18,
+      "occurredAt": 118000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-1",
+        "turn": 2,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 24,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:19",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 19,
+      "occurredAt": 119000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:20",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 20,
+      "occurredAt": 120000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:21",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 21,
+      "occurredAt": 121000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-1",
+        "turn": 2,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 18,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:22",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 22,
+      "occurredAt": 122000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:23",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 23,
+      "occurredAt": 123000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:24",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 24,
+      "occurredAt": 124000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 5,
+        "blocked": 2,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:25",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 25,
+      "occurredAt": 125000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:26",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 26,
+      "occurredAt": 126000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 3,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:27",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 27,
+      "occurredAt": 127000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:28",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 28,
+      "occurredAt": 128000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:29",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 29,
+      "occurredAt": 129000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-1",
+        "turn": 3,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 12,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:30",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 30,
+      "occurredAt": 130000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:31",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 31,
+      "occurredAt": 131000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:32",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 32,
+      "occurredAt": 132000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-1",
+        "turn": 3,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 6,
+        "fatal": true
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:33",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 33,
+      "occurredAt": 133000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:34",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 34,
+      "occurredAt": 134000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 3,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:35",
+      "eventType": "combat.ended",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 35,
+      "occurredAt": 135000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "victory": true
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:36",
+      "eventType": "reward.offered",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 36,
+      "occurredAt": 136000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cards": [
+          "POMMEL_STRIKE",
+          "SHRUG_IT_OFF"
+        ]
+      },
+      "synthetic": true,
+      "decisionId": "reward-1"
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:37",
+      "eventType": "reward.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 37,
+      "occurredAt": 137000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "result": "selected",
+        "cardId": "POMMEL_STRIKE"
+      },
+      "synthetic": true,
+      "decisionId": "reward-1"
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:38",
+      "eventType": "deck.card_added",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 38,
+      "occurredAt": 138000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "POMMEL_STRIKE",
+        "cardInstanceId": "deck-pommel"
+      },
+      "synthetic": true
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:39",
+      "eventType": "combat.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 39,
+      "occurredAt": 139000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "roomType": "Normal",
+        "encounterId": "BOWLBUGS_NORMAL",
+        "deckInstanceIds": [
+          "deck-bash",
+          "deck-strike-1",
+          "deck-strike-2",
+          "deck-defend"
+        ]
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:40",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 40,
+      "occurredAt": 140000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:41",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 41,
+      "occurredAt": 141000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:42",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 42,
+      "occurredAt": 142000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:43",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 43,
+      "occurredAt": 143000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-2",
+        "turn": 1,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 36,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:44",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 44,
+      "occurredAt": 144000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:45",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 45,
+      "occurredAt": 145000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:46",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 46,
+      "occurredAt": 146000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-2",
+        "turn": 1,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 30,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:47",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 47,
+      "occurredAt": 147000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:48",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 48,
+      "occurredAt": 148000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:49",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 49,
+      "occurredAt": 149000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 5,
+        "blocked": 2,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:50",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 50,
+      "occurredAt": 150000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:51",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 51,
+      "occurredAt": 151000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:52",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 52,
+      "occurredAt": 152000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:53",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 53,
+      "occurredAt": 153000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:54",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 54,
+      "occurredAt": 154000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-2",
+        "turn": 2,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 24,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:55",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 55,
+      "occurredAt": 155000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:56",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 56,
+      "occurredAt": 156000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:57",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 57,
+      "occurredAt": 157000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-2",
+        "turn": 2,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 18,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:58",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 58,
+      "occurredAt": 158000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:59",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 59,
+      "occurredAt": 159000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:60",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 60,
+      "occurredAt": 160000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 5,
+        "blocked": 2,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:61",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 61,
+      "occurredAt": 161000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:62",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 62,
+      "occurredAt": 162000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 3,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:63",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 63,
+      "occurredAt": 163000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:64",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 64,
+      "occurredAt": 164000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:65",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 65,
+      "occurredAt": 165000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-2",
+        "turn": 3,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 12,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:66",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 66,
+      "occurredAt": 166000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:67",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 67,
+      "occurredAt": 167000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:68",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 68,
+      "occurredAt": 168000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-2",
+        "turn": 3,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 6,
+        "fatal": true
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:69",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 69,
+      "occurredAt": 169000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:70",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 70,
+      "occurredAt": 170000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 3,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:71",
+      "eventType": "combat.ended",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 71,
+      "occurredAt": 171000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "victory": true
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:72",
+      "eventType": "reward.offered",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 72,
+      "occurredAt": 172000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cards": [
+          "POMMEL_STRIKE",
+          "SHRUG_IT_OFF"
+        ]
+      },
+      "synthetic": true,
+      "decisionId": "reward-2"
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:73",
+      "eventType": "reward.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 73,
+      "occurredAt": 173000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "result": "skipped",
+        "cardId": null
+      },
+      "synthetic": true,
+      "decisionId": "reward-2"
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:74",
+      "eventType": "combat.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 74,
+      "occurredAt": 174000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "roomType": "Normal",
+        "encounterId": "BOWLBUGS_NORMAL",
+        "deckInstanceIds": [
+          "deck-bash",
+          "deck-strike-1",
+          "deck-strike-2",
+          "deck-defend"
+        ]
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:75",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 75,
+      "occurredAt": 175000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:76",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 76,
+      "occurredAt": 176000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:77",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 77,
+      "occurredAt": 177000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:78",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 78,
+      "occurredAt": 178000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-3",
+        "turn": 1,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 36,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:79",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 79,
+      "occurredAt": 179000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:80",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 80,
+      "occurredAt": 180000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:81",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 81,
+      "occurredAt": 181000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-3",
+        "turn": 1,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 30,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:82",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 82,
+      "occurredAt": 182000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:83",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 83,
+      "occurredAt": 183000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:84",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 84,
+      "occurredAt": 184000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 5,
+        "blocked": 2,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:85",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 85,
+      "occurredAt": 185000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:86",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 86,
+      "occurredAt": 186000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:87",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 87,
+      "occurredAt": 187000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:88",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 88,
+      "occurredAt": 188000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:89",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 89,
+      "occurredAt": 189000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-3",
+        "turn": 2,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 24,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:90",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 90,
+      "occurredAt": 190000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:91",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 91,
+      "occurredAt": 191000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:92",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 92,
+      "occurredAt": 192000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-3",
+        "turn": 2,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 18,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:93",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 93,
+      "occurredAt": 193000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:94",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 94,
+      "occurredAt": 194000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:95",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 95,
+      "occurredAt": 195000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 5,
+        "blocked": 2,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:96",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 96,
+      "occurredAt": 196000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:97",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 97,
+      "occurredAt": 197000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 3,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:98",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 98,
+      "occurredAt": 198000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:99",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 99,
+      "occurredAt": 199000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:100",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 100,
+      "occurredAt": 200000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-3",
+        "turn": 3,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 12,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:101",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 101,
+      "occurredAt": 201000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:102",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 102,
+      "occurredAt": 202000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:103",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 103,
+      "occurredAt": 203000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-3",
+        "turn": 3,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 6,
+        "fatal": true
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:104",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 104,
+      "occurredAt": 204000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:105",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 105,
+      "occurredAt": 205000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 3,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:106",
+      "eventType": "combat.ended",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 106,
+      "occurredAt": 206000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "victory": true
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:107",
+      "eventType": "reward.offered",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 107,
+      "occurredAt": 207000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cards": [
+          "POMMEL_STRIKE",
+          "SHRUG_IT_OFF"
+        ]
+      },
+      "synthetic": true,
+      "decisionId": "reward-3"
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:108",
+      "eventType": "reward.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 108,
+      "occurredAt": 208000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "result": "skipped",
+        "cardId": null
+      },
+      "synthetic": true,
+      "decisionId": "reward-3"
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:109",
+      "eventType": "combat.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 109,
+      "occurredAt": 209000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "roomType": "Normal",
+        "encounterId": "BOWLBUGS_NORMAL",
+        "deckInstanceIds": [
+          "deck-bash",
+          "deck-strike-1",
+          "deck-strike-2",
+          "deck-defend"
+        ]
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:110",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 110,
+      "occurredAt": 210000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:111",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 111,
+      "occurredAt": 211000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:112",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 112,
+      "occurredAt": 212000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:113",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 113,
+      "occurredAt": 213000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-4",
+        "turn": 1,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 36,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:114",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 114,
+      "occurredAt": 214000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:115",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 115,
+      "occurredAt": 215000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:116",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 116,
+      "occurredAt": 216000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-4",
+        "turn": 1,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 30,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:117",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 117,
+      "occurredAt": 217000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:118",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 118,
+      "occurredAt": 218000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:119",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 119,
+      "occurredAt": 219000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 5,
+        "blocked": 2,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:120",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 120,
+      "occurredAt": 220000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:121",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 121,
+      "occurredAt": 221000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:122",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 122,
+      "occurredAt": 222000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:123",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 123,
+      "occurredAt": 223000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:124",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 124,
+      "occurredAt": 224000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-4",
+        "turn": 2,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 24,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:125",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 125,
+      "occurredAt": 225000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:126",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 126,
+      "occurredAt": 226000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:127",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 127,
+      "occurredAt": 227000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-4",
+        "turn": 2,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 18,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:128",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 128,
+      "occurredAt": 228000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:129",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 129,
+      "occurredAt": 229000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:130",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 130,
+      "occurredAt": 230000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 5,
+        "blocked": 2,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:131",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 131,
+      "occurredAt": 231000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:132",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 132,
+      "occurredAt": 232000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 3,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:133",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 133,
+      "occurredAt": 233000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:134",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 134,
+      "occurredAt": 234000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:135",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 135,
+      "occurredAt": 235000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-4",
+        "turn": 3,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 12,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:136",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 136,
+      "occurredAt": 236000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:137",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 137,
+      "occurredAt": 237000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:138",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 138,
+      "occurredAt": 238000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-4",
+        "turn": 3,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 6,
+        "fatal": true
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:139",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 139,
+      "occurredAt": 239000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:140",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 140,
+      "occurredAt": 240000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 3,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:141",
+      "eventType": "combat.ended",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 141,
+      "occurredAt": 241000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "victory": true
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:142",
+      "eventType": "reward.offered",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 142,
+      "occurredAt": 242000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cards": [
+          "POMMEL_STRIKE",
+          "SHRUG_IT_OFF"
+        ]
+      },
+      "synthetic": true,
+      "decisionId": "reward-4"
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:143",
+      "eventType": "reward.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 143,
+      "occurredAt": 243000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "result": "skipped",
+        "cardId": null
+      },
+      "synthetic": true,
+      "decisionId": "reward-4"
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:144",
+      "eventType": "event.options_offered",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 144,
+      "occurredAt": 244000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "eventId": "ACT1_RISK_EVENT",
+        "options": [
+          "take_damage_for_reward"
+        ]
+      },
+      "synthetic": true
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:145",
+      "eventType": "event.option_resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 145,
+      "occurredAt": 245000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "eventId": "ACT1_RISK_EVENT",
+        "hpLoss": 16,
+        "hpAfter": 24
+      },
+      "synthetic": true
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:146",
+      "eventType": "rest.action_completed",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 146,
+      "occurredAt": 246000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "action": "smith",
+        "cardId": "BASH",
+        "cardName": "痛击",
+        "cardInstanceId": "deck-bash",
+        "upgraded": true
+      },
+      "synthetic": true
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:147",
+      "eventType": "combat.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 147,
+      "occurredAt": 247000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "roomType": "Elite",
+        "encounterId": "BYGONE_EFFIGY_ELITE",
+        "deckInstanceIds": [
+          "deck-bash",
+          "deck-strike-1",
+          "deck-strike-2",
+          "deck-defend",
+          "deck-pommel"
+        ]
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:148",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 148,
+      "occurredAt": 248000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:149",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 149,
+      "occurredAt": 249000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "POMMEL_STRIKE",
+        "cardInstanceId": "deck-pommel",
+        "actualEnergyPaid": 1,
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:150",
+      "eventType": "resource.changed",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 150,
+      "occurredAt": 250000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "resource": "energy",
+        "before": 1,
+        "after": 0
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:151",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 151,
+      "occurredAt": 251000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "BASH",
+        "cardInstanceId": "deck-bash",
+        "cost": 2,
+        "energyAtDraw": 0,
+        "playable": false,
+        "unavailableReason": "insufficient_energy"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:152",
+      "eventType": "power.changed",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 152,
+      "occurredAt": 252000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "entityId": "ironclad",
+        "powerId": "STRENGTH",
+        "amount": 4
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:153",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 153,
+      "occurredAt": 253000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:154",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 154,
+      "occurredAt": 254000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "POMMEL_STRIKE",
+        "cardInstanceId": "deck-pommel"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:155",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 155,
+      "occurredAt": 255000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "POMMEL_STRIKE",
+        "cardInstanceId": "deck-pommel",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:156",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 156,
+      "occurredAt": 256000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "turn": 2,
+        "side": "player",
+        "targetEntityId": "effigy-1",
+        "hpLoss": 13,
+        "resolvedDamageBeforeHpCap": 13,
+        "targetHpBefore": 127,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:157",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 157,
+      "occurredAt": 257000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:158",
+      "eventType": "block.changed",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 158,
+      "occurredAt": 258000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "entityId": "ironclad",
+        "gained": 13,
+        "current": 13
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:159",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 159,
+      "occurredAt": 259000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 0,
+        "blocked": 13,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:160",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 160,
+      "occurredAt": 260000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 3,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:161",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 161,
+      "occurredAt": 261000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "POMMEL_STRIKE",
+        "cardInstanceId": "deck-pommel"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:162",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 162,
+      "occurredAt": 262000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "POMMEL_STRIKE",
+        "cardInstanceId": "deck-pommel",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:163",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 163,
+      "occurredAt": 263000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "turn": 3,
+        "side": "player",
+        "targetEntityId": "effigy-1",
+        "hpLoss": 13,
+        "resolvedDamageBeforeHpCap": 13,
+        "targetHpBefore": 114,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:164",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 164,
+      "occurredAt": 264000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 3,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:165",
+      "eventType": "block.changed",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 165,
+      "occurredAt": 265000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "entityId": "ironclad",
+        "gained": 13,
+        "current": 13
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:166",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 166,
+      "occurredAt": 266000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 0,
+        "blocked": 13,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:167",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 167,
+      "occurredAt": 267000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 4,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:168",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 168,
+      "occurredAt": 268000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "POMMEL_STRIKE",
+        "cardInstanceId": "deck-pommel"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:169",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 169,
+      "occurredAt": 269000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "POMMEL_STRIKE",
+        "cardInstanceId": "deck-pommel",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:170",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 170,
+      "occurredAt": 270000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "turn": 4,
+        "side": "player",
+        "targetEntityId": "effigy-1",
+        "hpLoss": 13,
+        "resolvedDamageBeforeHpCap": 13,
+        "targetHpBefore": 101,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:171",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 171,
+      "occurredAt": 271000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 4,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:172",
+      "eventType": "block.changed",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 172,
+      "occurredAt": 272000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "entityId": "ironclad",
+        "gained": 13,
+        "current": 13
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:173",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 173,
+      "occurredAt": 273000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 0,
+        "blocked": 13,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:174",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 174,
+      "occurredAt": 274000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 5,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:175",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 175,
+      "occurredAt": 275000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "POMMEL_STRIKE",
+        "cardInstanceId": "deck-pommel"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:176",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 176,
+      "occurredAt": 276000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "POMMEL_STRIKE",
+        "cardInstanceId": "deck-pommel",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:177",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 177,
+      "occurredAt": 277000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "turn": 5,
+        "side": "player",
+        "targetEntityId": "effigy-1",
+        "hpLoss": 13,
+        "resolvedDamageBeforeHpCap": 13,
+        "targetHpBefore": 88,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:178",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 178,
+      "occurredAt": 278000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 5,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:179",
+      "eventType": "block.changed",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 179,
+      "occurredAt": 279000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "entityId": "ironclad",
+        "gained": 13,
+        "current": 13
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:180",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 180,
+      "occurredAt": 280000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 0,
+        "blocked": 13,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:181",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 181,
+      "occurredAt": 281000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 6,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:182",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 182,
+      "occurredAt": 282000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "POMMEL_STRIKE",
+        "cardInstanceId": "deck-pommel"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:183",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 183,
+      "occurredAt": 283000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "POMMEL_STRIKE",
+        "cardInstanceId": "deck-pommel",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:184",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 184,
+      "occurredAt": 284000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "turn": 6,
+        "side": "player",
+        "targetEntityId": "effigy-1",
+        "hpLoss": 13,
+        "resolvedDamageBeforeHpCap": 13,
+        "targetHpBefore": 75,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:185",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 185,
+      "occurredAt": 285000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 6,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:186",
+      "eventType": "block.changed",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 186,
+      "occurredAt": 286000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "entityId": "ironclad",
+        "gained": 13,
+        "current": 13
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:187",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 187,
+      "occurredAt": 287000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 0,
+        "blocked": 13,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:188",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 188,
+      "occurredAt": 288000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 7,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:189",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 189,
+      "occurredAt": 289000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "POMMEL_STRIKE",
+        "cardInstanceId": "deck-pommel"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:190",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 190,
+      "occurredAt": 290000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "POMMEL_STRIKE",
+        "cardInstanceId": "deck-pommel",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:191",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 191,
+      "occurredAt": 291000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "turn": 7,
+        "side": "player",
+        "targetEntityId": "effigy-1",
+        "hpLoss": 13,
+        "resolvedDamageBeforeHpCap": 13,
+        "targetHpBefore": 62,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:192",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 192,
+      "occurredAt": 292000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 7,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:193",
+      "eventType": "block.changed",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 193,
+      "occurredAt": 293000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "entityId": "ironclad",
+        "gained": 13,
+        "current": 13
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:194",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 194,
+      "occurredAt": 294000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 0,
+        "blocked": 13,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:195",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 195,
+      "occurredAt": 295000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 8,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:196",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 196,
+      "occurredAt": 296000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "POMMEL_STRIKE",
+        "cardInstanceId": "deck-pommel"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:197",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 197,
+      "occurredAt": 297000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "POMMEL_STRIKE",
+        "cardInstanceId": "deck-pommel",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:198",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 198,
+      "occurredAt": 298000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "turn": 8,
+        "side": "player",
+        "targetEntityId": "effigy-1",
+        "hpLoss": 13,
+        "resolvedDamageBeforeHpCap": 13,
+        "targetHpBefore": 49,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:199",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 199,
+      "occurredAt": 299000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 8,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:200",
+      "eventType": "block.changed",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 200,
+      "occurredAt": 300000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "entityId": "ironclad",
+        "gained": 13,
+        "current": 13
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:201",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 201,
+      "occurredAt": 301000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 0,
+        "blocked": 13,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:202",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 202,
+      "occurredAt": 302000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 9,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:203",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 203,
+      "occurredAt": 303000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "POMMEL_STRIKE",
+        "cardInstanceId": "deck-pommel"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:204",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 204,
+      "occurredAt": 304000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "POMMEL_STRIKE",
+        "cardInstanceId": "deck-pommel",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:205",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 205,
+      "occurredAt": 305000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "turn": 9,
+        "side": "player",
+        "targetEntityId": "effigy-1",
+        "hpLoss": 13,
+        "resolvedDamageBeforeHpCap": 13,
+        "targetHpBefore": 36,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:206",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 206,
+      "occurredAt": 306000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 9,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:207",
+      "eventType": "block.changed",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 207,
+      "occurredAt": 307000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "entityId": "ironclad",
+        "gained": 13,
+        "current": 13
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:208",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 208,
+      "occurredAt": 308000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 0,
+        "blocked": 13,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:209",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 209,
+      "occurredAt": 309000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 10,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:210",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 210,
+      "occurredAt": 310000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "POMMEL_STRIKE",
+        "cardInstanceId": "deck-pommel"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:211",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 211,
+      "occurredAt": 311000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "POMMEL_STRIKE",
+        "cardInstanceId": "deck-pommel",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:212",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 212,
+      "occurredAt": 312000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "turn": 10,
+        "side": "player",
+        "targetEntityId": "effigy-1",
+        "hpLoss": 13,
+        "resolvedDamageBeforeHpCap": 13,
+        "targetHpBefore": 23,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:213",
+      "eventType": "power.changed",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 213,
+      "occurredAt": 313000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "entityId": "ironclad",
+        "powerId": "STRENGTH",
+        "amount": 18
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:214",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 214,
+      "occurredAt": 314000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "turn": 10,
+        "side": "player",
+        "targetEntityId": "effigy-1",
+        "hpLoss": 10,
+        "targetHpBefore": 10,
+        "resolvedDamageBeforeHpCap": 24,
+        "requested": 24,
+        "fatal": true
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:215",
+      "eventType": "combat.ended",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 215,
+      "occurredAt": 315000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "victory": true
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-overkill-confirmed:216",
+      "eventType": "run.ended",
+      "runId": "synthetic-sts2-overkill-confirmed",
+      "sourceSessionId": "fixture-overkill-confirmed",
+      "sourceSeq": 216,
+      "occurredAt": 316000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cleared": true,
+        "reason": "synthetic_fixture"
+      },
+      "synthetic": true
+    }
+  ],
+  "coverage": {
+    "families": {
+      "lifecycle": {
+        "state": "available"
+      },
+      "reload_observation": {
+        "state": "available"
+      },
+      "card_play": {
+        "state": "available"
+      },
+      "card_movement": {
+        "state": "available"
+      },
+      "combat_resolution": {
+        "state": "available"
+      }
+    },
+    "gaps": []
+  },
+  "expected": {
+    "candidate": {
+      "pattern": "overkill",
+      "eventId": "fixture-overkill-confirmed:214"
+    },
+    "allowed": true,
+    "forbidden": [
+      "如果回血一定能赢",
+      "玩家操作失误"
+    ]
+  }
+}

@@ -10,6 +10,8 @@
     let dashboard = null;
     let profile = { displayName: '匿名人士' };
     let expandedRunId = null;
+    const recaps = Object.create(null);
+    let recapGeneration = 0;
     let toastTimer;
 
     function runs() {
@@ -41,15 +43,47 @@
 
     function render(renderOptions = {}) {
       retainExpanded();
-      root.innerHTML = ui?.render(dashboard, expandedRunId, profile) || '';
+      root.innerHTML = ui?.render(dashboard, expandedRunId, profile, recaps) || '';
       bindActions();
       if (renderOptions.restoreFocus && expandedRunId) focusRun(expandedRunId);
+    }
+
+    function refreshRecap(runId) {
+      if (expandedRunId !== runId) return;
+      const region = root.querySelector?.('.review-recap');
+      if (region && 'outerHTML' in region && ui?.renderRecap) region.outerHTML = ui.renderRecap(recaps[runId], runs().find(run => run.runId === runId));
+      else render({ restoreFocus: true });
+    }
+
+    function loadRecap(runId) {
+      if (runId && (!recaps[runId] || ['retryable', 'cancelled', 'stale', 'unavailable'].includes(recaps[runId].status))) {
+        const generation = recapGeneration;
+        recaps[runId] = { status: 'loading' };
+        refreshRecap(runId);
+        Promise.resolve(bridge?.getRunRecapPreview ? bridge.getRunRecapPreview(runId) : bridge?.getRunMetrics?.(runId)).then(preview => {
+          if (generation === recapGeneration && recaps[runId]?.status === 'loading') {
+            if (Array.isArray(preview)) recaps[runId].fixedMetrics = preview;
+            else if (preview) Object.assign(recaps[runId], preview, { status: 'loading' });
+            if (expandedRunId === runId) refreshRecap(runId);
+          }
+        }).catch(() => {});
+        Promise.resolve(bridge?.getRunRecap?.(runId)).then(recap => {
+          if (generation !== recapGeneration) return;
+          recaps[runId] = recap || { status: 'unavailable' };
+          if (expandedRunId === runId) refreshRecap(runId);
+        }).catch(() => {
+          if (generation !== recapGeneration) return;
+          recaps[runId] = { status: 'unavailable' };
+          if (expandedRunId === runId) refreshRecap(runId);
+        });
+      }
     }
 
     function activateRun(runId) {
       if (!runId) return;
       expandedRunId = expandedRunId === runId ? null : runId;
       render({ restoreFocus: true });
+      if (expandedRunId) loadRecap(runId);
     }
 
     function runCardFromEvent(event) {
@@ -97,6 +131,8 @@
           return;
         }
         expandedRunId = null;
+        recapGeneration++;
+        for (const key of Object.keys(recaps)) delete recaps[key];
         dashboard = result.dashboard;
         render();
         showToast('本机个人数据已清空');
@@ -108,7 +144,10 @@
 
     function setDashboard(nextDashboard) {
       dashboard = nextDashboard;
+      recapGeneration++;
+      for (const key of Object.keys(recaps)) delete recaps[key];
       render();
+      if (expandedRunId) loadRecap(expandedRunId);
     }
 
     function setProfile(nextProfile) {

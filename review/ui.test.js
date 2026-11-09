@@ -186,4 +186,20 @@ assert.match(html, /id="review-display-name"/);
 assert.match(html, /榜上名称/);
 assert.doesNotMatch(html, /排行榜|review-open-leaderboard/);
 
+const recapHtml = window.GameBuddyReviewUi.renderRecap({
+  status: 'local_only', portrait: '惜命<script>不惜债',
+  runSummary: { character: 'IRONCLAD', ascension: 2, totalFloor: 39, act: 3, floor: 6,
+    result: 'loss', durationLabel: '记录覆盖', durationDisplay: '40分42秒' },
+  battleMetrics: [{ label: '累计输出', value: 0, display: '0' }],
+  choiceStats: [{ label: '火堆回血', display: '6次' }],
+  cards: [{ title: '瓶中精灵，留对了', body: '三层后它来捞人。' }], closing: '这局，命是真硬。'
+});
+assert.match(recapHtml, /累计输出/); assert.match(recapHtml, /实际恢复/);
+assert.equal((recapHtml.match(/class="is-unknown"/g) || []).length, 3);
+assert.match(recapHtml, /<strong>0<\/strong>/);
+assert.match(recapHtml, /40分42秒/); assert.match(recapHtml, /到达第 39 层/);
+assert.match(recapHtml, /惜命&lt;script&gt;不惜债/);
+assert.doesNotMatch(recapHtml, /惜命<script>|evidenceIds|factsRevision/);
+assert.match(recapHtml, /已记录选择/);
+
 console.log('Review UI tests passed.');

@@ -14,9 +14,9 @@ internal static class GameBuddyFactProjection
             try
             {
                 var property = type.GetProperty(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-                if (property is not null) return property.GetValue(source);
+                if (property?.GetValue(source) is object propertyValue) return propertyValue;
                 var field = type.GetField(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-                if (field is not null) return field.GetValue(source);
+                if (field?.GetValue(source) is object fieldValue) return fieldValue;
             }
             catch
             {

@@ -47,34 +47,45 @@ public static class GameBuddySelectionFactPatches
 
     public static void ItemPurchasedPostfix(object[] __args)
     {
-        var item = __args.FirstOrDefault(value => value is not null && !IsPrimitive(value));
+        var item = __args.FirstOrDefault(value => value is not null && new[] { "Card", "Relic", "Potion", "ShopEntry" }.Any(kind => value.GetType().Name.Contains(kind, StringComparison.OrdinalIgnoreCase)));
+        var decisionId = GameBuddyExporter.CurrentShopDecisionId;
+        var actionId = $"shop:{Guid.NewGuid():N}";
         GameBuddyFactEmitter.Publish("shop.transaction_completed", new
         {
+            shopVisitId = decisionId,
+            beforeSnapshotId = GameBuddyRecapCapture.BeforeDecision(decisionId),
+            afterSnapshotId = GameBuddyRecapCapture.Capture("shop_purchase_observed", actionId, decisionId),
+            itemInstanceId = GameBuddyRecapCapture.InstanceId(item),
             itemId = GameBuddyFactProjection.ModelId(item),
             itemType = item?.GetType().Name,
             price = FindInteger(__args),
             status = "completed"
-        }, actionId: $"shop:{Guid.NewGuid():N}", observationMethod: "direct_hook");
+        }, decisionId: decisionId, actionId: actionId, observationMethod: "direct_hook");
     }
 
-    public static void RestHealPostfix(object[] __args)
-    {
-        GameBuddyFactEmitter.Publish("rest.action_completed", new
-        {
-            action = "heal",
-            amount = FindInteger(__args)
-        }, actionId: $"rest:{Guid.NewGuid():N}", observationMethod: "direct_hook");
-    }
+    public static void RestHealPostfix(object[] __args) => PublishRestResult("heal", null, FindInteger(__args));
 
     public static void RestSmithPostfix(object[] __args)
     {
         var card = __args.FirstOrDefault(value => value?.GetType().Name.Contains("Card", StringComparison.OrdinalIgnoreCase) == true);
-        GameBuddyFactEmitter.Publish("rest.action_completed", new
-        {
-            action = "smith",
-            cardInstanceId = GameBuddyFactProjection.EntityId(card),
-            cardId = GameBuddyFactProjection.ModelId(card)
-        }, actionId: $"rest:{Guid.NewGuid():N}", observationMethod: "direct_hook");
+        PublishRestResult("smith", card, null);
+    }
+
+    private static void PublishRestResult(string action, object? card, int? amount)
+    {
+        var decisionId = GameBuddyRecapCapture.RestDecisionId;
+        var actionId = $"rest:{Guid.NewGuid():N}";
+        GameBuddyFactEmitter.Publish("rest.action_completed", new {
+            action, amount,
+            cardInstanceId = GameBuddyRecapCapture.InstanceId(card),
+            originDeckCardInstanceId = GameBuddyRecapCapture.OriginId(card),
+            cardId = GameBuddyFactProjection.ModelId(card),
+            cardName = GameBuddyFactProjection.Text(card, "Title", "Name"),
+            upgradedAfter = GameBuddyFactProjection.Boolean(card, "IsUpgraded", "Upgraded"),
+            beforeSnapshotId = GameBuddyRecapCapture.BeforeDecision(decisionId),
+            afterSnapshotId = GameBuddyRecapCapture.Capture("after_rest_choice_observed", actionId, decisionId)
+        }, decisionId: decisionId, actionId: actionId, observationMethod: "direct_hook");
+        GameBuddyRecapCapture.FinishDecision(decisionId);
     }
 
     public static void EventOptionChosenPostfix(object __instance)
@@ -119,7 +130,7 @@ public static class GameBuddySelectionFactPatches
         {
             try
             {
-                if (value is not null && IsPrimitive(value)) return Convert.ToInt32(value);
+                if (value is not null && IsPrimitive(value) && value is not bool && value is not char) return Convert.ToInt32(value);
             }
             catch
             {

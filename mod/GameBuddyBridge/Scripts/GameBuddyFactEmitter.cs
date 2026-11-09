@@ -51,6 +51,7 @@ public static class GameBuddyFactEmitter
         {
             _runId = (_identities ?? throw new InvalidOperationException("Fact emitter is not initialized.")).BeginNew(fingerprint);
             ResetCombat();
+            GameBuddyRecapCapture.ResetRun();
             EmitLocked("run.started", payload);
             EmitCapabilitiesLocked();
             return _runId;
@@ -63,6 +64,7 @@ public static class GameBuddyFactEmitter
         {
             _runId = (_identities ?? throw new InvalidOperationException("Fact emitter is not initialized.")).Resume(fingerprint);
             ResetCombat();
+            GameBuddyRecapCapture.ResetRun();
             EmitLocked("run.resumed", payload);
             EmitCapabilitiesLocked();
             return _runId;
@@ -74,6 +76,12 @@ public static class GameBuddyFactEmitter
         lock (Gate)
         {
             if (_runId is null) return;
+            if (_combatId is not null && !_combatEnded && (reason == "death" || reason == "abandoned"))
+            {
+                EmitLocked("combat.ended", new { victory = false, outcome = reason, playerDied = reason == "death", details, afterSnapshotId = GameBuddyRecapCapture.Capture("run_end_observed") },
+                    combatId: _combatId, attemptGeneration: _attemptGeneration);
+                _combatEnded = true;
+            }
             EmitLocked("run.ended", new { cleared, reason, details });
             _identities?.End(_runId);
             _runId = null;
@@ -114,6 +122,12 @@ public static class GameBuddyFactEmitter
         lock (Gate)
         {
             if (_runId is null) return;
+            EmitLocked("run.reload_observed", new
+            {
+                observationId = $"{_runId}:{reloadCount}",
+                observedCount = reloadCount,
+                combatId = _combatId
+            });
             _reloadPending = true;
             if (_combatId is null || _combatEnded) return;
             var replaced = _attemptGeneration;
@@ -183,7 +197,8 @@ public static class GameBuddyFactEmitter
     {
         EmitLocked("capture.capability_reported", new
         {
-            build = "sts2-v0.107.1",
+            build = "unknown",
+            gameAssemblyVersion = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "sts2")?.GetName().Version?.ToString(),
             capabilities = GameBuddyHookCapabilityRegistry.Snapshot()
         });
     }
@@ -238,6 +253,14 @@ public static class GameBuddyFactEmitter
         IReadOnlyDictionary<string, string>? unknownReasons)
     {
         var reasons = unknownReasons ?? new Dictionary<string, string>();
+        var payloadJson = JsonSerializer.SerializeToElement(payload, JsonOptions);
+        string? Reference(string name)
+        {
+            if (payloadJson.ValueKind != JsonValueKind.Object) return null;
+            if (payloadJson.TryGetProperty(name, out var direct) && direct.ValueKind == JsonValueKind.String) return direct.GetString();
+            return payloadJson.TryGetProperty("details", out var details) && details.ValueKind == JsonValueKind.Object
+                && details.TryGetProperty(name, out var nested) && nested.ValueKind == JsonValueKind.String ? nested.GetString() : null;
+        }
         var fact = new
         {
             schema = FactSchema,
@@ -253,6 +276,9 @@ public static class GameBuddyFactEmitter
             attemptGeneration,
             decisionId,
             actionId,
+            beforeSnapshotId = Reference("beforeSnapshotId"),
+            afterSnapshotId = Reference("afterSnapshotId"),
+            contextSnapshotId = Reference("contextSnapshotId"),
             payload,
             quality = new
             {

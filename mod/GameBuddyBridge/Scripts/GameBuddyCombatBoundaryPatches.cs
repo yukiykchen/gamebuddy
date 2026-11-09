@@ -24,6 +24,7 @@ public static class GameBuddyCombatBoundaryPatches
 
     public static void CombatStartedPostfix(object[] __args)
     {
+        GameBuddyRecapCapture.ResetCombat();
         var roomKey = ResolveRoomKey(__args);
         GameBuddyFactEmitter.StartCombat(roomKey, new
         {
@@ -34,13 +35,13 @@ public static class GameBuddyCombatBoundaryPatches
 
     public static void CombatVictoryPostfix()
     {
-        GameBuddyFactEmitter.EndCombat(true, new { hook = "AfterCombatVictory" });
+        GameBuddyFactEmitter.EndCombat(true, new { hook = "AfterCombatVictory", afterSnapshotId = GameBuddyRecapCapture.Capture("combat_victory_observed") });
     }
 
     public static void CombatEndedPostfix(object[] __args)
     {
         var victory = __args.OfType<bool>().FirstOrDefault();
-        GameBuddyFactEmitter.EndCombat(victory, new { hook = "AfterCombatEnd" });
+        GameBuddyFactEmitter.EndCombat(victory, new { hook = "AfterCombatEnd", afterSnapshotId = GameBuddyRecapCapture.Capture("combat_end_observed") });
     }
 
     private static bool PatchNamed(Harmony harmony, Type type, string name, string patchName, string modDirectory)

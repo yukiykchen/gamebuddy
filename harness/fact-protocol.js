@@ -1,7 +1,7 @@
 const FACT_SCHEMA = 'gamebuddy.fact-event.v1';
 const FACT_EVENT_TYPES = new Set([
-  'capture.started', 'capture.capability_reported', 'capture.gap_detected', 'capture.recovered', 'capture.stopped',
-  'run.observed', 'run.started', 'run.resumed', 'run.suspended', 'run.ended',
+  'context.snapshot', 'capture.started', 'capture.capability_reported', 'capture.gap_detected', 'capture.recovered', 'capture.stopped',
+  'run.observed', 'run.started', 'run.resumed', 'run.suspended', 'run.ended', 'run.reload_observed',
   'room.entered', 'room.exited',
   'reward.offered', 'reward.updated', 'reward.resolved',
   'route.offered', 'route.selected', 'map.observed',
@@ -12,7 +12,7 @@ const FACT_EVENT_TYPES = new Set([
   'relic.gained', 'relic.lost', 'relic.changed',
   'potion.gained', 'potion.used', 'potion.discarded', 'potion.replaced',
   'combat.started', 'combat.attempt_replaced', 'combat.ended',
-  'turn.started', 'turn.ended', 'entity.spawned', 'entity.exited',
+  'turn.started', 'turn.ending', 'turn.ended', 'entity.spawned', 'entity.exited',
   'card.played', 'card.drawn', 'card.discarded', 'card.exhausted', 'card.generated', 'card.moved',
   'damage.resolved', 'block.changed', 'heal.resolved', 'resource.changed', 'power.changed',
   'gold.changed', 'health.changed', 'max_health.changed', 'capacity.changed'
@@ -92,7 +92,7 @@ function validateFactEvent(fact) {
   if (fact.receivedAt !== undefined && fact.receivedAt !== null && !Number.isFinite(fact.receivedAt)) {
     return { ok: false, reason: 'fact receivedAt must be a number' };
   }
-  for (const field of ['segmentId', 'combatId', 'decisionId', 'actionId', 'parentActionId', 'contextSnapshotId']) {
+  for (const field of ['segmentId', 'combatId', 'decisionId', 'actionId', 'parentActionId', 'contextSnapshotId', 'beforeSnapshotId', 'afterSnapshotId']) {
     if (fact[field] !== undefined && fact[field] !== null && !nonEmptyString(fact[field], 256)) {
       return { ok: false, reason: `fact ${field} must be a non-empty string or null` };
     }

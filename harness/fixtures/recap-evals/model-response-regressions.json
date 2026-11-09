@@ -1,0 +1,271 @@
+{
+  "synthetic": true,
+  "source": "deepseek-flash actual API responses on synthetic fixtures, 2026-10-26",
+  "cases": [
+    {
+      "fixtureId": "upgrade-never-drawn",
+      "candidates": [
+        {
+          "pattern": "upgrade_never_drawn",
+          "title": "升级后未上手",
+          "bodyTemplate": "痛击在铁匠处升级，随后精英战{{n}}次抽牌均未上手，战斗落败。",
+          "bindings": {
+            "n": {
+              "claimIndex": 0
+            }
+          },
+          "evidenceIds": [
+            "fixture-upgrade-never-drawn:146",
+            "fixture-upgrade-never-drawn:147",
+            "fixture-upgrade-never-drawn:156"
+          ],
+          "assertions": [
+            {
+              "type": "event_field",
+              "eventId": "fixture-upgrade-never-drawn:146",
+              "field": "cardName",
+              "value": "痛击"
+            },
+            {
+              "type": "event_field",
+              "eventId": "fixture-upgrade-never-drawn:146",
+              "field": "upgraded",
+              "value": true
+            },
+            {
+              "type": "never_entered_hand",
+              "subjectId": "deck-bash",
+              "combatId": "elite-bygone-effigy"
+            },
+            {
+              "type": "combat_outcome",
+              "combatId": "elite-bygone-effigy",
+              "value": "defeat"
+            }
+          ]
+        },
+        {
+          "pattern": "risk_event_hp_loss",
+          "title": "风险事件掉血",
+          "bodyTemplate": "风险事件选择以生命换奖励，实际损失{{hp}}点生命，剩余{{after}}点。",
+          "bindings": {
+            "hp": {
+              "claimIndex": 0
+            },
+            "after": {
+              "claimIndex": 1
+            }
+          },
+          "evidenceIds": [
+            "fixture-upgrade-never-drawn:144",
+            "fixture-upgrade-never-drawn:145"
+          ],
+          "assertions": [
+            {
+              "type": "event_field",
+              "eventId": "fixture-upgrade-never-drawn:145",
+              "field": "hpLoss",
+              "value": 16
+            },
+            {
+              "type": "event_field",
+              "eventId": "fixture-upgrade-never-drawn:145",
+              "field": "hpAfter",
+              "value": 24
+            }
+          ]
+        },
+        {
+          "pattern": "reward_skip_streak",
+          "title": "连续跳过奖励",
+          "bodyTemplate": "第二、三、四场胜利后，奖励卡均选择跳过，未再增卡。",
+          "bindings": {},
+          "evidenceIds": [
+            "fixture-upgrade-never-drawn:73",
+            "fixture-upgrade-never-drawn:108",
+            "fixture-upgrade-never-drawn:143"
+          ],
+          "assertions": [
+            {
+              "type": "event_field",
+              "eventId": "fixture-upgrade-never-drawn:73",
+              "field": "result",
+              "value": "skipped"
+            },
+            {
+              "type": "event_field",
+              "eventId": "fixture-upgrade-never-drawn:108",
+              "field": "result",
+              "value": "skipped"
+            },
+            {
+              "type": "event_field",
+              "eventId": "fixture-upgrade-never-drawn:143",
+              "field": "result",
+              "value": "skipped"
+            }
+          ]
+        }
+      ],
+      "forbiddenTitles": [
+        "升级后未上手",
+        "连续跳过奖励"
+      ]
+    },
+    {
+      "fixtureId": "overkill-confirmed",
+      "candidates": [
+        {
+          "pattern": "overkill",
+          "title": "用力过猛",
+          "bodyTemplate": "{{target}}只剩{{hp}}血，这一击结算{{dmg}}点，溢出{{over}}点。",
+          "bindings": {
+            "target": {
+              "claimIndex": 0
+            },
+            "hp": {
+              "claimIndex": 1
+            },
+            "dmg": {
+              "claimIndex": 2
+            },
+            "over": {
+              "claimIndex": 3
+            }
+          },
+          "evidenceIds": [
+            "fixture-overkill-confirmed:214"
+          ],
+          "assertions": [
+            {
+              "type": "entity_name",
+              "subjectId": "effigy-1",
+              "combatId": "elite-bygone-effigy",
+              "value": "木偶"
+            },
+            {
+              "type": "event_field",
+              "eventId": "fixture-overkill-confirmed:214",
+              "field": "targetHpBefore",
+              "value": 10
+            },
+            {
+              "type": "event_field",
+              "eventId": "fixture-overkill-confirmed:214",
+              "field": "resolvedDamageBeforeHpCap",
+              "value": 24
+            },
+            {
+              "type": "metric",
+              "metricId": "highest_overkill",
+              "value": 14
+            }
+          ]
+        },
+        {
+          "pattern": "strength_spike",
+          "title": "力量暴涨",
+          "bodyTemplate": "第{{turn}}回合力量涨到{{str}}，前一击{{d1}}点，终结一击结算{{d2}}点。",
+          "bindings": {
+            "turn": {
+              "claimIndex": 0
+            },
+            "str": {
+              "claimIndex": 1
+            },
+            "d1": {
+              "claimIndex": 2
+            },
+            "d2": {
+              "claimIndex": 3
+            }
+          },
+          "evidenceIds": [
+            "fixture-overkill-confirmed:212",
+            "fixture-overkill-confirmed:213",
+            "fixture-overkill-confirmed:214"
+          ],
+          "assertions": [
+            {
+              "type": "event_field",
+              "eventId": "fixture-overkill-confirmed:212",
+              "field": "turn",
+              "value": 10
+            },
+            {
+              "type": "event_field",
+              "eventId": "fixture-overkill-confirmed:213",
+              "field": "amount",
+              "value": 18
+            },
+            {
+              "type": "event_field",
+              "eventId": "fixture-overkill-confirmed:212",
+              "field": "resolvedDamageBeforeHpCap",
+              "value": 13
+            },
+            {
+              "type": "event_field",
+              "eventId": "fixture-overkill-confirmed:214",
+              "field": "resolvedDamageBeforeHpCap",
+              "value": 24
+            }
+          ]
+        },
+        {
+          "pattern": "upgraded_unplayed",
+          "title": "升级未出手",
+          "bodyTemplate": "{{card}}在休息处升到{{lv}}级，精英战抽到{{draw}}次却因{{reason}}一次未打出。",
+          "bindings": {
+            "card": {
+              "claimIndex": 0
+            },
+            "lv": {
+              "claimIndex": 1
+            },
+            "draw": {
+              "claimIndex": 2
+            },
+            "reason": {
+              "claimIndex": 3
+            }
+          },
+          "evidenceIds": [
+            "fixture-overkill-confirmed:146",
+            "fixture-overkill-confirmed:151"
+          ],
+          "assertions": [
+            {
+              "type": "entity_name",
+              "subjectId": "deck-bash",
+              "combatId": "elite-bygone-effigy",
+              "value": "痛击"
+            },
+            {
+              "type": "event_field",
+              "eventId": "fixture-overkill-confirmed:146",
+              "field": "upgraded",
+              "value": true
+            },
+            {
+              "type": "subject_count",
+              "subjectId": "deck-bash",
+              "combatId": "elite-bygone-effigy",
+              "field": "drawCount",
+              "value": 1
+            },
+            {
+              "type": "event_field",
+              "eventId": "fixture-overkill-confirmed:151",
+              "field": "unavailableReason",
+              "value": "insufficient_energy"
+            }
+          ]
+        }
+      ],
+      "forbiddenTitles": [
+        "力量暴涨"
+      ]
+    }
+  ]
+}

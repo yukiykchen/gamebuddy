@@ -116,15 +116,48 @@
       </section>`;
   }
 
-  function runBuild(run, panelId) {
+  function renderRecap(recap, run = {}) {
+    const labels = ['累计输出', '实际抗伤', '累计受伤', '实际恢复'];
+    const metrics = labels.map(label => recap?.battleMetrics?.find(metric => metric.label === label) || { label, display: '未记录' });
+    const summary = recap?.runSummary || {}, character = summary.character || run.character;
+    const [result, resultClass] = resultLabel(summary.result || run.result);
+    const meta = [character ? characterName(character) : '',
+      Number.isInteger(summary.ascension) ? `进阶 ${summary.ascension}` : '',
+      Number.isFinite(summary.totalFloor ?? run.floor) ? `到达第 ${summary.totalFloor ?? run.floor} 层` : '',
+      Number.isInteger(summary.act) && Number.isInteger(summary.floor) ? `第 ${summary.act} 幕 · 第 ${summary.floor} 层` : ''].filter(Boolean);
+    const records = (recap?.fixedMetrics || []).filter(metric => metric.label !== '实际抗伤'
+      && metric.display && metric.display !== '未记录');
+    const status = recap?.status === 'loading' ? '正在寻找更多值得回味的片段…'
+      : recap?.status === 'unavailable' ? '本局记录暂时无法读取'
+        : recap?.cards?.length ? '' : recap?.coverageNote || '本局暂无值得回味的片段';
+    return `<section class="review-recap" aria-label="本局复盘">
+      <header class="review-recap-heading">
+        <div><span class="review-recap-eyebrow">TALES FROM THE SPIRE</span><h3>本局复盘</h3></div>
+        <span class="review-recap-result ${resultClass}">${escapeHtml(result)}</span>
+      </header>
+      ${recap?.portrait ? `<p class="review-recap-portrait">${escapeHtml(recap.portrait)}</p>` : ''}
+      <div class="review-recap-meta">${meta.map(text => `<span>${escapeHtml(text)}</span>`).join('')}</div>
+      <p class="review-recap-duration">${escapeHtml(summary.durationLabel || '记录覆盖')}<strong>${escapeHtml(summary.durationDisplay || '未记录')}</strong></p>
+      <div class="review-recap-metrics">${metrics.map((metric, index) => `<div${metric.display === '未记录' ? ' class="is-unknown"' : ''}><span class="review-recap-metric-label"><i aria-hidden="true">${['攻', '御', '伤', '愈'][index]}</i>${escapeHtml(metric.label)}</span><strong>${escapeHtml(metric.display)}</strong></div>`).join('')}</div>
+      ${recap?.choiceStats?.length ? `<div class="review-recap-choices"><span>已记录选择</span>${recap.choiceStats.map(stat => `<span>${escapeHtml(stat.label)} <b>${escapeHtml(stat.display)}</b></span>`).join('')}</div>` : ''}
+      ${records.length ? `<div class="review-recap-records">${records.map(metric => `<span>${escapeHtml(metric.label)} <b>${escapeHtml(metric.display)}</b></span>`).join('')}</div>` : ''}
+      <div class="review-recap-cards">${(recap?.cards || []).map((card, index) => `<article><span class="review-recap-card-index" aria-hidden="true">${String(index + 1).padStart(2, '0')}</span><h4>${escapeHtml(card.title)}</h4><p>${escapeHtml(card.body)}</p></article>`).join('')}</div>
+      ${recap?.closing ? `<p class="review-recap-closing"><span>这局怎么说</span>${escapeHtml(recap.closing)}</p>` : ''}
+      ${status ? `<p class="review-recap-status" role="status">${escapeHtml(status)}</p>` : ''}
+      ${recap?.cards?.length && metrics.some(m => m.display === '未记录') ? '<p class="review-recap-footnote">部分累计战况未记录，已保留可确认的故事。</p>' : ''}
+    </section>`;
+  }
+
+  function runBuild(run, panelId, recap) {
     return `
-      <div class="review-run-build" id="${panelId}" role="region" aria-label="终局牌组与遗物" data-run-id="${escapeHtml(run.runId)}">
+      <div class="review-run-build" id="${panelId}" role="region" aria-label="本局复盘与终局牌组" data-run-id="${escapeHtml(run.runId)}">
+        ${renderRecap(recap, run)}
         ${buildCollection('终局牌组', run.deck, '本局没有记录到牌组', '张')}
         ${buildCollection('终局遗物', run.relics, '本局没有记录到遗物', '件')}
       </div>`;
   }
 
-  function recentRuns(runs, expandedRunId = null) {
+  function recentRuns(runs, expandedRunId = null, recaps = {}) {
     if (!runs?.length) {
       return `<div class="review-no-runs"><strong>还没有本地对局记录</strong><span>开始一局《杀戮尖塔 2》，GameBuddy 会自动记录到这里。</span></div>`;
     }
@@ -141,12 +174,12 @@
             <div><span>最终楼层</span><strong>${Number.isFinite(run.floor) ? `${run.floor} 层` : '未知'}</strong></div>
             <div><span>最高单回合伤害</span><strong>${Number.isFinite(run.maxTurnDamage) ? run.maxTurnDamage : '未知'}</strong></div>
           </div>
-          ${expanded ? runBuild(run, panelId) : ''}
+          ${expanded ? runBuild(run, panelId, recaps[run.runId]) : ''}
         </div>`;
     }).join('');
   }
 
-  function render(dashboard, expandedRunId = null, profile = null) {
+  function render(dashboard, expandedRunId = null, profile = null, recaps = {}) {
     const displayName = profile?.displayName || '匿名人士';
     const safe = dashboard || { window: {}, axes: [], stats: [], recentRuns: [] };
     const character = safe.mainCharacter || 'ironclad';
@@ -167,7 +200,7 @@
               <button type="submit">保存</button>
             </form>
             <div class="review-actions">
-              <span>仅保存在本机</span>
+              <span>记录保存在本机；生成复盘时，本局必要片段会发送至已配置的模型服务</span>
               <button type="button" id="review-export">导出</button>
               <button type="button" id="review-clear">清空</button>
             </div>
@@ -197,10 +230,10 @@
 
         <section class="review-history">
           <div class="review-history-heading"><strong>最近游戏记录</strong><span>角色 · 通关状态 · BOSS · 楼层 · 单回合伤害</span></div>
-          <div class="review-run-list">${recentRuns(safe.recentRuns, expandedRunId)}</div>
+          <div class="review-run-list">${recentRuns(safe.recentRuns, expandedRunId, recaps)}</div>
         </section>
       </section>`;
   }
 
-  globalScope.GameBuddyReviewUi = { render, characterName, pointsForRadius };
+  globalScope.GameBuddyReviewUi = { render, renderRecap, characterName, pointsForRadius };
 })(window);

@@ -448,7 +448,7 @@ function createLocalFactStore({ rootDir, now = () => Date.now() } = {}) {
         };
       }
       snapshot = cloneRunState(run);
-      const stored = { ...fact, receivedAt: now(), replay: Boolean(replay) };
+      const stored = { ...fact, receivedAt: now(), ingestSeq: run.eventIds.size + 1, replay: Boolean(replay) };
       const deferredDeletes = [];
       if (stored.combatId) appendCombatFact(run, stored, appended, deferredDeletes);
       else trackAppend(appended, run.paths.events, stored);
@@ -486,7 +486,15 @@ function createLocalFactStore({ rootDir, now = () => Date.now() } = {}) {
 
   function appendSnapshot(runId, snapshot) {
     const run = loadRun(runId);
+    if (!snapshot || snapshot.schema !== 'gamebuddy.recap-snapshot.v1'
+      || snapshot.runId !== runId || typeof snapshot.snapshotId !== 'string'
+      || !snapshot.snapshotId) throw new Error('invalid recap snapshot');
     appendJsonl(run.paths.snapshots, snapshot);
+  }
+
+  function getSnapshots(runId) {
+    const run = loadRun(runId);
+    return readFileWithHealth(run, run.paths.snapshots);
   }
 
   function readFileWithHealth(run, filePath) {
@@ -537,11 +545,20 @@ function createLocalFactStore({ rootDir, now = () => Date.now() } = {}) {
     return index;
   }
 
+  function clearAll() {
+    cache.clear();
+    fs.rmSync(runsDir, { recursive: true, force: true });
+    fs.mkdirSync(runsDir, { recursive: true });
+    rebuildIndex();
+  }
+
   return {
     appendSnapshot,
+    clearAll,
     flush: () => {},
     getCoverage,
     getEffectiveFacts,
+    getSnapshots,
     ingest,
     rebuildIndex,
     rootDir

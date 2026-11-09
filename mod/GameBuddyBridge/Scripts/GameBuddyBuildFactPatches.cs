@@ -49,9 +49,9 @@ public static class GameBuddyBuildFactPatches
         var cards = __args.Where(value => value?.GetType().Name.Contains("Card", StringComparison.OrdinalIgnoreCase) == true).ToArray();
         GameBuddyFactEmitter.Publish("deck.card_transformed", new
         {
-            fromCardInstanceId = GameBuddyFactProjection.EntityId(cards.ElementAtOrDefault(0)),
+            fromCardInstanceId = GameBuddyRecapCapture.InstanceId(cards.ElementAtOrDefault(0)),
             fromCardId = GameBuddyFactProjection.ModelId(cards.ElementAtOrDefault(0)),
-            toCardInstanceId = GameBuddyFactProjection.EntityId(cards.ElementAtOrDefault(1)),
+            toCardInstanceId = GameBuddyRecapCapture.InstanceId(cards.ElementAtOrDefault(1)),
             toCardId = GameBuddyFactProjection.ModelId(cards.ElementAtOrDefault(1))
         }, actionId: $"transform:{Guid.NewGuid():N}", observationMethod: "direct_hook");
     }
@@ -66,7 +66,8 @@ public static class GameBuddyBuildFactPatches
     {
         GameBuddyFactEmitter.Publish(eventType, new
         {
-            cardInstanceId = GameBuddyFactProjection.EntityId(card),
+            cardInstanceId = GameBuddyRecapCapture.InstanceId(card),
+            originDeckCardInstanceId = GameBuddyRecapCapture.OriginId(card),
             cardId = GameBuddyFactProjection.ModelId(card),
             upgraded = GameBuddyFactProjection.Boolean(card, "IsUpgraded", "Upgraded")
         }, actionId: $"deck:{Guid.NewGuid():N}", observationMethod: "direct_hook");
@@ -77,7 +78,7 @@ public static class GameBuddyBuildFactPatches
         var relic = FindModel(arguments, "Relic");
         GameBuddyFactEmitter.Publish(eventType, new
         {
-            relicInstanceId = GameBuddyFactProjection.EntityId(relic),
+            relicInstanceId = GameBuddyRecapCapture.InstanceId(relic),
             relicId = GameBuddyFactProjection.ModelId(relic)
         }, actionId: $"relic:{Guid.NewGuid():N}", observationMethod: "direct_hook");
     }
@@ -87,7 +88,7 @@ public static class GameBuddyBuildFactPatches
         var potion = FindModel(arguments, "Potion");
         GameBuddyFactEmitter.Publish(eventType, new
         {
-            potionInstanceId = GameBuddyFactProjection.EntityId(potion),
+            potionInstanceId = GameBuddyRecapCapture.InstanceId(potion),
             potionId = GameBuddyFactProjection.ModelId(potion)
         }, actionId: $"potion:{Guid.NewGuid():N}", observationMethod: "direct_hook");
     }

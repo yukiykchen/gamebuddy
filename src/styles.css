@@ -509,6 +509,49 @@ body.review-mode .app-shell { background: #f5bd19; }
   background: rgba(255, 248, 214, .96);
   box-shadow: 5px 5px 0 rgba(23,73,134,.13);
 }
+.review-run-list:has(.review-run-card.is-expanded) { max-height: none; overflow: visible; }
+.review-recap {
+  position: relative; isolation: isolate; overflow: hidden;
+  margin-bottom: 18px; padding: 28px;
+  border: 1px solid #877450; border-radius: 14px;
+  background: #111c22; color: #f4ebd9;
+  box-shadow: 0 12px 30px #06121a30;
+  font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+}
+.review-recap::before {
+  content: ""; position: absolute; z-index: -1; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, #101b24ec 0%, #101b2480 65%, #101b2410 100%),
+    linear-gradient(0deg, #101b24 5%, #101b24db 48%, transparent 100%),
+    url('./assets/recap/spire-campfire-v1.png') right top / cover no-repeat;
+}
+.review-recap-heading { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.review-recap-eyebrow { color: #cfac70; font: 700 9px/1.4 Georgia, serif; letter-spacing: 3px; }
+.review-recap h3 { margin: 5px 0 0; color: #fff3d6; font: 700 25px/1.3 "Songti SC", "SimSun", serif; letter-spacing: 4px; }
+.review-recap-result { flex: none; padding: 5px 12px; border: 1px solid #ae8059; border-radius: 999px; color: #f3c8a1; background: #251e1caa; font-size: 11px; }
+.review-recap-result.win { color: #b2ead9; border-color: #679b8a; background: #122e2aaa; }
+.review-recap-result.unknown, .review-recap-result.abandoned { color: #d7d3c7; border-color: #79796c; }
+.review-recap-portrait { margin: 18px 0 7px; color: #ffe8b0; font: 700 20px/1.4 "Songti SC", "SimSun", serif; letter-spacing: 1px; }
+.review-recap-meta { display: flex; flex-wrap: wrap; gap: 6px 13px; margin-top: 12px; color: #d7dcd9; font-size: 11px; }
+.review-recap-meta span + span { border-left: 1px solid #8c9b9666; padding-left: 13px; }
+.review-recap-duration { display: flex; gap: 10px; align-items: baseline; margin: 11px 0 21px; color: #aebdbb; font-size: 11px; }
+.review-recap-duration strong { color: #f1dbad; font-size: 13px; font-variant-numeric: tabular-nums; }
+.review-recap-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 9px; }
+.review-recap-metrics > div { min-width: 0; display: grid; gap: 10px; padding: 14px; border: 1px solid #b29d6d55; border-radius: 8px; background: #101a22b8; }
+.review-recap-metric-label { display: flex; gap: 7px; align-items: center; color: #ccd2cc; font-size: 11px; }
+.review-recap-metric-label i { display: inline-grid; place-items: center; width: 21px; height: 21px; border: 1px solid #beab7a66; border-radius: 5px; color: #dac499; font: normal 11px Georgia, serif; }
+.review-recap-metrics strong { color: #ffe3a6; font-size: 23px; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.review-recap-metrics .is-unknown strong { color: #bbc4c0; font-size: 15px; font-weight: 500; padding-bottom: 3px; }
+.review-recap-choices, .review-recap-records { display: flex; flex-wrap: wrap; gap: 7px 14px; margin-top: 12px; color: #c2cbc5; font-size: 10px; line-height: 1.7; }
+.review-recap-choices > span:first-child { color: #9dabaa; }
+.review-recap-choices b, .review-recap-records b { color: #ead5a9; font-weight: 600; }
+.review-recap-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px; margin-top: 24px; }
+.review-recap-cards article { position: relative; min-width: 0; padding: 17px 15px 16px; border: 1px solid #8d9c9444; border-top: 2px solid #c2a26b; border-radius: 6px; background: linear-gradient(130deg, #263336ef, #16232bec); }
+.review-recap-card-index { display: block; margin-bottom: 10px; color: #8d9e9b; font: italic 12px Georgia, serif; letter-spacing: 2px; }
+.review-recap-cards h4 { margin: 0; color: #ffe7b4; font: 700 14px/1.5 "Songti SC", "SimSun", serif; overflow-wrap: anywhere; }
+.review-recap-cards p { margin: 9px 0 0; color: #e0e3db; font-size: 12px; line-height: 1.9; overflow-wrap: anywhere; }
+.review-recap-closing { margin: 21px 0 0; padding: 15px 0 0; border-top: 1px solid #b29d6d44; color: #efe2c5; font-size: 12px; line-height: 1.9; }
+.review-recap-closing span { display: block; margin-bottom: 5px; color: #bfa36d; font-size: 10px; letter-spacing: 2px; }
+.review-recap-status, .review-recap-footnote { margin: 13px 0 0; color: #aebdb8; font-size: 10px; line-height: 1.7; }
 .review-build-section + .review-build-section { margin-top: 12px; }
 .review-build-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 8px; color: var(--review-blue); }
 .review-build-heading strong { font: 800 13px "Microsoft YaHei", "PingFang SC", sans-serif; letter-spacing: 1px; }
@@ -560,6 +603,9 @@ body.review-mode .app-shell { background: #f5bd19; }
   .review-run-card { grid-template-columns: 42px 1fr 1fr; }
   .review-run-card > div:nth-last-child(-n+2) { grid-column: span 1; }
   .review-run-build { padding: 10px 10px 12px; }
+  .review-recap { padding: 20px; }
+  .review-recap-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .review-recap-cards { grid-template-columns: 1fr; }
   .review-build-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 120px), 1fr)); }
   .review-build-heading { align-items: flex-start; flex-wrap: wrap; }
 }
