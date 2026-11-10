@@ -11,6 +11,12 @@ const { buildRecap } = require('./runner');
 const directory = path.join(__dirname, '../../harness/fixtures/recap-evals');
 const manifest = JSON.parse(fs.readFileSync(path.join(directory, 'manifest.json'), 'utf8'));
 
+test('recap voice is a natural game partner rather than a battlefield reporter', () => {
+  const source = fs.readFileSync(path.join(__dirname, 'runner.js'), 'utf8');
+  assert.match(source, /复盘搭子/);
+  assert.doesNotMatch(source, /战地记者/);
+});
+
 for (const row of manifest.cases) {
   test(`synthetic ${row.id}: validates evidence and outcome`, () => {
     const fixture = JSON.parse(fs.readFileSync(path.join(directory, `${row.id}.json`), 'utf8'));
