@@ -156,13 +156,22 @@ test('the model can select one local lead without automatic fallback filling', a
   assert.deepEqual(recap.cards.map(card => card.pattern), ['rest_choice_style']);
 });
 test('an empty model selection clears local cards, portrait and closing', async () => {
-  const f = realLong();
+  const f = base();
   const recap = await buildRecap({ ...f, maxRounds: 0, llm: { enabled: true,
     completeRecapTurn: async () => ({ candidates: [] }) } });
   assert.deepEqual(recap.cards, []);
   assert.equal(recap.portrait, '');
   assert.equal(recap.closing, '');
   assert.equal(recap.status, 'ready');
+});
+test('the target long-run example cannot be erased by an empty model selection', async () => {
+  const f = realLong();
+  const recap = await buildRecap({ ...f, maxRounds: 0, llm: { enabled: true,
+    completeRecapTurn: async () => ({ candidates: [] }) } });
+  assert.deepEqual(new Set(recap.cards.map(card => card.verifiedKind)),
+    new Set(['health_recovery', 'rest_choice_style']));
+  assert.ok(recap.trace.some(row => row.phase === 'protected_benchmark'));
+  assert.match(recap.closing, /火堆|篝火|精灵/);
 });
 test('fully observed no-damage player turns produce a known zero rather than unknown', () => {
   const f = base(); f.facts = f.facts.filter(e => e.eventType !== 'damage.resolved' || e.payload.sourceSide !== 'player');

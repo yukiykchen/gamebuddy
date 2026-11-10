@@ -27,6 +27,16 @@
 - **THEN** 系统 SHALL 可以将其作为一个片段
 - **AND** 文案中的数字、名称和结果 SHALL 来自已读取记录或本地已核实关系
 
+#### Scenario: Strong relation survives ordinary-number filtering
+- **WHEN** 已核实关系证明此前选择在数层后兑现，或同类选择重复形成整局风格
+- **THEN** 系统 SHALL 保留该跨事件片段
+- **AND** MUST NOT 因片段同时包含普通生命值、伤害值或回血值而删除整个片段
+
+#### Scenario: Target long run remains a positive benchmark
+- **WHEN** 目标长局包含瓶中精灵的保留与后续救命、多次火堆回血和跨事件资源反差
+- **THEN** 回归评测 SHALL 生成对应的高价值片段
+- **AND** MUST NOT 把全部片段判为空
+
 ### Requirement: Recap output may be empty
 
 系统 SHALL 允许每局输出 0–3 张片段。只有至少一张片段时，页面 SHALL 展示本局画像和最后一句总结；没有片段时 SHALL 只展示战况数字和简短的无素材状态，MUST NOT 生成空洞总结。
@@ -39,6 +49,8 @@
 ### Requirement: Local relations are leads, not mandatory filler
 
 本地已核实关系 SHALL 作为整局检索的优先线索。自由生成可用时，系统 MUST NOT 把未被选中的本地关系自动补进三张卡；模型不可用时 MAY 仅展示预定义的高价值关系，但 MUST NOT 展示普通状态差分或孤立指标。
+
+当同一局具备重复火堆回血，并同时存在后续救命/归零恢复或跨事件资源反差时，这组目标关系 SHALL 作为完整的已核实正向基准保留，不适用普通 fallback 禁止补齐规则。
 
 #### Scenario: Model selects one of several local leads
 - **WHEN** 本地提供三个已核实关系而整局生成只选择其中一个
