@@ -38,19 +38,20 @@ for (const row of manifest.cases) {
   });
 }
 
-test('the model can investigate but cannot publish unsupported free text', async () => {
+test('the model can investigate but cannot publish unsupported or low-interest free text', async () => {
   const fixture = JSON.parse(fs.readFileSync(path.join(directory, 'upgrade-never-drawn.json'), 'utf8'));
   let rounds = 0;
-  const llm = { enabled: true, completeRecapTurn: async () => {
+  const llm = { enabled: true, completeRecapTurn: async input => {
+    if (input.stage === 'closing') return { portrait: '', closing: '升级刚落锤，下一战却没等到它上手。' };
     rounds++;
     return rounds === 1
       ? { tool_calls: [{ name: 'find_events', args: { eventTypes: ['rest.action_completed'] } }] }
-      : { candidates: [fixture.expected.candidate,
+      : { candidates: [{ ...fixture.expected.candidate, interest: 'contrast' },
         { pattern: 'upgrade_not_used', eventId: 'fabricated-event' }] };
   } };
   const recap = await buildRecap({ runId: fixture.runId, facts: fixture.facts,
     coverage: fixture.coverage, llm });
-  assert.equal(recap.cards.length, 1);
+  assert.equal(recap.cards.length, 0);
   assert.equal(recap.status, 'ready');
   assert.ok(recap.trace.some(row => row.name === 'find_events'));
 });

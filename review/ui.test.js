@@ -203,4 +203,13 @@ assert.match(recapHtml, /惜命&lt;script&gt;不惜债/);
 assert.doesNotMatch(recapHtml, /惜命<script>|evidenceIds|factsRevision/);
 assert.match(recapHtml, /已记录选择/);
 
+const emptyRecapHtml = window.GameBuddyReviewUi.renderRecap({
+  status: 'ready', portrait: '', cards: [], closing: '',
+  coverageNote: '本局没有找到值得单独讲的片段',
+  runSummary: { character: 'IRONCLAD', result: 'loss' },
+  battleMetrics: []
+});
+assert.match(emptyRecapHtml, /本局没有找到值得单独讲的片段/);
+assert.doesNotMatch(emptyRecapHtml, /review-recap-card-index|review-recap-closing|review-recap-portrait/);
+
 console.log('Review UI tests passed.');

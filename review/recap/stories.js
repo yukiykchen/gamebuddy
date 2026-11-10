@@ -171,7 +171,10 @@ function storyPriority(card) {
     health_recovery: 100, overkill: 95, upgrade_not_used: 90, upgrade_no_energy: 90,
     rest_max_hp_growth: 75, low_hp_inventory: 20 })[card.verifiedKind] ?? 80;
 }
-function localStories(timeline) {
+function highValueLocalStory(card) {
+  return card?.verifiedKind !== 'low_hp_inventory';
+}
+function localStories(timeline, { highValueOnly = false } = {}) {
   const candidates = timeline.facts.flatMap(f => f.eventType === 'rest.action_completed'
     ? [{ pattern: 'upgrade_no_energy', eventId: f.eventId }, { pattern: 'upgrade_not_used', eventId: f.eventId }]
     : f.eventType === 'damage.resolved' ? [{ pattern: 'overkill', eventId: f.eventId }] : []);
@@ -180,7 +183,8 @@ function localStories(timeline) {
   const relations = observedRelations(timeline).map(relationCandidate).filter(Boolean);
   const all = [...relations, ...candidates.filter(candidate => story(timeline, candidate))]
     .sort((a, b) => storyPriority({ verifiedKind: b.pattern }) - storyPriority({ verifiedKind: a.pattern }));
-  return selectStories(timeline, all);
+  const selected = selectStories(timeline, all);
+  return highValueOnly ? selected.filter(highValueLocalStory) : selected;
 }
 function relationCandidate(relation) {
   const { kind, fields, relationId, evidenceIds } = relation;
@@ -256,4 +260,5 @@ function candidateDiagnostics(timeline, candidates) {
     reminder: '按实际绑定后长度检查：标题10字、正文40字；完整引用关系所有evidenceIds；无法支持的候选应放弃，不用普通经过凑数。' };
   });
 }
-module.exports = { story, groundedStory, selectStories, localStories, candidateDiagnostics, storyKeys, storyPriority, localClosing, localPortrait };
+module.exports = { story, groundedStory, selectStories, localStories, highValueLocalStory,
+  candidateDiagnostics, storyKeys, storyPriority, localClosing, localPortrait };

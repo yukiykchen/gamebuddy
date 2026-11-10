@@ -126,6 +126,44 @@ test('generated cards publish without a later semantic review', async () => {
   assert.equal(recap.cards.length, 1); assert.equal(recap.cards[0].title, '普通经过');
   assert.deepEqual(stages, ['investigate', 'closing']);
 });
+test('a free-form story needs an interest reason and a prior investigation read', async () => {
+  const f = base(), c = candidate(f), ended = f.facts.find(e => e.eventType === 'run.ended');
+  c.interest = 'payoff'; c.evidenceIds.push(ended.eventId);
+  const withoutRead = await buildRecap({ ...f, llm: { enabled: true, completeRecapTurn: async input =>
+    input.stage === 'repair' ? { candidates: [c] } : { candidates: [c] } } });
+  assert.deepEqual(withoutRead.cards, []);
+  const stages = [];
+  const withRead = await buildRecap({ ...f, llm: { enabled: true, completeRecapTurn: async input => {
+    stages.push(input.stage);
+    if (input.stage === 'closing') return { portrait: '', closing: '升级后的牌，下一战却没等到上场。' };
+    if (!input.history.length) return { tool_calls: [{ name: 'read_event_window',
+      args: { anchorEventId: c.evidenceIds[0], before: 1, after: 2, includeSnapshots: true } }] };
+    return { candidates: [c] };
+  } } });
+  assert.equal(withRead.cards.length, 1);
+  assert.ok(withRead.trace.some(row => row.phase === 'tool' && row.name === 'read_event_window'));
+  assert.ok(!stages.includes('validate'));
+});
+test('the model can select one local lead without automatic fallback filling', async () => {
+  const { localStories } = require('./stories');
+  const f = realLong(), lead = localStories(timeline(f)).find(card => card.pattern === 'rest_choice_style');
+  const selected = { ...lead, bodyTemplate: '{{n}}次火堆全选回血，{{hp}}/{{max}}血也不打铁。',
+    bindings: { n: { claimIndex: 0 }, hp: { claimIndex: 1 }, max: { claimIndex: 2 } } };
+  const recap = await buildRecap({ ...f, maxRounds: 0, llm: { enabled: true, completeRecapTurn: async input => {
+    if (input.stage === 'closing') return { portrait: '', closing: '火堆一路选回血，养生比打铁更执着。' };
+    return { candidates: [selected] };
+  } } });
+  assert.deepEqual(recap.cards.map(card => card.pattern), ['rest_choice_style']);
+});
+test('an empty model selection clears local cards, portrait and closing', async () => {
+  const f = realLong();
+  const recap = await buildRecap({ ...f, maxRounds: 0, llm: { enabled: true,
+    completeRecapTurn: async () => ({ candidates: [] }) } });
+  assert.deepEqual(recap.cards, []);
+  assert.equal(recap.portrait, '');
+  assert.equal(recap.closing, '');
+  assert.equal(recap.status, 'ready');
+});
 test('fully observed no-damage player turns produce a known zero rather than unknown', () => {
   const f = base(); f.facts = f.facts.filter(e => e.eventType !== 'damage.resolved' || e.payload.sourceSide !== 'player');
   assert.equal(fixedMetrics(timeline(f))[0].value, 0);
@@ -140,6 +178,16 @@ test('overkill 9999 on 10 HP counts 10 actual burst and 9999 lethal hit', () => 
   insert(f, 'damage.resolved', { sourceSide: 'Player', targetSide: 'Enemy', turn: 1, side: 'Player', hpLoss: 10,
     resolvedDamageBeforeHpCap: 9999, targetHpBefore: 10, fatal: true });
   const metrics = fixedMetrics(timeline(f)); assert.equal(metrics[0].value, 10); assert.equal(metrics[1].value, 9999);
+});
+test('turn burst sums several hits in one player turn rather than requiring one equal hit', () => {
+  const f = base(); f.facts = f.facts.filter(e => e.eventType !== 'damage.resolved');
+  insert(f, 'damage.resolved', { sourceSide: 'Player', targetSide: 'Enemy', turn: 1, side: 'Player',
+    hpLoss: 20, resolvedDamageBeforeHpCap: 20, targetHpBefore: 100, fatal: false });
+  insert(f, 'damage.resolved', { sourceSide: 'Player', targetSide: 'Enemy', turn: 1, side: 'Player',
+    hpLoss: 30, resolvedDamageBeforeHpCap: 30, targetHpBefore: 80, fatal: false });
+  const burst = fixedMetrics(timeline(f))[0];
+  assert.equal(burst.value, 50);
+  assert.ok(f.facts.filter(e => e.eventType === 'damage.resolved').every(e => e.payload.hpLoss < burst.value));
 });
 
 test('numeric payload values marked unknown never become a record or overkill story', () => {
@@ -212,7 +260,6 @@ test('replaying actual weak-model responses keeps rejected stories out even if i
       if (input.stage === 'closing') return { closing: '这些片段留下了本局的选择与转折。' };
       return { candidates: row.candidates };
     } } });
-    assert.ok(recap.cards.length > 0);
     assert.ok(recap.cards.every(c => !row.forbiddenTitles.includes(c.title)));
     assert.ok(recap.cards.every(c => !/痛击次|true次|飞剑打击/.test(c.body)));
   }
@@ -333,7 +380,7 @@ const realLong = () => clone(realObservationCases.cases.find(c => c.runId.starts
 test('real legacy observations recover the three grounded long-run relations without inventing metrics', async () => {
   const f = realLong(), recap = await buildRecap({ ...f, llm: null });
   assert.deepEqual(recap.fixedMetrics.map(m => m.value), [null, null, null, null]);
-  assert.deepEqual(recap.cards.map(c => c.pattern), ['health_recovery', 'rest_choice_style', 'low_hp_inventory']);
+  assert.deepEqual(recap.cards.map(c => c.pattern), ['health_recovery', 'rest_choice_style']);
   assert.ok(recap.cards[0].body.includes('37'));
   assert.ok(recap.cards[1].body.includes('6次') && recap.cards[1].body.includes('61/80'));
   assert.ok(recap.choiceStats.some(s => s.label === '休息增加生命上限' && s.display === '+30'));
@@ -426,7 +473,7 @@ test('known-relation summaries stay within typed facts and strongest moments com
     if (input.stage === 'validate') return { verdicts: input.supportPackets.map(p => ({ index: p.index, supported: true, issues: [] })) };
     return { candidates };
   } } });
-  assert.deepEqual(recap.cards.map(c => c.pattern), ['health_recovery', 'rest_choice_style', 'low_hp_inventory']);
+  assert.deepEqual(recap.cards.map(c => c.pattern), ['health_recovery', 'rest_choice_style']);
   assert.equal(closingCalls, 0);
   assert.ok(!recap.closing.includes('没动'));
 });
