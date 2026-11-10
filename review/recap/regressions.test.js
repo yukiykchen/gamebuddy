@@ -77,13 +77,13 @@ test('the real HTTP adapter carries every prior result and full tool contracts i
   const f = base(), requests = [], c = candidate(f);
   const responses = [ { tool_calls: [{ name: 'find_events', args: { eventTypes: ['rest.action_completed'] } }] },
     { tool_calls: [{ name: 'inspect_subject', args: { subjectId: 'deck-bash', combatId: 'elite-bygone-effigy' } }] },
-    { candidates: [c] }, { verdicts: [{ index: 0, supported: true }] }, { closing: '这次的选择，也留下了值得回味的一笔。' } ];
+    { candidates: [c] }, { closing: '这次的选择，也留下了值得回味的一笔。' } ];
   const llm = createOpenAiClient({ enabled: true, apiKey: 'test-not-a-secret', baseURL: 'https://example.invalid/v1', model: 'mock', wireApi: 'chat' }, { fetchImpl: async (url, options) => {
     requests.push(JSON.parse(options.body));
     return { ok: true, json: async () => ({ choices: [{ message: { content: JSON.stringify(responses.shift()) } }] }) };
   } });
   const recap = await buildRecap({ runId: f.runId, facts: f.facts, coverage: f.coverage, llm });
-  assert.equal(recap.status, 'ready'); assert.equal(recap.cards.length, 1); assert.equal(requests.length, 5);
+  assert.equal(recap.status, 'ready'); assert.equal(recap.cards.length, 1); assert.equal(requests.length, 4);
   const third = JSON.parse(requests[2].messages.find(m => m.role === 'user').content);
   assert.equal(third.history.length, 2); assert.equal(third.history[0].results[0].name, 'find_events');
   assert.ok(third.tools.every(t => t.parameters && t.description)); assert.ok(recap.closing);
@@ -97,8 +97,8 @@ test('temporary model failures retry, concurrent reads deduplicate, successful r
       calls++; if (fail) throw Error('temporary'); return input.stage === 'closing' ? { closing: '选择之后，总有回响。' } : input.stage === 'validate' ? { verdicts: [{ index: 0, supported: true }] } : { candidates: [candidate(f)] };
     } }) });
   await Promise.all([store.get(f.runId), store.get(f.runId)]); assert.equal(calls, 1);
-  fail = false; await store.get(f.runId); assert.equal(calls, 4);
-  await store.get(f.runId); assert.equal(calls, 4);
+  fail = false; await store.get(f.runId); assert.equal(calls, 3);
+  await store.get(f.runId); assert.equal(calls, 3);
 });
 test('clearing a pending generation aborts it without recreating deleted run data', async t => {
   const f = base(), directory = fs.mkdtempSync(path.join(os.tmpdir(), 'recap-clear-')); let reads = 0, finish;
@@ -116,15 +116,15 @@ test('local preview discovers a late-run story after many ordinary damage events
   const cards = localStories(timeline(f));
   assert.ok(cards.some(c => c.pattern === 'upgrade_not_used'));
 });
-test('a semantic rejection cannot suppress a better story sharing the same event', async () => {
-  const f = base(), c = candidate(f); let rounds = 0;
+test('generated cards publish without a later semantic review', async () => {
+  const f = base(), c = candidate(f); const stages = [];
   const recap = await buildRecap({ ...f, llm: { enabled: true, completeRecapTurn: async input => {
-    rounds++;
-    if (input.stage === 'validate') return { verdicts: [{ index: 0, supported: false, reason: 'ordinary narration' }, { index: 1, supported: true }] };
+    stages.push(input.stage);
     if (input.stage === 'closing') return { closing: '这次选择留下了回响。' };
     return { candidates: [{ ...c, title: '普通经过' }, { ...c, title: '值得记住' }] };
   } } });
-  assert.equal(recap.cards.length, 1); assert.equal(recap.cards[0].title, '值得记住'); assert.equal(rounds, 3);
+  assert.equal(recap.cards.length, 1); assert.equal(recap.cards[0].title, '普通经过');
+  assert.deepEqual(stages, ['investigate', 'closing']);
 });
 test('fully observed no-damage player turns produce a known zero rather than unknown', () => {
   const f = base(); f.facts = f.facts.filter(e => e.eventType !== 'damage.resolved' || e.payload.sourceSide !== 'player');
@@ -386,13 +386,18 @@ test('a candidate submitted on the last investigation response still gets one bo
   assert.ok(recap.trace.some(x => x.phase === 'repair'));
   assert.ok(recap.cards.some(c => c.verifiedKind === 'health_recovery' && c.body.includes('37') && c.rendering === 'canonical_known_relation'));
 });
-test('a semantic approval that still requires factual correction cannot publish the candidate', async () => {
+test('a grounded candidate publishes even when a later review would have asked for edits', async () => {
   const { localStories } = require('./stories');
   const f = realLong(), card = localStories(timeline(f))[0];
   const c = { ...card, title: '模型待修版', bodyTemplate: '生命从{{a}}回到{{b}}血。', bindings: { a: { claimIndex: 0 }, b: { claimIndex: 1 } } };
-  const recap = await buildRecap({ ...f, maxRounds: 0, llm: { enabled: true, completeRecapTurn: async input =>
-    input.stage === 'validate' ? { verdicts: [{ index: 0, supported: true, reason: '但此处还缺来源，建议修改。' }] } : { candidates: [c] } } });
-  assert.ok(recap.cards.every(c => c.title !== '模型待修版'));
+  const stages = [];
+  const recap = await buildRecap({ ...f, maxRounds: 0, llm: { enabled: true, completeRecapTurn: async input => {
+    stages.push(input.stage);
+    if (input.stage === 'closing') return { closing: '血条重新亮了起来。' };
+    return { candidates: [c] };
+  } } });
+  assert.ok(recap.cards.length > 0);
+  assert.ok(!stages.includes('validate'));
 });
 test('holding potions cannot be rewritten as confirmed death', () => {
   const { localStories, candidateDiagnostics } = require('./stories');
@@ -462,17 +467,18 @@ test('free model pattern and provenance fields cannot manufacture a health-recov
   } } });
   assert.equal(recap.status, 'ready'); assert.ok(!/归零|恢复/.test(recap.closing));
 });
-test('identical rendered repair candidates are deduplicated before expensive semantic validation', async () => {
+test('identical rendered repair candidates are deduplicated without a later review', async () => {
   const { localStories } = require('./stories');
   const f = realLong(), card = localStories(timeline(f))[0];
   const c = { ...card, bodyTemplate: '生命从{{zero}}回到{{hp}}血。', bindings: { zero: { claimIndex: 0 }, hp: { claimIndex: 1 } } };
-  let validationCount = null;
+  const stages = [];
   const recap = await buildRecap({ ...f, maxRounds: 0, llm: { enabled: true, completeRecapTurn: async input => {
+    stages.push(input.stage);
     if (input.stage === 'repair') return { candidates: [c, clone(c)] };
-    if (input.stage === 'validate') { validationCount = input.supportPackets.length; return { verdicts: [{ index: 0, supported: true, issues: [] }] }; }
+    if (input.stage === 'closing') return { closing: '血条重新亮了起来。' };
     return { candidates: [c, { ...c, bodyTemplate: '一次治疗后恢复。' }] };
   } } });
-  assert.equal(validationCount, 1);
+  assert.ok(!stages.includes('validate'));
   assert.ok(recap.trace.some(x => x.phase === 'exact_deduplication' && x.after === 1));
 });
 test('real recovery and the later third act form one card, while a reload removes only the continuation', () => {
