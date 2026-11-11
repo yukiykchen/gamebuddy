@@ -89,8 +89,19 @@ function namedThreats(knowledge) {
   };
 }
 
+// The shop's card removal service refuses Eternal cards. Match the game's CardKeyword enum
+// key, which is stable across languages, instead of the localized keyword text: the catalog
+// stores "永恒" for zh and "Eternal" for en, so a text match silently misses one of them.
+function isRemovableCard(card) {
+  const keys = card?.keywords_key || card?.keywordsKey || [];
+  return !keys.some(key => String(key).toLowerCase() === 'eternal');
+}
+
 function removeTarget(deck) {
-  const candidates = (deck || []).map((card, index) => {
+  const candidates = (deck || [])
+    .map((card, index) => ({ card, index }))
+    .filter(entry => isRemovableCard(entry.card))
+    .map(({ card, index }) => {
     const name = card.name || card.id || `第 ${index + 1} 张牌`;
     const text = `${card.id || ''} ${name} ${card.type || card.type_key || ''}`;
     let score = 20;
@@ -212,7 +223,9 @@ function analyzeItems(shop, state, knowledge) {
   const threats = upcomingThreats(state, { context: {} });
   const tags = threatTags(knowledge, threats);
   const cardByKey = new Map((knowledge.cards || []).map(card => [normalizeKey(card.id || card.name), card]));
-  const target = removeTarget(knowledge.deckCards || state?.player?.cards || []);
+  const removalDeck = knowledge.deckCards || state?.player?.cards || [];
+  const target = removeTarget(removalDeck);
+  const nothingRemovable = removalDeck.length > 0 && !removalDeck.some(isRemovableCard);
   return shop.items.map(item => {
     const base = {
       index: item.index,
@@ -242,7 +255,7 @@ function analyzeItems(shop, state, knowledge) {
     const analysis = {
       effect: '从牌组中永久删除一张牌。',
       pros: target ? [target.reason, '牌组更精简后更容易抽到核心牌'] : [],
-      cons: target ? [] : ['没有找到明确值得删除的牌'],
+      cons: target ? [] : [nothingRemovable ? '牌组里的牌都是永恒牌，删牌服务删不掉它们' : '没有找到明确值得删除的牌'],
       removeTarget: target
     };
     return { ...base, score: item.price === null ? 0 : priceAdjustedScore(raw, item.price, 'service', item.onSale), analysis };
@@ -250,7 +263,10 @@ function analyzeItems(shop, state, knowledge) {
 }
 
 function combinations(items, gold, maxItems = 3) {
+  // A removal service with no removable card left in the deck is not a legal purchase: it
+  // would be listed, paid for, and then have nothing to delete.
   const legal = items.filter(item => item.affordable && item.stocked && Number.isFinite(item.price) && item.price <= gold)
+    .filter(item => !(item.itemType === 'service' && !item.analysis?.removeTarget))
     .sort((left, right) => right.score - left.score || left.price - right.price)
     .slice(0, 12);
   const output = [];
