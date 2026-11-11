@@ -24,6 +24,10 @@ function encounterKind(state) {
   return 'Normal';
 }
 
+function shouldAutoOpenEncounterGuide(guide) {
+  return ['elite','boss'].includes(String(guide?.kind || '').toLowerCase());
+}
+
 function encounterGuideSignature(state) {
   const kind = encounterKind(state);
   if (!kind) return '';
@@ -288,4 +292,4 @@ async function buildEncounterGuide(state, { codex = codexClient, now = Date.now(
   }
 }
 
-module.exports = { encounterKind, encounterGuideSignature, buildEncounterGuide, moveText, dangerAndTips, mechanicStrategy };
+module.exports = { encounterKind, encounterGuideSignature, buildEncounterGuide, moveText, dangerAndTips, mechanicStrategy, shouldAutoOpenEncounterGuide };

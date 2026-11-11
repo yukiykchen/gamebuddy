@@ -1,0 +1,118 @@
+[
+  {
+    "schema": "gamebuddy.fact-event.v1",
+    "eventVersion": 1,
+    "eventId": "fixture-full:1",
+    "eventType": "capture.capability_reported",
+    "runId": "run-full",
+    "sourceSessionId": "fixture-full",
+    "sourceSeq": 1,
+    "occurredAt": 1001,
+    "quality": { "observationMethod": "direct_hook", "unknownFields": [], "unknownReasons": {} },
+    "payload": {
+      "capabilities": {
+        "lifecycle": { "state": "available" },
+        "decisions": { "state": "available" },
+        "card_play": { "state": "available" },
+        "damage": { "state": "unavailable", "reason": "fixture_hook_unavailable" }
+      }
+    }
+  },
+  {
+    "schema": "gamebuddy.fact-event.v1",
+    "eventVersion": 1,
+    "eventId": "fixture-full:2",
+    "eventType": "run.started",
+    "runId": "run-full",
+    "sourceSessionId": "fixture-full",
+    "sourceSeq": 2,
+    "occurredAt": 1002,
+    "quality": { "observationMethod": "direct_hook", "unknownFields": [], "unknownReasons": {} },
+    "payload": { "character": "IRONCLAD", "ascension": 1 }
+  },
+  {
+    "schema": "gamebuddy.fact-event.v1",
+    "eventVersion": 1,
+    "eventId": "fixture-full:3",
+    "eventType": "reward.offered",
+    "runId": "run-full",
+    "decisionId": "reward-1",
+    "sourceSessionId": "fixture-full",
+    "sourceSeq": 3,
+    "occurredAt": 1003,
+    "quality": { "observationMethod": "direct_hook", "unknownFields": [], "unknownReasons": {} },
+    "payload": { "candidateVersion": 1, "slots": [{ "slot": 0, "cardId": "BASH" }] }
+  },
+  {
+    "schema": "gamebuddy.fact-event.v1",
+    "eventVersion": 1,
+    "eventId": "fixture-full:4",
+    "eventType": "reward.resolved",
+    "runId": "run-full",
+    "decisionId": "reward-1",
+    "sourceSessionId": "fixture-full",
+    "sourceSeq": 4,
+    "occurredAt": 1004,
+    "quality": {
+      "observationMethod": "unknown",
+      "unknownFields": ["outcome"],
+      "unknownReasons": { "outcome": "not_observed" }
+    },
+    "payload": { "outcome": "unknown" }
+  },
+  {
+    "schema": "gamebuddy.fact-event.v1",
+    "eventVersion": 1,
+    "eventId": "fixture-full:5",
+    "eventType": "combat.started",
+    "runId": "run-full",
+    "combatId": "combat-boss",
+    "sourceSessionId": "fixture-full",
+    "sourceSeq": 5,
+    "occurredAt": 1005,
+    "attemptGeneration": 0,
+    "quality": { "observationMethod": "direct_hook", "unknownFields": [], "unknownReasons": {} },
+    "payload": { "roomType": "Boss", "encounterId": "TEST_SUBJECT_BOSS" }
+  },
+  {
+    "schema": "gamebuddy.fact-event.v1",
+    "eventVersion": 1,
+    "eventId": "fixture-full:6",
+    "eventType": "card.played",
+    "runId": "run-full",
+    "combatId": "combat-boss",
+    "actionId": "play-1",
+    "sourceSessionId": "fixture-full",
+    "sourceSeq": 6,
+    "occurredAt": 1006,
+    "attemptGeneration": 0,
+    "quality": { "observationMethod": "direct_hook", "unknownFields": [], "unknownReasons": {} },
+    "payload": { "cardId": "BASH", "cardType": "Attack", "playMode": "manual" }
+  },
+  {
+    "schema": "gamebuddy.fact-event.v1",
+    "eventVersion": 1,
+    "eventId": "fixture-full:7",
+    "eventType": "combat.ended",
+    "runId": "run-full",
+    "combatId": "combat-boss",
+    "sourceSessionId": "fixture-full",
+    "sourceSeq": 7,
+    "occurredAt": 1007,
+    "attemptGeneration": 0,
+    "quality": { "observationMethod": "direct_hook", "unknownFields": [], "unknownReasons": {} },
+    "payload": { "victory": true, "encounterId": "TEST_SUBJECT_BOSS" }
+  },
+  {
+    "schema": "gamebuddy.fact-event.v1",
+    "eventVersion": 1,
+    "eventId": "fixture-full:8",
+    "eventType": "run.ended",
+    "runId": "run-full",
+    "sourceSessionId": "fixture-full",
+    "sourceSeq": 8,
+    "occurredAt": 1008,
+    "quality": { "observationMethod": "direct_hook", "unknownFields": [], "unknownReasons": {} },
+    "payload": { "cleared": true, "endReason": "architect", "floor": 48 }
+  }
+]

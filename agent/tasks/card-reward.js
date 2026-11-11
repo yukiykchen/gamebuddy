@@ -1,6 +1,8 @@
 const { SCHEMA } = require('../recommendation');
 const { createSpireCodexClient, normalizeKey, stripMarkup, inferUpgraded } = require('../knowledge/spire-codex');
 const { cardSearchText, deriveMechanicTags, isStatusGenerationTrigger, inferOrbGeneration } = require('../knowledge/mechanic-tags');
+const { decorateCardGuidance: decorateIroncladArchetypes, buildStrategyContext } = require('../knowledge/card-guidance');
+const { cardDecisionPool, cardDecisionReason } = require('../knowledge/build-decision-guard');
 
 const codexClient = createSpireCodexClient();
 
@@ -553,7 +555,15 @@ async function recommendCardReward(observation, { llm, now = Date.now(), codex =
   const threats = upcomingThreats(state, reward);
   const enemyTags = threatTagSet(knowledge, threats);
   const stats = coachMap(knowledge.coach);
-  const options = knowledge.cards.map(card => analyzeCard(card, state, context, threats, stats.get(normalizeKey(card.id || card.name)), enemyTags))
+  const options = decorateIroncladArchetypes(
+    state.run?.character,
+    knowledge.deckCards || state.player?.cards || [],
+    knowledge.relics || state.player?.relics || [],
+    knowledge.cards.map(card => (
+      analyzeCard(card, state, context, threats, stats.get(normalizeKey(card.id || card.name)), enemyTags)
+    )),
+    {hp:state.player?.hp,maxHp:state.player?.maxHp}
+  )
     .sort((left, right) => right.score - left.score || left.name.localeCompare(right.name, 'zh-CN'));
   if (!options.length) return null;
 
@@ -562,12 +572,16 @@ async function recommendCardReward(observation, { llm, now = Date.now(), codex =
   if (skip >= 0) candidates.push({ action: 'SKIP', score: skip, label: '跳过奖励' });
   candidates.sort((left, right) => right.score - left.score);
 
-  let chosen = candidates[0];
+  const decisionPool = cardDecisionPool(candidates);
+  let chosen = candidates[decisionPool.allowedIndexes[0]];
   let source = 'rules';
   let reason = explanation(chosen, threats, knowledge);
   if (llm?.enabled && typeof llm.completeCardReward === 'function') {
     try {
       const pick = await llm.completeCardReward({
+        strategyContext:buildStrategyContext(state.run?.character,knowledge.deckCards || state.player?.cards || [],knowledge.relics || state.player?.relics || []),
+        allowedIndexes:decisionPool.allowedIndexes,
+        forcedRiskChoice:decisionPool.forced,
         gameVersion: knowledge.cards[0]?.evaluation?.gameVersion || null,
         player: {
           act: state.run?.act,
@@ -629,22 +643,28 @@ async function recommendCardReward(observation, { llm, now = Date.now(), codex =
               pros: candidate.card.pros,
               cons: candidate.card.cons,
               knowledgeEvaluation: candidate.card.knowledgeEvaluation,
+              buildPolicy: candidate.card.buildPolicy,
+              buildGuidance: candidate.card.buildGuidance,
               trigger: candidate.card.trigger || null,
               synergy: candidate.card.synergy || null,
               bossFit: candidate.card.fit.boss,
               eliteFit: candidate.card.fit.elite
             })
       });
-      if (!Number.isInteger(pick?.index) || !candidates[pick.index]) return null;
-      chosen = candidates[pick.index];
-      source = 'llm';
-      reason = pick.reason?.trim() || explanation(chosen, threats, knowledge);
+      if (Number.isInteger(pick?.index) && decisionPool.allowedIndexes.includes(pick.index)) {
+        chosen = candidates[pick.index];
+        source = 'llm';
+        reason = pick.reason?.trim() || explanation(chosen, threats, knowledge);
+      }
     } catch {
-      return null;
+      // 失败或越界选择保留已验证的规则候选。
     }
   }
 
-  return toCardRecommendation(chosen, candidates, options, context, threats, knowledge, state, source, reason, now);
+  reason=cardDecisionReason(chosen,candidates,reason,decisionPool.forced);
+  const result=toCardRecommendation(chosen, candidates, options, context, threats, knowledge, state, source, reason, now);
+  result.strategyDecision={allowedIndexes:decisionPool.allowedIndexes,forcedRiskChoice:decisionPool.forced};
+  return result;
 }
 
 function cardRewardSignature(observation) {

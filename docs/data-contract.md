@@ -1,6 +1,6 @@
 # GameBuddy 数据契约
 
-GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责把当前可观测状态和事件通过本地 WebSocket 推送给桌面应用，桌面应用负责展示、缓存和调用决策引擎。
+GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 将当前可观测状态和事件通过本地 WebSocket 推送给桌面应用，并在选牌奖励页显示桌面端回传的只读流派度标签；桌面应用负责展示、缓存和调用决策引擎。
 
 ## 当前状态消息
 
@@ -55,6 +55,7 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
         "maxHp": 96,
         "block": 0,
         "intent": "AttackIntent",
+        "intentKinds": ["attack"],
         "alive": true
       }
     ]
@@ -135,6 +136,7 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
     "cards": [
       { "id": "ANGER", "name": "愤怒", "type": "Attack", "cost": 0, "upgraded": false, "description": "造成6点伤害。将一张此牌的复制品放入你的弃牌堆。", "descriptionSource": "runtime", "energyCost": 0, "energyCostX": false, "energyCostSource": "runtime", "starCost": null, "starCostX": false, "starCostSource": "runtime" }
     ],
+    "signature": "ANGER:False|SEVEN_STARS:True|X_CARD:False",
     "canSkip": true,
     "source": "combat",
     "context": { "act": 1, "actId": "OVERGROWTH", "floor": 6, "defeatedType": "Elite", "defeatedEnemies": ["劫掠者"], "nextBossId": "CEREMONIAL_BEAST_BOSS", "nextBoss": "仪式兽" }
@@ -189,6 +191,14 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
 ```
 
 玩家选牌、跳过奖励或以其他方式关闭奖励层时，Mod 发送 `card.reward.closed`。桌面端收到后会立即取消尚未完成的卡牌 LLM 请求、停止思考动画并清除旧建议；后续只有新的 `card.reward.opened` 才能再次触发选牌 Agent。
+
+铁甲战士奖励页打开后，桌面端立即计算每张牌对自动打击流派度的增量，并通过同一条本地 WebSocket 回传：
+
+```json
+{ "type": "draft_impact", "signature": "ANGER:False|SEVEN_STARS:True|X_CARD:False", "impacts": [{ "cardId": "ANGER", "deltaPoints": 0 }] }
+```
+
+Mod 仅接受与当前奖励签名和候选 ID 对应的整数增量，在各卡牌上方显示；奖励刷新或关闭时清理标签。该消息只改变游戏内的辅助文字，不触发选牌或其他游戏操作。
 
 选牌 LLM 对候选牌和完整牌组都接收 `upgraded`、`description`、`descriptionSource`、结构化 `costs` 和 `contextCompleteness`。实机值优先于目录；`contextCompleteness=partial` 或来源为 `unavailable` 时，模型提示词明确禁止猜测缺失效果与费用。
 
@@ -246,6 +256,12 @@ Spire Codex API 默认地址为 `https://spire-codex.com/api`，可用 `GAMEBUDD
 `strategy` 字段包括 `summary`、`dangerWindows`、`deckChecks`、`priorityTargets`、`tips`、`avoid`、`confidence`、`reviewStatus`、`basis` 和可追溯的 `sources`。stable `v0.107.1` 的 12 个 Boss 和 12 个精英优先按稳定 ID 使用 `encounter-strategies.json` 的社区复核档案，此时 `basis=community`。Spire Codex 收录的 63 个普通遭遇按当前 Act 和实际敌人组合匹配；没有人工档案时使用确定机制生成同结构建议，标记 `basis=mechanics` 与 `reviewStatus=mechanic-derived`，界面不会显示社区来源数量。目录无法匹配时只给保守提示，不猜测具体机制。
 
 同一份 `strategy` 也会挂到卡牌奖励 Agent 的 `threats.knownBoss`、`possibleElites` 和 `knownUpcomingElites` 上，并随完整遭遇上下文送入 LLM。这样模型评判奖励牌时能针对具体遭遇的牌组检查和常见失误，而不是只看到笼统的 Boss / Elite 标签。
+
+## 确定性弹幕
+
+弹幕是表达层，不参与决策。运行时只消费 Mod 当前事实、本地 Spire Codex 事实和已经发布的 `gamebuddy.recommendation.v1`，不调用弹幕大模型，不检索外部语料，也不读取 B 站弹幕库。怪物入场弹幕展示遭遇标题；行动弹幕由 `agent/danmaku/action-dialogue.js` 按当前行动的机制分类，从固定技能词库选择修饰词和台词；完整攻击循环、危险点、建议、行动效果和来源放在悬停详情中。`card_reward`（包括商店卡牌）、`map_route`、`rest_site` 和 `event_choice` 建议发布后都会生成一条短弹幕，选项效果和建议理由放在悬停详情中。所有已经入队的弹幕都完整跑过屏幕，不因来源或优先级截断。
+
+共享弹幕是可选的低频 HTTP 表达层，不参与决策。客户端只上传和请求脱敏后的 `sceneKey`，主键格式为“游戏版本:职业:combat:怪物组合”；时机只有 `combat`（战斗中）和 `death`（死亡）。生命、手牌、金币和具体回合只作为本地标签，不进入主键。共享服务不可用时，本地固定弹幕照常工作。
 
 路线任务在没有配置 LLM 时用规则打分：每个节点拆成**收益**和**风险**，并在安全、平衡与成长三个视角下评价。生命 ≥65% 视为健康并采用成长视角，35%～65% 采用平衡视角，生命 ≤35% 视为危险并采用安全视角。精英按遗物缺口和生命评估，火堆考虑回血与升级，商店按金币和删牌需求估计价值；路线还会考虑后续分叉带来的调整空间和连续战斗压力。精英附近的火堆、精英前的宝箱只在相邻或隔一层时加有限协同分，不把未来不确定收益当成保证。当前可选入口一一去重，各取最佳后续路径，再交给 LLM 受限复核；明显违背危险生命安全首选的模型选择会被拒绝。`routeProfiles` 给出三种视角的入口和相对分，`routesTruncated` 表示地图枚举未完整；分数不是胜率或伤害预测。进入休息处后，`rest-site-strategy` Skill 会逐张比较升级前后效果，并结合完整牌组、遗物、药水、地图、生命安全线和近期强敌，单独建议 **回血还是升级哪一张牌**。同一层出现多个同类型节点时，建议会携带 `targetId`、`target.row`、`target.col`、`direction` 和 `displayLabel`；当可见信息无法拉开差距时，仍保留一个暂时首选、降低置信度，并用 `uncertainty.isClose=true` 标记，而不宣称不同路线客观等价。
 

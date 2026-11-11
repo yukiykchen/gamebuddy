@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GameBuddy · 个人数据</title>
+    <link rel="stylesheet" href="./styles.css?v=leaderboard" />
+    <link rel="stylesheet" href="./run-details.css" />
+  </head>
+  <body class="review-mode">
+    <div class="app-shell">
+      <header class="titlebar">
+        <div class="brand-lockup">
+          <div>
+            <div class="brand-name">GAMEBUDDY</div>
+            <div class="brand-subtitle">PERSONAL DATA / RECAP MAY USE YOUR MODEL PROVIDER</div>
+          </div>
+        </div>
+        <div class="titlebar-center">个人数据</div>
+        <div class="titlebar-actions">
+          <button class="icon-button window-control" id="minimize-button" aria-label="最小化窗口">−</button>
+          <button class="icon-button window-control close-control" id="close-button" aria-label="关闭窗口">×</button>
+        </div>
+      </header>
+      <main id="review-root" aria-live="polite"></main>
+      <div class="toast" id="toast" role="status"></div>
+    </div>
+    <script src="./run-details-ui.js"></script>
+    <script src="./review-ui.js?v=leaderboard"></script>
+    <script src="./review-renderer.js?v=leaderboard"></script>
+  </body>
+</html>

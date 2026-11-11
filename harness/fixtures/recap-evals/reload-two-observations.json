@@ -1,0 +1,3800 @@
+{
+  "synthetic": true,
+  "game": "Slay the Spire 2",
+  "runId": "synthetic-sts2-reload-two-observations",
+  "provenance": "hand-authored deterministic fixture; not captured from game",
+  "facts": [
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:1",
+      "eventType": "capture.capability_reported",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 1,
+      "occurredAt": 101000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "capabilities": {
+          "lifecycle": {
+            "state": "available"
+          },
+          "reload_observation": {
+            "state": "available"
+          },
+          "card_play": {
+            "state": "available"
+          },
+          "card_movement": {
+            "state": "available"
+          },
+          "combat_resolution": {
+            "state": "available"
+          }
+        }
+      },
+      "synthetic": true
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:2",
+      "eventType": "run.started",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 2,
+      "occurredAt": 102000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "character": "IRONCLAD",
+        "ascension": 0,
+        "game": "Slay the Spire 2"
+      },
+      "synthetic": true
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:3",
+      "eventType": "combat.started",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 3,
+      "occurredAt": 103000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "roomType": "Normal",
+        "encounterId": "BOWLBUGS_NORMAL",
+        "deckInstanceIds": [
+          "deck-bash",
+          "deck-strike-1",
+          "deck-strike-2",
+          "deck-defend"
+        ]
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:4",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 4,
+      "occurredAt": 104000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:5",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 5,
+      "occurredAt": 105000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:6",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 6,
+      "occurredAt": 106000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:7",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 7,
+      "occurredAt": 107000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-1",
+        "turn": 1,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 36,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:8",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 8,
+      "occurredAt": 108000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:9",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 9,
+      "occurredAt": 109000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:10",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 10,
+      "occurredAt": 110000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-1",
+        "turn": 1,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 30,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:11",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 11,
+      "occurredAt": 111000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:12",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 12,
+      "occurredAt": 112000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:13",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 13,
+      "occurredAt": 113000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 5,
+        "blocked": 2,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:14",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 14,
+      "occurredAt": 114000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:15",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 15,
+      "occurredAt": 115000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:16",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 16,
+      "occurredAt": 116000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:17",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 17,
+      "occurredAt": 117000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:18",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 18,
+      "occurredAt": 118000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-1",
+        "turn": 2,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 24,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:19",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 19,
+      "occurredAt": 119000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:20",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 20,
+      "occurredAt": 120000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:21",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 21,
+      "occurredAt": 121000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-1",
+        "turn": 2,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 18,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:22",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 22,
+      "occurredAt": 122000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:23",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 23,
+      "occurredAt": 123000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:24",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 24,
+      "occurredAt": 124000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 5,
+        "blocked": 2,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:25",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 25,
+      "occurredAt": 125000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:26",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 26,
+      "occurredAt": 126000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 3,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:27",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 27,
+      "occurredAt": 127000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:28",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 28,
+      "occurredAt": 128000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:29",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 29,
+      "occurredAt": 129000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-1",
+        "turn": 3,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 12,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:30",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 30,
+      "occurredAt": 130000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:31",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 31,
+      "occurredAt": 131000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:32",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 32,
+      "occurredAt": 132000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-1",
+        "turn": 3,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 6,
+        "fatal": true
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:33",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 33,
+      "occurredAt": 133000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:34",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 34,
+      "occurredAt": 134000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 3,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:35",
+      "eventType": "combat.ended",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 35,
+      "occurredAt": 135000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "victory": true
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:36",
+      "eventType": "reward.offered",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 36,
+      "occurredAt": 136000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cards": [
+          "POMMEL_STRIKE",
+          "SHRUG_IT_OFF"
+        ]
+      },
+      "synthetic": true,
+      "decisionId": "reward-1"
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:37",
+      "eventType": "reward.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 37,
+      "occurredAt": 137000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "result": "selected",
+        "cardId": "POMMEL_STRIKE"
+      },
+      "synthetic": true,
+      "decisionId": "reward-1"
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:38",
+      "eventType": "deck.card_added",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 38,
+      "occurredAt": 138000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "POMMEL_STRIKE",
+        "cardInstanceId": "deck-pommel"
+      },
+      "synthetic": true
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:39",
+      "eventType": "combat.started",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 39,
+      "occurredAt": 139000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "roomType": "Normal",
+        "encounterId": "BOWLBUGS_NORMAL",
+        "deckInstanceIds": [
+          "deck-bash",
+          "deck-strike-1",
+          "deck-strike-2",
+          "deck-defend"
+        ]
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:40",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 40,
+      "occurredAt": 140000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:41",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 41,
+      "occurredAt": 141000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:42",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 42,
+      "occurredAt": 142000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:43",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 43,
+      "occurredAt": 143000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-2",
+        "turn": 1,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 36,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:44",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 44,
+      "occurredAt": 144000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:45",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 45,
+      "occurredAt": 145000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:46",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 46,
+      "occurredAt": 146000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-2",
+        "turn": 1,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 30,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:47",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 47,
+      "occurredAt": 147000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:48",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 48,
+      "occurredAt": 148000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:49",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 49,
+      "occurredAt": 149000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 5,
+        "blocked": 2,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:50",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 50,
+      "occurredAt": 150000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:51",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 51,
+      "occurredAt": 151000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:52",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 52,
+      "occurredAt": 152000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:53",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 53,
+      "occurredAt": 153000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:54",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 54,
+      "occurredAt": 154000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-2",
+        "turn": 2,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 24,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:55",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 55,
+      "occurredAt": 155000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:56",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 56,
+      "occurredAt": 156000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:57",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 57,
+      "occurredAt": 157000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-2",
+        "turn": 2,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 18,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:58",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 58,
+      "occurredAt": 158000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:59",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 59,
+      "occurredAt": 159000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:60",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 60,
+      "occurredAt": 160000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 5,
+        "blocked": 2,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:61",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 61,
+      "occurredAt": 161000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:62",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 62,
+      "occurredAt": 162000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 3,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:63",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 63,
+      "occurredAt": 163000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:64",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 64,
+      "occurredAt": 164000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:65",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 65,
+      "occurredAt": 165000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-2",
+        "turn": 3,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 12,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:66",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 66,
+      "occurredAt": 166000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:67",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 67,
+      "occurredAt": 167000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:68",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 68,
+      "occurredAt": 168000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-2",
+        "turn": 3,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 6,
+        "fatal": true
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:69",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 69,
+      "occurredAt": 169000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:70",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 70,
+      "occurredAt": 170000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 3,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:71",
+      "eventType": "combat.ended",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 71,
+      "occurredAt": 171000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "victory": true
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:72",
+      "eventType": "reward.offered",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 72,
+      "occurredAt": 172000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cards": [
+          "POMMEL_STRIKE",
+          "SHRUG_IT_OFF"
+        ]
+      },
+      "synthetic": true,
+      "decisionId": "reward-2"
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:73",
+      "eventType": "reward.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 73,
+      "occurredAt": 173000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "result": "skipped",
+        "cardId": null
+      },
+      "synthetic": true,
+      "decisionId": "reward-2"
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:74",
+      "eventType": "combat.started",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 74,
+      "occurredAt": 174000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "roomType": "Normal",
+        "encounterId": "BOWLBUGS_NORMAL",
+        "deckInstanceIds": [
+          "deck-bash",
+          "deck-strike-1",
+          "deck-strike-2",
+          "deck-defend"
+        ]
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:75",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 75,
+      "occurredAt": 175000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:76",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 76,
+      "occurredAt": 176000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:77",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 77,
+      "occurredAt": 177000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:78",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 78,
+      "occurredAt": 178000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-3",
+        "turn": 1,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 36,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:79",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 79,
+      "occurredAt": 179000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:80",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 80,
+      "occurredAt": 180000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:81",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 81,
+      "occurredAt": 181000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-3",
+        "turn": 1,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 30,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:82",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 82,
+      "occurredAt": 182000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:83",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 83,
+      "occurredAt": 183000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:84",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 84,
+      "occurredAt": 184000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 5,
+        "blocked": 2,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:85",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 85,
+      "occurredAt": 185000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:86",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 86,
+      "occurredAt": 186000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:87",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 87,
+      "occurredAt": 187000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:88",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 88,
+      "occurredAt": 188000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:89",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 89,
+      "occurredAt": 189000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-3",
+        "turn": 2,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 24,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:90",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 90,
+      "occurredAt": 190000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:91",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 91,
+      "occurredAt": 191000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:92",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 92,
+      "occurredAt": 192000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-3",
+        "turn": 2,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 18,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:93",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 93,
+      "occurredAt": 193000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:94",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 94,
+      "occurredAt": 194000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:95",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 95,
+      "occurredAt": 195000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 5,
+        "blocked": 2,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:96",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 96,
+      "occurredAt": 196000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:97",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 97,
+      "occurredAt": 197000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 3,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:98",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 98,
+      "occurredAt": 198000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:99",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 99,
+      "occurredAt": 199000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:100",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 100,
+      "occurredAt": 200000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-3",
+        "turn": 3,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 12,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:101",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 101,
+      "occurredAt": 201000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:102",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 102,
+      "occurredAt": 202000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:103",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 103,
+      "occurredAt": 203000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-3",
+        "turn": 3,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 6,
+        "fatal": true
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:104",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 104,
+      "occurredAt": 204000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:105",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 105,
+      "occurredAt": 205000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 3,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:106",
+      "eventType": "combat.ended",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 106,
+      "occurredAt": 206000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "victory": true
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:107",
+      "eventType": "reward.offered",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 107,
+      "occurredAt": 207000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cards": [
+          "POMMEL_STRIKE",
+          "SHRUG_IT_OFF"
+        ]
+      },
+      "synthetic": true,
+      "decisionId": "reward-3"
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:108",
+      "eventType": "reward.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 108,
+      "occurredAt": 208000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "result": "skipped",
+        "cardId": null
+      },
+      "synthetic": true,
+      "decisionId": "reward-3"
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:109",
+      "eventType": "combat.started",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 109,
+      "occurredAt": 209000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "roomType": "Normal",
+        "encounterId": "BOWLBUGS_NORMAL",
+        "deckInstanceIds": [
+          "deck-bash",
+          "deck-strike-1",
+          "deck-strike-2",
+          "deck-defend"
+        ]
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:110",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 110,
+      "occurredAt": 210000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:111",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 111,
+      "occurredAt": 211000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:112",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 112,
+      "occurredAt": 212000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:113",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 113,
+      "occurredAt": 213000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-4",
+        "turn": 1,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 36,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:114",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 114,
+      "occurredAt": 214000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:115",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 115,
+      "occurredAt": 215000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:116",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 116,
+      "occurredAt": 216000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-4",
+        "turn": 1,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 30,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:117",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 117,
+      "occurredAt": 217000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:118",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 118,
+      "occurredAt": 218000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:119",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 119,
+      "occurredAt": 219000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 5,
+        "blocked": 2,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:120",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 120,
+      "occurredAt": 220000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:121",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 121,
+      "occurredAt": 221000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:122",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 122,
+      "occurredAt": 222000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:123",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 123,
+      "occurredAt": 223000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:124",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 124,
+      "occurredAt": 224000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-4",
+        "turn": 2,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 24,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:125",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 125,
+      "occurredAt": 225000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:126",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 126,
+      "occurredAt": 226000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:127",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 127,
+      "occurredAt": 227000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-4",
+        "turn": 2,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 18,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:128",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 128,
+      "occurredAt": 228000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:129",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 129,
+      "occurredAt": 229000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:130",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 130,
+      "occurredAt": 230000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 5,
+        "blocked": 2,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:131",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 131,
+      "occurredAt": 231000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:132",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 132,
+      "occurredAt": 232000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 3,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:133",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 133,
+      "occurredAt": 233000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:134",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 134,
+      "occurredAt": 234000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:135",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 135,
+      "occurredAt": 235000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-4",
+        "turn": 3,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 12,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:136",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 136,
+      "occurredAt": 236000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:137",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 137,
+      "occurredAt": 237000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:138",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 138,
+      "occurredAt": 238000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-4",
+        "turn": 3,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 6,
+        "fatal": true
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:139",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 139,
+      "occurredAt": 239000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:140",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 140,
+      "occurredAt": 240000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 3,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:141",
+      "eventType": "combat.ended",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 141,
+      "occurredAt": 241000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "victory": true
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:142",
+      "eventType": "reward.offered",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 142,
+      "occurredAt": 242000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cards": [
+          "POMMEL_STRIKE",
+          "SHRUG_IT_OFF"
+        ]
+      },
+      "synthetic": true,
+      "decisionId": "reward-4"
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:143",
+      "eventType": "reward.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 143,
+      "occurredAt": 243000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "result": "skipped",
+        "cardId": null
+      },
+      "synthetic": true,
+      "decisionId": "reward-4"
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:144",
+      "eventType": "event.options_offered",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 144,
+      "occurredAt": 244000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "eventId": "ACT1_RISK_EVENT",
+        "options": [
+          "take_damage_for_reward"
+        ]
+      },
+      "synthetic": true
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:145",
+      "eventType": "event.option_resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 145,
+      "occurredAt": 245000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "eventId": "ACT1_RISK_EVENT",
+        "hpLoss": 16,
+        "hpAfter": 24
+      },
+      "synthetic": true
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:146",
+      "eventType": "run.reload_observed",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 146,
+      "occurredAt": 246000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "observationId": "synthetic-sts2-reload-two-observations:1",
+        "observedCount": 1
+      },
+      "synthetic": true
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:147",
+      "eventType": "run.reload_observed",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 147,
+      "occurredAt": 247000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "observationId": "synthetic-sts2-reload-two-observations:2",
+        "observedCount": 2
+      },
+      "synthetic": true
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:148",
+      "eventType": "rest.action_completed",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 148,
+      "occurredAt": 248000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "action": "smith",
+        "cardId": "BASH",
+        "cardName": "痛击",
+        "cardInstanceId": "deck-bash",
+        "upgraded": true
+      },
+      "synthetic": true
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:149",
+      "eventType": "combat.started",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 149,
+      "occurredAt": 249000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "roomType": "Elite",
+        "encounterId": "BYGONE_EFFIGY_ELITE",
+        "deckInstanceIds": [
+          "deck-bash",
+          "deck-strike-1",
+          "deck-strike-2",
+          "deck-defend",
+          "deck-pommel"
+        ]
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:150",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 150,
+      "occurredAt": 250000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:151",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 151,
+      "occurredAt": 251000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:152",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 152,
+      "occurredAt": 252000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:153",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 153,
+      "occurredAt": 253000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:154",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 154,
+      "occurredAt": 254000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 13,
+        "blocked": 0,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:155",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 155,
+      "occurredAt": 255000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:156",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 156,
+      "occurredAt": 256000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:157",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 157,
+      "occurredAt": 257000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 11,
+        "blocked": 0,
+        "fatal": true
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:158",
+      "eventType": "combat.ended",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 158,
+      "occurredAt": 258000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "victory": false
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-reload-two-observations:159",
+      "eventType": "run.ended",
+      "runId": "synthetic-sts2-reload-two-observations",
+      "sourceSessionId": "fixture-reload-two-observations",
+      "sourceSeq": 159,
+      "occurredAt": 259000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cleared": false,
+        "reason": "death"
+      },
+      "synthetic": true
+    }
+  ],
+  "coverage": {
+    "families": {
+      "lifecycle": {
+        "state": "available"
+      },
+      "reload_observation": {
+        "state": "available"
+      },
+      "card_play": {
+        "state": "available"
+      },
+      "card_movement": {
+        "state": "available"
+      },
+      "combat_resolution": {
+        "state": "available"
+      }
+    },
+    "gaps": []
+  },
+  "expected": {
+    "candidate": {
+      "pattern": "upgrade_not_used",
+      "eventId": "fixture-reload-two-observations:148"
+    },
+    "allowed": true,
+    "forbidden": [
+      "如果回血一定能赢",
+      "玩家操作失误"
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "description": "合成事件的独立算式：普通战斗每玩家回合2×6扣血，4战各4实际格挡；精英胜利最后回合13+10扣血、致死结算24，另8次13格挡。缺口与缺字段保持未知。不是实机效果评分。",
+  "values": {
+    "upgrade-never-drawn": [12, 6, 16, 0],
+    "upgrade-drawn-no-energy": [12, 6, 16, 0],
+    "overkill-confirmed": [23, 24, 120, 0],
+    "capture-gap": [null, null, null, null],
+    "same-name-instance": [12, 6, 16, 0],
+    "automatic-upgrade-play": [12, 6, 16, 0],
+    "reload-two-observations": [12, 6, 16, 2],
+    "block-gain-vs-absorb": [12, 6, 16, 0],
+    "requested-not-resolved": [23, null, 120, 0],
+    "overkill-with-reload": [23, 24, 120, 2]
+  }
+}

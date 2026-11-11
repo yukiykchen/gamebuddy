@@ -1,0 +1,186 @@
+:root {
+  --gb-danmaku-height: 32px;
+  --gb-danmaku-compact-height: 28px;
+  --gb-danmaku-avatar-size: 68px;
+  --gb-danmaku-compact-avatar-size: 58px;
+  --gb-danmaku-avatar-left: -6px;
+  --gb-danmaku-avatar-gap: 6px;
+  --gb-danmaku-max-width: 480px;
+  --gb-danmaku-text-size: 15px;
+}
+
+.gb-danmaku-layer {
+  display: grid;
+  gap: 26px;
+  width: min(var(--gb-danmaku-max-width), 100%);
+}
+
+.gb-danmaku {
+  --gb-accent: #d6dcdd;
+  --gb-accent-rgb: 214, 220, 221;
+  --gb-line: #4b5558;
+  --gb-panel: #1a2023;
+  --gb-deep: #121719;
+  --gb-radius: 14px;
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  align-items: center;
+  width: max-content;
+  max-width: 100%;
+  height: var(--gb-danmaku-height);
+  padding: 2px 14px 2px calc(var(--gb-danmaku-avatar-size) + var(--gb-danmaku-avatar-left) + var(--gb-danmaku-avatar-gap));
+  box-sizing: border-box;
+  overflow: visible;
+  border: 1px solid var(--gb-line);
+  border-radius: var(--gb-radius);
+  color: #e8ece9;
+  background: linear-gradient(110deg, rgba(var(--gb-accent-rgb), .10), transparent 36%), var(--gb-panel);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, .28), inset 0 1px rgba(255, 255, 255, .04);
+  font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  transition: transform .24s cubic-bezier(.16, 1, .3, 1), border-color .24s ease;
+}
+
+.gb-danmaku:hover {
+  transform: translateX(7px);
+  border-color: var(--gb-accent);
+}
+
+.gb-danmaku::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 3px 0 0 3px;
+  background: var(--gb-accent);
+  opacity: .7;
+}
+
+.gb-danmaku__avatar {
+  position: absolute;
+  z-index: 2;
+  left: var(--gb-danmaku-avatar-left);
+  top: 50%;
+  width: var(--gb-danmaku-avatar-size);
+  height: var(--gb-danmaku-avatar-size);
+  object-fit: contain;
+  transform: translateY(-50%);
+  filter: drop-shadow(0 6px 6px rgba(0, 0, 0, .32));
+  pointer-events: none;
+  user-select: none;
+}
+
+.gb-danmaku__text {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  margin: 0;
+  font-size: var(--gb-danmaku-text-size);
+  font-weight: 650;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gb-danmaku--no-avatar {
+  padding: 2px 20px;
+}
+
+.gb-danmaku--compact {
+  height: var(--gb-danmaku-compact-height);
+  padding-left: calc(var(--gb-danmaku-compact-avatar-size) + var(--gb-danmaku-avatar-left) + var(--gb-danmaku-avatar-gap));
+}
+
+.gb-danmaku--compact .gb-danmaku__avatar {
+  width: var(--gb-danmaku-compact-avatar-size);
+  height: var(--gb-danmaku-compact-avatar-size);
+}
+
+.gb-danmaku--compact.gb-danmaku--no-avatar {
+  padding-inline: 18px;
+}
+
+.gb-danmaku--bird {
+  --gb-panel: #1c261d;
+  --gb-deep: #101710;
+  --gb-line: #67755c;
+  --gb-accent: #bdc9a2;
+  --gb-accent-rgb: 189, 201, 162;
+  --gb-radius: 18px 8px 20px 10px;
+  border: 2px dashed var(--gb-line);
+  background: repeating-linear-gradient(110deg, rgba(189, 201, 162, .045) 0 14px, transparent 14px 30px), linear-gradient(135deg, #263226, #121914);
+}
+
+.gb-danmaku--reaper {
+  --gb-panel: #1b132b;
+  --gb-deep: #0f0c19;
+  --gb-line: #675083;
+  --gb-accent: #63e5ff;
+  --gb-accent-rgb: 99, 229, 255;
+  --gb-radius: 8px 22px 8px 22px;
+  background: radial-gradient(circle at 87% 18%, rgba(99, 229, 255, .11), transparent 26%), linear-gradient(135deg, #291846, #130e25);
+}
+
+.gb-danmaku--robot {
+  --gb-panel: #10232d;
+  --gb-deep: #08161d;
+  --gb-line: #4d7080;
+  --gb-accent: #5ce0f5;
+  --gb-accent-rgb: 92, 224, 245;
+  --gb-radius: 0;
+  border: 0;
+  background: repeating-linear-gradient(0deg, rgba(92, 224, 245, .055) 0 1px, transparent 1px 8px), linear-gradient(135deg, #153442, #0a1a22);
+  box-shadow: inset 4px 0 #5ce0f5, inset -1px 0 rgba(92, 224, 245, .6), 0 10px 24px rgba(0, 0, 0, .28);
+}
+
+.gb-danmaku--star {
+  --gb-panel: #1d2443;
+  --gb-deep: #10162c;
+  --gb-line: #c38249;
+  --gb-accent: #ffdc70;
+  --gb-accent-rgb: 255, 220, 112;
+  --gb-radius: 22px;
+  border: 2px solid #c38249;
+  background: radial-gradient(circle at 90% 20%, rgba(255, 220, 112, .10), transparent 22%), linear-gradient(135deg, #293f7c, #251943);
+  box-shadow: 0 10px 26px rgba(2, 6, 18, .4), inset 0 0 0 3px rgba(75, 105, 191, .35);
+}
+
+.gb-danmaku--warrior {
+  --gb-panel: #392117;
+  --gb-deep: #190f0c;
+  --gb-line: #9a603c;
+  --gb-accent: #f2a340;
+  --gb-accent-rgb: 242, 163, 64;
+  --gb-radius: 0;
+  border: 0;
+  background: repeating-linear-gradient(116deg, transparent 0 64px, rgba(242, 163, 64, .12) 65px 67px), linear-gradient(135deg, #48291b, #21130e);
+  box-shadow: inset 4px 0 #f2a340, inset -2px 0 #a54c31, 0 10px 24px rgba(0, 0, 0, .3);
+}
+
+.gb-danmaku--enter {
+  animation: gb-danmaku-enter .44s cubic-bezier(.16, 1, .3, 1) both;
+}
+
+@keyframes gb-danmaku-enter {
+  from { opacity: 0; transform: translateX(28px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@media (max-width: 560px) {
+  :root {
+    --gb-danmaku-avatar-size: 58px;
+    --gb-danmaku-compact-avatar-size: 52px;
+    --gb-danmaku-text-size: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gb-danmaku,
+  .gb-danmaku--enter {
+    animation: none;
+    transition: none;
+  }
+}
+

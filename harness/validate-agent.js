@@ -805,6 +805,18 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
   assert.equal(rewardRec.task, 'card_reward');
   assert.equal(rewardRec.options.length, 3);
   assert.ok(rewardRec.options.every(card => card.fit?.boss && card.fit?.elite));
+  assert.ok(rewardRec.options.every(card => Array.isArray(card.buildGuidance?.systems)));
+  assert.ok(rewardRec.options.find(card=>card.id==='BARRICADE').buildGuidance.systems.some(s=>s.systemId==='ironclad:block-barricade'));
+  assert.ok(rewardRec.options.every(card=>card.buildGuidance.systems.every(s=>s.systemId!=='generic')));
+  assert.ok(rewardRec.options.every(card => !card.archetypeScores && !card.archetypeImpacts && !card.archetypeImpact));
+  const silentRewardRec = await recommendCardReward({
+    ...rewardObservation,
+    state: { ...mapState, run: { ...mapState.run, character: 'silent' } }
+  }, { codex: fakeCodex, now: 14 });
+  assert.ok(silentRewardRec.options.every(card => !card.archetypeImpact));
+  assert.ok(silentRewardRec.options.every(card => !card.archetypeScores && !card.archetypeImpacts));
+  assert.ok(silentRewardRec.options.every(card => Array.isArray(card.buildGuidance?.systems)));
+  assert.ok(silentRewardRec.options.every(card=>card.buildGuidance.systems.every(s=>s.systemId!=='generic')));
 
   const llmCardRec = await recommendCardReward(rewardObservation, {
     codex: fakeCodex,
@@ -1271,7 +1283,8 @@ recommendRoute(mapState, { now: 1 }).then(async rulesRec => {
       }
     }
   });
-  assert.equal(failedLlmCard, null);
+  assert.equal(failedLlmCard.source, 'rules');
+  assert.equal(validateRecommendation(failedLlmCard).ok, true);
 
   let routeCalls = 0;
   let releaseRoute;

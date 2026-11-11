@@ -1,0 +1,957 @@
+{
+  "type": "draft_impact",
+  "signature": "affinity-v2-calibration",
+  "impacts": [
+    {
+      "cardId": "BARRICADE",
+      "deltaPoints": 0,
+      "reason": "不补充当前路线的主要功能，加入后会稀释组件密度",
+      "archetypes": [
+        {
+          "id": "auto_strike",
+          "deltaPoints": 0,
+          "reason": "不补充当前路线的主要功能，加入后会稀释组件密度",
+          "beforeScore": 1,
+          "afterScore": 1,
+          "beforeStage": "unformed",
+          "afterStage": "unformed",
+          "completedAxes": [],
+          "started": false,
+          "readiness": 1,
+          "status": "missing_starter",
+          "beforeStatus": "missing_starter",
+          "afterStatus": "missing_starter",
+          "presentFunctions": [
+            {
+              "id": "auto_support",
+              "label": "通用资源支持"
+            },
+            {
+              "id": "auto_amplification",
+              "label": "打击伤害放大"
+            }
+          ],
+          "missingFunctions": [
+            {
+              "id": "auto_output",
+              "label": "打击输出与成长"
+            },
+            {
+              "id": "auto_gate",
+              "label": "自动打击启动"
+            },
+            {
+              "id": "auto_loop",
+              "label": "抽牌打击循环"
+            },
+            {
+              "id": "auto_ammo",
+              "label": "打击牌供给"
+            }
+          ],
+          "completedFunctions": [],
+          "beforePresentFunctions": [
+            {
+              "id": "auto_support",
+              "label": "通用资源支持"
+            },
+            {
+              "id": "auto_amplification",
+              "label": "打击伤害放大"
+            }
+          ],
+          "beforeMissingFunctions": [
+            {
+              "id": "auto_output",
+              "label": "打击输出与成长"
+            },
+            {
+              "id": "auto_gate",
+              "label": "自动打击启动"
+            },
+            {
+              "id": "auto_loop",
+              "label": "抽牌打击循环"
+            },
+            {
+              "id": "auto_ammo",
+              "label": "打击牌供给"
+            }
+          ],
+          "affinity": 1,
+          "deltaExact": -0.03,
+          "referenceId": "auto_strike_reference",
+          "referenceName": "自动打击·抽牌打击",
+          "beforeReferenceName": "自动打击·抽牌打击",
+          "confidence": "partial",
+          "beforeConfidence": "partial",
+          "learningTag": "dilution",
+          "beforeIdentity": false,
+          "afterIdentity": false,
+          "ruleVersion": "affinity-2.1.0"
+        },
+        {
+          "id": "exhaust",
+          "deltaPoints": 0,
+          "reason": "不补充当前路线的主要功能，加入后会稀释组件密度",
+          "beforeScore": 3,
+          "afterScore": 3,
+          "beforeStage": "unformed",
+          "afterStage": "unformed",
+          "completedAxes": [],
+          "started": false,
+          "readiness": 3,
+          "status": "missing_starter",
+          "beforeStatus": "missing_starter",
+          "afterStatus": "missing_starter",
+          "presentFunctions": [
+            {
+              "id": "exhaust_support",
+              "label": "通用资源支持"
+            }
+          ],
+          "missingFunctions": [
+            {
+              "id": "exhaust_payoff",
+              "label": "消耗转输出"
+            },
+            {
+              "id": "exhaust_outlet",
+              "label": "主动消耗手段"
+            },
+            {
+              "id": "exhaust_draw",
+              "label": "消耗转抽牌"
+            }
+          ],
+          "completedFunctions": [],
+          "beforePresentFunctions": [
+            {
+              "id": "exhaust_support",
+              "label": "通用资源支持"
+            }
+          ],
+          "beforeMissingFunctions": [
+            {
+              "id": "exhaust_payoff",
+              "label": "消耗转输出"
+            },
+            {
+              "id": "exhaust_outlet",
+              "label": "主动消耗手段"
+            },
+            {
+              "id": "exhaust_draw",
+              "label": "消耗转抽牌"
+            }
+          ],
+          "affinity": 3,
+          "deltaExact": -0.13,
+          "referenceId": "exhaust_draw",
+          "referenceName": "消耗·抽牌与消耗堆兑现",
+          "beforeReferenceName": "消耗·抽牌与消耗堆兑现",
+          "confidence": "partial",
+          "beforeConfidence": "partial",
+          "learningTag": "dilution",
+          "beforeIdentity": false,
+          "afterIdentity": false,
+          "ruleVersion": "affinity-2.1.0"
+        },
+        {
+          "id": "strength",
+          "deltaPoints": -1,
+          "reason": "不补充当前路线的主要功能，加入后会稀释组件密度",
+          "beforeScore": 15,
+          "afterScore": 14,
+          "beforeStage": "unformed",
+          "afterStage": "unformed",
+          "completedAxes": [],
+          "started": false,
+          "readiness": 14,
+          "status": "missing_starter",
+          "beforeStatus": "missing_starter",
+          "afterStatus": "missing_starter",
+          "presentFunctions": [
+            {
+              "id": "strength_multihit",
+              "label": "多段与重复输出"
+            },
+            {
+              "id": "strength_throughput",
+              "label": "通用资源支持"
+            },
+            {
+              "id": "strength_defense",
+              "label": "基本防御"
+            }
+          ],
+          "missingFunctions": [
+            {
+              "id": "strength_source",
+              "label": "力量来源"
+            },
+            {
+              "id": "strength_multihit",
+              "label": "多段与重复输出"
+            },
+            {
+              "id": "strength_throughput",
+              "label": "通用资源支持"
+            }
+          ],
+          "completedFunctions": [],
+          "beforePresentFunctions": [
+            {
+              "id": "strength_multihit",
+              "label": "多段与重复输出"
+            },
+            {
+              "id": "strength_throughput",
+              "label": "通用资源支持"
+            },
+            {
+              "id": "strength_defense",
+              "label": "基本防御"
+            }
+          ],
+          "beforeMissingFunctions": [
+            {
+              "id": "strength_source",
+              "label": "力量来源"
+            },
+            {
+              "id": "strength_multihit",
+              "label": "多段与重复输出"
+            },
+            {
+              "id": "strength_throughput",
+              "label": "通用资源支持"
+            }
+          ],
+          "affinity": 14,
+          "deltaExact": -0.71,
+          "referenceId": "strength_reference",
+          "referenceName": "力量·成长与多段输出",
+          "beforeReferenceName": "力量·成长与多段输出",
+          "confidence": "partial",
+          "beforeConfidence": "partial",
+          "learningTag": "dilution",
+          "beforeIdentity": false,
+          "afterIdentity": false,
+          "ruleVersion": "affinity-2.1.0"
+        },
+        {
+          "id": "block",
+          "deltaPoints": 32,
+          "reason": "补充跨回合保留格挡，接通已有组件的配合",
+          "beforeScore": 68,
+          "afterScore": 100,
+          "beforeStage": "started",
+          "afterStage": "formed",
+          "completedAxes": [
+            "block_gate"
+          ],
+          "started": true,
+          "readiness": 100,
+          "status": "stable",
+          "beforeStatus": "operational",
+          "afterStatus": "stable",
+          "presentFunctions": [
+            {
+              "id": "block_gate",
+              "label": "跨回合保留格挡"
+            },
+            {
+              "id": "block_conversion",
+              "label": "格挡转输出"
+            },
+            {
+              "id": "block_source",
+              "label": "格挡来源"
+            },
+            {
+              "id": "block_growth",
+              "label": "格挡增长与放大"
+            },
+            {
+              "id": "block_support",
+              "label": "通用资源支持"
+            }
+          ],
+          "missingFunctions": [],
+          "completedFunctions": [
+            {
+              "id": "block_gate",
+              "label": "跨回合保留格挡"
+            }
+          ],
+          "beforePresentFunctions": [
+            {
+              "id": "block_conversion",
+              "label": "格挡转输出"
+            },
+            {
+              "id": "block_source",
+              "label": "格挡来源"
+            },
+            {
+              "id": "block_growth",
+              "label": "格挡增长与放大"
+            },
+            {
+              "id": "block_support",
+              "label": "通用资源支持"
+            }
+          ],
+          "beforeMissingFunctions": [
+            {
+              "id": "block_gate",
+              "label": "跨回合保留格挡"
+            }
+          ],
+          "affinity": 100,
+          "deltaExact": 31.69,
+          "referenceId": "block_reference",
+          "referenceName": "格挡·壁垒与全身撞击",
+          "beforeReferenceName": "格挡·壁垒与全身撞击",
+          "confidence": "partial",
+          "beforeConfidence": "partial",
+          "learningTag": "synergy",
+          "beforeIdentity": true,
+          "afterIdentity": true,
+          "ruleVersion": "affinity-2.1.0"
+        }
+      ]
+    },
+    {
+      "cardId": "BODY_SLAM",
+      "deltaPoints": 0,
+      "reason": "不补充当前路线的主要功能，加入后会稀释组件密度",
+      "archetypes": [
+        {
+          "id": "auto_strike",
+          "deltaPoints": 0,
+          "reason": "不补充当前路线的主要功能，加入后会稀释组件密度",
+          "beforeScore": 1,
+          "afterScore": 1,
+          "beforeStage": "unformed",
+          "afterStage": "unformed",
+          "completedAxes": [],
+          "started": false,
+          "readiness": 1,
+          "status": "missing_starter",
+          "beforeStatus": "missing_starter",
+          "afterStatus": "missing_starter",
+          "presentFunctions": [
+            {
+              "id": "auto_support",
+              "label": "通用资源支持"
+            },
+            {
+              "id": "auto_amplification",
+              "label": "打击伤害放大"
+            }
+          ],
+          "missingFunctions": [
+            {
+              "id": "auto_output",
+              "label": "打击输出与成长"
+            },
+            {
+              "id": "auto_gate",
+              "label": "自动打击启动"
+            },
+            {
+              "id": "auto_loop",
+              "label": "抽牌打击循环"
+            },
+            {
+              "id": "auto_ammo",
+              "label": "打击牌供给"
+            }
+          ],
+          "completedFunctions": [],
+          "beforePresentFunctions": [
+            {
+              "id": "auto_support",
+              "label": "通用资源支持"
+            },
+            {
+              "id": "auto_amplification",
+              "label": "打击伤害放大"
+            }
+          ],
+          "beforeMissingFunctions": [
+            {
+              "id": "auto_output",
+              "label": "打击输出与成长"
+            },
+            {
+              "id": "auto_gate",
+              "label": "自动打击启动"
+            },
+            {
+              "id": "auto_loop",
+              "label": "抽牌打击循环"
+            },
+            {
+              "id": "auto_ammo",
+              "label": "打击牌供给"
+            }
+          ],
+          "affinity": 1,
+          "deltaExact": -0.03,
+          "referenceId": "auto_strike_reference",
+          "referenceName": "自动打击·抽牌打击",
+          "beforeReferenceName": "自动打击·抽牌打击",
+          "confidence": "partial",
+          "beforeConfidence": "partial",
+          "learningTag": "dilution",
+          "beforeIdentity": false,
+          "afterIdentity": false,
+          "ruleVersion": "affinity-2.1.0"
+        },
+        {
+          "id": "exhaust",
+          "deltaPoints": 0,
+          "reason": "不补充当前路线的主要功能，加入后会稀释组件密度",
+          "beforeScore": 3,
+          "afterScore": 3,
+          "beforeStage": "unformed",
+          "afterStage": "unformed",
+          "completedAxes": [],
+          "started": false,
+          "readiness": 3,
+          "status": "missing_starter",
+          "beforeStatus": "missing_starter",
+          "afterStatus": "missing_starter",
+          "presentFunctions": [
+            {
+              "id": "exhaust_support",
+              "label": "通用资源支持"
+            }
+          ],
+          "missingFunctions": [
+            {
+              "id": "exhaust_payoff",
+              "label": "消耗转输出"
+            },
+            {
+              "id": "exhaust_outlet",
+              "label": "主动消耗手段"
+            },
+            {
+              "id": "exhaust_draw",
+              "label": "消耗转抽牌"
+            }
+          ],
+          "completedFunctions": [],
+          "beforePresentFunctions": [
+            {
+              "id": "exhaust_support",
+              "label": "通用资源支持"
+            }
+          ],
+          "beforeMissingFunctions": [
+            {
+              "id": "exhaust_payoff",
+              "label": "消耗转输出"
+            },
+            {
+              "id": "exhaust_outlet",
+              "label": "主动消耗手段"
+            },
+            {
+              "id": "exhaust_draw",
+              "label": "消耗转抽牌"
+            }
+          ],
+          "affinity": 3,
+          "deltaExact": -0.13,
+          "referenceId": "exhaust_draw",
+          "referenceName": "消耗·抽牌与消耗堆兑现",
+          "beforeReferenceName": "消耗·抽牌与消耗堆兑现",
+          "confidence": "partial",
+          "beforeConfidence": "partial",
+          "learningTag": "dilution",
+          "beforeIdentity": false,
+          "afterIdentity": false,
+          "ruleVersion": "affinity-2.1.0"
+        },
+        {
+          "id": "strength",
+          "deltaPoints": -1,
+          "reason": "不补充当前路线的主要功能，加入后会稀释组件密度",
+          "beforeScore": 15,
+          "afterScore": 14,
+          "beforeStage": "unformed",
+          "afterStage": "unformed",
+          "completedAxes": [],
+          "started": false,
+          "readiness": 14,
+          "status": "missing_starter",
+          "beforeStatus": "missing_starter",
+          "afterStatus": "missing_starter",
+          "presentFunctions": [
+            {
+              "id": "strength_multihit",
+              "label": "多段与重复输出"
+            },
+            {
+              "id": "strength_throughput",
+              "label": "通用资源支持"
+            },
+            {
+              "id": "strength_defense",
+              "label": "基本防御"
+            }
+          ],
+          "missingFunctions": [
+            {
+              "id": "strength_source",
+              "label": "力量来源"
+            },
+            {
+              "id": "strength_multihit",
+              "label": "多段与重复输出"
+            },
+            {
+              "id": "strength_throughput",
+              "label": "通用资源支持"
+            }
+          ],
+          "completedFunctions": [],
+          "beforePresentFunctions": [
+            {
+              "id": "strength_multihit",
+              "label": "多段与重复输出"
+            },
+            {
+              "id": "strength_throughput",
+              "label": "通用资源支持"
+            },
+            {
+              "id": "strength_defense",
+              "label": "基本防御"
+            }
+          ],
+          "beforeMissingFunctions": [
+            {
+              "id": "strength_source",
+              "label": "力量来源"
+            },
+            {
+              "id": "strength_multihit",
+              "label": "多段与重复输出"
+            },
+            {
+              "id": "strength_throughput",
+              "label": "通用资源支持"
+            }
+          ],
+          "affinity": 14,
+          "deltaExact": -0.71,
+          "referenceId": "strength_reference",
+          "referenceName": "力量·成长与多段输出",
+          "beforeReferenceName": "力量·成长与多段输出",
+          "confidence": "partial",
+          "beforeConfidence": "partial",
+          "learningTag": "dilution",
+          "beforeIdentity": false,
+          "afterIdentity": false,
+          "ruleVersion": "affinity-2.1.0"
+        },
+        {
+          "id": "block",
+          "deltaPoints": -3,
+          "reason": "同类功能已较充分，继续增加的构筑收益有限，会降低当前路线的组件密度",
+          "beforeScore": 68,
+          "afterScore": 65,
+          "beforeStage": "started",
+          "afterStage": "started",
+          "completedAxes": [],
+          "started": true,
+          "readiness": 65,
+          "status": "operational",
+          "beforeStatus": "operational",
+          "afterStatus": "operational",
+          "presentFunctions": [
+            {
+              "id": "block_conversion",
+              "label": "格挡转输出"
+            },
+            {
+              "id": "block_source",
+              "label": "格挡来源"
+            },
+            {
+              "id": "block_growth",
+              "label": "格挡增长与放大"
+            },
+            {
+              "id": "block_support",
+              "label": "通用资源支持"
+            }
+          ],
+          "missingFunctions": [
+            {
+              "id": "block_gate",
+              "label": "跨回合保留格挡"
+            }
+          ],
+          "completedFunctions": [],
+          "beforePresentFunctions": [
+            {
+              "id": "block_conversion",
+              "label": "格挡转输出"
+            },
+            {
+              "id": "block_source",
+              "label": "格挡来源"
+            },
+            {
+              "id": "block_growth",
+              "label": "格挡增长与放大"
+            },
+            {
+              "id": "block_support",
+              "label": "通用资源支持"
+            }
+          ],
+          "beforeMissingFunctions": [
+            {
+              "id": "block_gate",
+              "label": "跨回合保留格挡"
+            }
+          ],
+          "affinity": 65,
+          "deltaExact": -3.25,
+          "referenceId": "block_reference",
+          "referenceName": "格挡·壁垒与全身撞击",
+          "beforeReferenceName": "格挡·壁垒与全身撞击",
+          "confidence": "partial",
+          "beforeConfidence": "partial",
+          "learningTag": "redundant",
+          "beforeIdentity": true,
+          "afterIdentity": true,
+          "ruleVersion": "affinity-2.1.0"
+        }
+      ]
+    },
+    {
+      "cardId": "MANGLE",
+      "deltaPoints": 0,
+      "reason": "不补充当前路线的主要功能，加入后会稀释组件密度",
+      "archetypes": [
+        {
+          "id": "auto_strike",
+          "deltaPoints": 0,
+          "reason": "不补充当前路线的主要功能，加入后会稀释组件密度",
+          "beforeScore": 1,
+          "afterScore": 1,
+          "beforeStage": "unformed",
+          "afterStage": "unformed",
+          "completedAxes": [],
+          "started": false,
+          "readiness": 1,
+          "status": "missing_starter",
+          "beforeStatus": "missing_starter",
+          "afterStatus": "missing_starter",
+          "presentFunctions": [
+            {
+              "id": "auto_support",
+              "label": "通用资源支持"
+            },
+            {
+              "id": "auto_amplification",
+              "label": "打击伤害放大"
+            }
+          ],
+          "missingFunctions": [
+            {
+              "id": "auto_output",
+              "label": "打击输出与成长"
+            },
+            {
+              "id": "auto_gate",
+              "label": "自动打击启动"
+            },
+            {
+              "id": "auto_loop",
+              "label": "抽牌打击循环"
+            },
+            {
+              "id": "auto_ammo",
+              "label": "打击牌供给"
+            }
+          ],
+          "completedFunctions": [],
+          "beforePresentFunctions": [
+            {
+              "id": "auto_support",
+              "label": "通用资源支持"
+            },
+            {
+              "id": "auto_amplification",
+              "label": "打击伤害放大"
+            }
+          ],
+          "beforeMissingFunctions": [
+            {
+              "id": "auto_output",
+              "label": "打击输出与成长"
+            },
+            {
+              "id": "auto_gate",
+              "label": "自动打击启动"
+            },
+            {
+              "id": "auto_loop",
+              "label": "抽牌打击循环"
+            },
+            {
+              "id": "auto_ammo",
+              "label": "打击牌供给"
+            }
+          ],
+          "affinity": 1,
+          "deltaExact": -0.03,
+          "referenceId": "auto_strike_reference",
+          "referenceName": "自动打击·抽牌打击",
+          "beforeReferenceName": "自动打击·抽牌打击",
+          "confidence": "partial",
+          "beforeConfidence": "partial",
+          "learningTag": "dilution",
+          "beforeIdentity": false,
+          "afterIdentity": false,
+          "ruleVersion": "affinity-2.1.0"
+        },
+        {
+          "id": "exhaust",
+          "deltaPoints": 0,
+          "reason": "不补充当前路线的主要功能，加入后会稀释组件密度",
+          "beforeScore": 3,
+          "afterScore": 3,
+          "beforeStage": "unformed",
+          "afterStage": "unformed",
+          "completedAxes": [],
+          "started": false,
+          "readiness": 3,
+          "status": "missing_starter",
+          "beforeStatus": "missing_starter",
+          "afterStatus": "missing_starter",
+          "presentFunctions": [
+            {
+              "id": "exhaust_support",
+              "label": "通用资源支持"
+            }
+          ],
+          "missingFunctions": [
+            {
+              "id": "exhaust_payoff",
+              "label": "消耗转输出"
+            },
+            {
+              "id": "exhaust_outlet",
+              "label": "主动消耗手段"
+            },
+            {
+              "id": "exhaust_draw",
+              "label": "消耗转抽牌"
+            }
+          ],
+          "completedFunctions": [],
+          "beforePresentFunctions": [
+            {
+              "id": "exhaust_support",
+              "label": "通用资源支持"
+            }
+          ],
+          "beforeMissingFunctions": [
+            {
+              "id": "exhaust_payoff",
+              "label": "消耗转输出"
+            },
+            {
+              "id": "exhaust_outlet",
+              "label": "主动消耗手段"
+            },
+            {
+              "id": "exhaust_draw",
+              "label": "消耗转抽牌"
+            }
+          ],
+          "affinity": 3,
+          "deltaExact": -0.13,
+          "referenceId": "exhaust_draw",
+          "referenceName": "消耗·抽牌与消耗堆兑现",
+          "beforeReferenceName": "消耗·抽牌与消耗堆兑现",
+          "confidence": "partial",
+          "beforeConfidence": "partial",
+          "learningTag": "dilution",
+          "beforeIdentity": false,
+          "afterIdentity": false,
+          "ruleVersion": "affinity-2.1.0"
+        },
+        {
+          "id": "strength",
+          "deltaPoints": -1,
+          "reason": "不补充当前路线的主要功能，加入后会稀释组件密度",
+          "beforeScore": 15,
+          "afterScore": 14,
+          "beforeStage": "unformed",
+          "afterStage": "unformed",
+          "completedAxes": [],
+          "started": false,
+          "readiness": 14,
+          "status": "missing_starter",
+          "beforeStatus": "missing_starter",
+          "afterStatus": "missing_starter",
+          "presentFunctions": [
+            {
+              "id": "strength_multihit",
+              "label": "多段与重复输出"
+            },
+            {
+              "id": "strength_throughput",
+              "label": "通用资源支持"
+            },
+            {
+              "id": "strength_defense",
+              "label": "基本防御"
+            }
+          ],
+          "missingFunctions": [
+            {
+              "id": "strength_source",
+              "label": "力量来源"
+            },
+            {
+              "id": "strength_multihit",
+              "label": "多段与重复输出"
+            },
+            {
+              "id": "strength_throughput",
+              "label": "通用资源支持"
+            }
+          ],
+          "completedFunctions": [],
+          "beforePresentFunctions": [
+            {
+              "id": "strength_multihit",
+              "label": "多段与重复输出"
+            },
+            {
+              "id": "strength_throughput",
+              "label": "通用资源支持"
+            },
+            {
+              "id": "strength_defense",
+              "label": "基本防御"
+            }
+          ],
+          "beforeMissingFunctions": [
+            {
+              "id": "strength_source",
+              "label": "力量来源"
+            },
+            {
+              "id": "strength_multihit",
+              "label": "多段与重复输出"
+            },
+            {
+              "id": "strength_throughput",
+              "label": "通用资源支持"
+            }
+          ],
+          "affinity": 14,
+          "deltaExact": -0.71,
+          "referenceId": "strength_reference",
+          "referenceName": "力量·成长与多段输出",
+          "beforeReferenceName": "力量·成长与多段输出",
+          "confidence": "partial",
+          "beforeConfidence": "partial",
+          "learningTag": "dilution",
+          "beforeIdentity": false,
+          "afterIdentity": false,
+          "ruleVersion": "affinity-2.1.0"
+        },
+        {
+          "id": "block",
+          "deltaPoints": -3,
+          "reason": "不补充当前路线的主要功能，加入后会稀释组件密度",
+          "beforeScore": 68,
+          "afterScore": 65,
+          "beforeStage": "started",
+          "afterStage": "started",
+          "completedAxes": [],
+          "started": true,
+          "readiness": 65,
+          "status": "operational",
+          "beforeStatus": "operational",
+          "afterStatus": "operational",
+          "presentFunctions": [
+            {
+              "id": "block_conversion",
+              "label": "格挡转输出"
+            },
+            {
+              "id": "block_source",
+              "label": "格挡来源"
+            },
+            {
+              "id": "block_growth",
+              "label": "格挡增长与放大"
+            },
+            {
+              "id": "block_support",
+              "label": "通用资源支持"
+            }
+          ],
+          "missingFunctions": [
+            {
+              "id": "block_gate",
+              "label": "跨回合保留格挡"
+            }
+          ],
+          "completedFunctions": [],
+          "beforePresentFunctions": [
+            {
+              "id": "block_conversion",
+              "label": "格挡转输出"
+            },
+            {
+              "id": "block_source",
+              "label": "格挡来源"
+            },
+            {
+              "id": "block_growth",
+              "label": "格挡增长与放大"
+            },
+            {
+              "id": "block_support",
+              "label": "通用资源支持"
+            }
+          ],
+          "beforeMissingFunctions": [
+            {
+              "id": "block_gate",
+              "label": "跨回合保留格挡"
+            }
+          ],
+          "affinity": 65,
+          "deltaExact": -3.25,
+          "referenceId": "block_reference",
+          "referenceName": "格挡·壁垒与全身撞击",
+          "beforeReferenceName": "格挡·壁垒与全身撞击",
+          "confidence": "partial",
+          "beforeConfidence": "partial",
+          "learningTag": "dilution",
+          "beforeIdentity": true,
+          "afterIdentity": true,
+          "ruleVersion": "affinity-2.1.0"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const { DEFAULT_DISPLAY_NAME, loadPlayerProfile, saveDisplayName } = require('./player-profile');
+
+const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'gamebuddy-profile-'));
+const first = loadPlayerProfile(dir);
+assert.equal(first.displayName, DEFAULT_DISPLAY_NAME);
+assert.match(first.playerId, /^[0-9a-f-]{36}$/i);
+const again = loadPlayerProfile(dir);
+assert.equal(again.playerId, first.playerId);
+const named = saveDisplayName(dir, '  阿达  ');
+assert.equal(named.displayName, '阿达');
+assert.equal(named.playerId, first.playerId);
+const blank = saveDisplayName(dir, '   ');
+assert.equal(blank.displayName, DEFAULT_DISPLAY_NAME);
+const stored = JSON.parse(fs.readFileSync(path.join(dir, 'player-profile.json'), 'utf8'));
+assert.equal(stored.displayName, DEFAULT_DISPLAY_NAME);
+console.log('Player profile tests passed.');

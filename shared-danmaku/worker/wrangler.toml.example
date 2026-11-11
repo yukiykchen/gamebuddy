@@ -1,0 +1,18 @@
+name = "gamebuddy-shared-danmaku"
+main = "src/index.js"
+compatibility_date = "2026-09-24"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "gamebuddy-shared-danmaku"
+# 创建数据库后，把这里替换成真实 database_id。
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
+
+[[d1_databases]]
+binding = "CLEARS_DB"
+database_name = "gamebuddy-clears"
+# 通关记录使用另一个数据库，不要填成上面的弹幕库。
+database_id = "REPLACE_WITH_CLEARS_D1_DATABASE_ID"
+
+[vars]
+# 生产环境请用 wrangler secret put SHARED_DANMAKU_SALT 设置，不要提交真实值。

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GameBuddy Danmaku</title>
+    <link rel="stylesheet" href="./assets/danmaku-handoff/danmaku.css" />
+    <link rel="stylesheet" href="./danmaku.css" />
+  </head>
+  <body>
+    <main class="danmaku-layer" id="danmaku-layer" aria-live="off" aria-hidden="true"></main>
+    <aside class="shared-composer" id="shared-composer">
+      <section class="shared-composer__panel" id="shared-composer-panel" hidden>
+        <header>
+          <div>
+            <strong>留下场景弹幕</strong>
+            <span id="shared-composer-scene">正在读取当前场景…</span>
+          </div>
+          <button class="shared-composer__close" id="shared-composer-close" type="button" aria-label="关闭弹幕输入">×</button>
+        </header>
+        <textarea id="shared-composer-input" maxlength="80" rows="3" placeholder="写给进入相同场景的玩家…"></textarea>
+        <footer>
+          <span id="shared-composer-status">Enter 发送 · Shift+Enter 换行</span>
+          <button id="shared-composer-submit" type="button">发送</button>
+        </footer>
+      </section>
+      <button class="shared-composer__toggle" id="shared-composer-toggle" type="button" aria-expanded="false" aria-controls="shared-composer-panel">
+        发弹幕
+      </button>
+    </aside>
+    <script src="./assets/danmaku-handoff/danmaku.js"></script>
+    <script src="./danmaku-theme.js"></script>
+    <script src="./danmaku.js"></script>
+  </body>
+</html>

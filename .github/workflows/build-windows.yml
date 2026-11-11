@@ -40,6 +40,13 @@ jobs:
         shell: pwsh
         run: ./scripts/windows-package-smoke.ps1
 
+      - name: Verify installed composer with native Windows mouse and keyboard
+        shell: pwsh
+        run: |
+          $installedApp = Join-Path $env:RUNNER_TEMP 'GameBuddy-install-check/GameBuddy.exe'
+          node scripts/windows-composer-smoke.js "$installedApp" 2>&1 | Tee-Object -FilePath windows-composer-smoke.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Package precompiled Bridge and install guide
         shell: pwsh
         run: |
@@ -67,6 +74,9 @@ jobs:
           if (Test-Path windows-package-smoke.log) {
             Get-Content windows-package-smoke.log >> $env:GITHUB_STEP_SUMMARY
           }
+          if (Test-Path windows-composer-smoke.log) {
+            Get-Content windows-composer-smoke.log >> $env:GITHUB_STEP_SUMMARY
+          }
           if (Test-Path build-windows.log) {
             '## Windows installer build output' >> $env:GITHUB_STEP_SUMMARY
             '```text' >> $env:GITHUB_STEP_SUMMARY
@@ -82,6 +92,8 @@ jobs:
           path: |
             build-windows.log
             windows-package-smoke.log
+            windows-composer-smoke.log
+            windows-composer-artifacts/*
           if-no-files-found: ignore
 
       - name: Upload installer

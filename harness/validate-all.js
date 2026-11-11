@@ -8,12 +8,16 @@ const checks = [
   ['renderer syntax', [path.join(__dirname, '..', 'src', 'renderer.js')]],
   ['pet syntax', [path.join(__dirname, '..', 'src', 'pet.js')]],
   ['protocol syntax', [path.join(__dirname, 'protocol.js')]],
+  ['fact protocol syntax', [path.join(__dirname, 'fact-protocol.js')]],
+  ['fact store syntax', [path.join(__dirname, '..', 'facts', 'local-fact-store.js')]],
   ['observation syntax', [path.join(__dirname, 'observation-store.js')]],
   ['replay syntax', [path.join(__dirname, 'replay-bridge.js')]],
   ['record syntax', [path.join(__dirname, 'record-bridge.js')]],
   ['event fixture', [path.join(__dirname, 'validate-events.js'), path.join(__dirname, 'fixtures', 'recorded-smoke.events.json')]],
   ['inspect syntax', [path.join(__dirname, 'inspect-bridge.js')]],
   ['protocol cases', [path.join(__dirname, 'validate-protocol.js')]],
+  ['fact store cases', [path.join(__dirname, '..', 'facts', 'local-fact-store.test.js')]],
+  ['fact replay cases', [path.join(__dirname, 'validate-fact-replay.js')]],
   ['observation cases', [path.join(__dirname, 'validate-observation.js')]],
   ['fixture validation', [path.join(__dirname, 'validate-replay.js')]],
   ['recorded fixture', [path.join(__dirname, 'validate-replay.js'), path.join(__dirname, 'fixtures', 'recorded-smoke.json')]],
@@ -26,6 +30,7 @@ const checks = [
   ['llm syntax', [path.join(__dirname, '..', 'agent', 'llm', 'openai.js')]],
   ['load-env syntax', [path.join(__dirname, '..', 'agent', 'llm', 'load-env.js')]],
   ['agent cases', [path.join(__dirname, 'validate-agent.js')]],
+  ['card guidance cases', ['--test', path.join(__dirname, '..', 'agent', 'tests', 'card-guidance.test.js'), path.join(__dirname, '..', 'agent', 'tests', 'build-strategy-policy.test.js')]],
   ['Mod shape', [path.join(__dirname, 'validate-mod.js')]]
 ];
 

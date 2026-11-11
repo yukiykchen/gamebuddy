@@ -1,7 +1,13 @@
+const { validateFactMessage } = require('./fact-protocol');
+
 const SUPPORTED_SCHEMA = 'gamebuddy.state.v1';
-const SUPPORTED_EVENTS = new Set(['combat.started', 'turn.started', 'combat.ended', 'map.opened', 'rest.opened', 'rest.closed', 'event.opened', 'event.closed', 'shop.opened', 'shop.updated', 'shop.closed', 'card.played', 'card.reward.opened', 'card.reward.closed', 'card.removal.opened', 'card.removal.closed']);
+const SUPPORTED_EVENTS = new Set(['run.started', 'run.ended', 'combat.started', 'turn.started', 'combat.ended', 'map.opened', 'rest.opened', 'rest.closed', 'event.opened', 'event.closed', 'shop.opened', 'shop.updated', 'shop.closed', 'card.played', 'card.reward.opened', 'card.reward.closed', 'card.reward.selected', 'card.removal.opened', 'card.removal.closed']);
+const RUN_RESULTS = new Set(['win', 'loss', 'abandoned']);
 const CARD_SOURCES = new Set(['runtime', 'catalog', 'unavailable']);
 const SHOP_ITEM_TYPES = new Set(['card', 'relic', 'potion', 'service']);
+const DRAFT_ARCHETYPE_IDS = ['auto_strike', 'exhaust', 'strength', 'block'];
+const DRAFT_ARCHETYPE_STAGES = new Set(['unformed', 'started', 'formed']);
+const DRAFT_ARCHETYPE_STATUSES = new Set(['missing_starter', 'incomplete_loop', 'operational', 'stable']);
 
 function validateCardSnapshot(card, prefix) {
   if (typeof card === 'string' && card) return { ok: true };
@@ -47,11 +53,23 @@ function validateReward(reward, prefix = 'reward') {
   if (reward.canSkip !== undefined && typeof reward.canSkip !== 'boolean') {
     return { ok: false, reason: `${prefix}.canSkip must be a boolean` };
   }
+  if (reward.signature !== undefined && (typeof reward.signature !== 'string' || !reward.signature || reward.signature.length > 1024)) {
+    return { ok: false, reason: `${prefix}.signature must be a non-empty string` };
+  }
+  if (reward.opportunityId !== undefined && (typeof reward.opportunityId !== 'string' || !reward.opportunityId || reward.opportunityId.length > 128)) {
+    return { ok: false, reason: `${prefix}.opportunityId must be a non-empty string` };
+  }
+  if (reward.source !== undefined && reward.source !== 'combat' && reward.source !== 'event') {
+    return { ok: false, reason: `${prefix}.source must be combat or event` };
+  }
   return { ok: true };
 }
 
 function validateShop(shop, prefix = 'shop') {
   if (!shop || typeof shop !== 'object') return { ok: false, reason: `${prefix} must be an object` };
+  if (shop.visitId !== undefined && (typeof shop.visitId !== 'string' || !shop.visitId || shop.visitId.length > 128)) {
+    return { ok: false, reason: `${prefix}.visitId must be a non-empty string` };
+  }
   if (!Number.isFinite(shop.gold) || shop.gold < 0) return { ok: false, reason: `${prefix}.gold must be a non-negative number` };
   if (!Array.isArray(shop.items) || shop.items.length > 30) return { ok: false, reason: `${prefix}.items must be an array with at most 30 entries` };
   const indexes = new Set();
@@ -76,6 +94,9 @@ function validateShop(shop, prefix = 'shop') {
     if (item.description !== undefined && item.description !== null && typeof item.description !== 'string') {
       return { ok: false, reason: `${prefix} item description must be a string or null` };
     }
+    if (item.stockKey !== undefined && item.stockKey !== null && (typeof item.stockKey !== 'string' || !item.stockKey || item.stockKey.length > 64)) {
+      return { ok: false, reason: `${prefix} item stockKey must be a non-empty string` };
+    }
     if (item.itemType === 'card') {
       if (!item.card || typeof item.card !== 'object') return { ok: false, reason: `${prefix} card item needs card details` };
       const cardValidation = validateCardSnapshot(item.card, `${prefix}.items.card`);
@@ -95,6 +116,14 @@ function validateState(state) {
   if (!state.run || typeof state.run !== 'object') return { ok: false, reason: 'run must be an object' };
   for (const field of ['act', 'floor', 'room', 'character']) {
     if (!(field in state.run)) return { ok: false, reason: `run missing ${field}` };
+  }
+  if (state.run.runId !== undefined && (typeof state.run.runId !== 'string' || !state.run.runId)) {
+    return { ok: false, reason: 'run.runId must be a non-empty string' };
+  }
+  for (const field of ['startedAt', 'maxTurnDamage']) {
+    if (state.run[field] !== undefined && state.run[field] !== null && !Number.isFinite(state.run[field])) {
+      return { ok: false, reason: `run.${field} must be a number or null` };
+    }
   }
   if (!state.player || typeof state.player !== 'object') return { ok: false, reason: 'player must be an object' };
   for (const field of ['hp', 'maxHp', 'block', 'gold', 'energy', 'maxEnergy', 'cards', 'relics', 'potions']) {
@@ -220,7 +249,6 @@ function validateRemoval(payload, label) {
   for (const card of payload.cards) {
     const validation = validateCardSnapshot(card, `${label}.cards`);
     if (!validation.ok) return validation;
-    // Advice names cards, so a candidate without any readable identity is not usable.
     if (typeof card === 'string') {
       if (!card) return { ok: false, reason: `${label}.cards entries must be non-empty` };
     } else if (typeof card.id !== 'string' && typeof card.name !== 'string') {
@@ -237,13 +265,39 @@ function validateRemoval(payload, label) {
 
 function validateMessage(message) {
   if (!message || typeof message !== 'object') return { ok: false, reason: 'message must be an object' };
+  if (message.type === 'fact') return validateFactMessage(message);
   if (message.type === 'state') return validateState(message.data);
   if (message.type !== 'event') return { ok: false, reason: `unsupported message type ${message.type || 'missing'}` };
   if (typeof message.name !== 'string' || !SUPPORTED_EVENTS.has(message.name)) return { ok: false, reason: `unsupported event ${message.name || 'missing'}` };
   if (!Number.isFinite(message.timestamp)) return { ok: false, reason: 'event timestamp must be a number' };
+  if (message.name === 'run.started') {
+    const data = message.data;
+    if (!data || typeof data !== 'object') return { ok: false, reason: 'run.started data must be an object' };
+    if (typeof data.runId !== 'string' || !data.runId) return { ok: false, reason: 'run.started runId must be a non-empty string' };
+    if (typeof data.character !== 'string' || !data.character) return { ok: false, reason: 'run.started character must be a non-empty string' };
+  }
+  if (message.name === 'run.ended') {
+    const data = message.data;
+    if (!data || typeof data !== 'object') return { ok: false, reason: 'run.ended data must be an object' };
+    if (typeof data.runId !== 'string' || !data.runId) return { ok: false, reason: 'run.ended runId must be a non-empty string' };
+    if (!RUN_RESULTS.has(data.result)) return { ok: false, reason: 'run.ended result must be win, loss or abandoned' };
+  }
   if (message.name === 'card.reward.opened' && message.data !== undefined && message.data !== null) {
     const validation = validateReward(message.data, 'card.reward.opened data');
     if (!validation.ok) return validation;
+  }
+  if (message.name === 'card.reward.selected') {
+    const data = message.data;
+    if (!data || typeof data !== 'object') return { ok: false, reason: 'card.reward.selected data must be an object' };
+    if (typeof data.signature !== 'string' || !data.signature || data.signature.length > 1024) {
+      return { ok: false, reason: 'card.reward.selected signature must be a non-empty string' };
+    }
+    if (typeof data.cardId !== 'string' || !data.cardId || data.cardId.length > 128) {
+      return { ok: false, reason: 'card.reward.selected cardId must be a non-empty string' };
+    }
+    if (typeof data.upgraded !== 'boolean') {
+      return { ok: false, reason: 'card.reward.selected upgraded must be a boolean' };
+    }
   }
   if (message.name === 'card.removal.opened' && message.data !== undefined && message.data !== null) {
     const validation = validateRemoval(message.data, 'card.removal.opened data');
@@ -256,4 +310,110 @@ function validateMessage(message) {
   return { ok: true };
 }
 
-module.exports = { SUPPORTED_EVENTS, SUPPORTED_SCHEMA, validateCardSnapshot, validateRemoval, validateShop, validateMessage, validateState, stateSignature };
+function validateDraftImpactMessage(message) {
+  if (!message || typeof message !== 'object' || message.type !== 'draft_impact') {
+    return { ok: false, reason: 'message must be a draft_impact object' };
+  }
+  if (typeof message.signature !== 'string' || !message.signature || message.signature.length > 1024) {
+    return { ok: false, reason: 'draft_impact.signature must be a non-empty string' };
+  }
+  if (!Array.isArray(message.impacts) || message.impacts.length < 1 || message.impacts.length > 6) {
+    return { ok: false, reason: 'draft_impact.impacts must contain 1 to 6 entries' };
+  }
+  const cardIds = new Set();
+  for (const impact of message.impacts) {
+    if (!impact || typeof impact !== 'object'
+      || typeof impact.cardId !== 'string' || !impact.cardId || impact.cardId.length > 128
+      || cardIds.has(impact.cardId)) {
+      return { ok: false, reason: 'draft_impact cardId must be unique and non-empty' };
+    }
+    cardIds.add(impact.cardId);
+    if (!Number.isInteger(impact.deltaPoints) || impact.deltaPoints < -100 || impact.deltaPoints > 100) {
+      return { ok: false, reason: 'draft_impact deltaPoints must be an integer from -100 to 100' };
+    }
+    if (impact.reason !== undefined && typeof impact.reason !== 'string') {
+      return { ok: false, reason: 'draft_impact reason must be a string' };
+    }
+    if (!Array.isArray(impact.archetypes) || impact.archetypes.length !== DRAFT_ARCHETYPE_IDS.length) {
+      return { ok: false, reason: 'draft_impact archetypes must contain exactly four entries' };
+    }
+    for (let index = 0; index < DRAFT_ARCHETYPE_IDS.length; index += 1) {
+      const archetype = impact.archetypes[index];
+      if (!archetype || archetype.id !== DRAFT_ARCHETYPE_IDS[index]) {
+        return { ok: false, reason: 'draft_impact archetype IDs must use the fixed order' };
+      }
+      if (!Number.isInteger(archetype.deltaPoints)
+        || archetype.deltaPoints < -100 || archetype.deltaPoints > 100) {
+        return { ok: false, reason: 'archetype deltaPoints must be an integer from -100 to 100' };
+      }
+      if (archetype.reason !== undefined && typeof archetype.reason !== 'string') {
+        return { ok: false, reason: 'archetype reason must be a string' };
+      }
+      for (const field of ['beforeScore', 'afterScore']) {
+        if (!Number.isInteger(archetype[field]) || archetype[field] < 0 || archetype[field] > 100) {
+          return { ok: false, reason: `archetype ${field} must be an integer from 0 to 100` };
+        }
+      }
+      for (const field of ['beforeStage', 'afterStage']) {
+        if (!DRAFT_ARCHETYPE_STAGES.has(archetype[field])) {
+          return { ok: false, reason: `archetype ${field} must be a known stage` };
+        }
+      }
+      if (!Array.isArray(archetype.completedAxes) || archetype.completedAxes.length > 8
+        || archetype.completedAxes.some(axis => typeof axis !== 'string' || !axis || axis.length > 64)
+        || new Set(archetype.completedAxes).size !== archetype.completedAxes.length) {
+        return { ok: false, reason: 'archetype completedAxes must contain unique axis IDs' };
+      }
+      if (archetype.started !== undefined && typeof archetype.started !== 'boolean') {
+        return { ok: false, reason: 'archetype started must be a boolean' };
+      }
+      const modern = ['readiness', 'status', 'beforeStatus', 'afterStatus', 'presentFunctions', 'missingFunctions', 'completedFunctions']
+        .filter(field => archetype[field] !== undefined);
+      if (modern.length && modern.length !== 7) {
+        return { ok: false, reason: 'archetype readiness fields must be provided together' };
+      }
+      if (modern.length === 7) {
+        if (!Number.isInteger(archetype.readiness) || archetype.readiness < 0 || archetype.readiness > 100
+          || archetype.readiness !== archetype.afterScore) {
+          return { ok: false, reason: 'archetype readiness must match afterScore' };
+        }
+        for (const field of ['status', 'beforeStatus', 'afterStatus']) {
+          if (!DRAFT_ARCHETYPE_STATUSES.has(archetype[field])) {
+            return { ok: false, reason: `archetype ${field} must be a known operating status` };
+          }
+        }
+        for (const field of ['presentFunctions', 'missingFunctions', 'completedFunctions']) {
+          if (!Array.isArray(archetype[field]) || archetype[field].length > 8) {
+            return { ok: false, reason: `archetype ${field} must be a function list` };
+          }
+          const ids = new Set();
+          for (const entry of archetype[field]) {
+            if (!entry || typeof entry.id !== 'string' || !entry.id || entry.id.length > 64
+              || typeof entry.label !== 'string' || !entry.label || entry.label.length > 64
+              || ids.has(entry.id)) {
+              return { ok: false, reason: `archetype ${field} entries need unique id and label` };
+            }
+            ids.add(entry.id);
+          }
+        }
+      }
+    }
+    if (impact.deltaPoints !== impact.archetypes[0].deltaPoints) {
+      return { ok: false, reason: 'legacy deltaPoints must match auto_strike' };
+    }
+  }
+  return { ok: true };
+}
+
+module.exports = {
+  DRAFT_ARCHETYPE_IDS,
+  SUPPORTED_EVENTS,
+  SUPPORTED_SCHEMA,
+  validateCardSnapshot,
+  validateRemoval,
+  validateDraftImpactMessage,
+  validateShop,
+  validateMessage,
+  validateState,
+  stateSignature
+};

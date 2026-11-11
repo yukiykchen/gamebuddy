@@ -8,12 +8,12 @@ function appendJsonl(filePath, row) {
   fs.appendFileSync(filePath, `${JSON.stringify(row)}\n`);
 }
 
-function runDirectory(seed = null, now = Date.now()) {
-  const id = seed || new Date(now).toISOString().replace(/[-:.TZ]/g, '').slice(0, 14);
-  return path.join(ROOT, id);
+function runDirectory(seed = null, now = Date.now(), rootDir = ROOT) {
+  const id = seed ? String(seed).replace(/[^a-zA-Z0-9_-]/g, '_') : new Date(now).toISOString().replace(/[-:.TZ]/g, '').slice(0, 14);
+  return path.join(rootDir, id);
 }
 
-function recordDecision({ runId, observation, decision, accepted = null, now = Date.now() }) {
+function recordDecision({ runId, observation, decision, accepted = null, now = Date.now(), rootDir = ROOT }) {
   const row = {
     schema: 'runmate.decision_log.v1',
     timestamp: now,
@@ -28,7 +28,7 @@ function recordDecision({ runId, observation, decision, accepted = null, now = D
     payload: decision.payload,
     accepted
   };
-  appendJsonl(path.join(ROOT, runId, 'decisions.jsonl'), row);
+  appendJsonl(path.join(runDirectory(runId, now, rootDir), 'decisions.jsonl'), row);
   return row;
 }
 

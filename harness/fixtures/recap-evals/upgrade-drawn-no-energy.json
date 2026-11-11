@@ -1,0 +1,3788 @@
+{
+  "synthetic": true,
+  "game": "Slay the Spire 2",
+  "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+  "provenance": "hand-authored deterministic fixture; not captured from game",
+  "facts": [
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:1",
+      "eventType": "capture.capability_reported",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 1,
+      "occurredAt": 101000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "capabilities": {
+          "lifecycle": {
+            "state": "available"
+          },
+          "reload_observation": {
+            "state": "available"
+          },
+          "card_play": {
+            "state": "available"
+          },
+          "card_movement": {
+            "state": "available"
+          },
+          "combat_resolution": {
+            "state": "available"
+          }
+        }
+      },
+      "synthetic": true
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:2",
+      "eventType": "run.started",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 2,
+      "occurredAt": 102000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "character": "IRONCLAD",
+        "ascension": 0,
+        "game": "Slay the Spire 2"
+      },
+      "synthetic": true
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:3",
+      "eventType": "combat.started",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 3,
+      "occurredAt": 103000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "roomType": "Normal",
+        "encounterId": "BOWLBUGS_NORMAL",
+        "deckInstanceIds": [
+          "deck-bash",
+          "deck-strike-1",
+          "deck-strike-2",
+          "deck-defend"
+        ]
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:4",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 4,
+      "occurredAt": 104000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:5",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 5,
+      "occurredAt": 105000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:6",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 6,
+      "occurredAt": 106000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:7",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 7,
+      "occurredAt": 107000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-1",
+        "turn": 1,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 36,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:8",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 8,
+      "occurredAt": 108000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:9",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 9,
+      "occurredAt": 109000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:10",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 10,
+      "occurredAt": 110000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-1",
+        "turn": 1,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 30,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:11",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 11,
+      "occurredAt": 111000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:12",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 12,
+      "occurredAt": 112000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:13",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 13,
+      "occurredAt": 113000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 5,
+        "blocked": 2,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:14",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 14,
+      "occurredAt": 114000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:15",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 15,
+      "occurredAt": 115000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:16",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 16,
+      "occurredAt": 116000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:17",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 17,
+      "occurredAt": 117000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:18",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 18,
+      "occurredAt": 118000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-1",
+        "turn": 2,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 24,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:19",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 19,
+      "occurredAt": 119000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:20",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 20,
+      "occurredAt": 120000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:21",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 21,
+      "occurredAt": 121000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-1",
+        "turn": 2,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 18,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:22",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 22,
+      "occurredAt": 122000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:23",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 23,
+      "occurredAt": 123000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:24",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 24,
+      "occurredAt": 124000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 5,
+        "blocked": 2,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:25",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 25,
+      "occurredAt": 125000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:26",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 26,
+      "occurredAt": 126000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 3,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:27",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 27,
+      "occurredAt": 127000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:28",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 28,
+      "occurredAt": 128000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:29",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 29,
+      "occurredAt": 129000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-1",
+        "turn": 3,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 12,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:30",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 30,
+      "occurredAt": 130000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:31",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 31,
+      "occurredAt": 131000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:32",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 32,
+      "occurredAt": 132000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-1",
+        "turn": 3,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 6,
+        "fatal": true
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:33",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 33,
+      "occurredAt": 133000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:34",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 34,
+      "occurredAt": 134000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 3,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:35",
+      "eventType": "combat.ended",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 35,
+      "occurredAt": 135000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "victory": true
+      },
+      "synthetic": true,
+      "combatId": "normal-1",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:36",
+      "eventType": "reward.offered",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 36,
+      "occurredAt": 136000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cards": [
+          "POMMEL_STRIKE",
+          "SHRUG_IT_OFF"
+        ]
+      },
+      "synthetic": true,
+      "decisionId": "reward-1"
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:37",
+      "eventType": "reward.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 37,
+      "occurredAt": 137000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "result": "selected",
+        "cardId": "POMMEL_STRIKE"
+      },
+      "synthetic": true,
+      "decisionId": "reward-1"
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:38",
+      "eventType": "deck.card_added",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 38,
+      "occurredAt": 138000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "POMMEL_STRIKE",
+        "cardInstanceId": "deck-pommel"
+      },
+      "synthetic": true
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:39",
+      "eventType": "combat.started",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 39,
+      "occurredAt": 139000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "roomType": "Normal",
+        "encounterId": "BOWLBUGS_NORMAL",
+        "deckInstanceIds": [
+          "deck-bash",
+          "deck-strike-1",
+          "deck-strike-2",
+          "deck-defend"
+        ]
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:40",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 40,
+      "occurredAt": 140000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:41",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 41,
+      "occurredAt": 141000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:42",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 42,
+      "occurredAt": 142000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:43",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 43,
+      "occurredAt": 143000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-2",
+        "turn": 1,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 36,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:44",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 44,
+      "occurredAt": 144000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:45",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 45,
+      "occurredAt": 145000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:46",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 46,
+      "occurredAt": 146000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-2",
+        "turn": 1,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 30,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:47",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 47,
+      "occurredAt": 147000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:48",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 48,
+      "occurredAt": 148000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:49",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 49,
+      "occurredAt": 149000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 5,
+        "blocked": 2,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:50",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 50,
+      "occurredAt": 150000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:51",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 51,
+      "occurredAt": 151000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:52",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 52,
+      "occurredAt": 152000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:53",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 53,
+      "occurredAt": 153000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:54",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 54,
+      "occurredAt": 154000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-2",
+        "turn": 2,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 24,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:55",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 55,
+      "occurredAt": 155000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:56",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 56,
+      "occurredAt": 156000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:57",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 57,
+      "occurredAt": 157000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-2",
+        "turn": 2,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 18,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:58",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 58,
+      "occurredAt": 158000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:59",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 59,
+      "occurredAt": 159000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:60",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 60,
+      "occurredAt": 160000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 5,
+        "blocked": 2,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:61",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 61,
+      "occurredAt": 161000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:62",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 62,
+      "occurredAt": 162000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 3,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:63",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 63,
+      "occurredAt": 163000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:64",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 64,
+      "occurredAt": 164000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:65",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 65,
+      "occurredAt": 165000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-2",
+        "turn": 3,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 12,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:66",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 66,
+      "occurredAt": 166000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:67",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 67,
+      "occurredAt": 167000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:68",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 68,
+      "occurredAt": 168000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-2",
+        "turn": 3,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 6,
+        "fatal": true
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:69",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 69,
+      "occurredAt": 169000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:70",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 70,
+      "occurredAt": 170000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 3,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:71",
+      "eventType": "combat.ended",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 71,
+      "occurredAt": 171000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "victory": true
+      },
+      "synthetic": true,
+      "combatId": "normal-2",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:72",
+      "eventType": "reward.offered",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 72,
+      "occurredAt": 172000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cards": [
+          "POMMEL_STRIKE",
+          "SHRUG_IT_OFF"
+        ]
+      },
+      "synthetic": true,
+      "decisionId": "reward-2"
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:73",
+      "eventType": "reward.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 73,
+      "occurredAt": 173000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "result": "skipped",
+        "cardId": null
+      },
+      "synthetic": true,
+      "decisionId": "reward-2"
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:74",
+      "eventType": "combat.started",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 74,
+      "occurredAt": 174000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "roomType": "Normal",
+        "encounterId": "BOWLBUGS_NORMAL",
+        "deckInstanceIds": [
+          "deck-bash",
+          "deck-strike-1",
+          "deck-strike-2",
+          "deck-defend"
+        ]
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:75",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 75,
+      "occurredAt": 175000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:76",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 76,
+      "occurredAt": 176000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:77",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 77,
+      "occurredAt": 177000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:78",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 78,
+      "occurredAt": 178000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-3",
+        "turn": 1,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 36,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:79",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 79,
+      "occurredAt": 179000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:80",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 80,
+      "occurredAt": 180000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:81",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 81,
+      "occurredAt": 181000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-3",
+        "turn": 1,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 30,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:82",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 82,
+      "occurredAt": 182000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:83",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 83,
+      "occurredAt": 183000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:84",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 84,
+      "occurredAt": 184000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 5,
+        "blocked": 2,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:85",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 85,
+      "occurredAt": 185000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:86",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 86,
+      "occurredAt": 186000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:87",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 87,
+      "occurredAt": 187000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:88",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 88,
+      "occurredAt": 188000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:89",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 89,
+      "occurredAt": 189000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-3",
+        "turn": 2,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 24,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:90",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 90,
+      "occurredAt": 190000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:91",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 91,
+      "occurredAt": 191000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:92",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 92,
+      "occurredAt": 192000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-3",
+        "turn": 2,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 18,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:93",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 93,
+      "occurredAt": 193000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:94",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 94,
+      "occurredAt": 194000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:95",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 95,
+      "occurredAt": 195000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 5,
+        "blocked": 2,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:96",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 96,
+      "occurredAt": 196000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:97",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 97,
+      "occurredAt": 197000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 3,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:98",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 98,
+      "occurredAt": 198000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:99",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 99,
+      "occurredAt": 199000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:100",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 100,
+      "occurredAt": 200000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-3",
+        "turn": 3,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 12,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:101",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 101,
+      "occurredAt": 201000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:102",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 102,
+      "occurredAt": 202000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:103",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 103,
+      "occurredAt": 203000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-3",
+        "turn": 3,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 6,
+        "fatal": true
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:104",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 104,
+      "occurredAt": 204000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:105",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 105,
+      "occurredAt": 205000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 3,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:106",
+      "eventType": "combat.ended",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 106,
+      "occurredAt": 206000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "victory": true
+      },
+      "synthetic": true,
+      "combatId": "normal-3",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:107",
+      "eventType": "reward.offered",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 107,
+      "occurredAt": 207000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cards": [
+          "POMMEL_STRIKE",
+          "SHRUG_IT_OFF"
+        ]
+      },
+      "synthetic": true,
+      "decisionId": "reward-3"
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:108",
+      "eventType": "reward.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 108,
+      "occurredAt": 208000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "result": "skipped",
+        "cardId": null
+      },
+      "synthetic": true,
+      "decisionId": "reward-3"
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:109",
+      "eventType": "combat.started",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 109,
+      "occurredAt": 209000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "roomType": "Normal",
+        "encounterId": "BOWLBUGS_NORMAL",
+        "deckInstanceIds": [
+          "deck-bash",
+          "deck-strike-1",
+          "deck-strike-2",
+          "deck-defend"
+        ]
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:110",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 110,
+      "occurredAt": 210000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:111",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 111,
+      "occurredAt": 211000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:112",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 112,
+      "occurredAt": 212000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:113",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 113,
+      "occurredAt": 213000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-4",
+        "turn": 1,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 36,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:114",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 114,
+      "occurredAt": 214000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:115",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 115,
+      "occurredAt": 215000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:116",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 116,
+      "occurredAt": 216000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-4",
+        "turn": 1,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 30,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:117",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 117,
+      "occurredAt": 217000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:118",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 118,
+      "occurredAt": 218000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:119",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 119,
+      "occurredAt": 219000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 5,
+        "blocked": 2,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:120",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 120,
+      "occurredAt": 220000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:121",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 121,
+      "occurredAt": 221000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:122",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 122,
+      "occurredAt": 222000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:123",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 123,
+      "occurredAt": 223000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:124",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 124,
+      "occurredAt": 224000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-4",
+        "turn": 2,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 24,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:125",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 125,
+      "occurredAt": 225000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:126",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 126,
+      "occurredAt": 226000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:127",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 127,
+      "occurredAt": 227000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-4",
+        "turn": 2,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 18,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:128",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 128,
+      "occurredAt": 228000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:129",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 129,
+      "occurredAt": 229000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:130",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 130,
+      "occurredAt": 230000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 5,
+        "blocked": 2,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:131",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 131,
+      "occurredAt": 231000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:132",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 132,
+      "occurredAt": 232000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 3,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:133",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 133,
+      "occurredAt": 233000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:134",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 134,
+      "occurredAt": 234000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-1",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:135",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 135,
+      "occurredAt": 235000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-4",
+        "turn": 3,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 12,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:136",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 136,
+      "occurredAt": 236000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:137",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 137,
+      "occurredAt": 237000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "STRIKE_IRONCLAD",
+        "cardInstanceId": "deck-strike-2",
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:138",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 138,
+      "occurredAt": 238000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "player",
+        "targetSide": "enemy",
+        "targetEntityId": "bowlbug-4",
+        "turn": 3,
+        "side": "player",
+        "hpLoss": 6,
+        "resolvedDamageBeforeHpCap": 6,
+        "targetHpBefore": 6,
+        "fatal": true
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:139",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 139,
+      "occurredAt": 239000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "DEFEND_IRONCLAD",
+        "cardInstanceId": "deck-defend"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:140",
+      "eventType": "turn.ended",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 140,
+      "occurredAt": 240000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 3,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:141",
+      "eventType": "combat.ended",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 141,
+      "occurredAt": 241000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "victory": true
+      },
+      "synthetic": true,
+      "combatId": "normal-4",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:142",
+      "eventType": "reward.offered",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 142,
+      "occurredAt": 242000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cards": [
+          "POMMEL_STRIKE",
+          "SHRUG_IT_OFF"
+        ]
+      },
+      "synthetic": true,
+      "decisionId": "reward-4"
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:143",
+      "eventType": "reward.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 143,
+      "occurredAt": 243000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "result": "skipped",
+        "cardId": null
+      },
+      "synthetic": true,
+      "decisionId": "reward-4"
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:144",
+      "eventType": "event.options_offered",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 144,
+      "occurredAt": 244000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "eventId": "ACT1_RISK_EVENT",
+        "options": [
+          "take_damage_for_reward"
+        ]
+      },
+      "synthetic": true
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:145",
+      "eventType": "event.option_resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 145,
+      "occurredAt": 245000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "eventId": "ACT1_RISK_EVENT",
+        "hpLoss": 16,
+        "hpAfter": 24
+      },
+      "synthetic": true
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:146",
+      "eventType": "rest.action_completed",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 146,
+      "occurredAt": 246000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "action": "smith",
+        "cardId": "BASH",
+        "cardName": "痛击",
+        "cardInstanceId": "deck-bash",
+        "upgraded": true
+      },
+      "synthetic": true
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:147",
+      "eventType": "combat.started",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 147,
+      "occurredAt": 247000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "roomType": "Elite",
+        "encounterId": "BYGONE_EFFIGY_ELITE",
+        "deckInstanceIds": [
+          "deck-bash",
+          "deck-strike-1",
+          "deck-strike-2",
+          "deck-defend",
+          "deck-pommel"
+        ]
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:148",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 148,
+      "occurredAt": 248000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:149",
+      "eventType": "card.played",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 149,
+      "occurredAt": 249000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "POMMEL_STRIKE",
+        "cardInstanceId": "deck-pommel",
+        "actualEnergyPaid": 1,
+        "executed": true
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:150",
+      "eventType": "resource.changed",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 150,
+      "occurredAt": 250000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "resource": "energy",
+        "before": 1,
+        "after": 0
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:151",
+      "eventType": "card.drawn",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 151,
+      "occurredAt": 251000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cardId": "BASH",
+        "cardInstanceId": "deck-bash",
+        "cost": 2,
+        "energyAtDraw": 0,
+        "playable": false,
+        "unavailableReason": "insufficient_energy"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:152",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 152,
+      "occurredAt": 252000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 1,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:153",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 153,
+      "occurredAt": 253000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 13,
+        "blocked": 0,
+        "fatal": false
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:154",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 154,
+      "occurredAt": 254000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "player"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:155",
+      "eventType": "turn.started",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 155,
+      "occurredAt": 255000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "turn": 2,
+        "side": "enemy"
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:156",
+      "eventType": "damage.resolved",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 156,
+      "occurredAt": 256000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "sourceSide": "enemy",
+        "targetSide": "player",
+        "targetEntityId": "ironclad",
+        "hpLoss": 11,
+        "blocked": 0,
+        "fatal": true
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:157",
+      "eventType": "combat.ended",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 157,
+      "occurredAt": 257000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "victory": false
+      },
+      "synthetic": true,
+      "combatId": "elite-bygone-effigy",
+      "attemptGeneration": 0
+    },
+    {
+      "schema": "gamebuddy.fact-event.v1",
+      "eventVersion": 1,
+      "eventId": "fixture-upgrade-drawn-no-energy:158",
+      "eventType": "run.ended",
+      "runId": "synthetic-sts2-upgrade-drawn-no-energy",
+      "sourceSessionId": "fixture-upgrade-drawn-no-energy",
+      "sourceSeq": 158,
+      "occurredAt": 258000,
+      "quality": {
+        "observationMethod": "direct_hook",
+        "unknownFields": [],
+        "unknownReasons": {}
+      },
+      "payload": {
+        "cleared": false,
+        "reason": "death"
+      },
+      "synthetic": true
+    }
+  ],
+  "coverage": {
+    "families": {
+      "lifecycle": {
+        "state": "available"
+      },
+      "reload_observation": {
+        "state": "available"
+      },
+      "card_play": {
+        "state": "available"
+      },
+      "card_movement": {
+        "state": "available"
+      },
+      "combat_resolution": {
+        "state": "available"
+      }
+    },
+    "gaps": []
+  },
+  "expected": {
+    "candidate": {
+      "pattern": "upgrade_no_energy",
+      "eventId": "fixture-upgrade-drawn-no-energy:146"
+    },
+    "allowed": true,
+    "forbidden": [
+      "如果回血一定能赢",
+      "玩家操作失误"
+    ]
+  }
+}

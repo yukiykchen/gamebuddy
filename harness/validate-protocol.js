@@ -1,5 +1,6 @@
 const assert = require('node:assert/strict');
-const { validateMessage, validateState } = require('./protocol');
+const { DRAFT_ARCHETYPE_IDS, validateDraftImpactMessage, validateMessage, validateState } = require('./protocol');
+const { FACT_SCHEMA, validateFactAck, validateFactEvent } = require('./fact-protocol');
 
 const validState = {
   schema: 'gamebuddy.state.v1',
@@ -14,6 +15,26 @@ const validState = {
 assert.equal(validateState(validState).ok, true);
 assert.equal(validateState({ ...validState, combat: null }).ok, true);
 assert.equal(validateMessage({ type: 'state', data: validState }).ok, true);
+assert.equal(validateState({ ...validState, run: { ...validState.run, runId: 'run-001', startedAt: Date.now(), maxTurnDamage: 37 } }).ok, true);
+assert.equal(validateState({ ...validState, run: { ...validState.run, runId: '' } }).ok, false);
+assert.equal(validateMessage({
+  type: 'event',
+  name: 'run.started',
+  timestamp: Date.now(),
+  data: { runId: 'run-001', character: 'ironclad', ascension: 3, startedAt: Date.now() }
+}).ok, true);
+assert.equal(validateMessage({
+  type: 'event',
+  name: 'run.ended',
+  timestamp: Date.now(),
+  data: { runId: 'run-001', result: 'win', act: 3, floor: 55, bossName: '守护者', maxTurnDamage: 92 }
+}).ok, true);
+assert.equal(validateMessage({
+  type: 'event',
+  name: 'run.ended',
+  timestamp: Date.now(),
+  data: { runId: 'run-001', result: 'maybe' }
+}).ok, false);
 assert.equal(validateMessage({ type: 'event', name: 'turn.started', timestamp: Date.now(), data: { turn: 1 } }).ok, true);
 assert.equal(validateMessage({ type: 'event', name: 'rest.opened', timestamp: Date.now() }).ok, true);
 assert.equal(validateMessage({
@@ -57,7 +78,8 @@ assert.equal(validateMessage({
       starCostX: false,
       starCostSource: 'runtime'
     }, 'IRON_WAVE'],
-    canSkip: true
+    canSkip: true,
+    signature: 'SEVEN_STARS:True|IRON_WAVE:False'
   }
 }).ok, true);
 assert.equal(validateMessage({
@@ -77,6 +99,30 @@ assert.equal(validateMessage({
   name: 'card.reward.opened',
   timestamp: Date.now(),
   data: { cards: [] }
+}).ok, false);
+assert.equal(validateMessage({
+  type: 'event',
+  name: 'card.reward.opened',
+  timestamp: Date.now(),
+  data: { cards: ['IRON_WAVE'], signature: 42 }
+}).ok, false);
+assert.equal(validateMessage({
+  type: 'event',
+  name: 'card.reward.selected',
+  timestamp: Date.now(),
+  data: { signature: 'ANGER:False|IRON_WAVE:False', cardId: 'IRON_WAVE', upgraded: false }
+}).ok, true);
+assert.equal(validateMessage({
+  type: 'event',
+  name: 'card.reward.selected',
+  timestamp: Date.now(),
+  data: { signature: 'ANGER:False|IRON_WAVE:False', cardId: '', upgraded: false }
+}).ok, false);
+assert.equal(validateMessage({
+  type: 'event',
+  name: 'card.reward.selected',
+  timestamp: Date.now(),
+  data: { signature: 'ANGER:False|IRON_WAVE:False', cardId: 'IRON_WAVE' }
 }).ok, false);
 const validRemoval = {
   cards: [
@@ -101,6 +147,70 @@ assert.equal(validateMessage({ type: 'event', name: 'card.removal.opened', times
 assert.equal(validateMessage({ type: 'event', name: 'made.up.event', timestamp: Date.now() }).ok, false);
 assert.equal(validateMessage({ type: 'state', data: { ...validState, player: { ...validState.player, energy: '3' } } }).ok, false);
 assert.equal(validateMessage({ type: 'unknown' }).ok, false);
+
+const fact = (overrides = {}) => ({
+  schema: FACT_SCHEMA,
+  eventVersion: 1,
+  eventId: 'source-test:1',
+  eventType: 'card.played',
+  runId: 'run-001',
+  segmentId: 'segment-001',
+  combatId: 'combat-001',
+  decisionId: null,
+  actionId: 'action-001',
+  parentActionId: null,
+  sourceSessionId: 'source-test',
+  sourceSeq: 1,
+  occurredAt: Date.now(),
+  sourceElapsedMs: 100,
+  attemptGeneration: 0,
+  contextSnapshotId: null,
+  quality: { observationMethod: 'direct_hook', unknownFields: [], unknownReasons: {} },
+  payload: { cardId: 'STRIKE_IRONCLAD', playMode: 'manual' },
+  ...overrides
+});
+assert.equal(validateFactEvent(fact()).ok, true);
+assert.equal(validateMessage({ type: 'fact', data: fact() }).ok, true);
+assert.equal(validateFactEvent(fact({ sourceSeq: 0 })).ok, false);
+assert.equal(validateFactEvent(fact({ eventType: 'invented.fact' })).ok, false);
+assert.equal(validateFactEvent(fact({
+  quality: {
+    observationMethod: 'direct_hook',
+    unknownFields: ['parentActionId'],
+    unknownReasons: { parentActionId: 'not_observed' }
+  }
+})).ok, true);
+assert.equal(validateFactEvent(fact({
+  quality: {
+    observationMethod: 'direct_hook',
+    unknownFields: ['parentActionId'],
+    unknownReasons: { parentActionId: 'maybe' }
+  }
+})).ok, false);
+assert.equal(validateFactEvent(fact({
+  eventType: 'combat.attempt_replaced',
+  attemptGeneration: 2,
+  payload: { replacedGeneration: 1 }
+})).ok, true);
+assert.equal(validateFactEvent(fact({
+  eventType: 'run.ended',
+  combatId: null,
+  attemptGeneration: null,
+  payload: { cleared: true, endReason: 'architect' }
+})).ok, true);
+assert.equal(validateFactEvent(fact({
+  eventType: 'capture.capability_reported',
+  combatId: null,
+  attemptGeneration: null,
+  payload: {
+    capabilities: {
+      card_play: { state: 'available' },
+      damage: { state: 'unavailable', reason: 'hook_failed' }
+    }
+  }
+})).ok, true);
+assert.equal(validateFactAck({ type: 'fact_ack', sourceSessionId: 'source-test', ackSourceSeq: 1 }).ok, true);
+assert.equal(validateFactAck({ type: 'fact_ack', sourceSessionId: '', ackSourceSeq: -1 }).ok, false);
 assert.equal(validateState({
   ...validState,
   map: {
@@ -171,4 +281,95 @@ assert.equal(validateState({
   reward: { cards: [] }
 }).ok, false);
 
-console.log('Protocol validation cases passed: 22');
+const rewardSignature = 'ANGER:False|POMMEL_STRIKE:False|BASH:True';
+const draftImpact = {
+  type: 'draft_impact',
+  signature: rewardSignature,
+  impacts: ['ANGER', 'POMMEL_STRIKE', 'BASH'].map((cardId, cardIndex) => ({
+    cardId,
+    deltaPoints: cardIndex - 1,
+    reason: '兼容原因',
+    archetypes: DRAFT_ARCHETYPE_IDS.map((id, archetypeIndex) => ({
+      id,
+      deltaPoints: cardIndex + archetypeIndex - 2,
+      reason: `${id}-reason`,
+      beforeScore: 10 + archetypeIndex,
+      afterScore: 11 + cardIndex + archetypeIndex,
+      beforeStage: 'unformed',
+      afterStage: cardIndex === 2 && archetypeIndex === 0 ? 'started' : 'unformed',
+      completedAxes: cardIndex === 2 && archetypeIndex === 0 ? ['auto_gate'] : []
+    }))
+  }))
+};
+draftImpact.impacts.forEach(impact => { impact.deltaPoints = impact.archetypes[0].deltaPoints; });
+assert.equal(validateDraftImpactMessage(draftImpact).ok, true);
+assert.equal(draftImpact.signature, rewardSignature);
+
+const invalidDraft = mutate => {
+  const copy = JSON.parse(JSON.stringify(draftImpact));
+  mutate(copy);
+  return validateDraftImpactMessage(copy).ok;
+};
+assert.equal(invalidDraft(message => message.impacts[0].archetypes.pop()), false);
+assert.equal(invalidDraft(message => {
+  message.impacts[0].archetypes[3].id = message.impacts[0].archetypes[0].id;
+}), false);
+assert.equal(invalidDraft(message => { message.impacts[1].archetypes[2].deltaPoints = 101; }), false);
+assert.equal(invalidDraft(message => { message.impacts[2].archetypes[1].deltaPoints = 0.5; }), false);
+assert.equal(invalidDraft(message => { message.impacts[0].deltaPoints += 1; }), false);
+assert.equal(invalidDraft(message => { delete message.impacts[0].archetypes[0].afterScore; }), false);
+assert.equal(invalidDraft(message => { message.impacts[0].archetypes[0].afterStage = 'winning'; }), false);
+assert.equal(invalidDraft(message => { message.impacts[0].archetypes[0].completedAxes = ['auto_gate', 'auto_gate']; }), false);
+
+const readinessDraft = JSON.parse(JSON.stringify(draftImpact));
+for (const impact of readinessDraft.impacts) {
+  for (const archetype of impact.archetypes) {
+    archetype.readiness = archetype.afterScore;
+    archetype.status = archetype.afterStage === 'started' ? 'operational' : 'missing_starter';
+    archetype.beforeStatus = 'missing_starter';
+    archetype.afterStatus = archetype.status;
+    archetype.presentFunctions = archetype.completedAxes.map(id => ({ id, label: id }));
+    archetype.missingFunctions = [{ id: 'auto_loop', label: '抽牌循环' }];
+    archetype.completedFunctions = archetype.presentFunctions;
+  }
+}
+assert.equal(validateDraftImpactMessage(readinessDraft).ok, true);
+assert.equal(validateDraftImpactMessage(draftImpact).ok, true);
+assert.equal(invalidDraft(message => {
+  message.impacts[0].archetypes[0].readiness = message.impacts[0].archetypes[0].afterScore;
+  message.impacts[0].archetypes[0].status = 'operational';
+}), false);
+assert.equal(validateMessage({
+  type: 'event',
+  name: 'card.reward.opened',
+  timestamp: Date.now(),
+  data: {
+    opportunityId: 'reward:1',
+    source: 'event',
+    signature: 'HELLRAISER:False',
+    cards: [{ id: 'HELLRAISER', name: '地狱狂徒' }]
+  }
+}).ok, true);
+assert.equal(validateMessage({
+  type: 'event',
+  name: 'shop.updated',
+  timestamp: Date.now(),
+  data: {
+    ...validShop,
+    visitId: 'shop:1',
+    items: [{ ...validShop.items[0], stockKey: 'card:2' }]
+  }
+}).ok, true);
+
+// C# ShopItemSnapshot 对删牌服务使用默认 StockKey=null，CamelCase序列化仍保留null。
+const nullableShop = { ...validShop, items: [...validShop.items, {
+  index: 20, itemType: 'service', id: 'CARD_REMOVAL', name: '删除一张牌', price: 75,
+  stocked: true, affordable: true, onSale: false, card: null, stockKey: null
+}] };
+assert.equal(validateMessage({ type: 'event', name: 'shop.opened', timestamp: Date.now(), data: nullableShop }).ok, true);
+assert.equal(validateMessage({ type: 'state', data: { ...validState, combat: null, shop: nullableShop } }).ok, true);
+for (const stockKey of [5, {}, '', 'x'.repeat(65)]) {
+  assert.equal(validateMessage({ type: 'event', name: 'shop.updated', timestamp: Date.now(), data: { ...nullableShop, items: [{ ...nullableShop.items[0], stockKey }] } }).ok, false);
+}
+
+console.log('Protocol validation cases passed, including four-archetype draft impacts');

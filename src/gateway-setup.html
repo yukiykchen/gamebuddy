@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>配置密钥</title>
+  <style>
+    :root { color-scheme: dark; font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif; }
+    body { margin: 0; background: #171a1c; color: #eef0ed; }
+    form { display: flex; flex-direction: column; gap: 8px; padding: 22px 22px 18px; }
+    h1 { margin: 0 0 4px; font-size: 18px; }
+    p { margin: 0; color: #b7c0bc; font-size: 13px; line-height: 1.5; }
+    label { margin-top: 8px; font-size: 13px; font-weight: 650; }
+    input { height: 36px; border: 1px solid #3c4448; border-radius: 8px; background: #101314; color: inherit; padding: 0 10px; font: inherit; }
+    .hint { color: #e4a64d; }
+    .keys-link { align-self: flex-start; padding: 0; border: 0; background: transparent; color: #6cb0d0; font-size: 13px; text-decoration: underline; cursor: pointer; }
+    .error { color: #e7796b; }
+    .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+    button { height: 34px; border: 0; border-radius: 8px; padding: 0 14px; font: inherit; cursor: pointer; }
+    #cancel { background: #2a3034; color: inherit; }
+    #save { background: #e4a64d; color: #23180c; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <form id="form">
+    <h1>配置密钥</h1>
+    <p>默认走公司个人 token 网关。需要 Key 时点下面的链接，再贴到第一行。第二行是网关，可以改成其他地址。</p>
+    <button type="button" class="keys-link" id="openKeys">公司内网 API 获取链接</button>
+    <label for="apiKey">API Key</label>
+    <input id="apiKey" name="apiKey" type="password" autocomplete="off" spellcheck="false">
+    <label for="baseURL">网关</label>
+    <input id="baseURL" name="baseURL" type="url" value="https://copilot.tencent.com/v2/" spellcheck="false">
+    <p class="hint" id="gatewayHint">公司个人 token 网关</p>
+    <p class="error" id="error" hidden></p>
+    <div class="actions">
+      <button type="button" id="cancel">取消</button>
+      <button type="submit" id="save">保存</button>
+    </div>
+  </form>
+  <script>
+    const apiKey = document.querySelector('#apiKey');
+    const baseURL = document.querySelector('#baseURL');
+    const error = document.querySelector('#error');
+    const hint = document.querySelector('#gatewayHint');
+    window.gatewaySetup?.load().then(draft => {
+      if (!draft) return;
+      if (draft.baseURL) baseURL.value = draft.baseURL;
+      if (draft.apiKey) apiKey.value = draft.apiKey;
+      if (draft.gatewayName) hint.textContent = draft.gatewayName;
+    }).catch(() => {});
+    document.querySelector('#cancel').addEventListener('click', () => window.gatewaySetup?.cancel());
+    document.querySelector('#openKeys').addEventListener('click', () => window.gatewaySetup?.openKeysPage());
+    document.querySelector('#form').addEventListener('submit', async event => {
+      event.preventDefault();
+      error.hidden = true;
+      const result = await window.gatewaySetup.save({ apiKey: apiKey.value, baseURL: baseURL.value });
+      if (!result?.ok) {
+        error.hidden = false;
+        error.textContent = result?.message || '请填写 API Key';
+      }
+    });
+  </script>
+</body>
+</html>

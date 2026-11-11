@@ -1,0 +1,12 @@
+---
+description: Commit each completed modification locally after verification
+alwaysApply: true
+---
+
+# 本地提交工作流
+
+- 每次完成一组用户要求的修改并通过相应验证后，创建一个本地 Git commit。
+- 只暂存本次任务实际修改的文件，禁止顺带提交工作区中的既有或用户修改。
+- 使用符合项目约定的 Conventional Commit 信息。
+- 除非用户明确要求，否则不要 push、创建 PR 或改写历史。
+- 如果本次修改无法与既有未提交内容安全分离，先说明冲突，不得创建混合提交。

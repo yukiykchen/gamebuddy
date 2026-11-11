@@ -1,0 +1,54 @@
+{
+  "cases": [
+    {
+      "id": "upgrade-never-drawn",
+      "eventCount": 157,
+      "synthetic": true
+    },
+    {
+      "id": "upgrade-drawn-no-energy",
+      "eventCount": 158,
+      "synthetic": true
+    },
+    {
+      "id": "overkill-confirmed",
+      "eventCount": 216,
+      "synthetic": true
+    },
+    {
+      "id": "capture-gap",
+      "eventCount": 157,
+      "synthetic": true
+    },
+    {
+      "id": "same-name-instance",
+      "eventCount": 159,
+      "synthetic": true
+    },
+    {
+      "id": "automatic-upgrade-play",
+      "eventCount": 158,
+      "synthetic": true
+    },
+    {
+      "id": "reload-two-observations",
+      "eventCount": 159,
+      "synthetic": true
+    },
+    {
+      "id": "block-gain-vs-absorb",
+      "eventCount": 158,
+      "synthetic": true
+    },
+    {
+      "id": "requested-not-resolved",
+      "eventCount": 215,
+      "synthetic": true
+    },
+    {
+      "id": "overkill-with-reload",
+      "eventCount": 217,
+      "synthetic": true
+    }
+  ]
+}

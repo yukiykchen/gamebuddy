@@ -1,6 +1,6 @@
 # GameBuddyBridge
 
-这是运行在《杀戮尖塔 2》进程内的只读数据采集 Mod。它不调用出牌、移动、选择奖励或鼠标控制 API，只把当前对局状态通过本地 WebSocket 推给 GameBuddy 桌面端。
+这是运行在《杀戮尖塔 2》进程内的数据采集与辅助标记 Mod。它不调用出牌、移动、选择奖励或鼠标控制 API；通过本地 WebSocket 将对局状态推给 GameBuddy 桌面端，并在选牌奖励页为每张卡显示四套流派度变化。
 
 从安装依赖到启动桌面端的完整流程见 [GameBuddy 启动与开发指南](../../docs/getting-started.md)，逐项真机检查见 [Windows 联调验收](../../docs/windows-validation.md)。
 
@@ -17,6 +17,7 @@
 - 卡牌快照：导出升级状态、游戏当前格式化效果文本、普通能量/X 费与星/X 星费；可选运行时字段变化时明确标记不可用
 - 卡牌奖励：监听 `NCardRewardSelectionScreen` 打开和刷新，导出当前候选牌、刚结束的战斗类型/敌人和可读取到的下一个 Boss
 - 商店：在 `MerchantRoom` 中导出当前玩家库存里的全部在售卡牌、遗物、药水、删牌服务、运行时价格与可购买状态；库存或金币变化时发送更新事件
+- 游戏内选牌标记：接收桌面端返回的当前奖励四套流派度，在牌列上方显示铜铁面板；面板不拦截输入，奖励刷新或关闭后立即清理
 
 ## 构建环境
 
@@ -61,6 +62,6 @@ npm run harness:inspect -- --once
 
 桌面端已经把回放桥和真实 Mod 桥放在同一个协议边界，后续 Agent 只需要订阅桌面端状态，不需要了解 Godot 或 STS2 内部对象。
 
-卡牌奖励通过 Harmony 生命周期 Hook 采集，但仍然只读：Mod 不会调用卡牌选择或跳过接口。游戏更新后若 `NCardRewardSelectionScreen` 的生命周期发生变化，日志会记录 `Harmony reward-screen patches failed`，其余状态采集仍会继续运行。
+卡牌奖励通过 Harmony 生命周期 Hook 采集；流派度标签只添加文字控件，Mod 不会调用卡牌选择或跳过接口。游戏更新后若 `NCardRewardSelectionScreen` 的生命周期发生变化，日志会记录 `Harmony reward-screen patches failed`，其余状态采集仍会继续运行。
 
 卡牌的动态描述和星费属于早期访问版本中可能变化的可选成员，Bridge 使用容错只读反射读取。读取失败时对应来源为 `unavailable`，不会阻止状态发布；桌面端可以使用 Spire Codex 回退并保留来源标记。更新本 Mod 后需要重新构建、复制 `gamebuddy_bridge.dll` 并重启游戏。

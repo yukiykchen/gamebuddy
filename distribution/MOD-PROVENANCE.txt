@@ -7,6 +7,4 @@ Godot SDK: Godot.NET.Sdk/4.5.1
 Manifest id: gamebuddy_bridge
 Manifest version: 0.1.0
 
-The distributed DLL was copied from the locally installed Windows Mod directory under the App宝 Wine environment. The current checkout has no later changes under mod/GameBuddyBridge after the source Mod commit listed above.
-
-Supplied by project maintainer on 2026-10-10. Usability confirmed by the project maintainer.
+The distributed DLL was rebuilt on 2026-10-20 from the current GameBuddyBridge source against the local Slay the Spire 2 Windows assemblies. It records RunState.GameMode and event.selected in addition to the existing clear facts.

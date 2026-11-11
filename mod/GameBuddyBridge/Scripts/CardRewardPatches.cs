@@ -10,6 +10,7 @@ public static class CardRewardOpenedPatch
     public static void AfterOpened(NCardRewardSelectionScreen __instance)
     {
         GameBuddyExporter.TrackCardRewardScreen(__instance);
+        GameBuddyRewardOverlay.TrackScreen(__instance);
     }
 }
 
@@ -20,6 +21,7 @@ public static class CardRewardRefreshedPatch
     public static void AfterRefresh(NCardRewardSelectionScreen __instance)
     {
         GameBuddyExporter.TrackCardRewardScreen(__instance);
+        GameBuddyRewardOverlay.TrackScreen(__instance);
     }
 }
 
@@ -30,5 +32,6 @@ public static class CardRewardClosedPatch
     public static void AfterClosed(NCardRewardSelectionScreen __instance)
     {
         GameBuddyExporter.ClearCardRewardScreen(__instance);
+        GameBuddyRewardOverlay.ClearScreen(__instance);
     }
 }

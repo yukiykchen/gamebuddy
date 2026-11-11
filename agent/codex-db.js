@@ -88,6 +88,10 @@ function lookupPotion(input) {
     || indexes.potionByName.get(normalizeName(input)) || null;
 }
 
+function lookupPower(input) {
+  return indexes.power.get(String(input ?? '').toUpperCase()) || null;
+}
+
 function monsterMoves(monster) {
   const moves = Array.isArray(monster?.moves) ? monster.moves : [];
   return moves.map(move => {
@@ -118,5 +122,6 @@ module.exports = {
   lookupEvent,
   lookupRelic,
   lookupPotion,
+  lookupPower,
   monsterMoves
 };

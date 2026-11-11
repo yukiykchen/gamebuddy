@@ -1,0 +1,56 @@
+{
+  "capturedAt": "2026-10-18",
+  "gameVersion": "v0.107.1",
+  "labelsMethod": "依据牌面机制在运行新评分前给出；标签为本次 AI 辅助研究的初标，尚未由独立玩家复核。胜负不参与标签和分数。",
+  "extraction": "从公开页面可见的卡牌链接、数量、升级标记和遗物链接提取；保留原始数量。未读取逐卡附魔和疯狂科学的动态改造效果，均作为不确定项。",
+  "reference": {
+    "id": "771edca84735c8d3", "purpose": "格挡教学参照，不参加五套独立验证",
+    "url": "https://spire-codex.com/zhs/runs/771edca84735c8d3",
+    "player": "Kristofa20", "ascension": 7, "outcome": "victory", "mode": "standard", "version": "v0.107.1", "seed": "R73D5CCCXA", "cardCount": 21,
+    "cards": ["ASCENDERS_BANE", "BARRICADE+", "BASH", "BATTLE_TRANCE+", "BLOOD_WALL", "BLOOD_WALL+", "BODY_SLAM+*2", "BODY_SLAM", "COLOSSUS+", "CRIMSON_MANTLE", "DEFEND_IRONCLAD*4", "FINESSE", "MAD_SCIENCE", "PROLONG+", "SHRUG_IT_OFF", "TEAR_ASUNDER+", "TREMBLE"],
+    "relics": ["BURNING_BLOOD", "LOST_COFFER", "FESTIVE_POPPER", "ASTROLABE", "ANCHOR", "LANTERN", "WHISPERING_EARRING", "CANDELABRA", "RED_MASK", "STONE_CALENDAR", "HORN_CLEAT", "MEAT_ON_THE_BONE"],
+    "knownUnknowns": ["MAD_SCIENCE 的运行时改造", "至少一张 DEFEND_IRONCLAD 的涡旋附魔"]
+  },
+  "validation": [
+    {
+      "id": "27411835bfd3f399", "url": "https://spire-codex.com/zhs/runs/27411835bfd3f399",
+      "ascension": 1, "outcome": "victory", "mode": "standard", "version": "v0.107.1", "seed": "ZHE4C2FVBM", "cardCount": 26,
+      "expectedPrimary": ["block"], "expectedSecondary": ["auto_strike"],
+      "labelEvidence": "壁垒、坚定不移、两张全身撞击、势不可当、两张岩石铠甲构成格挡主体；地狱狂徒和打击提供副方向。",
+      "cards": ["STRIKE_IRONCLAD*4", "DEFEND_IRONCLAD+*4", "BASH", "BARRICADE+", "ARMAMENTS+*3", "BODY_SLAM+*2", "UNMOVABLE+", "JUGGERNAUT+", "CURSE_OF_THE_BELL", "STONE_ARMOR+*2", "RAGE+", "BEACON_OF_HOPE+", "CRUELTY+", "TREMBLE", "HELLRAISER+", "TWIN_STRIKE+"],
+      "relics": ["BURNING_BLOOD", "HEFTY_TABLET", "BRONZE_SCALES", "ANCHOR", "HORN_CLEAT", "POTION_BELT", "CALLING_BELL", "SPARKLING_ROUGE", "FROZEN_EGG", "VEXING_PUZZLEBOX", "DAUGHTER_OF_THE_WIND", "SIGNET_RING", "REGAL_PILLOW", "BAG_OF_MARBLES", "HISTORY_COURSE", "ART_OF_WAR", "ODDLY_SMOOTH_STONE", "CAPTAINS_WHEEL"]
+    },
+    {
+      "id": "b88bf732fa576d92", "url": "https://spire-codex.com/zhs/runs/b88bf732fa576d92",
+      "player": "Kuro", "ascension": 5, "outcome": "victory", "mode": "standard", "version": "v0.107.1", "seed": "8LUYXQFV80", "cardCount": 18,
+      "expectedPrimary": ["auto_strike"], "expectedSecondary": [],
+      "labelEvidence": "地狱狂徒和七张剑柄打击形成明确的自动打击抽牌路线，无力量或消耗收益核心。",
+      "cards": ["STRIKE_IRONCLAD*3", "DEFEND_IRONCLAD*2", "BASH", "ASCENDERS_BANE", "SPITE", "POMMEL_STRIKE+*6", "ANGER", "HELLRAISER", "POMMEL_STRIKE", "FINESSE"],
+      "relics": ["BURNING_BLOOD", "NEW_LEAF", "BAG_OF_PREPARATION", "ANCHOR", "SWORD_OF_STONE", "GORGET", "NUTRITIOUS_SOUP", "PARRYING_SHIELD", "REGAL_PILLOW", "LOOMING_FRUIT", "BRONZE_SCALES", "BLOOD_VIAL", "STRAWBERRY", "PEAR", "HAPPY_FLOWER"]
+    },
+    {
+      "id": "2dd1c482c04fadec", "url": "https://spire-codex.com/zhs/runs/2dd1c482c04fadec",
+      "player": "Kite", "ascension": 6, "outcome": "victory", "mode": "standard", "version": "v0.107.1", "seed": "QD9YLY7U7E", "cardCount": 32,
+      "expectedPrimary": ["exhaust"], "expectedSecondary": ["strength"],
+      "labelEvidence": "黑暗之拥、添柴、燃烧契约、恶魔之焰、烙印及消耗堆兑现构成消耗主体；燃烧与旋风斩构成副方向。没有无惧疼痛仍可识别消耗路线。",
+      "cards": ["STRIKE_IRONCLAD*4", "DEFEND_IRONCLAD*3", "BASH", "ASCENDERS_BANE", "STOKE+", "SHRUG_IT_OFF*4", "DRUM_OF_BATTLE", "DARK_EMBRACE+", "BLOOD_WALL", "AUTOMATION", "WHIRLWIND", "INFLAME", "BRAND+", "FINESSE", "BURNING_PACT+", "BLOODLETTING*2", "FIEND_FIRE+", "TAUNT+", "ASHEN_STRIKE", "PACTS_END", "MAD_SCIENCE", "BATTLE_TRANCE+", "OFFERING"],
+      "relics": ["BURNING_BLOOD", "ARCANE_SCROLL", "TUNING_FORK", "STRAWBERRY", "MINIATURE_CANNON", "TOY_BOX", "WHITE_STAR", "RED_MASK", "FESTIVE_POPPER", "MEAL_TICKET", "LANTERN", "JOSS_PAPER", "ORICHALCUM", "PRAYER_WHEEL", "MERCURY_HOURGLASS", "MR_STRUGGLES", "CHOICES_PARADOX", "PENDULUM", "LETTER_OPENER", "VAJRA", "FAKE_BLOOD_VIAL", "FAKE_LEES_WAFFLE", "FAKE_ORICHALCUM"]
+    },
+    {
+      "id": "e04c9b9a5f9b98fc", "url": "https://spire-codex.com/zhs/runs/e04c9b9a5f9b98fc",
+      "player": "Assassin Thane", "ascension": 0, "outcome": "abandoned", "mode": "standard", "version": "v0.107.1", "seed": "S4YED36PSL", "cardCount": 22,
+      "expectedPrimary": ["strength"], "expectedSecondary": [],
+      "labelEvidence": "恶魔形态、与我一战、预备打击与两张飞剑回旋镖、双重打击形成力量方向；放弃不等于没有流派倾向。",
+      "cards": ["STRIKE_IRONCLAD*4", "DEFEND_IRONCLAD*4", "BASH", "SWORD_BOOMERANG+", "FIGHT_ME", "INFERNAL_BLADE", "TREMBLE", "TORIC_TOUGHNESS", "JUGGLING", "SPOILS_MAP", "TWIN_STRIKE", "FLAME_BARRIER", "DEMON_FORM", "SETUP_STRIKE", "BLUDGEON", "SWORD_BOOMERANG"],
+      "relics": ["BURNING_BLOOD", "NUTRITIOUS_OYSTER", "STRIKE_DUMMY", "CAULDRON", "GOLDEN_COMPASS", "DAUGHTER_OF_THE_WIND"]
+    },
+    {
+      "id": "35a9b4838a58956d", "url": "https://spire-codex.com/zhs/runs/35a9b4838a58956d",
+      "player": "danilodesouza150", "ascension": 1, "outcome": "defeat", "mode": "standard", "version": "v0.107.1", "seed": "X2LZPMKFQY", "cardCount": 39,
+      "expectedPrimary": ["auto_strike", "strength"], "expectedSecondary": ["block"],
+      "labelEvidence": "地狱狂徒与打击组件、力量与多段输出同时存在；少量壁垒全身撞击为副方向。允许力量或自动打击居首，不强行标成纯流派。",
+      "cards": ["STRIKE_IRONCLAD*6", "DEFEND_IRONCLAD*4", "BASH", "PERFECTED_STRIKE+", "DEMONIC_SHIELD", "BLOODLETTING*2", "ANGER", "PERFECTED_STRIKE", "TWIN_STRIKE+", "MOLTEN_FIST*2", "ONE_TWO_PUNCH+", "MIND_BLAST+", "BARRICADE", "SHRUG_IT_OFF", "INFLAME", "SETUP_STRIKE", "VICIOUS", "OFFERING", "JUGGLING+", "BULLY", "HAVOC", "ONE_TWO_PUNCH", "HELLRAISER+", "STAMPEDE", "BODY_SLAM+", "COLOSSUS", "DISMANTLE", "RUPTURE+", "WHIRLWIND+"],
+      "relics": ["BLACK_BLOOD", "LARGE_CAPSULE", "FESTIVE_POPPER", "MEAT_ON_THE_BONE", "CENTENNIAL_PUZZLE", "SHURIKEN", "PENDULUM", "REPTILE_TRINKET", "TOUCH_OF_OROBAS", "STRIKE_DUMMY", "GORGET", "BOOK_OF_FIVE_RINGS", "ROYAL_STAMP", "VAMBRACE", "RUNIC_PYRAMID", "LASTING_CANDY", "BAG_OF_MARBLES", "RED_SKULL"]
+    }
+  ]
+}

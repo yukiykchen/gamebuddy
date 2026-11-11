@@ -1,0 +1,71 @@
+'use strict';
+const { app, BrowserWindow, ipcMain } = require('electron');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const { builds, cards, decorateCardGuidance } = require('../agent/knowledge/card-guidance');
+const { stripMarkup } = require('../agent/knowledge/spire-codex');
+const output = path.join(__dirname,'..','.runtime','card-guidance'); fs.mkdirSync(output,{recursive:true});
+app.setPath('userData',fs.mkdtempSync(path.join(os.tmpdir(),'gamebuddy-guidance-')));
+ipcMain.handle('review:getDashboard',()=>null);
+const timeout=setTimeout(()=>{console.error('Guidance renderer timed out');app.exit(1);},30000);
+app.whenReady().then(async()=>{
+  const window=new BrowserWindow({show:false,width:1400,height:1050,webPreferences:{preload:path.join(__dirname,'..','preload.js'),contextIsolation:true,nodeIntegration:false,backgroundThrottling:false}});
+  const errors=[];window.webContents.on('console-message',e=>{if(e.level==='error')errors.push(e.message);});
+  await window.loadFile(path.join(__dirname,'..','src','index.html'));
+  const settle=()=>window.webContents.executeJavaScript('new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))');
+  for(const character of ['ironclad','silent','defect','regent','necrobinder']){
+    const selected=builds.filter(b=>b.character===character).slice(0,3).map(b=>b.core[0].id);
+    if(character==='ironclad')selected[0]='ASHEN_STRIKE';
+    const deck=character==='ironclad'?['HELLRAISER','POMMEL_STRIKE','TWIN_STRIKE',...Array(17).fill('DEFEND_IRONCLAD')]:[];
+    const options=decorateCardGuidance(character,deck,[],selected.map((id,i)=>({...cards.get(id),description:stripMarkup(cards.get(id).description),score:90-i*10,pros:[],cons:[],costs:{energy:cards.get(id).cost},fit:{}})));
+    window.webContents.send('bridge-state',{run:{character,runId:character,act:2,floor:20,room:'reward'},player:{hp:60,maxHp:80,cards:deck,relics:[],potions:[],gold:150},reward:{signature:character,cards:options},combat:null});
+    window.webContents.send('bridge-recommendation',{task:'card_reward',source:'rules',options,primary:{action:'TAKE_CARD',cardId:options[0].id,cardName:options[0].name},reason:'本地构筑提示回放。',context:{}});
+    await settle();
+    await window.webContents.executeJavaScript("document.querySelector('.draft-card[data-card]').focus()");await settle();
+    const reward=await window.webContents.executeJavaScript(`({text:document.querySelector('#view-container').innerText,rows:document.querySelectorAll('.build-guidance-system').length,scores:document.querySelectorAll('.archetype-score,.archetype-impact').length,width:document.documentElement.scrollWidth,viewport:innerWidth,visible:getComputedStyle(document.querySelector('.build-guidance')).display})`);
+    assert.ok(reward.rows>=3);assert.equal(reward.scores,0);assert.equal(reward.visible,'grid');assert.ok(reward.width<=reward.viewport);assert.doesNotMatch(reward.text,/契合度|构筑进度|构筑点/);
+    assert.ok(options.every(c=>reward.text.includes(c.name)),'Normal recommendation candidates lost');
+    if(character==='ironclad'){assert.match(reward.text,/消耗流/);assert.match(reward.text,/自动打击/);assert.doesNotMatch(reward.text,/打击成长/);}
+    if(['ironclad','necrobinder'].includes(character))fs.writeFileSync(path.join(output,`${character}-reward.png`),(await window.webContents.capturePage()).toPNG());
+    if(character==='ironclad'){
+      const rect=await window.webContents.executeJavaScript("(()=>{const e=document.querySelector('.build-guidance');const r=e.getBoundingClientRect();return {x:Math.floor(r.x),y:Math.floor(r.y),width:Math.ceil(r.width),height:Math.ceil(r.height)};})()");
+      fs.writeFileSync(path.join(output,'guidance-redesign.png'),(await window.webContents.capturePage(rect)).toPNG());
+    }
+    const inventory=options.map(analysis=>({itemType:'card',id:analysis.id,name:analysis.name,card:{upgraded:false},price:80,stocked:true,affordable:true,score:analysis.score,analysis}));
+    window.webContents.send('bridge-state',{run:{character,room:'merchant'},shop:{gold:150,items:inventory}});
+    window.webContents.send('bridge-recommendation',{task:'shop_choice',source:'rules',inventory,primary:{plan:[],remainingGold:150},reason:'本地商店提示回放。',context:{}});
+    await settle();await window.webContents.executeJavaScript("document.querySelector('.shop-item').focus()");await settle();
+    const shop=await window.webContents.executeJavaScript("({text:document.querySelector('#view-container').innerText,visible:getComputedStyle(document.querySelector('.build-guidance')).display})");
+    assert.equal(shop.visible,'grid');assert.match(shop.text,/购物|商店|清单/);assert.doesNotMatch(shop.text,/契合度/);
+    if(character==='ironclad')fs.writeFileSync(path.join(output,'ironclad-shop.png'),(await window.webContents.capturePage()).toPNG());
+  }
+  const deck=['HELLRAISER','PERFECTED_STRIKE','POMMEL_STRIKE','STRIKE_IRONCLAD'];
+  const options=decorateCardGuidance('ironclad',deck,[],['PRIMAL_FORCE','GIANT_ROCK','BATTLE_TRANCE'].map(id=>({...cards.get(id),pros:[],cons:[],score:70,fit:{},costs:{}})));
+  window.webContents.send('bridge-state',{run:{character:'ironclad',runId:'conflict',room:'reward'},player:{hp:70,maxHp:80,cards:deck,relics:[]},reward:{signature:'conflict',cards:options}});
+  window.webContents.send('bridge-recommendation',{task:'card_reward',source:'rules',options,primary:{action:'SKIP'},reason:'机制冲突检查。',context:{}});
+  await settle();await window.webContents.executeJavaScript("document.querySelector('.draft-card[data-card]').focus()");await settle();
+  const conflict=await window.webContents.executeJavaScript("document.querySelector('#view-container').innerText");
+  assert.match(conflict,/不适合当前路线/);assert.match(conflict,/当前手牌/);assert.match(conflict,/巨石/);
+  fs.writeFileSync(path.join(output,'auto-strike-conflict.png'),(await window.webContents.capturePage()).toPNG());
+  const rect=await window.webContents.executeJavaScript("(()=>{const r=document.querySelector('.build-guidance').getBoundingClientRect();return {x:Math.floor(r.x),y:Math.floor(r.y),width:Math.ceil(r.width),height:Math.ceil(r.height)};})()");
+  fs.writeFileSync(path.join(output,'guidance-conflict-redesign.png'),(await window.webContents.capturePage(rect)).toPNG());
+  await window.webContents.executeJavaScript("document.querySelectorAll('.draft-card[data-card]')[1].focus()");await settle();
+  const silent=await window.webContents.executeJavaScript("({own:document.querySelectorAll('.draft-card[data-card]')[1].querySelectorAll('.build-guidance').length,shown:[...document.querySelectorAll('.build-guidance')].filter(e=>getComputedStyle(e).display!=='none').length})");
+  assert.equal(silent.own,0);assert.equal(silent.shown,0,'Hover must not retain the previous card tooltip');
+  const inventory=options.map(analysis=>({itemType:'card',id:analysis.id,name:analysis.name,price:80,stocked:true,affordable:true,analysis,score:analysis.score}));
+  window.webContents.send('bridge-state',{run:{character:'ironclad',room:'merchant'},shop:{gold:150,items:inventory}});
+  window.webContents.send('bridge-recommendation',{task:'shop_choice',source:'rules',inventory,primary:{plan:[],remainingGold:150},reason:'机制冲突检查。',context:{}});
+  await settle();await window.webContents.executeJavaScript("document.querySelector('.shop-item').focus()");await settle();
+  assert.match(await window.webContents.executeJavaScript("document.querySelector('#view-container').innerText"),/不适合当前路线/);
+  await window.webContents.executeJavaScript("document.querySelectorAll('.shop-item')[1].focus()");await settle();
+  assert.equal(await window.webContents.executeJavaScript("document.querySelectorAll('.shop-item')[1].querySelectorAll('.build-guidance').length"),0);
+  const long=structuredClone(options[0]);
+  long.buildGuidance.systems=Array.from({length:4},(_,i)=>({...long.buildGuidance.systems[0],systemId:'layout-'+i,shortfall:'当前缺少循环组件；需要按实际供给数量判断，不能因为持有一张核心就宣布稳定。'.repeat(4),advice:'优先补充当前路线需要的组件，并保留关键攻击身份与后续资源。'.repeat(4)}));
+  window.webContents.send('bridge-recommendation',{task:'shop_choice',source:'rules',inventory:[{...inventory[0],analysis:long}],primary:{plan:[],remainingGold:150},reason:'长文本布局检查。',context:{}});
+  await settle();await window.webContents.executeJavaScript("document.querySelector('.shop-item').focus()");await settle();
+  const layout=await window.webContents.executeJavaScript("(()=>{const e=document.querySelector('.build-guidance');return {w:e.clientWidth,sw:e.scrollWidth,h:e.clientHeight,sh:e.scrollHeight,labels:e.querySelectorAll('.build-guidance-label').length};})()");
+  assert.ok(layout.sw<=layout.w+1);assert.ok(layout.sh>layout.h);assert.ok(layout.h<=390);assert.equal(layout.labels,8);
+  assert.deepEqual(errors,[]);console.log('Five-character reward/shop and mechanism-conflict renderer passed: '+output);clearTimeout(timeout);window.destroy();app.exit(0);
+}).catch(error=>{console.error(error);clearTimeout(timeout);app.exit(1);});

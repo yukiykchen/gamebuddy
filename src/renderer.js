@@ -13,18 +13,37 @@ const state = {
   reward: null,
   event: null,
   shop: null,
-  recommendation: null
+  recommendation: null,
+  reviewDashboard: null
 };
 
 const viewContainer = document.querySelector('#view-container');
 const toast = document.querySelector('#toast');
+const archetypeUi = window.GameBuddyArchetypeUi;
+let currentCardGuidance = null;
+function buildGuidanceFor(card) {
+  const upgraded = Boolean(card?.upgraded || card?.isUpgraded || /\+$/.test(card?.name || ''));
+  return currentCardGuidance?.cards.find(c => c.cardId === card?.id && c.upgraded === upgraded) || card?.buildGuidance;
+}
 let toastTimer;
 
 function showToast(message) {
   toast.textContent = message;
+  toast.classList.remove('archetype-milestone', 'formed');
   toast.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toast.classList.remove('show'), 2300);
+}
+
+function showArchetypeMilestone(milestone) {
+  if (!milestone?.message) return;
+  toast.textContent = `${milestone.title} · ${milestone.message}`;
+  toast.classList.toggle('formed', milestone.level === 'formed');
+  toast.classList.add('archetype-milestone', 'show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    toast.classList.remove('show', 'archetype-milestone', 'formed');
+  }, milestone.level === 'formed' ? 3600 : 3000);
 }
 
 function hpPercent(unit) { return unit?.maxHp > 0 ? Math.max(0, Math.min(100, Math.round((unit.hp / unit.maxHp) * 100))) : 0; }
@@ -201,13 +220,14 @@ function shopView() {
       const cons = (analysis.cons || []).slice(0, 2).map(text => `<li>${escapeHtml(text)}</li>`).join('');
       const price = Number.isFinite(item.price) ? `${item.price} 金币` : '价格未读取';
       const affordable = item.affordable === true || (Number.isFinite(item.price) && item.price <= (state.shop?.gold ?? state.player.gold ?? 0));
-      const status = item.stocked === false ? '已售出' : !affordable ? '金币不足' : item.onSale ? '折扣' : '在售';
-      return `<article class="draft-card shop-item ${recommended ? 'top-pick' : ''}">
+      const status = item.stocked === false ? '已售出' : analysis.buildPolicy?.blocked ? '不适合当前路线' : !affordable ? '金币不足' : item.onSale ? '折扣' : '在售';
+      return `<article tabindex="0" class="draft-card shop-item ${recommended ? 'top-pick' : ''}">
         <div class="draft-card-head"><span class="pick-tag">${recommended ? '清单' : escapeHtml(status)}</span><strong>${Number.isFinite(item.score) ? item.score : '--'}</strong></div>
         <div class="card-name">${escapeHtml(item.name || item.id)}</div>
         <div class="draft-card-meta">${escapeHtml(typeLabels[item.itemType] || item.itemType)} · ${escapeHtml(price)}${item.rarity ? ` · ${escapeHtml(item.rarity)}` : ''}</div>
         <p>${escapeHtml(effect)}</p>
         ${pros || cons ? `<ul class="draft-notes">${pros}${cons}</ul>` : ''}
+        ${archetypeUi?.renderGuidance(buildGuidanceFor({ ...analysis, ...item.card, id: item.id })) || ''}
       </article>`;
     }).join('')
     : `<div class="data-empty large-empty">${state.shop ? '当前已没有仍在售的商品；进店时生成的购物清单仍保留在右侧。' : '进入商店后，Mod 会同步全部在售卡牌、遗物、药水和删牌服务。'}</div>`;
@@ -230,6 +250,8 @@ function draftView() {
 
   const primaryId = rec?.primary?.action === 'TAKE_CARD' ? String(rec.primary.cardId) : '';
   const skipPick = rec?.primary?.action === 'SKIP';
+  const archetypeScores = options.find(card => Array.isArray(card.archetypeScores))?.archetypeScores || [];
+  const archetypeOverview = '';
   const cardHtml = options.map((card, index) => {
     const id = String(card.id || card.name || index);
     const recommended = primaryId && id === primaryId;
@@ -245,8 +267,10 @@ function draftView() {
     const knowledgeHtml = knowledge
       ? `<div class="card-knowledge"><div class="knowledge-head"><span>${escapeHtml(knowledge.rank || '未评级')}</span><strong>${escapeHtml(knowledge.sourceName || 'GameBuddy')}</strong></div><p>${escapeHtml(knowledge.expertSummary || '')}</p><div class="knowledge-condition good">适合：${escapeHtml((knowledge.goodWhen || []).slice(0, 2).join('；'))}</div><div class="knowledge-condition bad">慎拿：${escapeHtml((knowledge.badWhen || []).slice(0, 2).join('；'))}</div>${knowledge.sourceTimestamp ? `<div class="knowledge-source">${escapeHtml(knowledge.gameVersion || '')} · 来源时间点 ${escapeHtml(knowledge.sourceTimestamp)}</div>` : `<div class="knowledge-source">${escapeHtml(knowledge.gameVersion || '')} · 无专家时间点，使用社区/机制综合评价</div>`}</div>`
       : '';
-    return `<article class="draft-card ${recommended ? 'top-pick' : ''}" data-card="${escapeHtml(card.name || card.id)}">
-      <div class="draft-card-head"><span class="pick-tag">${recommended ? '首选' : rec ? `第 ${index + 1} 位` : '分析中'}</span><strong>${Number.isFinite(card.score) ? card.score : '--'}</strong></div>
+    const impactHtml = archetypeUi?.renderGuidance(buildGuidanceFor(card)) || '';
+    return `<article tabindex="0" class="draft-card ${recommended ? 'top-pick' : ''}" data-card="${escapeHtml(card.name || card.id)}">
+      <div class="draft-card-head"><span class="pick-tag">${card.buildPolicy?.blocked ? '不适合当前路线' : recommended ? '首选' : rec ? `第 ${index + 1} 位` : '分析中'}</span><strong>${Number.isFinite(card.score) ? card.score : '--'}</strong></div>
+      ${impactHtml}
       <div class="card-name">${escapeHtml(card.name || card.id)}</div>
       <div class="draft-card-meta">${escapeHtml(card.type || '未知')} · ${escapeHtml(card.rarity || '未知')} · ${card.cost === null ? 'X' : escapeHtml(card.cost ?? '?')} 费</div>
       <p>${escapeHtml(card.description || '正在从 Spire Codex 获取卡牌说明与对局统计。')}</p>
@@ -266,7 +290,7 @@ function draftView() {
     : '分析中';
   const context = rec?.context || {};
   const defeatedType = state.reward?.context?.defeatedType;
-  return `<div class="draft-layout"><section class="panel draft-offer"><div class="draft-kicker">REWARD / CARD REWARD</div><h2 class="draft-title">${title}</h2><p class="recommendation-reason">${escapeHtml(reason)}</p>${skipPick ? '<div class="skip-advice">跳过也是有效选择：避免弱牌稀释核心循环。</div>' : ''}<div class="draft-cards">${cardHtml}</div></section><section class="panel draft-side"><div class="panel-heading"><span class="panel-title">选牌依据</span><span class="panel-meta">${escapeHtml(sourceLabel)}</span></div><div class="deck-stat"><span>卡组厚度</span><strong>${state.player.cards.length || '--'} 张</strong></div><div class="deck-stat"><span>遗物 / 药水</span><strong>${state.player.relics.length || 0} / ${state.player.potions.length || 0}</strong></div><div class="deck-stat"><span>金币</span><strong>${state.player.gold ?? '--'}</strong></div><div class="deck-stat"><span>当前生命</span><strong>${state.player.hp || '--'} / ${state.player.maxHp || '--'}</strong></div><div class="deck-stat"><span>近期精英</span><strong>${context.eliteSoon ? '有' : '未发现'}</strong></div><div class="deck-stat"><span>确定 Boss</span><strong>${escapeHtml(context.knownBoss || '尚未识别')}</strong></div><div class="deck-stat"><span>接近 Boss</span><strong>${context.bossSoon ? '是' : '否'}</strong></div><div class="deck-stat"><span>刚结束战斗</span><strong>${escapeHtml(defeatedType || '普通战斗')}</strong></div>${context.archetype ? `<div class="archetype-note"><span>当前流派</span><strong>${escapeHtml(context.archetype)}</strong></div>` : ''}<div class="data-empty draft-disclaimer">建议只辅助判断，不会替你点击卡牌。</div></section></div>`;
+  return `<div class="draft-layout"><section class="panel draft-offer"><div class="draft-kicker">REWARD / CARD REWARD</div><h2 class="draft-title">${title}</h2><p class="recommendation-reason">${escapeHtml(reason)}</p>${skipPick ? '<div class="skip-advice">跳过也是有效选择：避免弱牌稀释核心循环。</div>' : ''}<div class="draft-cards">${cardHtml}</div></section><section class="panel draft-side"><div class="panel-heading"><span class="panel-title">选牌依据</span><span class="panel-meta">${escapeHtml(sourceLabel)}</span></div>${archetypeOverview}<div class="deck-stat"><span>卡组厚度</span><strong>${state.player.cards.length || '--'} 张</strong></div><div class="deck-stat"><span>遗物 / 药水</span><strong>${state.player.relics.length || 0} / ${state.player.potions.length || 0}</strong></div><div class="deck-stat"><span>金币</span><strong>${state.player.gold ?? '--'}</strong></div><div class="deck-stat"><span>当前生命</span><strong>${state.player.hp || '--'} / ${state.player.maxHp || '--'}</strong></div><div class="deck-stat"><span>近期精英</span><strong>${context.eliteSoon ? '有' : '未发现'}</strong></div><div class="deck-stat"><span>确定 Boss</span><strong>${escapeHtml(context.knownBoss || '尚未识别')}</strong></div><div class="deck-stat"><span>接近 Boss</span><strong>${context.bossSoon ? '是' : '否'}</strong></div><div class="deck-stat"><span>刚结束战斗</span><strong>${escapeHtml(defeatedType || '普通战斗')}</strong></div><div class="data-empty draft-disclaimer">建议只辅助判断，不会替你点击卡牌。</div></section></div>`;
 }
 
 const MAP_TYPE_LABELS = {
@@ -350,6 +374,13 @@ function routeView() {
 
 function render() {
   document.querySelectorAll('.nav-item').forEach(button => button.classList.toggle('active', button.dataset.mode === state.mode));
+  const reviewing = state.mode === 'review';
+  document.body.classList.toggle('review-mode', reviewing);
+  if (reviewing) {
+    viewContainer.innerHTML = window.GameBuddyReviewUi?.render(state.reviewDashboard) || '';
+    bindViewActions();
+    return;
+  }
   const copy = {
     combat: ['COMBAT / LIVE STATE', '战斗数据在同步', '出牌顺序先不做。这里只显示真实手牌和敌人，路线建议在地图页。'],
     draft: ['REWARD / CARD REWARD', '这张牌值得拿吗？', '把卡组当前缺口、未来路线和战斗表现放在一起判断。'],
@@ -394,9 +425,30 @@ function bindViewActions() {
   document.querySelector('#confirm-action')?.addEventListener('click', () => showToast('建议已记录，GameBuddy 不会自动操作游戏'));
   document.querySelector('#more-actions')?.addEventListener('click', () => showToast('其他方案将在决策引擎接入后显示'));
   document.querySelectorAll('[data-node]').forEach(button => button.addEventListener('click', () => showToast(`节点 ${button.dataset.node}`)));
+  document.querySelector('#review-exit')?.addEventListener('click', () => { state.mode = 'combat'; render(); });
+  document.querySelector('#review-export')?.addEventListener('click', async () => {
+    const result = await window.gamebuddyBridge?.exportReview?.();
+    showToast(result?.ok ? '复盘记录已导出' : '已取消导出');
+  });
+  document.querySelector('#review-clear')?.addEventListener('click', async () => {
+    if (!window.confirm('确认清空本机全部复盘记录？此操作不能撤销。')) return;
+    const token = await window.gamebuddyBridge?.requestReviewClear?.();
+    const result = await window.gamebuddyBridge?.clearReview?.(token);
+    if (result?.ok) {
+      state.reviewDashboard = result.dashboard;
+      render();
+      showToast('本机复盘记录已清空');
+    }
+  });
 }
 
-document.querySelectorAll('.nav-item').forEach(button => button.addEventListener('click', () => { state.mode = button.dataset.mode; render(); }));
+document.querySelectorAll('.nav-item').forEach(button => button.addEventListener('click', async () => {
+  state.mode = button.dataset.mode;
+  if (state.mode === 'review') {
+    state.reviewDashboard = await window.gamebuddyBridge?.getReviewDashboard?.();
+  }
+  render();
+}));
 document.querySelector('#minimize-button').addEventListener('click', () => window.windowControls?.minimize());
 document.querySelector('#close-button').addEventListener('click', () => window.windowControls?.close());
 document.querySelector('#refresh-button').addEventListener('click', async () => {
@@ -454,6 +506,8 @@ function setBridgeStatus(status) {
 }
 
 function applyBridgeState(next) {
+  if ((next.run?.character && next.run.character !== state.run.character) || (next.run?.runId && next.run.runId !== state.run.runId)
+    || (next.player?.cards && JSON.stringify(next.player.cards) !== JSON.stringify(state.player.cards))) currentCardGuidance = null;
   if (next.run) state.run = { ...state.run, ...next.run };
   if (next.player) state.player = { ...state.player, ...next.player };
   state.map = next.map || { visited: [] };
@@ -500,9 +554,16 @@ setInterval(() => {
 render();
 setBridgeStatus({ status: 'waiting' });
 window.gamebuddyBridge?.onState(applyBridgeState);
+window.gamebuddyBridge?.onReviewChanged(dashboard => {
+  state.reviewDashboard = dashboard;
+  if (state.mode === 'review') render();
+});
 window.gamebuddyBridge?.onEvent(event => {
+  if (['card.reward.opened', 'card.reward.closed', 'card.reward.selected', 'shop.opened', 'shop.updated', 'shop.closed', 'map.opened', 'combat.started'].includes(event.name)) currentCardGuidance = null;
+  if (state.mode === 'review') return;
   if (event.name === 'card.reward.opened') {
     state.reward = event.data || null;
+    state.recommendation = null;
     state.mode = 'draft';
     render();
     showToast('发现新的卡牌奖励');
@@ -561,6 +622,12 @@ window.gamebuddyBridge?.onEvent(event => {
     showToast('已离开商店');
   }
 });
+window.gamebuddyBridge?.onCardGuidance?.(message => {
+  if (message && ((message.context === 'reward' && state.reward?.signature && state.reward.signature !== message.signature)
+    || (message.context === 'shop' && state.shop?.guidanceSignature && state.shop.guidanceSignature !== message.signature))) return;
+  currentCardGuidance = message;
+  if (state.mode === 'draft' || state.mode === 'shop') render();
+});
 window.gamebuddyBridge?.onRecommendation(recommendation => {
   if (!recommendation) {
     state.recommendation = null;
@@ -569,6 +636,7 @@ window.gamebuddyBridge?.onRecommendation(recommendation => {
   }
   if (recommendation.task !== 'map_route' && recommendation.task !== 'rest_site' && recommendation.task !== 'card_reward' && recommendation.task !== 'event_choice' && recommendation.task !== 'shop_choice') return;
   state.recommendation = recommendation;
+  if (state.mode === 'review') return;
   if (recommendation.task === 'rest_site' || recommendation.task === 'event_choice') state.mode = 'route';
   if (recommendation.task === 'card_reward') state.mode = 'draft';
   if (recommendation.task === 'shop_choice') state.mode = 'shop';

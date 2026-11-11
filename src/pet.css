@@ -77,6 +77,10 @@ button { font: inherit; }
 .speech:hover { border-color: var(--pet-accent); }
 .speech:focus-visible, .thinking-toggle:focus-visible { outline: 2px solid var(--pet-accent); outline-offset: 2px; }
 .speech.visible { opacity: 1; transform: translate(-50%, 0); }
+.pet-stage.archetype-milestone .speech { border-color: #c98243; background: rgba(48, 32, 22, .97); color: #ffd59c; box-shadow: 0 0 0 1px rgba(201, 130, 67, .25), 0 9px 28px rgba(52, 27, 12, .42); animation: milestone-speech .7s ease-out; }
+.pet-stage.archetype-formed .speech { border-color: #e3a35b; color: #ffe5b8; box-shadow: 0 0 0 1px rgba(227, 163, 91, .35), 0 9px 34px rgba(83, 44, 19, .52); }
+.pet-stage.archetype-milestone .speech::after { border-color: #c98243; background: #302016; }
+@keyframes milestone-speech { 0% { transform: translate(-50%, 5px) scale(.96); } 55% { transform: translate(-50%, 0) scale(1.035); } 100% { transform: translate(-50%, 0) scale(1); } }
 .speech.has-details { padding-right: 35px; }
 .speech-text { min-width: 0; display: -webkit-box; overflow: hidden; overflow-wrap: anywhere; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .speech-chevron { position: absolute; right: 14px; top: 50%; width: 7px; height: 7px; border-right: 1.5px solid var(--pet-accent); border-bottom: 1.5px solid var(--pet-accent); opacity: 0; transform: translateY(-65%) rotate(-45deg); }
