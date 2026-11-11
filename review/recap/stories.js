@@ -65,16 +65,37 @@ function groundedStory(timeline, candidate, diagnostic = {}, { canonicalizeRelat
   const missing = [...new Set(assertions.filter(c => c.type === 'recorded_relation')
     .flatMap(c => checkClaim(timeline, c).evidenceIds).filter(id => !evidenceIds.includes(id)))];
   if (missing.length) return reject('missing_relation_evidence', { missingEvidenceIds: missing });
-  // Narrative observations are supported; unverified normative/counterfactual blame is not.
-  const prohibited = /必胜|一定(?:能赢|获胜|打过)|本来(?:能|可以|应该)|操作失误|你(?:打错|选错)|如果[^。！？]*(?:就能|必能)/;
-  const chineseNumber = /第[零一二三四五六七八九十百千万两〇、和]+[场次回幕章]|[零一二三四五六七八九十百千万两〇]+(?:次|点|血|层|张|回合|场|刀|击|幕|章)/;
   const literalBody = bodyTemplate.replace(/\{\{[a-zA-Z][\w]*\}\}/g, '');
-  if (prohibited.test(title + bodyTemplate)) return reject('unsupported_counterfactual_or_blame');
-  if (/死亡|阵亡|牺牲|临死|死前|宁死|战死/.test(title + bodyTemplate)
-    && !assertions.some(c => c.type === 'combat_outcome' && (c.value === 'death' || c.victory === 'death')))
-    return reject('unproved_player_death');
-  if (/\d/.test(title) || /\d/.test(literalBody) || chineseNumber.test((title + literalBody).replace(/下一场|这一场|这一次|那一次|最后一击/g, '')))
-    return reject('unbound_number', '标题不得自由写数值；正文包括中文次数、章节等均须绑定。收窄“一次治疗”为“随后恢复”可避免无证次数。');
+  const supportedNumbers = new Set(assertions.map(c => checkClaim(timeline, c).value)
+    .filter(v => typeof v === 'number').map(String));
+  // Location labels may be copied literally from the cited observation.
+  for (const id of evidenceIds) {
+    const p = observedPayload(timeline.byId.get(id));
+    for (const k of ['act', 'floor', 'totalFloor']) if (Number.isFinite(p?.[k])) supportedNumbers.add(String(p[k]));
+  }
+  const chineseValue = text => {
+    const digits = { 零:0, 〇:0, 一:1, 二:2, 两:2, 三:3, 四:4, 五:5, 六:6, 七:7, 八:8, 九:9 };
+    let total = 0, digit = 0;
+    for (const ch of text) {
+      if (Object.hasOwn(digits, ch)) digit = digits[ch];
+      else { const unit = {十:10,百:100,千:1000}[ch]; if (!unit) return NaN; total += (digit || 1) * unit; digit = 0; }
+    }
+    return total + digit;
+  };
+  const literalText = title + literalBody;
+  const numericLiterals = literalText.match(/\d+(?:\.\d+)?/g) || [];
+  const chineseLiterals = [...literalText.matchAll(/([零〇一二两三四五六七八九十百千]+)(?:回合|场|次|点|血|层|张|刀|击|幕|章)/g)].map(m => String(chineseValue(m[1])));
+  const unsupportedNumbers = [...new Set([...numericLiterals, ...chineseLiterals].filter(n => !supportedNumbers.has(n)))];
+  if (unsupportedNumbers.length) {
+    const matchingObservedFields = [];
+    const visit = (value, field, eventId) => {
+      if (typeof value === 'number' && unsupportedNumbers.includes(String(value))) matchingObservedFields.push({ eventId, field, value });
+      else if (value && typeof value === 'object') for (const [key, child] of Object.entries(value)) visit(child, field ? `${field}.${key}` : key, eventId);
+    };
+    for (const id of evidenceIds) visit(observedPayload(timeline.byId.get(id)), '', id);
+    return reject('unbound_number', { unsupportedNumbers, matchingObservedFields: matchingObservedFields.slice(0, 20),
+      repairHint: '正确数字可补齐匹配字段的event_field断言并绑定；不要删掉有趣的表达。匹配字段仅为线索，须选择语义对应的实际字段。' });
+  }
   const namedClaims = Object.entries(bindings).filter(([name]) => bodyTemplate.includes(`{{${name}}}`))
     .map(([, b]) => assertions[b?.claimIndex]).filter(c => c && (c.type === 'entity_name'
       || c.type === 'event_field' && /^(cardName|cardId|potionName|potionId)$/.test(c.field)));
@@ -85,14 +106,6 @@ function groundedStory(timeline, candidate, diagnostic = {}, { canonicalizeRelat
     ? name.subjectId === subject.subjectId
     : inspectSubject(timeline, subject.subjectId, subject.combatId).eventIds.includes(name.eventId)
       || timeline.byId.get(name.eventId)?.payload?.cardId === inspectSubject(timeline, subject.subjectId, subject.combatId).modelId))) return reject('unbound_subject_name');
-  // A play count is not a hit count or proof that a particular card caused damage.
-  if (subjects.some(c => c.type === 'subject_count') && /命中|每次|每一|削血|造成|伤害|收尾|终结|带飞/.test(bodyTemplate)
-    && !assertions.some(c => c.type === 'action_link')) return reject('count_is_not_effect');
-  const cardPlays = evidenceIds.map(id => timeline.byId.get(id)).filter(f => f?.eventType === 'card.played');
-  const effects = evidenceIds.map(id => timeline.byId.get(id)).filter(f => /^(damage.resolved|block.changed|power.changed)$/.test(f?.eventType || ''));
-  if (cardPlays.length && effects.length && /获|提供|造成|挡住|削血|叠加/.test(bodyTemplate)
-    && !assertions.some(c => c.type === 'action_link' && cardPlays.some(f => f.eventId === c.causeEventId)
-      && effects.some(f => f.eventId === c.effectEventId))) return reject('unproven_effect_attribution');
   let valid = true;
   const body = bodyTemplate.replace(/\{\{([a-zA-Z][\w]*)\}\}/g, (match, name, offset) => {
     const binding = bindings[name];
@@ -115,26 +128,8 @@ function groundedStory(timeline, candidate, diagnostic = {}, { canonicalizeRelat
   });
   if (!valid) return reject('invalid_binding', '占位符须指向有效断言的标量value；合并potionNames应绑定一个完整字符串，不能拆成两个不同名字。');
   if (/\{\{|\}\}|\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*\b|\b(?:true|false)\b/.test(body)) return reject('machine_identifier_or_unresolved_placeholder');
-  const direct = evidenceIds.map(id => timeline.byId.get(id)).filter(Boolean);
-  const upgradeOnly = direct.some(f => f.eventType === 'rest.action_completed' && f.payload?.action === 'smith')
-    && direct.every(f => ['rest.action_completed', 'combat.started', 'combat.ended', 'run.ended'].includes(f.eventType))
-    && assertions.every(c => ['event_field', 'occurred', 'combat_outcome', 'sequence'].includes(c.type));
-  if (upgradeOnly) return reject('ordinary_upgrade_background');
-  const ordinaryHpChange = direct.length > 0 && direct.every(f => /^event\./.test(f.eventType))
-    && assertions.every(c => c.type === 'occurred' || c.type === 'event_field'
-      && ['eventId', 'hpLoss', 'hpAfter', 'optionId', 'choice'].includes(c.field));
-  if (ordinaryHpChange) return reject('ordinary_health_background');
-  const ordinaryMoneyChange = direct.some(f => /^shop\./.test(f.eventType))
-    && direct.every(f => /^shop\./.test(f.eventType) || f.eventType === 'run.observed')
-    && assertions.every(c => ['occurred', 'sequence'].includes(c.type)
-      || c.type === 'event_field' && ['price', 'gold', 'status'].includes(c.field));
-  if (ordinaryMoneyChange) return reject('ordinary_transaction_background', '交易金额与余额变化本身不成故事；需补具体用途、代价或后续兑现关系，否则放弃。');
-  if (direct.some(f => f.eventType === 'power.changed') && /涨|暴增|增加|增强|提升|叠/.test(title + bodyTemplate)
-    && !direct.some(f => f.eventType === 'power.changed' && (observedPayload(f).delta > 0
-      || observedPayload(f).amountAfter > observedPayload(f).amountBefore))) return reject('unproven_power_growth');
-  // The known relation is a typed positive proposition, not a license to add
-  // absence, motive or engineering commentary. The model chooses the relation;
-  // its factual sentence is rendered from that relation's checked fields.
+  // Wording and story value are editorial choices. Keep claim values and
+  // bindings authoritative without rejecting narrative style by keywords.
   const relationIds = [...new Set(assertions.filter(c => c.type === 'recorded_relation').map(c => c.relationId))];
   if (canonicalizeRelations && relationIds.length === 1
     && assertions.every(c => ['recorded_relation', 'event_field', 'sequence', 'occurred'].includes(c.type))) {
@@ -148,14 +143,15 @@ function groundedStory(timeline, candidate, diagnostic = {}, { canonicalizeRelat
   if (/证据|未证|只证明|字段|工具|快照|诊断|来源(?:不足|未知|不明)|未核实/.test(title + body)) return reject('engineering_commentary');
   return { pattern: candidate.pattern || 'observed_moment', title, body, evidenceIds,
     assertions, relationId: relationIds.length === 1 ? relationIds[0] : null,
+    ...(relationIds.length === 1 ? { verifiedKind: observedRelations(timeline).find(r => r.relationId === relationIds[0])?.kind, rendering: 'model_voice_verified_relation' } : {}),
     location: candidate.combatId || '', subjectId: candidate.subjectId || null };
 }
 
-function selectStories(timeline, candidates, { deduplicate = true } = {}) {
+function selectStories(timeline, candidates, { deduplicate = true, preserveModelVoice = false } = {}) {
   const seenEvidence = new Set(), selected = [];
   for (const candidate of Array.isArray(candidates) ? candidates.slice(0, 12) : []) {
-    const card = groundedStory(timeline, candidate);
-    if (!card || !card.title.trim() || !card.body.trim() || [...card.title].length > 10 || [...card.body].length > 40
+    const card = groundedStory(timeline, candidate, {}, { canonicalizeRelations: !preserveModelVoice });
+    if (!card || !card.title.trim() || !card.body.trim() || [...card.title].length > 16 || [...card.body].length > 80
       || deduplicate && storyKeys(timeline, card).some(id => seenEvidence.has(id))) continue;
     storyKeys(timeline, card).forEach(id => seenEvidence.add(id)); selected.push(card);
     if (selected.length === (deduplicate ? 3 : 12)) break;
@@ -209,11 +205,11 @@ function relationCandidate(relation) {
     d.bodyTemplate = '最后记录只剩{{hp}}血，{{potionNames}}仍在背包。'; d.fields = ['hp', 'potionNames'];
   }
   if (kind === 'low_hp_inventory' && Number.isFinite(fields.hpEarlier) && fields.hpEarlier > fields.hp) {
-    d.title = '血掉了，药还在';
-    d.bodyTemplate = '这场记录从{{hpEarlier}}血降到{{hp}}血，背包仍有{{potionCount}}瓶药水。';
+    d.title = '血线告急，背包有货';
+    d.bodyTemplate = '这场{{hpEarlier}}血打到只剩{{hp}}；背包里，还有{{potionCount}}瓶药水。';
     d.fields = ['hpEarlier', 'hp', 'potionCount'];
-    if (fields.enemyName && [...`对上${fields.enemyName}，${fields.hpEarlier}血降到${fields.hp}血，背包仍有${fields.potionCount}瓶药水。`].length <= 40) {
-      d.bodyTemplate = '对上{{enemyName}}，{{hpEarlier}}血降到{{hp}}血，背包仍有{{potionCount}}瓶药水。';
+    if (fields.enemyName && [...`对上${fields.enemyName}，${fields.hpEarlier}血打到只剩${fields.hp}；背包里，还有${fields.potionCount}瓶药水。`].length <= 40) {
+      d.bodyTemplate = '对上{{enemyName}}，{{hpEarlier}}血打到只剩{{hp}}；背包里，还有{{potionCount}}瓶药水。';
       d.fields = ['enemyName', ...d.fields];
     }
   }
@@ -233,7 +229,7 @@ function localClosing(cards) {
   if (kinds.has('health_recovery') && kinds.has('rest_max_hp_growth')) return '血条归零后再次亮起，多次休息也积累了更长的生命上限。';
   if (kinds.has('health_recovery')) return '血条曾经归零，随后又重新亮起。';
   if (kinds.has('rest_max_hp_growth')) return '多次休息，积累出了更长的生命上限。';
-  if (kinds.has('low_hp_inventory')) return '血量已低，最后记录里仍有留在背包的药水。';
+  if (kinds.has('low_hp_inventory')) return '血条在告急，背包却还没见底。';
   return cards.length ? '这些选择与转折，留下了值得回味的片段。' : '';
 }
 function localPortrait(cards) {
@@ -244,11 +240,11 @@ function localPortrait(cards) {
   if (kinds.has('resource_choice_style')) return '血条精打细算，欠债另说';
   return '';
 }
-function candidateDiagnostics(timeline, candidates) {
+function candidateDiagnostics(timeline, candidates, { preserveModelVoice = false } = {}) {
   return (Array.isArray(candidates) ? candidates.slice(0, 12) : []).map((c, index) => {
-    const diagnostic = {}, card = groundedStory(timeline, c, diagnostic);
+    const diagnostic = {}, card = groundedStory(timeline, c, diagnostic, { canonicalizeRelations: !preserveModelVoice });
     const lengths = card && { title: [...card.title].length, body: [...card.body].length };
-    if (card && (lengths.title > 10 || lengths.body > 40 || !card.title.trim() || !card.body.trim())) diagnostic.reason = 'rendered_length_or_empty';
+    if (card && (lengths.title > 16 || lengths.body > 80 || !card.title.trim() || !card.body.trim())) diagnostic.reason = 'rendered_length_or_empty';
     return { index, title: c?.title, accepted: Boolean(card && !diagnostic.reason), ...diagnostic, ...(lengths ? { renderedLengths: lengths } : {}),
     claims: (Array.isArray(c?.assertions) ? c.assertions : []).map((claim, i) => ({ index: i,
       ...checkClaim(timeline, claim), ...(!claim.type ? { reason: '每条断言必须有type字段；使用扁平对象，不能用{event_field:{...}}' } : {}),
@@ -257,7 +253,7 @@ function candidateDiagnostics(timeline, candidates) {
     bindings: Object.entries(c?.bindings || {}).map(([name, binding]) => ({ name, claimIndex: binding?.claimIndex,
       valid: Number.isInteger(binding?.claimIndex) && Boolean(c?.assertions?.[binding.claimIndex]),
       field: c?.assertions?.[binding?.claimIndex]?.field })),
-    reminder: '按实际绑定后长度检查：标题10字、正文40字；完整引用关系所有evidenceIds；无法支持的候选应放弃，不用普通经过凑数。' };
+    reminder: '按实际绑定后长度检查：标题16字、正文80字；完整引用关系所有evidenceIds；数值与引用无法支持时修正，表达和选材不做主观拦截。' };
   });
 }
 module.exports = { story, groundedStory, selectStories, localStories, highValueLocalStory,
