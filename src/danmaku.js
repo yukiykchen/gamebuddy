@@ -9,10 +9,11 @@ const composerInput = document.querySelector('#shared-composer-input');
 const composerSubmit = document.querySelector('#shared-composer-submit');
 const composerScene = document.querySelector('#shared-composer-scene');
 const composerStatus = document.querySelector('#shared-composer-status');
-const surface = new URLSearchParams(location.search).get('surface') || 'all';
+const query = new URLSearchParams(location.search);
+const surface = query.get('surface') || 'all';
 // Windows 飞行层使用主进程光标采样作为唯一悬停来源，避免穿透切换产生的
 // pointerleave 与下一次采样相互撤销，造成暂停和详情反复闪动。
-const usesCursorProbe = surface === 'overlay';
+const usesCursorProbe = surface === 'overlay' && query.get('cursorProbe') !== 'native';
 if (surface === 'overlay') composer?.remove();
 if (surface === 'composer') {
   layer?.remove();

@@ -188,7 +188,7 @@ assert.match(html, /榜上名称/);
 assert.doesNotMatch(html, /排行榜|review-open-leaderboard/);
 
 const recapHtml = window.GameBuddyReviewUi.renderRecap({
-  status: 'local_only', portrait: '惜命<script>不惜债',
+  status: 'ready', portrait: '惜命<script>不惜债',
   runSummary: { character: 'IRONCLAD', ascension: 2, totalFloor: 39, act: 3, floor: 6,
     result: 'loss', durationLabel: '记录覆盖', durationDisplay: '40分42秒' },
   battleMetrics: [
@@ -215,6 +215,15 @@ assert.match(recapHtml, /40分42秒/); assert.match(recapHtml, /到达第 39 层
 assert.match(recapHtml, /惜命&lt;script&gt;不惜债/);
 assert.doesNotMatch(recapHtml, /惜命<script>|evidenceIds|factsRevision/);
 assert.match(recapHtml, /已记录选择/);
+
+const draftRecapHtml = window.GameBuddyReviewUi.renderRecap({
+  status: 'loading', portrait: '未经评分画像', closing: '未经评分总结',
+  cards: [{ title: '未经评分故事', body: '仍在评审' }],
+  battleMetrics: [{ label: '累计输出', display: '120' }]
+});
+assert.match(draftRecapHtml, /正在寻找更多值得回味的片段/);
+assert.match(draftRecapHtml, /<strong>120<\/strong>/);
+assert.doesNotMatch(draftRecapHtml, /未经评分|review-recap-card-index/);
 
 const emptyRecapHtml = window.GameBuddyReviewUi.renderRecap({
   status: 'ready', portrait: '', cards: [], closing: '',

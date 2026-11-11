@@ -48,7 +48,7 @@ test('the model can investigate and retain a valid story while dropping a fabric
   const fixture = JSON.parse(fs.readFileSync(path.join(directory, 'upgrade-never-drawn.json'), 'utf8'));
   let rounds = 0;
   const llm = { enabled: true, completeRecapTurn: async input => {
-    if (input.stage === 'interest_review') return { reviews: [{ index: 0, score: 2, reason: '升级后整场没上手' }] };
+    if (input.stage === 'interest_review') return { reviews: [{ index: 0, score: 2, titleFunny: true, reason: '升级后整场没上手' }] };
     if (input.stage === 'closing') return { portrait: '', closing: '升级刚落锤，下一战却没等到它上手。' };
     rounds++;
     return rounds === 1

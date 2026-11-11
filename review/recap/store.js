@@ -4,7 +4,7 @@ const crypto = require('node:crypto');
 const { makeTimeline } = require('./facts');
 const { buildRecap, PROMPT_VERSION, TOOL_VERSION } = require('./runner');
 const { knowledgeRevision } = require('./versions');
-const { runSummary } = require('./presentation');
+const { battleMetrics, recapFixedMetrics, runSummary } = require('./presentation');
 function createRecapStore({ directory, factStore, llmFactory }) {
   const pending = new Map(); let epoch = 0;
   fs.mkdirSync(directory, { recursive: true });
@@ -15,7 +15,11 @@ function createRecapStore({ directory, factStore, llmFactory }) {
     const summaryRevision = crypto.createHash('sha256').update(JSON.stringify(runSummary(timeline, run))).digest('hex').slice(0, 16);
     const version = `${timeline.revision}:${summaryRevision}:${PROMPT_VERSION}:${TOOL_VERSION}:${knowledgeRevision()}:${llm?.cacheKey || 'no-model'}`;
     const file = path.join(directory, `${crypto.createHash('sha256').update(runId).digest('hex')}.json`);
-    try { const cached = JSON.parse(fs.readFileSync(file, 'utf8')); if (cached.version === version) return cached.recap; } catch { /* Rebuild missing or invalid cache. */ }
+    let cached;
+    try { cached = JSON.parse(fs.readFileSync(file, 'utf8')); } catch { /* Rebuild missing or invalid cache. */ }
+    if (cached?.version === version) {
+      return { ...cached.recap, fixedMetrics: recapFixedMetrics(timeline, run), battleMetrics: battleMetrics(timeline, run) };
+    }
     const taskKey = `${runId}:${version}`;
     if (pending.has(taskKey)) return pending.get(taskKey).job;
     for (const [key, task] of pending) if (task.runId === runId && key !== taskKey) { task.controller.abort(); pending.delete(key); }

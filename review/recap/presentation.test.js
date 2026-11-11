@@ -5,7 +5,7 @@ const os = require('node:os');
 const path = require('node:path');
 const { makeTimeline, observedRelations } = require('./facts');
 const { localRecap, buildRecap } = require('./runner');
-const { battleMetrics } = require('./presentation');
+const { battleMetrics, recapFixedMetrics } = require('./presentation');
 const { createRecapStore } = require('./store');
 
 function fixture() {
@@ -127,23 +127,62 @@ function metricFixture() {
 test('totals exclude overkill, self damage, enemy self damage and overheal', () => {
   assert.deepEqual(battleMetrics(metricFixture().timeline()).map(m => m.value), [10, 6, 4, 10]);
 });
-test('requested healing and uncertain damage directions remain unknown', () => {
+test('uncertain rows do not hide metrics backed by other damage events', () => {
   const f = metricFixture();
   delete f.facts.find(e => e.eventType === 'damage.resolved').payload.sourceSide;
   const heal = f.facts.find(e => e.eventType === 'heal.resolved'); delete heal.payload.hpBefore;
-  assert.deepEqual(battleMetrics(f.timeline()).map(m => m.value), [null, null, null, null]);
+  assert.deepEqual(battleMetrics(f.timeline()).map(m => m.value), [null, 6, 4, null]);
 });
-test('partial runs never publish partial sums as full-run totals', () => {
+test('ended runs display available totals even when the start marker is absent', () => {
   const f = metricFixture(); f.facts[0].eventType = 'run.resumed';
-  assert.deepEqual(battleMetrics(f.timeline()).map(m => m.value), [null, null, null, null]);
+  assert.deepEqual(battleMetrics(f.timeline()).map(m => m.display), ['10', '6', '4', '10']);
 });
 
-test('approved contextual cards survive asynchronous model failure', async () => {
+test('recorded battle values appear when the final combat has no end marker', () => {
+  const f = metricFixture();
+  f.facts.splice(f.facts.findIndex(event => event.eventType === 'combat.ended'), 1);
+  Object.assign(f.facts.find(event => event.eventType === 'damage.resolved').payload, { turn: 1, side: 'Player' });
+  const recap = localRecap(f.timeline());
+  assert.deepEqual(recap.battleMetrics.slice(0, 3).map(metric => metric.display), ['10', '6', '4']);
+  assert.ok(recap.battleMetrics.every(metric => metric.scope === 'recorded'));
+  assert.deepEqual(recap.fixedMetrics[0], { id: 'turn_damage', label: '最高回合实际爆发', value: 10,
+    display: '10', scope: 'recorded' });
+  f.facts.pop();
+  assert.equal(battleMetrics(f.timeline())[0].display, '已记录 10');
+  assert.equal(battleMetrics(f.timeline(), { result: 'loss' })[0].display, '10');
+  assert.equal(recapFixedMetrics(f.timeline(), { result: 'loss' })[0].display, '10');
+  f.facts.splice(0, f.facts.length);
+  assert.equal(recapFixedMetrics(f.timeline())[0].display, '未记录');
+  assert.ok(battleMetrics(f.timeline()).every(metric => metric.display === '未记录'));
+});
+
+test('a cached recap refreshes displayed metrics without replacing its cards', async t => {
+  const f = metricFixture(), directory = fs.mkdtempSync(path.join(os.tmpdir(), 'recap-recorded-stats-'));
+  t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+  f.facts.splice(f.facts.findIndex(event => event.eventType === 'combat.ended'), 1);
+  const { runId } = f.facts[0];
+  const store = createRecapStore({ directory, llmFactory: () => null, factStore: {
+    getEffectiveFacts: () => f.facts, getCoverage: () => f.timeline().coverage, getSnapshots: () => []
+  } });
+  await store.get(runId);
+  const file = path.join(directory, fs.readdirSync(directory)[0]);
+  const saved = JSON.parse(fs.readFileSync(file, 'utf8'));
+  saved.recap.battleMetrics = [];
+  saved.recap.cards = [{ title: '火堆忙活完，牌还没醒', body: '已保存的故事。' }];
+  fs.writeFileSync(file, JSON.stringify(saved));
+  const recap = await store.get(runId);
+  assert.equal(recap.battleMetrics[0].display, '10');
+  assert.deepEqual(recap.cards, saved.recap.cards);
+});
+
+test('model failure shows local metrics and leaves the story area empty', async () => {
   const f = fixture();
   const r = await buildRecap({ runId: f.runId, facts: f.facts, coverage: {}, llm: { enabled: true,
     completeRecapTurn: async () => { throw Error('offline'); } } });
   assert.equal(r.status, 'retryable');
-  assert.deepEqual(r.cards.map(c => c.verifiedKind), ['fairy_kept_rescue', 'rest_choice_style', 'resource_choice_style']);
+  assert.deepEqual(r.cards, []);
+  assert.equal(r.closing, '');
+  assert.ok(r.fixedMetrics.length);
 });
 test('recap cache includes corrected run metadata and does not reuse an old floor', async t => {
   const f = fixture(), directory = fs.mkdtempSync(path.join(os.tmpdir(), 'recap-summary-'));
@@ -153,6 +192,5 @@ test('recap cache includes corrected run metadata and does not reuse an old floo
     llmFactory: () => null });
   assert.equal((await store.get(f.runId, { finalFloor: 39 })).runSummary.totalFloor, 39);
   assert.equal((await store.get(f.runId, { finalFloor: 40 })).runSummary.totalFloor, 40);
-  assert.deepEqual((await store.get(f.runId, { finalFloor: 40 })).cards.map(c => c.verifiedKind),
-    ['fairy_kept_rescue', 'rest_choice_style', 'resource_choice_style']);
+  assert.deepEqual((await store.get(f.runId, { finalFloor: 40 })).cards, []);
 });

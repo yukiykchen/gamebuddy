@@ -406,6 +406,7 @@ function setStatus(status) {
   const replay = status.status === 'live' && status.mode === 'replay';
   petState.live = status.status === 'live';
   statusDot.classList.remove('live', 'alert');
+  statusLabel.title = status.detail || '';
   if (replay) {
     connectionLabel = '演示中';
     statusDot.classList.add('live');
@@ -418,11 +419,16 @@ function setStatus(status) {
     statusDot.classList.add('alert');
     connectionLabel = status.status === 'stale' ? '数据延迟' : '数据异常';
     say(status.status === 'stale' ? '游戏状态停住了' : '数据格式需要检查');
+  } else if (status.status === 'storage_error' || status.status === 'processing_error') {
+    statusDot.classList.add('alert');
+    connectionLabel = status.status === 'storage_error' ? '记录写入失败' : '数据处理异常';
+    say(connectionLabel);
   } else {
     connectionLabel = status.status === 'connected' ? '等待对局' : status.status === 'connecting' ? '连接中' : status.status === 'demo' ? '演示中' : '未连接';
     if (!hasAdvice()) {
       if (status.status === 'connecting') say('正在连接游戏');
       else if (status.status === 'connected') say('等待开始对局');
+      else if (status.status === 'disconnected') say('游戏连接已断开，正在重连');
       else if (status.status !== 'demo') say('等待游戏启动');
     }
   }

@@ -59,22 +59,22 @@
 
     function loadRecap(runId) {
       if (runId && (!recaps[runId] || ['retryable', 'cancelled', 'stale', 'unavailable'].includes(recaps[runId].status))) {
-        const generation = dataGeneration;
-        recaps[runId] = { status: 'loading' };
+        const loading = { status: 'loading' };
+        recaps[runId] = loading;
         refreshRecap(runId);
         Promise.resolve(bridge?.getRunRecapPreview ? bridge.getRunRecapPreview(runId) : bridge?.getRunMetrics?.(runId)).then(preview => {
-          if (generation === dataGeneration && recaps[runId]?.status === 'loading') {
+          if (recaps[runId] === loading) {
             if (Array.isArray(preview)) recaps[runId].fixedMetrics = preview;
             else if (preview) Object.assign(recaps[runId], preview, { status: 'loading' });
             if (expandedRunId === runId) refreshRecap(runId);
           }
         }).catch(() => {});
         Promise.resolve(bridge?.getRunRecap?.(runId)).then(recap => {
-          if (generation !== dataGeneration) return;
+          if (recaps[runId] !== loading) return;
           recaps[runId] = recap || { status: 'unavailable' };
           if (expandedRunId === runId) refreshRecap(runId);
         }).catch(() => {
-          if (generation !== dataGeneration) return;
+          if (recaps[runId] !== loading) return;
           recaps[runId] = { status: 'unavailable' };
           if (expandedRunId === runId) refreshRecap(runId);
         });
@@ -186,10 +186,14 @@
     }
 
     function setDashboard(nextDashboard) {
+      const previousRuns = new Map(runs().map(run => [run.runId, run]));
       dashboard = nextDashboard;
       selectedFloorKey = null;
       dataGeneration++;
-      for (const key of Object.keys(recaps)) delete recaps[key];
+      const currentRuns = new Map(runs().map(run => [run.runId, run]));
+      for (const runId of Object.keys(recaps)) {
+        if (!currentRuns.has(runId) || currentRuns.get(runId).endedAt !== previousRuns.get(runId)?.endedAt) delete recaps[runId];
+      }
       for (const key of Object.keys(details)) delete details[key];
       render();
       if (expandedRunId) { loadRecap(expandedRunId); loadDetails(expandedRunId); }

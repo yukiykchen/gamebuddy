@@ -69,6 +69,40 @@ function compactChoice(f) {
     decisionId: f.decisionId, combatId: f.combatId,
     payload: pick(p, ['action', 'label', 'result', 'cardId', 'upgraded', 'relicId', 'potionId', 'coordinate', 'price', 'status']) };
 }
+function storyInterestEvidence(t, card) {
+  const related = card.relationId ? observedRelations(t).find(relation => relation.relationId === card.relationId) : null;
+  const references = new Set(related?.evidenceIds || []);
+  const checkedFacts = [];
+  for (const claim of (card.assertions || []).slice(0, 16)) {
+    if (!claim || claim.type === 'entity_name' || (claim.type === 'sequence' && !Array.isArray(claim.eventIds))) continue;
+    const checked = checkClaim(t, claim);
+    if (checked.status !== 'supported') continue;
+    for (const id of checked.evidenceIds) references.add(id);
+    checkedFacts.push({ ...pick(claim, ['type', 'field', 'metricId', 'subjectId', 'combatId', 'eventId', 'snapshotId', 'value']),
+      evidenceIds: checked.evidenceIds.slice(0, 8) });
+  }
+  for (const id of card.evidenceIds || []) references.add(id);
+  const events = [], snapshots = [];
+  for (const id of references) {
+    const fact = t.byId.get(id);
+    if (fact && !/^(capture\.|run\.(?:started|resumed|ended)$)/.test(fact.eventType)) {
+      if (events.length === 10) continue;
+      const payload = queryPayload(fact);
+      const state = pick(payload, ['act', 'floor', 'totalFloor', 'turn', 'hp', 'maxHp', 'gold', 'hpBefore', 'hpAfter',
+        'hpLoss', 'blocked', 'action', 'cardId', 'cardName', 'cardInstanceId', 'potionId', 'relicId', 'optionId', 'label',
+        'result', 'price', 'sourceSide', 'targetSide', 'sourceEntityId', 'targetEntityId', 'victory', 'outcome', 'playerDied']);
+      const enemies = payload.combat?.enemies || payload.enemies;
+      if (Array.isArray(enemies)) state.enemies = enemies.slice(0, 6).map(enemy => pick(enemy, ['id', 'name', 'hp', 'maxHp', 'intent']));
+      if (Array.isArray(payload.potions)) state.potions = payload.potions.slice(0, 5);
+      if (Number.isInteger(payload.combat?.turn)) state.turn = payload.combat.turn;
+      events.push({ id, type: fact.eventType, combatId: fact.combatId, state });
+    }
+    const snapshot = t.snapshotsById.get(id);
+    if (snapshot && snapshots.length < 4) snapshots.push({ id, ...pick(snapshot, ['combatId', 'turn', 'player', 'enemies']) });
+  }
+  return sanitize({ events, snapshots, checkedFacts, ...(related ? { relation: related } : {}) });
+}
+
 function createTools(t) {
   const eventTypes = [...new Set(t.facts.map(f => f.eventType))].sort();
   const wrap = (data, extra = {}) => ({ runId: t.runId, factsRevision: t.revision, scope: { view: 'effective' },
@@ -175,4 +209,4 @@ function createTools(t) {
     }
   };
 }
-module.exports = { createTools, checkClaim, DEFINITIONS, sanitize, queryPayload };
+module.exports = { createTools, checkClaim, DEFINITIONS, sanitize, queryPayload, storyInterestEvidence };

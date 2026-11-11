@@ -1,6 +1,6 @@
 const { inspectSubject, observedPayload, observedRelations } = require('./facts');
 const { checkClaim } = require('./claims');
-const { narrativeNumbers, numberValue, wordingIssue } = require('./editorial');
+const { narrativeNumbers, numberValue, titleHasNumber, wordingIssue } = require('./editorial');
 
 function story(timeline, candidate) {
   const p = candidate || {};
@@ -64,6 +64,7 @@ function groundedStory(timeline, candidate, diagnostic = {}, { canonicalizeRelat
   const { title, bodyTemplate, assertions = [], evidenceIds = [], bindings = {} } = candidate;
   if (typeof title !== 'string' || typeof bodyTemplate !== 'string' || !Array.isArray(assertions)
     || !Array.isArray(evidenceIds) || !bindings || typeof bindings !== 'object') return reject('invalid_schema');
+  if (titleHasNumber(title)) return reject('number_in_title', '用贴合本局的反差或调侃重写标题，具体数值保留在正文。');
   const numericResults = assertions.map(claim => checkNumericClaim(timeline, claim));
   if (numericResults.some(result => result && result.status !== 'supported'))
     return reject('unsupported_numeric_assertion');

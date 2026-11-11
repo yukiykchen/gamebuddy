@@ -23,6 +23,7 @@ function readRealRecap() {
 const real=readRealRecap();
 const counters={typedCardsPlayed:10,attacksPlayed:6,cardsTaken:2,rewardSkips:1,eliteEntries:1,normalCombats:3,shopsVisited:1,knownGoldSpent:60,smiths:1,heals:1,playerBlocked:6,playerHpLoss:4};
 let recapCalls=0;
+let finishRecap;
 let detailCalls=0;
 let dashboard=buildDashboard({runs:['win','loss','abandoned'].map((result,i)=>({runId:'profile-'+i,character:i===2?'silent':'ironclad',endedAt:i+1,result,finalAct:1,finalFloor:10,initialDeckSize:10,finalState:{deckSize:12,gold:20,deck:[],relics:[]},counters}))});
 app.setPath('userData',fs.mkdtempSync(path.join(os.tmpdir(),'gamebuddy-profile-')));
@@ -41,9 +42,9 @@ ipcMain.handle('review:getRunDetails',(_event,runId)=>{
 });
 const recapMetrics=['turn_damage','lethal_hit','absorbed','reloads'].map((id,i)=>({id,label:['最高回合实际爆发','最高斩杀','实际抗伤','SL次数'][i],display:['10','9999','120','2'][i]}));
 const battleMetrics=['累计输出','实际抗伤','累计受伤','实际恢复'].map((label,i)=>({label,display:['1200','480','80','60'][i]}));
-ipcMain.handle('review:getRunRecapPreview',(_event,runId)=>real?.run.runId===runId?real.recap:({fixedMetrics:recapMetrics,battleMetrics,cards:[{title:'有点用力过猛',body:'目标只剩十血，这次命中结算远远超出了它的生命。'}]}));
+ipcMain.handle('review:getRunRecapPreview',(_event,runId)=>real?.run.runId===runId?real.recap:({fixedMetrics:recapMetrics,battleMetrics,cards:[{title:'未经评分的预览稿',body:'等待发布校验。'}]}));
 ipcMain.handle('review:getRunRecap',async(_event,runId)=>{
- recapCalls++;await new Promise(resolve=>setTimeout(resolve,80));
+ recapCalls++;await new Promise(resolve=>{finishRecap=resolve;});
  if(real?.run.runId===runId)return real.recap;
  return {status:'ready',fixedMetrics:recapMetrics,battleMetrics,cards:[
   {title:'有点用力过猛',body:'目标只剩十血，这次命中结算远远超出了它的生命。'},
@@ -68,16 +69,20 @@ app.whenReady().then(async()=>{
  if(real){dashboard={...dashboard,recentRuns:[real.run,...dashboard.recentRuns]};win.webContents.send('review:changed',dashboard);await settle();}
  await win.webContents.executeJavaScript("document.querySelector('.review-run-card').click()");
  await win.webContents.executeJavaScript(`new Promise(resolve=>{const check=()=>{const node=document.querySelector('[data-floor-key]');if(node){if(document.querySelectorAll('.rd-floor').length)throw new Error('Floor list should start empty');node.focus();node.click();resolve();}else setTimeout(check,5);};check();})`);
- await win.webContents.executeJavaScript('new Promise(resolve=>setTimeout(resolve,150))');await settle();
+ const preview=await win.webContents.executeJavaScript("document.querySelector('.review-recap').textContent");
+ assert.match(preview,/正在寻找更多值得回味的片段/);
+ assert.doesNotMatch(preview,/未经评分的预览稿|等待发布校验/);
+ finishRecap();
+ await settle();
  const recapState=await win.webContents.executeJavaScript(`({cards:document.querySelectorAll('.review-recap-cards article').length,
   slots:[...document.querySelectorAll('.review-recap-metric-label')].map(label=>label.lastChild.textContent),
   peak:document.querySelector('.review-recap-metrics>div:last-child strong').textContent,
   focused:document.activeElement?.hasAttribute('data-floor-key'),
   text:document.querySelector('.review-recap').textContent,width:document.documentElement.scrollWidth,viewport:innerWidth})`);
- assert.equal(recapState.cards,3);assert.equal(recapState.focused,true);
+ assert.equal(recapState.cards,real ? 0 : 3);assert.equal(recapState.focused,true);
  assert.deepEqual(recapState.slots,['累计输出','实际抗伤','累计受伤','本回合最高出伤']);
  assert.equal(recapState.peak,real?real.recap.fixedMetrics.find(metric=>metric.id==='turn_damage').display:'10');
- assert.match(recapState.text,/本局复盘/);assert.match(recapState.text,real?/惜命不惜债/:/升级未兑现/);
+ assert.match(recapState.text,/本局复盘/);assert.match(recapState.text,real?/本局暂无值得回味的片段/:/升级未兑现/);
  assert.doesNotMatch(recapState.text,/实际恢复|最高回合实际爆发/);
  assert.doesNotMatch(recapState.text,/evidenceIds|tool_calls|snapshotId|时间线|展开战报/);
  assert.ok(recapState.width<=recapState.viewport);

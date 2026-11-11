@@ -12,7 +12,7 @@ const base = () => JSON.parse(fs.readFileSync(path.join(__dirname, '../../harnes
 const clone = value => structuredClone(value);
 const timeline = f => makeTimeline(f.runId, f.facts, f.coverage, f.snapshots || []);
 const interestReview = (input, score = () => 2) => ({
-  reviews: input.cards.map(card => ({ index: card.index, score: score(card), reason: '测试评分' }))
+  reviews: input.cards.map(card => ({ index: card.index, score: score(card), titleFunny: true, reason: '测试评分' }))
 });
 function insert(f, eventType, payload) {
   const i = f.facts.findIndex(e => e.combatId === 'elite-bygone-effigy' && e.eventType === 'combat.ended');
@@ -80,7 +80,7 @@ test('the real HTTP adapter carries every prior result and full tool contracts i
   const f = base(), requests = [], c = candidate(f);
   const responses = [ { tool_calls: [{ name: 'find_events', args: { eventTypes: ['rest.action_completed'] } }] },
     { tool_calls: [{ name: 'inspect_subject', args: { subjectId: 'deck-bash', combatId: 'elite-bygone-effigy' } }] },
-    { candidates: [c] }, { reviews: [{ index: 0, score: 2, reason: '升级后没能上手' }] }, { closing: '这次的选择，也留下了值得回味的一笔。' } ];
+    { candidates: [c] }, { reviews: [{ index: 0, score: 2, titleFunny: true, reason: '升级后没能上手' }] }, { closing: '这次的选择，也留下了值得回味的一笔。' } ];
   const llm = createOpenAiClient({ enabled: true, apiKey: 'test-not-a-secret', baseURL: 'https://example.invalid/v1', model: 'mock', wireApi: 'chat' }, { fetchImpl: async (url, options) => {
     requests.push(JSON.parse(options.body));
     return { ok: true, json: async () => ({ choices: [{ message: { content: JSON.stringify(responses.shift()) } }] }) };
@@ -168,6 +168,51 @@ test('a still-boring retry or one with an incorrect number leaves no story to di
     assert.equal(recap.coverageNote, '本局没有找到值得单独讲的片段');
     assert.deepEqual(stages, ['investigate', 'interest_review', 'regenerate_interest',
       ...(bodyTemplate.includes('9999') ? [] : ['interest_review'])]);
+  }
+});
+
+test('a skill description without a real event never reaches the judge or the published cards', async () => {
+  const f = base(), stages = [];
+  const intro = { title: '怪物怎么写书', bodyTemplate: '这只怪物会写书，效果是给牌堆添麻烦。' };
+  const recap = await buildRecap({ ...f, llm: { enabled: true, completeRecapTurn: async input => {
+    stages.push(input.stage);
+    if (input.stage === 'investigate') return { candidates: [intro] };
+    if (input.stage === 'regenerate_interest') {
+      assert.equal(input.lowScoring[0].score, 0);
+      return { candidates: [candidate(f)] };
+    }
+    if (input.stage === 'interest_review') {
+      assert.equal(input.cards.length, 1);
+      assert.equal(input.cards[0].title, candidate(f).title);
+      assert.ok(input.cards[0].evidence.events.some(event => event.type === 'rest.action_completed'));
+      return interestReview(input);
+    }
+    return { closing: '升级落锤，结果没等到上场。' };
+  } } });
+  assert.deepEqual(stages, ['investigate', 'regenerate_interest', 'interest_review', 'closing']);
+  assert.deepEqual(recap.cards.map(card => card.title), [candidate(f).title]);
+});
+
+test('a flat title must be rewritten and pass its own check even when the story scores high', async () => {
+  const f = base(), original = candidate(f);
+  const revised = { ...original, title: '火堆开了光，牌还在睡觉' };
+  for (const titleFunny of [true, false]) {
+    let retryCount = 0;
+    const recap = await buildRecap({ ...f, llm: { enabled: true, completeRecapTurn: async input => {
+      if (input.stage === 'investigate') return { candidates: [original] };
+      if (input.stage === 'interest_review') return { reviews: input.cards.map(card => ({
+        index: card.index, score: 3, titleFunny: card.title === revised.title && titleFunny, reason: '升级在下一战没有兑现'
+      })) };
+      if (input.stage === 'regenerate_interest') {
+        retryCount++;
+        assert.equal(input.lowScoring[0].score, 3);
+        assert.equal(input.lowScoring[0].titleFunny, false);
+        return { candidates: [revised] };
+      }
+      return { closing: '火堆忙活完，牌还没醒。' };
+    } } });
+    assert.equal(retryCount, 1);
+    assert.deepEqual(recap.cards.map(card => card.title), titleFunny ? [revised.title] : []);
   }
 });
 
@@ -461,8 +506,8 @@ test('query projections remove repeated descriptions but preserve deck indices a
 // frozen source evidence, not generated gameplay; mutations below test guards.
 const realObservationCases = require('../../harness/fixtures/recap-evals/real-observation-regressions.json');
 const realLong = () => clone(realObservationCases.cases.find(c => c.runId.startsWith('309ec')));
-test('real legacy observations recover the three grounded long-run relations without inventing metrics', async () => {
-  const f = realLong(), recap = await buildRecap({ ...f, llm: null });
+test('real legacy observations provide grounded leads without inventing metrics', () => {
+  const f = realLong(), recap = require('./runner').localRecap(timeline(f), f.run);
   assert.deepEqual(recap.fixedMetrics.map(m => m.value), [null, null, null, null]);
   assert.deepEqual(recap.cards.map(c => c.pattern), ['health_recovery', 'rest_choice_style']);
   assert.ok(recap.cards[0].body.includes('37'));

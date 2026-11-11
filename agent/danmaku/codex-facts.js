@@ -405,6 +405,7 @@ function nextActionFact(enemy, { categoryLabel, sceneId = '', occurrence = 0, di
   if (enemy?.name) {
     return {
       text: dialogue.text,
+      variants: dialogue.variants,
       detail: {
         title: `${displayName || enemy.name}刚才大概是这么说的`,
         lines: detailLines,

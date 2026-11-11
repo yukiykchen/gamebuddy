@@ -29,6 +29,7 @@ class DanmakuDirector {
     this.fixedIntervalMs = fixedIntervalMs;
     this.lastFixedEmittedAt = -Infinity;
     this.recentTexts = new Map();
+    this.playedSkillTexts = new Set();
     this.presentedContentKeys = new Set();
     this.awaitingPresentation = new Map();
     this.presentedBySource = Object.fromEntries(SOURCE_NAMES.map(source => [source, 0]));
@@ -82,14 +83,20 @@ class DanmakuDirector {
 
     this.pruneTexts();
     const seen = new Set();
-    const factTexts = (event.factTexts || [event.factText]).map(safeText).filter(text => {
+    const skill = event.trigger === 'monster_skill';
+    const availableTexts = (event.factTexts || [event.factText]).map(safeText).filter(text => {
       const key = this.contentKey(text, event);
-      if (!text || seen.has(key) || this.recentTexts.has(key)
+      if (!text || seen.has(key) || this.recentTexts.has(key) || skill && this.playedSkillTexts.has(key)
         || this.queue.some(item => item.expiresAt > this.now() && item.contentKey === key)) return false;
       seen.add(key);
       return true;
     });
-    if (!factTexts.length) return { accepted: false, reason: 'empty_or_repeated_text' };
+    if (!availableTexts.length) return { accepted: false, reason: 'empty_or_repeated_text' };
+    let factTexts = availableTexts;
+    if (skill) {
+      const recent = new Set(this.recent.map(textKey));
+      factTexts = [availableTexts.find(text => !recent.has(textKey(text))) || availableTexts[0]];
+    }
     const detailByText = event.detailByText || {};
     const factSourceByText = event.factSourceByText || {};
     const start = this.now();
@@ -118,6 +125,7 @@ class DanmakuDirector {
         commentary,
         speaker: event.speaker || null,
         skillLabel: event.skillLabel || null,
+        ...(skill ? { monsterTurn: event.monsterTurn, enemyKey: event.enemyKey, actionSignature: event.actionSignature } : {}),
         displayPriority: wordingSource.source === 'key_component' ? 7 : wordingSource.source === 'recommendation' ? 6 : wordingSource.source === 'monster_skill' ? 5 : commentary?.momentId ? 4 : 2,
         style: ['enemy_move', 'recommendation'].includes(event.trigger) ? 'tense' : 'warm',
         dueAt: start + index * interval,
@@ -211,6 +219,7 @@ class DanmakuDirector {
     this.lastEmitAt = now;
     this.recent = [...this.recent, message.text].slice(-20);
     this.recentTexts.set(message.contentKey, now);
+    if (message.trigger === 'monster_skill') this.playedSkillTexts.add(message.contentKey);
     if (message.source === 'key_component') {
       this.presentedContentKeys.add(message.contentKey);
       for (const objectKey of message.objectKeys || []) {
@@ -226,9 +235,9 @@ class DanmakuDirector {
   }
 
   contentKey(text, event) {
-    if (event?.contentKey) return event.contentKey;
     const key = textKey(text) || safeText(text);
-    if (event.trigger === 'monster_skill') return `skill:${event.runId}:${event.sceneId}:${event.contentIdentity}:${key}`;
+    if (event.trigger === 'monster_skill') return `skill:${key}`;
+    if (event.contentKey) return event.contentKey;
     // 不同决策即使短句相同，也可能对应新的有效建议。
     return event.trigger === 'recommendation'
       ? `recommendation:${event.runId}:${event.sceneId}:${event.recommendationId || event.eventId}:${key}`

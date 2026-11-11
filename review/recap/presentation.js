@@ -1,15 +1,31 @@
-const { observedPayload, observedRelations, PLAYER, ENEMY } = require('./facts');
+const { observedPayload, observedRelations, fixedMetrics, queryMetrics, PLAYER, ENEMY } = require('./facts');
 
 const BATTLE_METRICS = [
   ['total_damage', '累计输出'], ['total_absorbed', '实际抗伤'],
   ['total_taken', '累计受伤'], ['total_healed', '实际恢复']
 ];
 
-function battleMetrics(t) {
-  const totals = [0, 0, 0, 0], known = [true, true, true, true];
-  const complete = t.completeRun && t.combats.size > 0
-    && (t.available('damage') || t.available('combat_resolution'))
-    && [...t.combats.keys()].every(id => t.completeCombat(id, t.available('damage') ? 'damage' : 'combat_resolution'));
+function runHasEnded(t, run) {
+  return ['win', 'loss', 'abandoned'].includes(run.result) || t.facts.some(f => f.eventType === 'run.ended');
+}
+
+function recordedMetric(id, label, value, ended) {
+  if (value == null) return { id, label, value: null, display: '未记录' };
+  return { id, label, value, scope: 'recorded', display: ended ? String(value) : `已记录 ${value}` };
+}
+
+function recapFixedMetrics(t, run = {}) {
+  const metrics = fixedMetrics(t);
+  const turnDamage = metrics[0];
+  if (turnDamage.value !== null) return metrics;
+  const topTurn = queryMetrics(t).find(metric => metric.id === 'highest_turn_actual');
+  if (!topTurn) return metrics;
+  return [recordedMetric(turnDamage.id, turnDamage.label, topTurn.value, runHasEnded(t, run)), ...metrics.slice(1)];
+}
+
+function battleMetrics(t, run = {}) {
+  const totals = [null, null, null, null];
+  const add = (index, n) => { totals[index] = (totals[index] ?? 0) + n; };
   const roles = new Map();
   const amount = n => Number.isFinite(n) && n >= 0;
   for (const f of t.facts.filter(f => f.eventType === 'damage.resolved')) {
@@ -17,33 +33,19 @@ function battleMetrics(t) {
     for (const [id, side] of [[p.sourceEntityId, p.sourceSide], [p.targetEntityId, p.targetSide]]) {
       if (id && (PLAYER.test(side || '') || ENEMY.test(side || ''))) roles.set(`${f.combatId}:${id}`, side);
     }
-    if (!(PLAYER.test(p.sourceSide || '') || ENEMY.test(p.sourceSide || ''))
-      || !(PLAYER.test(p.targetSide || '') || ENEMY.test(p.targetSide || ''))) {
-      known[0] = known[1] = known[2] = false;
-      continue;
-    }
-    if (PLAYER.test(p.sourceSide) && ENEMY.test(p.targetSide)) {
-      if (amount(p.hpLoss)) totals[0] += p.hpLoss; else known[0] = false;
-    }
-    if (ENEMY.test(p.sourceSide) && PLAYER.test(p.targetSide)) {
-      if (amount(p.blocked)) totals[1] += p.blocked; else known[1] = false;
-      if (amount(p.hpLoss)) totals[2] += p.hpLoss; else known[2] = false;
+    if (PLAYER.test(p.sourceSide || '') && ENEMY.test(p.targetSide || '') && amount(p.hpLoss)) add(0, p.hpLoss);
+    if (ENEMY.test(p.sourceSide || '') && PLAYER.test(p.targetSide || '')) {
+      if (amount(p.blocked)) add(1, p.blocked);
+      if (amount(p.hpLoss)) add(2, p.hpLoss);
     }
   }
-  // A requested healing amount can include overheal. Only explicit HP deltas
-  // count as actual recovery, and the target must be identified as the player.
-  known[3] = t.available('combat_resolution');
+  // Healing requests can include overheal. Use only explicit player HP deltas.
   for (const f of t.facts.filter(f => f.eventType === 'heal.resolved')) {
     const p = observedPayload(f), side = p.targetSide || roles.get(`${f.combatId}:${p.targetEntityId}`);
-    if (ENEMY.test(side || '')) continue;
-    if (!PLAYER.test(side || '') || !amount(p.hpBefore) || !amount(p.hpAfter) || p.hpAfter < p.hpBefore) {
-      known[3] = false; continue;
-    }
-    totals[3] += p.hpAfter - p.hpBefore;
+    if (PLAYER.test(side || '') && amount(p.hpBefore) && amount(p.hpAfter) && p.hpAfter >= p.hpBefore) add(3, p.hpAfter - p.hpBefore);
   }
-  return BATTLE_METRICS.map(([id, label], i) => ({ id, label,
-    value: complete && known[i] ? totals[i] : null,
-    display: complete && known[i] ? String(totals[i]) : '未记录' }));
+  const ended = runHasEnded(t, run);
+  return BATTLE_METRICS.map(([id, label], index) => recordedMetric(id, label, totals[index], ended));
 }
 
 function runSummary(t, run = {}) {
@@ -82,4 +84,4 @@ function choiceStats(t) {
   return stats;
 }
 
-module.exports = { BATTLE_METRICS, battleMetrics, runSummary, choiceStats };
+module.exports = { BATTLE_METRICS, battleMetrics, recapFixedMetrics, runSummary, choiceStats };

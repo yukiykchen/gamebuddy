@@ -391,6 +391,15 @@ function projectRunBuild(run) {
   };
 }
 
+function groupEncounterNames(label) {
+  if (typeof label !== 'string') return null;
+  const counts = new Map();
+  for (const name of label.split('、').map(part => part.trim()).filter(Boolean)) {
+    counts.set(name, (counts.get(name) || 0) + 1);
+  }
+  return [...counts].map(([name, count]) => count === 1 ? name : `${name} ×${count}`).join('、') || null;
+}
+
 function buildDashboard(history) {
   const all = history.runs.map((run,index)=>({run,index}))
     .sort((a,b)=>(number(b.run.endedAt)||0)-(number(a.run.endedAt)||0)||a.index-b.index)
@@ -417,7 +426,7 @@ function buildDashboard(history) {
       character: run.character,
       result: run.result,
       bossId: run.finalBossId || null,
-      bossName: run.finalBossName || null,
+      bossName: run.finalEncounterKind === 'killer' ? groupEncounterNames(run.finalBossName) : run.finalBossName || null,
       encounterKind: run.finalEncounterKind || null,
       floor: number(run.finalFloor),
       maxTurnDamage: number(run.maxTurnDamage),
@@ -432,6 +441,7 @@ module.exports = {
   SCHEMA,
   atomicWrite,
   buildDashboard,
+  groupEncounterNames,
   createReviewService,
   emptyHistory,
   loadHistory

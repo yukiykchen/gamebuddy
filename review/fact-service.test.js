@@ -87,6 +87,15 @@ assert.equal(death.finalFloor, 39);
 assert.equal(death.finalBossName, '猫头鹰法官');
 assert.equal(death.finalBossId, 'OWL_MAGISTRATE');
 assert.equal(death.finalEncounterKind, 'killer');
+const groupDeath = summarize('group-death', deathFacts.map(fact => fact.combatId === 'owl' ? {
+  ...fact, payload: { ...fact.payload, enemies: [
+    { id: 'EEL', name: '花园幽灵鳗' }, { id: 'OWL_MAGISTRATE', name: '猫头鹰法官' }, { id: 'EEL', name: '花园幽灵鳗' }
+  ] }
+} : fact), { families: {} });
+assert.equal(groupDeath.finalBossName, '花园幽灵鳗 ×2、猫头鹰法官');
+const legacyGroupDeath = { ...groupDeath, finalBossName: '花园幽灵鳗、猫头鹰法官、花园幽灵鳗' };
+assert.equal(require('./service').buildDashboard({ runs: [legacyGroupDeath] }).recentRuns[0].bossName, groupDeath.finalBossName);
+
 assert.equal(summarize('explicit-floor', [
   observed(3, 6, 1),
   { eventType: 'run.observed', occurredAt: 2, payload: { act: 3, floor: 6, totalFloor: 40 } },

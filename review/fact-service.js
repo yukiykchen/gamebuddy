@@ -1,5 +1,5 @@
 const fs = require('node:fs');
-const { atomicWrite, buildDashboard } = require('./service');
+const { atomicWrite, buildDashboard, groupEncounterNames } = require('./service');
 
 const SCHEMA = 'gamebuddy.review-history.v2';
 const LIMIT = 100;
@@ -240,7 +240,7 @@ function summarize(runId, facts, coverage) {
       (left.occurredAt || 0) - (right.occurredAt || 0) || (left.sourceSeq || 0) - (right.sourceSeq || 0)
     )).at(-1);
     finalBossId = killer ? killer.bossId || killer.encounterId || killer.enemies?.[0]?.id || null : null;
-    finalBossName = killer ? encounterLabel(killer) : null;
+    finalBossName = killer ? groupEncounterNames(encounterLabel(killer)) : null;
     finalEncounterKind = killer ? 'killer' : null;
   } else if (finalBossName) {
     finalEncounterKind = 'boss';

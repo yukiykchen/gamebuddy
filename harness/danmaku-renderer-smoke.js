@@ -8,10 +8,12 @@ const os = require('node:os');
 const path = require('node:path');
 const { DanmakuBridgeAdapter } = require('../agent/danmaku/bridge-adapter');
 const { DanmakuDirector } = require('../agent/danmaku/director');
+const { createComposerHost, showComposerHost, setComposerExpanded } = require('../src/danmaku-composer-window');
 
 const userData = fs.mkdtempSync(path.join(os.tmpdir(), 'gamebuddy-danmaku-smoke-'));
 app.setPath('userData', userData);
 let window;
+let composerHost;
 let now = 0;
 const director = new DanmakuDirector({ now: () => now });
 const scope = { runId: 'smoke', sceneId: 'smoke-combat', stateRevision: 1 };
@@ -23,7 +25,14 @@ ipcMain.on('danmaku-presented', (event, id) => {
   director.acknowledgePresented(id);
 });
 ipcMain.handle('get-danmaku-stats', () => director.presentationStats());
-ipcMain.handle('get-shared-danmaku-context', () => null);
+ipcMain.handle('get-shared-danmaku-context', event =>
+  event.sender === composerHost?.webContents ? { sceneKey: 'composer-smoke', phase: 'combat' } : null);
+let submittedText;
+ipcMain.handle('submit-shared-danmaku', (event, { text }) => {
+  assert.equal(event.sender, composerHost.webContents);
+  submittedText = text;
+  return { accepted: true };
+});
 const timeout = setTimeout(() => { console.error('Danmaku renderer smoke timed out'); app.exit(1); }, 15_000);
 
 async function waitForCount(count) {
@@ -208,12 +217,53 @@ app.whenReady().then(async () => {
   assert.notEqual(await window.webContents.executeJavaScript("document.querySelector('.danmaku-item').style.transform"), pausedTransform);
   assert.deepEqual(pointerModes, [true, false]);
   console.log('Sampled hover remains stable through native leave events and resumes outside.');
+  // The compact native host must accept its first click and pass input through preload.
+  const compactBounds = { x: 220, y: 220, width: 128, height: 72 };
+  const expandedBounds = { ...compactBounds, width: 520, height: 280 };
+  composerHost = createComposerHost({ bounds: compactBounds,
+    parent: window, preload: path.join(__dirname, '..', 'preload.js'), page: path.join(__dirname, '..', 'src', 'danmaku.html') });
+  ipcMain.on('danmaku-composer-focus', (event, expanded) => {
+    if (event.sender === composerHost.webContents) setComposerExpanded(composerHost, expanded, expanded ? expandedBounds : compactBounds);
+  });
+  await new Promise(resolve => composerHost.webContents.once('did-finish-load', resolve));
+  showComposerHost(composerHost);
+  assert.equal(composerHost.isVisible(), true);
+  const click = async selector => {
+    const point = await composerHost.webContents.executeJavaScript(`(() => {
+      const rect = document.querySelector(${JSON.stringify(selector)}).getBoundingClientRect();
+      return { x: Math.round(rect.x + rect.width / 2), y: Math.round(rect.y + rect.height / 2) };
+    })()`);
+    for (const type of ['mouseDown', 'mouseUp']) {
+      composerHost.webContents.sendInputEvent({ type, ...point, button: 'left', clickCount: 1 });
+    }
+  };
+  // sendInputEvent requires app focus. Native first-mouse is enabled by createComposerHost.
+  composerHost.focus();
+  await click('#shared-composer-toggle');
+  await composerHost.webContents.executeJavaScript(`new Promise((resolve, reject) => {
+    const check = attempts => {
+      if (document.activeElement?.id === 'shared-composer-input') return resolve();
+      if (!attempts) return reject(Error('Composer input did not receive focus'));
+      setTimeout(() => check(attempts - 1), 30);
+    };
+    check(50);
+  })`);
+  await composerHost.webContents.executeJavaScript("document.querySelector('#shared-composer-input').value = '本地发送测试'");
+  await click('#shared-composer-submit');
+  for (let attempt = 0; !submittedText && attempt < 50; attempt += 1) {
+    await new Promise(resolve => setTimeout(resolve, 30));
+  }
+  assert.equal(submittedText, '本地发送测试');
+  assert.equal(await window.webContents.executeJavaScript("Boolean(document.querySelector('#shared-composer'))"), false);
+  console.log('Separate composer accepted clicks and forwarded a simulated submission.');
+  composerHost.destroy();
   clearTimeout(timeout);
   window.destroy();
   app.exit(0);
 }).catch(error => {
   console.error(error);
   clearTimeout(timeout);
+  if (composerHost && !composerHost.isDestroyed()) composerHost.destroy();
   window?.destroy();
   app.exit(1);
 });

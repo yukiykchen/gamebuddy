@@ -39,6 +39,8 @@ class DanmakuBridgeAdapter {
 
   reset() {
     this.cancelCommentary();
+    this.monsterTurns = new Set();
+    this.lastMonsterSpeaker = null;
     this.memory.reset();
     this.director.invalidate();
     this.director.presentedContentKeys?.clear();
@@ -184,12 +186,7 @@ class DanmakuBridgeAdapter {
     return enemy?.key || `${enemy?.name || enemy?.id || 'enemy'}#${index}`;
   }
 
-  actionSignature(enemy, index = 0) {
-    const fact = nextActionFact(enemy, {
-      categoryLabel,
-      sceneId: this.scope?.sceneId || 'unknown-scene',
-      displayName: this.displayName(enemy, index)
-    });
+  actionSignature(enemy, fact) {
     return [enemy.id || enemy.name, fact?.moveKey || '', fact?.kind || enemy.intent || ''].join('|');
   }
 
@@ -285,6 +282,9 @@ class DanmakuBridgeAdapter {
   }
 
   isRelevant(message) {
+    if (message.trigger === 'monster_skill' && Number.isInteger(message.monsterTurn)) {
+      return this.isMonsterActionCurrent(message);
+    }
     if (message.source !== 'ai' || !message.commentary) return true;
     if (message.commentary.momentId) return this.memory.validMoment(message.commentary.momentId);
     const alive = new Set(extractSceneContext({ state: this.previous || {} }).enemies.map(enemy => enemy.key));
@@ -296,15 +296,27 @@ class DanmakuBridgeAdapter {
     return this.director.tick(item => this.isRelevant(item));
   }
 
-  emitSkill(enemy, index, fact) {
-    if (!fact) return { accepted: false, reason: 'no_skill' };
-    const key = `${this.enemyKey(enemy, index)}:${fact.moveKey}:${fact.kind}`;
+  isMonsterActionCurrent({ sceneId, monsterTurn, enemyKey, actionSignature }) {
+    return this.accepting && this.scope?.sceneId === sceneId && this.previous?.combat?.turn === monsterTurn
+      && this.lastMoveKeys.get(enemyKey) === actionSignature;
+  }
+
+  emitMonsterTurn(actions, turn) {
+    if (!Number.isInteger(turn) || this.monsterTurns.has(turn) || !actions.length) return;
+    const action = actions.find(item => item.changed && item.enemyKey !== this.lastMonsterSpeaker)
+      || actions.find(item => item.changed) || actions.find(item => item.enemyKey !== this.lastMonsterSpeaker) || actions[0];
+    this.monsterTurns.add(turn);
+    this.lastMonsterSpeaker = action.enemyKey;
+    const { enemy, index, fact, enemyKey, signature } = action;
+    const sameName = actions.filter(item => item.enemy.name === enemy.name).length > 1;
+    const moveName = fact.detail.lines.find(line => line.startsWith('行动：'))?.slice(3) || '当前行动';
     return this.director.burst({
       ...this.scope, eventId: `skill-${++this.serial}`, trigger: 'monster_skill',
-      key: `${key}:${this.serial}`, contentIdentity: key, priority: 3,
-      skillLabel: `${enemy.name}${(this.previous?.combat?.enemies || []).filter(item => item.name === enemy.name).length > 1 ? `（${(enemy.slot ?? index) + 1}）` : ''} · ${fact.detail.lines.find(line => line.startsWith('行动：'))?.slice(3) || '当前行动'}`,
-      factTexts: [fact.text], detailByText: { [fact.text]: fact.detail },
-      factSourceByText: { [fact.text]: { type: 'skill_dialogue', source: 'monster_skill' } }
+      key: `turn-${turn}`, priority: 3, monsterTurn: turn, enemyKey, actionSignature: signature,
+      skillLabel: `${enemy.name}${sameName ? `（${(enemy.slot ?? index) + 1}）` : ''} · ${moveName}`,
+      factTexts: fact.variants,
+      detailByText: Object.fromEntries(fact.variants.map(text => [text, fact.detail])),
+      factSourceByText: Object.fromEntries(fact.variants.map(text => [text, { type: 'skill_dialogue', source: 'monster_skill' }]))
     });
   }
 
@@ -375,24 +387,35 @@ class DanmakuBridgeAdapter {
       this.shopVisit = null;
       this.director.dropKeyComponents();
       this.cancelCommentary();
+      this.monsterTurns.clear();
+      this.lastMonsterSpeaker = null;
       this.sceneCount += 1;
     }
     this.scope = { runId, sceneId: `${runId}:combat-${this.sceneCount}`, stateRevision: observation.sequence };
     this.director.setContext(this.scope);
     this.memory.observe(state, { runId, sceneId: this.scope.sceneId, entering });
 
+    const previousActions = this.lastMoveKeys;
+    this.lastMoveKeys = new Map();
+    const actions = [];
+    for (const [index, enemy] of sceneContext.enemies.entries()) {
+      const name = this.displayName(enemy, index);
+      const fact = nextActionFact(enemy, {
+        categoryLabel, sceneId: this.scope.sceneId, displayName: name,
+        occurrence: sceneContext.turn ?? index
+      });
+      const enemyKey = this.enemyKey(enemy, index);
+      const signature = this.actionSignature(enemy, fact);
+      this.lastMoveKeys.set(enemyKey, signature);
+      if (!fact) continue;
+      actions.push({ enemy, index, enemyKey, fact, signature, changed: entering || signature !== previousActions.get(enemyKey) });
+    }
+    this.emitMonsterTurn(actions, sceneContext.turn);
+
     if (entering) {
       this.sceneStartedAt = this.now();
       this.sharedScene = buildSharedScene(state, 'combat');
       this.markFact();
-      this.lastMoveKeys = new Map(sceneContext.enemies.map((enemy, index) => [
-        this.enemyKey(enemy, index), this.actionSignature(enemy, index)
-      ]));
-      for (const [index, enemy] of sceneContext.enemies.entries()) {
-        this.emitSkill(enemy, index, nextActionFact(enemy, {
-          categoryLabel, sceneId: this.scope.sceneId, displayName: this.displayName(enemy, index), occurrence: index
-        }));
-      }
       this.nextAiAt = this.now();
       this.maybeGenerateCommentary();
       void this.enqueueShared({ state, phase: 'combat', scope: this.scope }).catch(() => {});
@@ -401,25 +424,8 @@ class DanmakuBridgeAdapter {
     // 断线恢复同一场景时重新启动周期，但不重播入场。
     if (this.nextAiAt === Infinity && this.sharedScene?.phase === 'combat') this.nextAiAt = this.now();
 
-    const changed = sceneContext.enemies
-      .map((enemy, index) => ({
-        enemy,
-        index,
-        fact: nextActionFact(enemy, {
-          categoryLabel,
-          sceneId: this.scope.sceneId,
-          displayName: this.displayName(enemy, index),
-          occurrence: sceneContext.turn || 0
-        }),
-        key: this.actionSignature(enemy, index)
-      }))
-      .filter(item => item.fact && item.key !== this.lastMoveKeys.get(this.enemyKey(item.enemy, item.index)));
-    for (const [index, enemy] of sceneContext.enemies.entries()) {
-      this.lastMoveKeys.set(this.enemyKey(enemy, index), this.actionSignature(enemy, index));
-    }
-    if (changed.length) {
+    if (actions.some(item => item.changed)) {
       this.markFact();
-      for (const item of changed) this.emitSkill(item.enemy, item.index, item.fact);
       return { accepted: true, reason: 'skills_updated' };
     }
 

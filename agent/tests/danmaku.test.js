@@ -38,13 +38,13 @@ test('director only queues explicit fixed dialogue and never adds corpus or mode
   assert.equal(director.queue[0].text.startsWith('撕咬！'), true);
 });
 
-test('entry preserves independent skill introductions and hover details without AI', async () => {
+test('entry queues one local monster line with its skill details', async () => {
   const adapter = new DanmakuBridgeAdapter({ now: () => 0 });
   await adapter.ingestObservation(observation(1, state({ enemies: [
     { id: 'NIBBIT', name: '小啃兽', intent: 'AttackIntent', nextMoveName: '顶撞' },
     { id: 'NIBBIT', name: '小啃兽', intent: 'AttackIntent', nextMoveName: '顶撞' }
   ] })), { runId: 'run' });
-  assert.equal(adapter.director.queue.length, 2);
+  assert.equal(adapter.director.queue.length, 1);
   for (const item of adapter.director.queue) {
     assert.equal(item.source, 'monster_skill');
     assert.match(item.detail.lines.join(' '), /行动：顶撞/);
@@ -52,24 +52,61 @@ test('entry preserves independent skill introductions and hover details without 
   assert.equal(adapter.tick().length, 1);
 });
 
-test('skill changes appear immediately independently of the AI cadence', async () => {
+test('two identical monsters alternate without saying more than one line per turn', async () => {
   let now = 0;
   const adapter = new DanmakuBridgeAdapter({ now: () => now });
+  const twins = (intent, nextMoveName) => [0, 1].map(slot =>
+    ({ id: 'NIBBIT', name: '小啃兽', slot, intent, nextMoveName }));
+  const observe = (revision, turn, intent, move) => adapter.ingestObservation(observation(revision,
+    state({ sequence: turn, enemies: twins(intent, move) })), { runId: 'run' });
+  await observe(1, 1, 'DefendIntent', '缩壳');
+  const first = adapter.tick()[0];
+  now += 6000;
+  await observe(2, 1, 'AttackIntent', '顶撞');
+  assert.deepEqual(adapter.tick(), []);
+  await observe(3, 2, 'AttackIntent', '顶撞');
+  const second = adapter.tick()[0];
+  assert.deepEqual([first.monsterTurn, second.monsterTurn], [1, 2]);
+  assert.deepEqual([first.skillLabel, second.skillLabel], ['小啃兽（1） · 缩壳', '小啃兽（2） · 顶撞']);
+  assert.notEqual(first.text, second.text);
+});
+
+test('monster dialogue stays unique across fights and after the recent-text window', () => {
+  let now = 0;
+  const director = new DanmakuDirector({ now: () => now, repeatWindowMs: 90_000 });
+  const firstFight = { runId: 'run', sceneId: 'first-fight', stateRevision: 1 };
+  director.setContext(firstFight);
+  const emit = (scope, eventId, factTexts) =>
+    director.burst({ ...scope, eventId, key: eventId, trigger: 'monster_skill', priority: 3, factTexts });
+  assert.equal(emit(firstFight, 'first-monster', ['小心，前面有坑。']).count, 1);
+  assert.equal(director.tick()[0].text, '小心，前面有坑。');
+  now = 100_000;
+  assert.equal(emit(firstFight, 'second-monster', ['小心 前面有坑！']).reason, 'empty_or_repeated_text');
+  const nextFight = { ...firstFight, sceneId: 'next-fight' };
+  director.setContext(nextFight);
+  assert.equal(emit(nextFight, 'next-monster', ['小心，前面有坑。', '看我的下一步。']).count, 1);
+  assert.equal(director.tick()[0].text, '看我的下一步。');
+  assert.equal(emit(nextFight, 'last-monster', ['小心，前面有坑。']).reason, 'empty_or_repeated_text');
+});
+
+test('queued monster dialogue expires when the turn or selected action changes', async () => {
+  const adapter = new DanmakuBridgeAdapter({ now: () => 0 });
   const first = state({ enemies: [{ name: '小啃兽', intent: 'AttackIntent', nextMoveName: '顶撞' }] });
   await adapter.ingestObservation(observation(1, first), { runId: 'run' });
-  const second = state({ enemies: [{ name: '小啃兽', intent: 'DefendIntent', nextMoveName: '缩壳' }] });
-  const result = await adapter.ingestObservation(observation(2, second), { runId: 'run' });
-  assert.equal(result.reason, 'skills_updated');
+  const second = state({ sequence: 2, enemies: [{ name: '小啃兽', intent: 'DefendIntent', nextMoveName: '缩壳' }] });
+  await adapter.ingestObservation(observation(2, second), { runId: 'run' });
   assert.equal(adapter.director.queue.length, 2);
-  assert.match(adapter.director.queue.at(-1).detail.lines.join(' '), /行动：缩壳/);
-  const firstMessage = adapter.tick()[0];
-  now = 500;
-  const secondMessage = adapter.tick()[0];
-  assert.equal(firstMessage.source, 'monster_skill');
-  assert.equal(secondMessage.source, 'monster_skill');
-  adapter.director.acknowledgePresented(secondMessage.id);
-  assert.equal(adapter.director.presentationStats().bySource.monster_skill, 1);
-  assert.equal(adapter.director.presentationStats().commentaryAiPercent, null);
+  const [message] = adapter.tick();
+  assert.equal(message.monsterTurn, 2);
+  assert.match(message.skillLabel, /缩壳/);
+  assert.equal(adapter.director.queue.length, 0);
+
+  const third = state({ sequence: 3, enemies: [{ name: '小啃兽', intent: 'AttackIntent', nextMoveName: '顶撞' }] });
+  await adapter.ingestObservation(observation(3, third), { runId: 'run' });
+  const changed = state({ sequence: 3, enemies: [{ name: '小啃兽', intent: 'DefendIntent', nextMoveName: '缩壳' }] });
+  await adapter.ingestObservation(observation(4, changed), { runId: 'run' });
+  assert.deepEqual(adapter.tick(), []);
+  assert.equal(adapter.director.queue.length, 0);
 });
 
 test('普通推荐只留在面板，adapter不再生成推荐复述弹幕', async () => {

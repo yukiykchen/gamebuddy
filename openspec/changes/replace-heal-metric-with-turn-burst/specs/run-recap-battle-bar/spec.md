@@ -14,7 +14,7 @@
 - **AND** 次级纪录 MUST NOT 再出现同一峰值
 
 #### Scenario: Peak turn burst is unknown
-- **WHEN** 本局缺少完整的玩家回合扣血记录
+- **WHEN** 本局没有任何可计算的玩家回合扣血记录
 - **THEN** 主数字条第四项 SHALL 显示未记录
 - **AND** 系统 MUST NOT 用治疗请求量、旧摘要或其他单击伤害填入该格
 
@@ -22,3 +22,15 @@
 - **WHEN** 本局同时有累计输出、实际抗伤和累计受伤
 - **THEN** 这三项 SHALL 保持原名称、原顺序和原口径
 - **AND** 主数字条 MUST NOT 再展示实际恢复
+
+### Requirement: Display verified observations for incomplete battle coverage
+
+对局结束后，主数字条 SHALL 直接显示已有结算可计算出的数值。单场战斗结束事件、覆盖状态或其他结算的缺失 MUST NOT 阻止显示可计算指标。只有当前指标没有可用数据时才 SHALL 显示「未记录」。
+
+#### Scenario: The last combat does not have an end marker
+- **WHEN** 伤害事件存在，但最后一场战斗缺少结束事件
+- **THEN** 复盘 SHALL 直接显示累计输出、抗伤、受伤和最高回合出伤的已知数值
+
+#### Scenario: A saved recap is reopened
+- **WHEN** 已生成的故事卡命中缓存
+- **THEN** 界面 SHALL 用当前规则计算战况数字，并复用原有卡片

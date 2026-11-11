@@ -43,7 +43,8 @@ const { DanmakuLlmAtmosphere } = require('./agent/danmaku/llm-atmosphere');
 const { createFactReviewService } = require('./review/fact-service');
 const { readRunDetails } = require('./review/run-details');
 const { createRecapStore } = require('./review/recap/store');
-const { makeTimeline, fixedMetrics } = require('./review/recap/facts');
+const { makeTimeline } = require('./review/recap/facts');
+const { recapFixedMetrics } = require('./review/recap/presentation');
 const { localRecap } = require('./review/recap/runner');
 const { fromObservedState } = require('./review/recap/snapshot');
 const { createClearUploadClient, submitClearedRun } = require('./review/clear-upload-client');
@@ -86,6 +87,7 @@ let lastAgentThinking = { thinking: false, tasks: [], model: null, startedAtByTa
 const observationStore = createObservationStore({ staleAfterMs: 5000 });
 const PET_SKINS_DIR = path.join(__dirname, 'src', 'assets', 'pets');
 const PET_POSES = ['waiting', 'watching', 'thinking', 'advising'];
+const DECISION_LOG_ROOT = path.join(app.getPath('userData'), 'runs');
 const PET_PREFERENCES_PATH = path.join(app.getPath('userData'), 'pet-preferences.json');
 const REVIEW_HISTORY_PATH = process.env.GAMEBUDDY_REVIEW_FILE || path.join(app.getPath('userData'), 'review-history.v1.json');
 const FACT_REVIEW_HISTORY_PATH = process.env.GAMEBUDDY_FACT_REVIEW_FILE || path.join(app.getPath('userData'), 'review-history.v2.json');
@@ -93,6 +95,10 @@ const FACTS_ROOT_PATH = process.env.GAMEBUDDY_FACTS_DIR || path.join(app.getPath
 const reviewService = createFactReviewService({ filePath: FACT_REVIEW_HISTORY_PATH });
 const factStore = createLocalFactStore({ rootDir: FACTS_ROOT_PATH });
 const lastRecapSnapshot = new Map();
+const finishedReviewRuns = new Set();
+const pendingReviewRuns = new Set();
+const pendingAutomaticRecaps = new Set();
+let reviewRefreshTimer;
 reviewService.refreshFromFacts(factStore);
 let reviewClearToken = null;
 const llmConfig = readLlmConfig();
@@ -175,15 +181,44 @@ if (llmConfig.enabled) {
 if (gatewayPreference?.baseURL) console.log(`GameBuddy LLM preferred gateway: ${gatewayPreference.baseURL}`);
 let orchestrator;
 
+function refreshFactReview(runId) {
+  const summary = reviewService.ingestRun(runId, factStore.getEffectiveFacts(runId), factStore.getCoverage(runId));
+  if (summary) finishedReviewRuns.add(runId);
+  return summary;
+}
+
 function rebuildFactReviews() {
-  const index = factStore.rebuildIndex();
-  for (const entry of index.runs) {
-    reviewService.ingestRun(
-      entry.runId,
-      factStore.getEffectiveFacts(entry.runId),
-      factStore.getCoverage(entry.runId)
-    );
+  for (const entry of factStore.rebuildIndex().runs) refreshFactReview(entry.runId);
+}
+
+function queueFactReview(fact, stored, replay) {
+  if (fact.eventType === 'run.ended') {
+    finishedReviewRuns.add(fact.runId);
+    if (!stored.duplicate && !replay) pendingAutomaticRecaps.add(fact.runId);
   }
+  if (!finishedReviewRuns.has(fact.runId) || stored.duplicate && fact.eventType !== 'capture.gap_detected') return;
+  pendingReviewRuns.add(fact.runId);
+  if (reviewRefreshTimer) return;
+  reviewRefreshTimer = setTimeout(() => {
+    reviewRefreshTimer = undefined;
+    for (const runId of pendingReviewRuns) {
+      try {
+        const run = refreshFactReview(runId);
+        if (run && pendingAutomaticRecaps.delete(runId)) {
+          void getFinishedRecap(run).catch(error => console.warn('GameBuddy automatic recap failed:', error.message));
+        }
+      } catch (error) { console.warn('GameBuddy review refresh failed:', error.message); }
+    }
+    pendingReviewRuns.clear();
+    publishReviewChanged();
+  }, 500);
+}
+
+async function getFinishedRecap(run) {
+  const recap = await recapStore.get(run.runId, run);
+  if (recap.status !== 'stale' || isQuitting || !finishedReviewRuns.has(run.runId)) return recap;
+  const latestRun = reviewService.getHistory().runs.find(entry => entry.runId === run.runId);
+  return latestRun ? recapStore.get(run.runId, latestRun) : recap;
 }
 
 function logLlmMode() {
@@ -450,7 +485,15 @@ function currentObservation(now = Date.now()) {
 function startAgentRun() {
   const state = observationStore.getState();
   agentRunId = String(state?.run?.seed || state?.run?.id || new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 14));
-  fs.mkdirSync(path.join(__dirname, 'runs', agentRunId), { recursive: true });
+}
+
+function recordAgentDecision(observation, decision, accepted = null) {
+  if (!agentRunId || !decision) return;
+  try {
+    recordDecision({ runId: agentRunId, observation, decision, accepted, rootDir: DECISION_LOG_ROOT });
+  } catch (error) {
+    console.warn('GameBuddy decision log skipped:', error.message);
+  }
 }
 
 function broadcast(channel, payload) {
@@ -515,9 +558,23 @@ async function ingestCombatDanmaku(observation) {
 }
 
 function broadcastBridgeStatus(status, detail = '') {
+  if (lastBridgeStatus.status === status && lastBridgeStatus.detail === detail) return;
   lastBridgeStatus = { status, detail, url: BRIDGE_URL, mode: BRIDGE_MODE };
   if (status === 'live') reportBridgeOnce('success');
   broadcast('bridge-status', lastBridgeStatus);
+}
+
+let lastBridgeIssue;
+let bridgeIssueWrite = Promise.resolve();
+function reportBridgeIssue(status, detail) {
+  broadcastBridgeStatus(status, detail);
+  const issue = { status, detail: String(detail).slice(0, 300) };
+  const signature = JSON.stringify(issue);
+  if (signature === lastBridgeIssue) return;
+  lastBridgeIssue = signature;
+  const file = path.join(app.getPath('userData'), 'last-bridge-issue.json');
+  const record = JSON.stringify({ at: new Date().toISOString(), ...issue });
+  bridgeIssueWrite = bridgeIssueWrite.then(() => fs.promises.writeFile(file, record)).catch(() => {});
 }
 
 const MAX_LLM_LOG_ENTRIES = 80;
@@ -874,21 +931,28 @@ function connectBridge() {
   const socket = new WebSocket(BRIDGE_URL);
   bridgeSocket = socket;
   let disconnected = false;
+  let opened = false;
 
   socket.on('open', () => {
+    opened = true;
     broadcastBridgeStatus('connected');
     socket.send(JSON.stringify({ type: 'request_snapshot' }));
   });
 
   socket.on('message', raw => {
+    let message;
+    try { message = JSON.parse(raw.toString()); }
+    catch {
+      reportBridgeIssue('invalid', 'Mod 消息不是有效的 JSON');
+      return;
+    }
     try {
-      const message = JSON.parse(raw.toString());
-      if (message.type === 'fact') {
-        const stored = factStore.ingest(message.data, {
-          replay: BRIDGE_MODE === 'replay' || message.replay === true
-        });
+      if (message?.type === 'fact') {
+        const replay = BRIDGE_MODE === 'replay' || message.replay === true;
+        const stored = factStore.ingest(message.data, { replay });
         if (!stored.durable) {
-          broadcastBridgeStatus('invalid', stored.reason || 'fact write failed');
+          if (stored.reason === 'write_failed') reportBridgeIssue('storage_error', '无法写入本地对局日志');
+          else reportBridgeIssue('invalid', stored.reason || '游戏事件校验失败');
           return;
         }
         socket.send(JSON.stringify({
@@ -896,14 +960,9 @@ function connectBridge() {
           sourceSessionId: message.data.sourceSessionId,
           ackSourceSeq: stored.ackSourceSeq
         }));
-        reviewService.ingestRun(
-          message.data.runId,
-          factStore.getEffectiveFacts(message.data.runId),
-          factStore.getCoverage(message.data.runId)
-        );
-        void danmakuAdapter.ingestFact(message.data, { replay: BRIDGE_MODE === 'replay' || message.replay === true })
+        queueFactReview(message.data, stored, replay);
+        void danmakuAdapter.ingestFact(message.data, { replay })
           .catch(error => console.warn('GameBuddy danmaku fact skipped:', error.message));
-        publishReviewChanged();
         broadcastBridgeStatus('live');
         try {
           void submitClearedRun({
@@ -924,9 +983,7 @@ function connectBridge() {
       }
       const result = observationStore.ingest(message);
       if (result.kind === 'invalid') {
-        console.error('[Runmate DEBUG] invalid state reason:', result.reason);
-        console.error('[Runmate DEBUG] raw message:', JSON.stringify(message, null, 2).slice(0, 4000));
-        broadcastBridgeStatus('invalid', result.reason);
+        reportBridgeIssue('invalid', result.reason);
         return;
       }
       if (result.kind === 'state' || result.kind === 'duplicate') {
@@ -951,7 +1008,7 @@ function connectBridge() {
           }
           applyCharacterSkin(routableState?.run?.character);
           if (!routableState.combat && routeChoiceCount(routableState) <= 1) clearAgentThinking('map_route');
-          recordDecision({ runId: agentRunId, observation: { ...observation, state: routableState }, decision: observation.decision });
+          recordAgentDecision({ ...observation, state: routableState }, observation.decision);
           broadcast('bridge-state', routableState);
           syncCardGuidance(routableState);
           sendHighlightRoute(observation.decision, routableState);
@@ -977,25 +1034,27 @@ function connectBridge() {
         });
       }
     } catch (error) {
-      broadcastBridgeStatus('invalid', error.message);
+      reportBridgeIssue('processing_error', error.message);
     }
   });
 
-  const disconnect = () => {
+  const disconnect = detail => {
     if (disconnected) return;
     disconnected = true;
     if (bridgeSocket === socket) bridgeSocket = null;
+    if (isQuitting) return;
     clearEncounterGuide();
     clearCardRecommendation();
     clearDanmaku();
     rewardGuidanceInput = null;
     cardGuidanceService.clear();
-    broadcastBridgeStatus('waiting', '等待本地 Mod Bridge');
+    if (opened) reportBridgeIssue('disconnected', detail);
+    else broadcastBridgeStatus('waiting', '等待本地 Mod Bridge');
     clearTimeout(bridgeReconnectTimer);
     bridgeReconnectTimer = setTimeout(connectBridge, 2500);
   };
-  socket.on('error', disconnect);
-  socket.on('close', disconnect);
+  socket.on('error', error => disconnect(`桥接连接错误（${error.code || '未知'}）`));
+  socket.on('close', code => disconnect(`Mod Bridge 已断开（${code}）`));
 }
 
 function sendHighlightRoute(decision, routableState) {
@@ -1209,10 +1268,11 @@ function createDanmakuWindow() {
   danmakuWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
   setMousePassthrough(danmakuWindow, true);
   danmakuWindow.webContents.setBackgroundThrottling(false);
-  danmakuWindow.loadFile(path.join(__dirname, 'src', 'danmaku.html'), process.platform === 'win32'
-    ? { query: { surface: 'overlay' } }
+  const hasSeparateComposer = process.platform === 'win32' || process.platform === 'darwin';
+  danmakuWindow.loadFile(path.join(__dirname, 'src', 'danmaku.html'), hasSeparateComposer
+    ? { query: { surface: 'overlay', ...(process.platform === 'darwin' ? { cursorProbe: 'native' } : {}) } }
     : undefined);
-  if (process.platform === 'win32') createComposerWindow();
+  if (hasSeparateComposer) createComposerWindow();
   const window = danmakuWindow;
   const isCurrent = () => !isQuitting && danmakuWindow === window;
   danmakuWindow.webContents.on('did-finish-load', guardWindowCallback(window, isCurrent, () => {
@@ -1374,7 +1434,7 @@ ipcMain.handle('reopen-encounter-guide', reopenEncounterGuide);
 ipcMain.on('dismiss-card-recommendation', dismissCardRecommendation);
 ipcMain.on('set-card-expanded', (_event, expanded) => setCardExpanded(expanded));
 ipcMain.on('accept-decision', (_event, decision) => {
-  if (agentRunId && decision) recordDecision({ runId: agentRunId, observation: currentObservation(), decision, accepted: true });
+  recordAgentDecision(currentObservation(), decision, true);
 });
 ipcMain.on('clear-llm-log', () => clearLlmLog());
 ipcMain.handle('get-observation', () => currentObservation());
@@ -1384,9 +1444,10 @@ ipcMain.handle('review:listLeaderboard', (_event, input) => (
 ipcMain.handle('review:getDashboard', () => reviewService.getDashboard());
 ipcMain.handle('review:getRunDetails', (_event, runId) => readRunDetails(runId, reviewService.getHistory(), factStore));
 ipcMain.handle('review:getRunMetrics', (_event, runId) => {
-  if (typeof runId !== 'string' || !reviewService.getHistory().runs.some(run => run.runId === runId)) return [];
+  const run = typeof runId === 'string' && reviewService.getHistory().runs.find(entry => entry.runId === runId);
+  if (!run) return [];
   const timeline = makeTimeline(runId, factStore.getEffectiveFacts(runId), factStore.getCoverage(runId));
-  return fixedMetrics(timeline);
+  return recapFixedMetrics(timeline, run);
 });
 ipcMain.handle('review:getRunRecapPreview', (_event, runId) => {
   const run = typeof runId === 'string' && reviewService.getHistory().runs.find(run => run.runId === runId);
@@ -1399,13 +1460,14 @@ ipcMain.handle('review:getRunRecap', async (_event, runId) => {
   if (!run) {
     return { status: 'unavailable', fixedMetrics: [], cards: [], closing: '' };
   }
-  return playerRecap(await recapStore.get(runId, run));
+  return playerRecap(await getFinishedRecap(run));
 });
 function playerRecap(recap) {
+  const published = recap.status === 'ready';
   return { status: recap.status, fixedMetrics: recap.fixedMetrics, battleMetrics: recap.battleMetrics,
-    runSummary: recap.runSummary, choiceStats: recap.choiceStats, portrait: recap.portrait,
-    cards: recap.cards.map(card => ({ title: card.title, body: card.body })),
-    closing: recap.closing, coverageNote: recap.coverageNote };
+    runSummary: recap.runSummary, choiceStats: recap.choiceStats, portrait: published ? recap.portrait : '',
+    cards: published ? recap.cards.map(card => ({ title: card.title, body: card.body })) : [],
+    closing: published ? recap.closing : '', coverageNote: recap.coverageNote };
 }
 ipcMain.handle('review:getPlayerProfile', () => {
   const profile = loadPlayerProfile(app.getPath('userData'));
@@ -1435,6 +1497,11 @@ ipcMain.handle('review:clear', (_event, token) => {
   const dashboard = reviewService.clear();
   factStore.clearAll();
   lastRecapSnapshot.clear();
+  finishedReviewRuns.clear();
+  pendingReviewRuns.clear();
+  pendingAutomaticRecaps.clear();
+  clearTimeout(reviewRefreshTimer);
+  reviewRefreshTimer = undefined;
   recapStore.clear();
   publishReviewChanged();
   return { ok: true, dashboard };
@@ -1500,6 +1567,7 @@ app.on('before-quit', () => {
   reviewService.flush();
   factStore.flush();
   clearTimeout(bridgeReconnectTimer);
+  clearTimeout(reviewRefreshTimer);
   clearTimeout(danmakuHideTimer);
   clearInterval(bridgeHealthTimer);
   clearInterval(petTopmostTimer);

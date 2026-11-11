@@ -324,7 +324,7 @@ test('生命充足每场只反应一次，怪物意图变化留作背景，不�
   assert.doesNotMatch(contexts[1].facts.join(' '), /生命|80/);
   assert.doesNotMatch(contexts[1].facts.join(' '), /缩壳|小啃兽/);
   assert.equal(contexts[1].snapshot.enemies[0].nextMoveName, '缩壳');
-  assert.equal(adapter.director.queue.some(item => item.source === 'monster_skill'), true);
+  assert.equal(adapter.director.queue.some(item => item.source === 'monster_skill'), false);
   const hurt = state({ hp: 60 });
   await adapter.ingestObservation(obs(3, hurt), { runId: 'r' });
   await adapter.ingestObservation(obs(4, state({ hp: 80 })), { runId: 'r' });
