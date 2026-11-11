@@ -112,7 +112,7 @@ function observeModel(client, timeline, calls, { leadVisibility = 'visible' } = 
   return { enabled: client.enabled, model: client.model, cacheKey: client.cacheKey,
     async completeRecapTurn(input, options = {}) {
       const { payload, removedPaths, boundary } = prepareModelInput(input, leadVisibility);
-      const system = payload.stage === 'closing' ? require('../review/recap/runner').CLOSING_PROMPT : require('../review/recap/runner').PROMPT;
+      const system = require('../review/recap/runner').recapSystemPrompt(payload.stage);
       const call = { id: calls.length + 1, stage: payload.stage || 'unknown', mustFinalize: payload.mustFinalize ?? null,
         remainingReads: payload.remainingReads ?? null, payloadSize: inputSize(payload), payloadHash: hash(JSON.stringify(payload)),
         hiddenLeads: leadVisibility === 'hidden', leadVisibility, stageBoundary: boundary, removedLeadPaths: removedPaths,

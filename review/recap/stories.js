@@ -1,5 +1,6 @@
 const { inspectSubject, observedPayload, observedRelations } = require('./facts');
 const { checkClaim } = require('./claims');
+const { narrativeNumbers, numberValue, wordingIssue } = require('./editorial');
 
 function story(timeline, candidate) {
   const p = candidate || {};
@@ -46,6 +47,13 @@ function story(timeline, candidate) {
   return null;
 }
 
+function checkNumericClaim(timeline, claim) {
+  if (!claim || !(typeof claim.value === 'number'
+    || typeof claim.value === 'string' && /^[+-]?\d+(?:\.\d+)?$/.test(claim.value)
+    || ['metric', 'subject_count'].includes(claim.type))) return null;
+  return checkClaim(timeline, claim);
+}
+
 function groundedStory(timeline, candidate, diagnostic = {}, { canonicalizeRelations = true } = {}) {
   const reject = (reason, detail) => { Object.assign(diagnostic, { reason, ...(detail ? { detail } : {}) }); return null; };
   if (!candidate || typeof candidate !== 'object') return reject('invalid_candidate');
@@ -56,31 +64,30 @@ function groundedStory(timeline, candidate, diagnostic = {}, { canonicalizeRelat
   const { title, bodyTemplate, assertions = [], evidenceIds = [], bindings = {} } = candidate;
   if (typeof title !== 'string' || typeof bodyTemplate !== 'string' || !Array.isArray(assertions)
     || !Array.isArray(evidenceIds) || !bindings || typeof bindings !== 'object') return reject('invalid_schema');
-  // Only numerical claims are publication gates. Names and prose use model text.
-  const numericClaim = c => typeof c?.value === 'number' || typeof checkClaim(timeline, c).value === 'number';
-  if (assertions.some(c => numericClaim(c) && checkClaim(timeline, c).status !== 'supported'))
+  const numericResults = assertions.map(claim => checkNumericClaim(timeline, claim));
+  if (numericResults.some(result => result && result.status !== 'supported'))
     return reject('unsupported_numeric_assertion');
-  const literalBody = bodyTemplate.replace(/\{\{[a-zA-Z][\w]*\}\}/g, '');
-  const supportedNumbers = new Set(assertions.map(c => checkClaim(timeline, c).value)
-    .filter(v => typeof v === 'number').map(String));
-  // Location labels can use the whole run overview, not just card-local IDs.
+  const supportedNumbers = new Set(numericResults.filter(Boolean).map(result => String(result.value)));
+  const locations = { 幕: new Set(), 层: new Set(), 回合: new Set() };
   for (const fact of timeline.facts) {
-    const p = observedPayload(fact);
-    for (const k of ['act', 'floor', 'totalFloor']) if (Number.isFinite(p?.[k])) supportedNumbers.add(String(p[k]));
-  }
-  const chineseValue = text => {
-    const digits = { 零:0, 〇:0, 一:1, 二:2, 两:2, 三:3, 四:4, 五:5, 六:6, 七:7, 八:8, 九:9 };
-    let total = 0, digit = 0;
-    for (const ch of text) {
-      if (Object.hasOwn(digits, ch)) digit = digits[ch];
-      else { const unit = {十:10,百:100,千:1000}[ch]; if (!unit) return NaN; total += (digit || 1) * unit; digit = 0; }
+    const payload = observedPayload(fact);
+    if (Number.isFinite(payload.act)) locations.幕.add(String(payload.act));
+    for (const floor of [payload.floor, payload.totalFloor]) {
+      if (Number.isFinite(floor)) locations.层.add(String(floor));
     }
-    return total + digit;
-  };
-  const literalText = title + ' ' + literalBody;
-  const numericLiterals = literalText.match(/\d+(?:\.\d+)?/g) || [];
-  const chineseLiterals = [...literalText.matchAll(/([零〇一二两三四五六七八九十百千]+)(?:回合|场|次|点|血|层|张|刀|击|幕|章)/g)].map(m => String(chineseValue(m[1])));
-  const unsupportedNumbers = [...new Set([...numericLiterals, ...chineseLiterals].filter(n => !supportedNumbers.has(n)))];
+  }
+  for (const id of evidenceIds) {
+    const payload = observedPayload(timeline.byId.get(id));
+    const turn = payload.combat?.turn ?? payload.turn;
+    if (Number.isFinite(turn)) locations.回合.add(String(turn));
+  }
+  const storyNumbers = text => narrativeNumbers(text.replace(
+    /第(\d+|[零〇一二两三四五六七八九十百千]+)(幕|层|回合)/g,
+    (literal, number, unit) => locations[unit].has(numberValue(number)) ? '' : literal
+  ));
+  const literalBody = bodyTemplate.replace(/\{\{[a-zA-Z][\w]*\}\}/g, '');
+  const literalNumbers = storyNumbers(title + ' ' + literalBody);
+  const unsupportedNumbers = [...new Set(literalNumbers.filter(n => !supportedNumbers.has(n)))];
   if (unsupportedNumbers.length) {
     const matchingObservedFields = [];
     const visit = (value, field, eventId) => {
@@ -96,16 +103,21 @@ function groundedStory(timeline, candidate, diagnostic = {}, { canonicalizeRelat
     const binding = bindings[name];
     if (!binding || !Number.isInteger(binding.claimIndex) || !assertions[binding.claimIndex]) { valid = false; return ''; }
     const claim = assertions[binding.claimIndex];
-    const checked = numericClaim(claim) ? checkClaim(timeline, claim) : { value: claim.value };
+    const checked = numericResults[binding.claimIndex] || { value: claim.value };
     if (!['string', 'number'].includes(typeof checked.value)) { valid = false; return ''; }
     const tail = bodyTemplate.slice(offset + match.length), head = bodyTemplate.slice(0, offset);
     if (typeof checked.value === 'number' && /(?:增加|多了|涨了|提升了|减少|少了|降低了)$/.test(head)
-      && /^(hp|maxHp|gold|block|energy)$/.test(claim.field || '')) {
+      && /(?:^|\.)(?:hp(?:Before|After)?|maxHp|gold|block|energy)$/.test(claim.field || '')) {
       valid = false; bindingError = 'absolute_value_used_as_delta'; return '';
     }
     if (/^(?:次|点|血|层|张|回合|场|刀|击)/.test(tail) || /第$/.test(head)) {
       if (typeof checked.value !== 'number') { valid = false; return ''; }
       if (/^次/.test(tail) && !/count|times|index/i.test(claim.field || '') && !(claim.type === 'metric' && claim.metricId === 'reloads')) { valid = false; return ''; }
+    }
+    if (claim.type === 'event_field' && /^(cardId|potionId|relicId)$/.test(claim.field || '')) {
+      const catalog = claim.field === 'cardId' ? require('../../agent/data/codex/cards.json')
+        : claim.field === 'potionId' ? require('../../agent/data/codex/potions.json') : require('../../agent/data/codex/relics.json');
+      return catalog.find(item => item.id === checked.value)?.name || String(checked.value);
     }
     return String(checked.value);
   });
@@ -116,13 +128,28 @@ function groundedStory(timeline, candidate, diagnostic = {}, { canonicalizeRelat
     if (healthObservations.length && !healthObservations.some(p => p.hp === p.maxHp))
       return reject('full_health_does_not_match_numbers', '文案写满血，但引用观测hp均小于maxHp，请改为实际血线。');
   }
-  const renderedNumbers = (title + ' ' + body).match(/\d+(?:\.\d+)?/g) || [];
-  if (renderedNumbers.some(n => !supportedNumbers.has(n))) return reject('unsupported_rendered_number');
-  if (/\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\b|StatusIntent|SingleAttackIntent|字段|快照|诊断/.test(title + body)) return reject('unreadable_wording');
-  // Numerical checks are separate from editorial review; names need no lookup.
-  const relationIds = [...new Set(assertions.filter(c => c.type === 'recorded_relation').map(c => c.relationId))];
+  if (/\{\{|\}\}/.test(title + body)) return reject('invalid_binding');
+  if (storyNumbers(title + ' ' + body).some(number => !supportedNumbers.has(number)))
+    return reject('unsupported_rendered_number');
+  const wording = wordingIssue(title + ' ' + body);
+  if (wording) return reject(wording);
+  if (/阵亡|临死|死前|战死|(?:玩家|角色|你|自己)(?:已经|最终|当场)?(?:死亡|死了)/.test(title + ' ' + body)) {
+    const citedCombats = evidenceIds.map(id => timeline.byId.get(id)?.combatId);
+    const deathClaims = assertions.filter(claim => claim?.type === 'combat_outcome' && claim.value === 'death');
+    const combatIds = new Set([candidate.combatId, ...citedCombats, ...deathClaims.map(claim => claim.combatId)].filter(Boolean));
+    if (![...combatIds].some(combatId => checkClaim(timeline, { type: 'combat_outcome', combatId, value: 'death' }).status === 'supported'))
+      return reject('unproved_player_death');
+  }
+  const powerChanges = assertions.filter((claim, index) => numericResults[index]
+    && timeline.byId.get(claim.eventId)?.eventType === 'power.changed');
+  if (powerChanges.length && /涨|暴增|增加|提升|叠了/.test(title + body)
+    && !powerChanges.some(claim => {
+      const change = observedPayload(timeline.byId.get(claim.eventId));
+      return change.delta > 0 || change.amountAfter > change.amountBefore;
+    })) return reject('unproven_power_growth');
+  const relationIds = [...new Set(assertions.filter(c => c?.type === 'recorded_relation').map(c => c.relationId))];
   if (canonicalizeRelations && relationIds.length === 1
-    && assertions.every(c => ['recorded_relation', 'event_field', 'sequence', 'occurred'].includes(c.type))) {
+    && assertions.every(c => ['recorded_relation', 'event_field', 'sequence', 'occurred'].includes(c?.type))) {
     const relation = observedRelations(timeline).find(r => r.relationId === relationIds[0]);
     const canonical = relation && relationCandidate(relation);
     if (canonical) {
@@ -140,7 +167,7 @@ function selectStories(timeline, candidates, { deduplicate = true, preserveModel
   const seenEvidence = new Set(), selected = [];
   for (const candidate of Array.isArray(candidates) ? candidates.slice(0, 12) : []) {
     const card = groundedStory(timeline, candidate, {}, { canonicalizeRelations: !preserveModelVoice });
-    if (!card || !card.title.trim() || !card.body.trim() || [...card.title].length > 16 || [...card.body].length > 80
+    if (!card || !card.title.trim() || !card.body.trim()
       || deduplicate && storyKeys(timeline, card).some(id => seenEvidence.has(id))) continue;
     storyKeys(timeline, card).forEach(id => seenEvidence.add(id)); selected.push(card);
     if (selected.length === (deduplicate ? 3 : 12)) break;
@@ -231,17 +258,18 @@ function localPortrait(cards) {
 function candidateDiagnostics(timeline, candidates, { preserveModelVoice = false } = {}) {
   return (Array.isArray(candidates) ? candidates.slice(0, 12) : []).map((c, index) => {
     const diagnostic = {}, card = groundedStory(timeline, c, diagnostic, { canonicalizeRelations: !preserveModelVoice });
-    const lengths = card && { title: [...card.title].length, body: [...card.body].length };
-    if (card && (!card.title.trim() || !card.body.trim() || lengths.title > 16 || lengths.body > 80)) diagnostic.reason = 'rendered_length_or_empty';
-    return { index, title: c?.title, accepted: Boolean(card && !diagnostic.reason), ...diagnostic, ...(lengths ? { renderedLengths: lengths } : {}),
-    claims: (Array.isArray(c?.assertions) ? c.assertions : []).map((claim, i) => ({ index: i,
-      ...checkClaim(timeline, claim), ...(!claim.type ? { reason: '每条断言必须有type字段；使用扁平对象，不能用{event_field:{...}}' } : {}),
-      ...(claim.type === 'snapshot_field' && timeline.byId.get(claim.snapshotId)?.eventType === 'run.observed'
-        ? { repairHint: 'run.observed是事件：改用event_field，eventId取原snapshotId，field去掉payload.前缀；不能使用不存在的deckSize字段。' } : {}) })),
+    if (card && (!card.title.trim() || !card.body.trim())) diagnostic.reason = 'empty_card_text';
+    return { index, title: c?.title, accepted: Boolean(card && !diagnostic.reason), ...diagnostic,
+    claims: (Array.isArray(c?.assertions) ? c.assertions : []).flatMap((claim, index) => {
+      const result = checkNumericClaim(timeline, claim);
+      return result ? [{ index, ...result,
+        ...(claim.type === 'snapshot_field' && timeline.byId.get(claim.snapshotId)?.eventType === 'run.observed'
+          ? { repairHint: 'run.observed是事件，改用event_field，eventId取原snapshotId。' } : {}) }] : [];
+    }),
     bindings: Object.entries(c?.bindings || {}).map(([name, binding]) => ({ name, claimIndex: binding?.claimIndex,
       valid: Number.isInteger(binding?.claimIndex) && Boolean(c?.assertions?.[binding.claimIndex]),
       field: c?.assertions?.[binding?.claimIndex]?.field })),
-    reminder: '数值正确；标题16字正文80字；趣味至少2分且措辞自然。名称无需实体查询。不删除断言后保留旧绑定索引。' };
+    reminder: '核对数字及其含义，保留故事本身的措辞。删改断言时同步更新绑定索引。' };
   });
 }
 module.exports = { story, groundedStory, selectStories, localStories, highValueLocalStory,

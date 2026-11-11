@@ -44,10 +44,11 @@ for (const row of manifest.cases) {
   });
 }
 
-test('the model can investigate but cannot publish unsupported or low-interest free text', async () => {
+test('the model can investigate and retain a valid story while dropping a fabricated event', async () => {
   const fixture = JSON.parse(fs.readFileSync(path.join(directory, 'upgrade-never-drawn.json'), 'utf8'));
   let rounds = 0;
   const llm = { enabled: true, completeRecapTurn: async input => {
+    if (input.stage === 'interest_review') return { reviews: [{ index: 0, score: 2, reason: '升级后整场没上手' }] };
     if (input.stage === 'closing') return { portrait: '', closing: '升级刚落锤，下一战却没等到它上手。' };
     rounds++;
     return rounds === 1
@@ -57,7 +58,7 @@ test('the model can investigate but cannot publish unsupported or low-interest f
   } };
   const recap = await buildRecap({ runId: fixture.runId, facts: fixture.facts,
     coverage: fixture.coverage, llm });
-  assert.equal(recap.cards.length, 0);
+  assert.equal(recap.cards.length, 1);
   assert.equal(recap.status, 'ready');
   assert.ok(recap.trace.some(row => row.name === 'find_events'));
 });

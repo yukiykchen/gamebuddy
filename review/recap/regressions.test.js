@@ -11,6 +11,9 @@ const { createRecapStore } = require('./store');
 const base = () => JSON.parse(fs.readFileSync(path.join(__dirname, '../../harness/fixtures/recap-evals/upgrade-never-drawn.json')));
 const clone = value => structuredClone(value);
 const timeline = f => makeTimeline(f.runId, f.facts, f.coverage, f.snapshots || []);
+const interestReview = (input, score = () => 2) => ({
+  reviews: input.cards.map(card => ({ index: card.index, score: score(card), reason: '测试评分' }))
+});
 function insert(f, eventType, payload) {
   const i = f.facts.findIndex(e => e.combatId === 'elite-bygone-effigy' && e.eventType === 'combat.ended');
   const event = { ...clone(f.facts[i]), eventId: `added-${f.facts.length}`, eventType, payload };
@@ -48,12 +51,12 @@ function candidate(f) {
   return { pattern: 'new_story_type', title: '这次升级', bodyTemplate: '{{card}}升级后，直到战斗结束也没打出。',
     evidenceIds: [e.eventId], assertions: [{ type: 'event_field', eventId: e.eventId, field: 'cardId', value: e.payload.cardId }, { type: 'zero_plays', subjectId: 'deck-bash', combatId: 'elite-bygone-effigy' }], bindings: { card: { claimIndex: 0 } } };
 }
-test('new grounded story types bind names before checking final length without truncation', () => {
+test('card labels are rendered without enforcing a title or body length cap', () => {
   const f = base(), c = candidate(f);
   assert.equal(selectStories(timeline(f), [c])[0].body, '痛击升级后，直到战斗结束也没打出。');
   f.facts.find(e => e.eventType === 'rest.action_completed').payload.cardId = '很长的卡牌名字'.repeat(10);
   c.assertions[0].value = f.facts.find(e => e.eventType === 'rest.action_completed').payload.cardId;
-  assert.deepEqual(selectStories(timeline(f), [c]), []);
+  assert.ok(selectStories(timeline(f), [c])[0].body.startsWith(c.assertions[0].value));
 });
 test('counterfactual blame and raw numbers are rejected, ordinary battle completion is not a card', () => {
   const f = base(), c = candidate(f);
@@ -77,13 +80,16 @@ test('the real HTTP adapter carries every prior result and full tool contracts i
   const f = base(), requests = [], c = candidate(f);
   const responses = [ { tool_calls: [{ name: 'find_events', args: { eventTypes: ['rest.action_completed'] } }] },
     { tool_calls: [{ name: 'inspect_subject', args: { subjectId: 'deck-bash', combatId: 'elite-bygone-effigy' } }] },
-    { candidates: [c] }, { closing: '这次的选择，也留下了值得回味的一笔。' } ];
+    { candidates: [c] }, { reviews: [{ index: 0, score: 2, reason: '升级后没能上手' }] }, { closing: '这次的选择，也留下了值得回味的一笔。' } ];
   const llm = createOpenAiClient({ enabled: true, apiKey: 'test-not-a-secret', baseURL: 'https://example.invalid/v1', model: 'mock', wireApi: 'chat' }, { fetchImpl: async (url, options) => {
     requests.push(JSON.parse(options.body));
     return { ok: true, json: async () => ({ choices: [{ message: { content: JSON.stringify(responses.shift()) } }] }) };
   } });
   const recap = await buildRecap({ runId: f.runId, facts: f.facts, coverage: f.coverage, llm });
-  assert.equal(recap.status, 'ready'); assert.equal(recap.cards.length, 1); assert.equal(requests.length, 4);
+  assert.equal(recap.status, 'ready'); assert.equal(recap.cards.length, 1); assert.equal(requests.length, 5);
+  const judgeRequest = requests[3].messages;
+  assert.match(judgeRequest.find(m => m.role === 'system').content, /选材评审/);
+  assert.deepEqual(JSON.parse(judgeRequest.find(m => m.role === 'user').content).cards.map(({ title }) => title), [c.title]);
   const third = JSON.parse(requests[2].messages.find(m => m.role === 'user').content);
   assert.equal(third.history.length, 2); assert.equal(third.history[0].results[0].name, 'find_events');
   assert.ok(third.tools.every(t => t.parameters && t.description)); assert.ok(recap.closing);
@@ -94,11 +100,15 @@ test('temporary model failures retry, concurrent reads deduplicate, successful r
   let calls = 0, fail = true;
   const store = createRecapStore({ directory, factStore: { getEffectiveFacts: () => f.facts, getCoverage: () => f.coverage, getSnapshots: () => [] },
     llmFactory: () => ({ enabled: true, cacheKey: 'mock', completeRecapTurn: async input => {
-      calls++; if (fail) throw Error('temporary'); return input.stage === 'closing' ? { closing: '选择之后，总有回响。' } : input.stage === 'validate' ? { verdicts: [{ index: 0, supported: true }] } : { candidates: [candidate(f)] };
+      calls++;
+      if (fail) throw Error('temporary');
+      if (input.stage === 'interest_review') return interestReview(input);
+      if (input.stage === 'closing') return { closing: '选择之后，总有回响。' };
+      return { candidates: [candidate(f)] };
     } }) });
   await Promise.all([store.get(f.runId), store.get(f.runId)]); assert.equal(calls, 1);
-  fail = false; await store.get(f.runId); assert.equal(calls, 3);
-  await store.get(f.runId); assert.equal(calls, 3);
+  fail = false; await store.get(f.runId); assert.equal(calls, 4);
+  await store.get(f.runId); assert.equal(calls, 4);
 });
 test('clearing a pending generation aborts it without recreating deleted run data', async t => {
   const f = base(), directory = fs.mkdtempSync(path.join(os.tmpdir(), 'recap-clear-')); let reads = 0, finish;
@@ -116,25 +126,69 @@ test('local preview discovers a late-run story after many ordinary damage events
   const cards = localStories(timeline(f));
   assert.ok(cards.some(c => c.pattern === 'upgrade_not_used'));
 });
-test('generated cards publish without a later semantic review', async () => {
-  const f = base(), c = candidate(f); const stages = [];
+test('interesting cards are preserved and only low-scoring drafts get one regeneration', async () => {
+  const f = base(), c = candidate(f), stages = [];
+  const initial = [
+    { ...c, title: '普通经过', bodyTemplate: '在火堆升级了牌。' },
+    { ...c, title: '值得记住' }
+  ];
+  const replacement = { ...c, title: '刚升完就等不到它', bodyTemplate: '火堆刚给{{card}}升了级，下一战却直到结束也没上手。' };
   const recap = await buildRecap({ ...f, llm: { enabled: true, completeRecapTurn: async input => {
     stages.push(input.stage);
-    if (input.stage === 'closing') return { closing: '这次选择留下了回响。' };
-    return { candidates: [{ ...c, title: '普通经过' }, { ...c, title: '值得记住' }] };
+    if (input.stage === 'interest_review') return interestReview(input, card => card.title === '普通经过' ? 1 : 2);
+    if (input.stage === 'regenerate_interest') {
+      assert.deepEqual(input.lowScoring.map(({ title, score }) => [title, score]), [['普通经过', 1]]);
+      assert.deepEqual(input.keep.map(({ title }) => title), ['值得记住']);
+      assert.equal(input.maxCandidates, 1);
+      return { candidates: [replacement] };
+    }
+    if (input.stage === 'closing') {
+      assert.deepEqual(input.selectedCards.map(({ title }) => title), ['值得记住', replacement.title]);
+      return { closing: '这次选择留下了回响。' };
+    }
+    return { candidates: initial };
   } } });
-  assert.equal(recap.cards.length, 1); assert.equal(recap.cards[0].title, '普通经过');
-  assert.deepEqual(stages, ['investigate', 'closing']);
+  assert.deepEqual(recap.cards.map(card => card.title), ['值得记住', replacement.title]);
+  assert.deepEqual(stages, ['investigate', 'interest_review', 'regenerate_interest', 'interest_review', 'closing']);
+  assert.deepEqual(recap.trace.filter(row => row.phase === 'interest_review').map(row => row.reviews.map(review => review.score)), [[1, 2], [2]]);
 });
-test('a free-form story needs an interest reason and a prior investigation read', async () => {
+
+test('a still-boring retry or one with an incorrect number leaves no story to display', async () => {
+  for (const bodyTemplate of ['后来又开战了。', '这一刀打了9999点伤害。']) {
+    const f = base(), c = candidate(f), stages = [];
+    const recap = await buildRecap({ ...f, llm: { enabled: true, completeRecapTurn: async input => {
+      stages.push(input.stage);
+      if (input.stage === 'interest_review') return interestReview(input, () => 1);
+      if (input.stage === 'regenerate_interest') return { candidates: [{ ...c, title: '新片段', bodyTemplate }] };
+      return { candidates: [c] };
+    } } });
+    assert.equal(recap.status, 'ready');
+    assert.deepEqual(recap.cards, []);
+    assert.equal(recap.closing, '');
+    assert.equal(recap.coverageNote, '本局没有找到值得单独讲的片段');
+    assert.deepEqual(stages, ['investigate', 'interest_review', 'regenerate_interest',
+      ...(bodyTemplate.includes('9999') ? [] : ['interest_review'])]);
+  }
+});
+
+test('a card with no usable interest score is hidden', async () => {
+  const f = base(), c = candidate(f);
+  const recap = await buildRecap({ ...f, llm: { enabled: true, completeRecapTurn: async input =>
+    input.stage === 'interest_review' ? { reviews: [{ index: 0, score: 4 }] } : { candidates: [c] }
+  } });
+  assert.deepEqual(recap.cards, []);
+});
+
+test('a free-form story can publish from the overview or use additional reads', async () => {
   const f = base(), c = candidate(f), ended = f.facts.find(e => e.eventType === 'run.ended');
-  c.interest = 'payoff'; c.evidenceIds.push(ended.eventId);
+  c.evidenceIds.push(ended.eventId);
   const withoutRead = await buildRecap({ ...f, llm: { enabled: true, completeRecapTurn: async input =>
-    input.stage === 'repair' ? { candidates: [c] } : { candidates: [c] } } });
-  assert.deepEqual(withoutRead.cards, []);
+    input.stage === 'interest_review' ? interestReview(input) : { candidates: [c] } } });
+  assert.equal(withoutRead.cards.length, 1);
   const stages = [];
   const withRead = await buildRecap({ ...f, llm: { enabled: true, completeRecapTurn: async input => {
     stages.push(input.stage);
+    if (input.stage === 'interest_review') return interestReview(input);
     if (input.stage === 'closing') return { portrait: '', closing: '升级后的牌，下一战却没等到上场。' };
     if (!input.history.length) return { tool_calls: [{ name: 'read_event_window',
       args: { anchorEventId: c.evidenceIds[0], before: 1, after: 2, includeSnapshots: true } }] };
@@ -150,6 +204,7 @@ test('the model can select one local lead without automatic fallback filling', a
   const selected = { ...lead, bodyTemplate: '{{n}}次火堆全选回血，{{hp}}/{{max}}血也不打铁。',
     bindings: { n: { claimIndex: 0 }, hp: { claimIndex: 1 }, max: { claimIndex: 2 } } };
   const recap = await buildRecap({ ...f, maxRounds: 0, llm: { enabled: true, completeRecapTurn: async input => {
+    if (input.stage === 'interest_review') return interestReview(input);
     if (input.stage === 'closing') return { portrait: '', closing: '火堆一路选回血，养生比打铁更执着。' };
     return { candidates: [selected] };
   } } });
@@ -164,15 +219,15 @@ test('an empty model selection clears local cards, portrait and closing', async 
   assert.equal(recap.closing, '');
   assert.equal(recap.status, 'ready');
 });
-test('the target long-run example cannot be erased by an empty model selection', async () => {
+test('the model may leave a long run empty instead of forcing local stories into the result', async () => {
   const f = realLong();
   const recap = await buildRecap({ ...f, maxRounds: 0, llm: { enabled: true,
     completeRecapTurn: async () => ({ candidates: [] }) } });
-  assert.deepEqual(new Set(recap.cards.map(card => card.verifiedKind)),
-    new Set(['health_recovery', 'rest_choice_style']));
-  assert.ok(recap.trace.some(row => row.phase === 'protected_benchmark'));
-  assert.match(recap.closing, /火堆|篝火|精灵/);
+  assert.deepEqual(recap.cards, []);
+  assert.equal(recap.closing, '');
+  assert.equal(recap.status, 'ready');
 });
+
 test('fully observed no-damage player turns produce a known zero rather than unknown', () => {
   const f = base(); f.facts = f.facts.filter(e => e.eventType !== 'damage.resolved' || e.payload.sourceSide !== 'player');
   assert.equal(fixedMetrics(timeline(f))[0].value, 0);
@@ -216,14 +271,11 @@ test('a play count cannot be bound as card hits or confirmed damage attribution'
       { type: 'event_field', eventId: e.eventId, field: 'upgraded', value: true }] };
   assert.deepEqual(selectStories(timeline(f), [c]), []);
 });
-test('a made-up object name cannot accompany an otherwise supported subject count', () => {
-  const f = base(), c = candidate(f); c.bodyTemplate = '飞剑打击升级后没打出。'; c.bindings = {};
-  assert.deepEqual(selectStories(timeline(f), [c]), []);
-});
-test('plain upgrade followed by defeat is background rather than an independent story', () => {
+test('ordinary events remain a generation preference instead of a publication gate', () => {
   const f = base(), e = f.facts.find(e => e.eventType === 'rest.action_completed');
-  assert.deepEqual(selectStories(timeline(f), [{ pattern: 'background', title: '升级后失败', bodyTemplate: '升级后，下一战没能打赢。',
-    evidenceIds: [e.eventId], assertions: [{ type: 'event_field', eventId: e.eventId, field: 'action', value: 'smith' }] }]), []);
+  const [card] = selectStories(timeline(f), [{ pattern: 'background', title: '升级后失败', bodyTemplate: '升级后，下一战没能打赢。',
+    evidenceIds: [e.eventId], assertions: [{ type: 'event_field', eventId: e.eventId, field: 'action', value: 'smith' }] }]);
+  assert.equal(card?.title, '升级后失败');
 });
 
 test('a boolean cannot be rendered as a count and machine IDs never enter story prose', () => {
@@ -233,15 +285,16 @@ test('a boolean cannot be rendered as a count and machine IDs never enter story 
   e.payload.cardId = 'INTERNAL_CARD_ID'; c.assertions[0].value = 'INTERNAL_CARD_ID';
   assert.deepEqual(selectStories(timeline(f), [c]), []);
 });
-test('the summary receives selected cards only and rejects unselected card names', async () => {
+test('the summary receives selected cards only and rejects unsupported numbers', async () => {
   const f = base(), c = candidate(f); let closingInput;
   const recap = await buildRecap({ ...f, llm: { enabled: true, completeRecapTurn: async input => {
     if (input.stage === 'validate') return { verdicts: [{ index: 0, supported: true }] };
-    if (input.stage === 'closing') { closingInput = input; return { closing: '剑柄打击带来了胜利。' }; }
+    if (input.stage === 'interest_review') return interestReview(input);
+    if (input.stage === 'closing') { closingInput = input; return { closing: '这次打出了五张牌。' }; }
     return { candidates: [c] };
   } } });
   assert.deepEqual(Object.keys(closingInput).sort(), ['selectedCards', 'stage']);
-  assert.ok(!recap.closing.includes('剑柄打击'));
+  assert.equal(recap.closing, '');
 });
 
 test('an entity name cannot be rendered as a numeric count', () => {
@@ -266,6 +319,7 @@ test('replaying actual weak-model responses keeps rejected stories out even if i
     const f = JSON.parse(fs.readFileSync(path.join(__dirname, `../../harness/fixtures/recap-evals/${row.fixtureId}.json`)));
     const recap = await buildRecap({ ...f, llm: { enabled: true, completeRecapTurn: async input => {
       if (input.stage === 'validate') return { verdicts: input.supportPackets.map(p => ({ index: p.index, supported: true })) };
+      if (input.stage === 'interest_review') return interestReview(input);
       if (input.stage === 'closing') return { closing: '这些片段留下了本局的选择与转折。' };
       return { candidates: row.candidates };
     } } });
@@ -275,6 +329,27 @@ test('replaying actual weak-model responses keeps rejected stories out even if i
 });
 
 // Iteration 01 tools: bounded legacy observations, meaningful choice discovery and field quality.
+test('a completed historical run with observations can publish a natural recap', async () => {
+  const f = base(), prototype = f.facts[0], stages = [];
+  f.facts = [80, 28].map((hp, i) => ({ ...prototype, eventId: `observation-${i}`,
+    sourceSeq: i + 1, eventType: 'run.observed', payload: { act: 1, floor: i + 1, hp, maxHp: 80 } }));
+  const title = '血条比人先开始紧张';
+  const recap = await buildRecap({ ...f, run: { result: 'abandoned' }, llm: { enabled: true, completeRecapTurn: async input => {
+    stages.push(input.stage);
+    if (input.stage === 'interest_review') return interestReview(input);
+    if (input.stage === 'closing') return { closing: '这下每回合都得精打细算。' };
+    assert.equal(input.limitations.observationOnly, true);
+    assert.equal(input.limitations.noRecordedEndEvent, true);
+    return { candidates: [{ title, bodyTemplate: '血线只剩{{hp}}，手里的牌还得精打细算。',
+      assertions: [{ type: 'event_field', eventId: 'observation-1', field: 'hp', value: 28 }],
+      bindings: { hp: { claimIndex: 0 } } }] };
+  } } });
+  assert.equal(recap.status, 'ready');
+  assert.equal(recap.cards[0]?.title, title);
+  assert.equal(recap.cards[0]?.body, '血线只剩28，手里的牌还得精打细算。');
+  assert.deepEqual(stages, ['investigate', 'interest_review', 'closing']);
+});
+
 test('overview pages compact observations while keeping late-act extrema visible', () => {
   const f = base(), prototype = clone(f.facts[0]);
   f.facts = [prototype];
@@ -405,20 +480,21 @@ test('recovery relations cannot cross a resume, source session change or missing
     assert.ok(!observedRelations(timeline(f)).some(r => r.kind === 'health_recovery'), mode);
   }
 });
-test('relation facts require their complete source proof and diagnose missing evidence', () => {
+test('relation numbers are verified even when a card lists only some references', () => {
   const { localStories, candidateDiagnostics } = require('./stories');
   const f = realLong(), t = timeline(f), card = localStories(t).find(c => c.pattern === 'rest_choice_style');
   const c = { ...card, bodyTemplate: '{{n}}次火堆回血，{{hp}}血仍选择休息。',
     bindings: { n: { claimIndex: 0 }, hp: { claimIndex: 1 } }, evidenceIds: card.evidenceIds.slice(0, 2) };
-  assert.deepEqual(selectStories(t, [c]), []);
-  const diagnostic = candidateDiagnostics(t, [c])[0];
-  assert.equal(diagnostic.reason, 'missing_relation_evidence');
-  assert.ok(diagnostic.detail.missingEvidenceIds.length > 0);
+  assert.equal(candidateDiagnostics(t, [c], { preserveModelVoice: true })[0].accepted, true);
+  const wrong = { ...c, assertions: c.assertions.map((claim, index) => index ? claim : { ...claim, value: 999 }) };
+  assert.equal(candidateDiagnostics(t, [wrong])[0].reason, 'unsupported_numeric_assertion');
 });
+
 test('the actual misattributed thirty-block model response stays rejected even when its judge approves', async () => {
   const f = realLong();
   const recap = await buildRecap({ ...f, maxRounds: 0, llm: { enabled: true, completeRecapTurn: async input => {
     if (input.stage === 'validate') return { verdicts: input.supportPackets.map(p => ({ index: p.index, supported: true })) };
+    if (input.stage === 'interest_review') return interestReview(input);
     if (input.stage === 'closing') return { closing: '强化壁垒提供了30格挡。' };
     return { candidates: realObservationCases.rejectedModelCandidates };
   } } });
@@ -434,13 +510,14 @@ test('a candidate submitted on the last investigation response still gets one bo
   const recap = await buildRecap({ ...f, maxRounds: 0, llm: { enabled: true, completeRecapTurn: async input => {
     if (input.stage === 'repair') { repairCalls++; assert.equal(input.remainingReads, 0); return { candidates: [good] }; }
     if (input.stage === 'validate') return { verdicts: input.supportPackets.map(p => ({ index: p.index, supported: true, issues: [] })) };
+    if (input.stage === 'interest_review') return interestReview(input);
     if (input.stage === 'closing') return { closing: '血条重新亮了起来。' };
     return { candidates: [{ ...good, bodyTemplate: '一次治疗后，生命回到{{hp}}血。' }] };
   } } });
   assert.equal(repairCalls, 1);
   assert.equal(recap.status, 'ready');
   assert.ok(recap.trace.some(x => x.phase === 'repair'));
-  assert.ok(recap.cards.some(c => c.verifiedKind === 'health_recovery' && c.body.includes('37') && c.rendering === 'canonical_known_relation'));
+  assert.ok(recap.cards.some(c => c.verifiedKind === 'health_recovery' && c.body.includes('37') && c.rendering === 'model_voice_verified_relation'));
 });
 test('a grounded candidate publishes even when a later review would have asked for edits', async () => {
   const { localStories } = require('./stories');
@@ -449,6 +526,7 @@ test('a grounded candidate publishes even when a later review would have asked f
   const stages = [];
   const recap = await buildRecap({ ...f, maxRounds: 0, llm: { enabled: true, completeRecapTurn: async input => {
     stages.push(input.stage);
+    if (input.stage === 'interest_review') return interestReview(input);
     if (input.stage === 'closing') return { closing: '血条重新亮了起来。' };
     return { candidates: [c] };
   } } });
@@ -458,34 +536,27 @@ test('a grounded candidate publishes even when a later review would have asked f
 test('holding potions cannot be rewritten as confirmed death', () => {
   const { localStories, candidateDiagnostics } = require('./stories');
   const f = clone(realObservationCases.cases.find(c => c.runId.startsWith('0da9'))), t = timeline(f), card = localStories(t)[0];
-  const c = { ...card, bodyTemplate: '死前只剩{{hp}}血，药水还在。', bindings: { hp: { claimIndex: 0 } } };
+  const c = { ...card, bodyTemplate: '死前只剩{{hp}}血，药水还在。', bindings: { hp: { claimIndex: card.assertions.findIndex(c => c.field === 'hp') } } };
   assert.deepEqual(selectStories(t, [c]), []);
   assert.equal(candidateDiagnostics(t, [c])[0].reason, 'unproved_player_death');
 });
 
-test('known inventory relations render positive possession instead of absence or diagnostic prose', () => {
-  const { localStories, groundedStory } = require('./stories');
+test('inventory stories can keep a player-facing title and reject diagnostic wording', async () => {
+  const { localStories, candidateDiagnostics } = require('./stories');
   const f = clone(realObservationCases.cases.find(c => c.runId.startsWith('0da9'))), t = timeline(f), local = localStories(t)[0];
-  const c = { ...local, title: '药水没动', bodyTemplate: '末段还有{{hp}}血，只证明当时持有，未证使用。', bindings: { hp: { claimIndex: local.assertions.findIndex(c => c.field === 'hp') } } };
-  const card = groundedStory(t, c);
-  assert.equal(card.rendering, 'canonical_known_relation');
-  assert.ok(!/没动|未动|证据|未证|只证明/.test(card.title + card.body));
-  assert.ok(card.body.includes('63血降到8血') && card.body.includes('立柱构造体'));
-});
-test('known-relation summaries stay within typed facts and strongest moments come first', async () => {
-  const { localStories } = require('./stories');
-  const f = realLong(), local = localStories(timeline(f)), candidates = [...local].reverse().map(card => ({ ...card,
-    bodyTemplate: '记录{{v}}。', bindings: { v: { claimIndex: 0 } } }));
-  let closingCalls = 0;
+  const c = { ...local, title: '血条告急，背包还撑着', bodyTemplate: '末段还剩{{hp}}血，背包里还能看到药水。',
+    bindings: { hp: { claimIndex: local.assertions.findIndex(c => c.field === 'hp') } } };
+  const bad = { ...c, bodyTemplate: '末段还有{{hp}}血，只证明当时持有，未证使用。' };
+  assert.equal(candidateDiagnostics(t, [bad])[0].reason, 'unreadable_wording');
   const recap = await buildRecap({ ...f, maxRounds: 0, llm: { enabled: true, completeRecapTurn: async input => {
-    if (input.stage === 'closing') { closingCalls++; return { closing: '药水没动。' }; }
-    if (input.stage === 'validate') return { verdicts: input.supportPackets.map(p => ({ index: p.index, supported: true, issues: [] })) };
-    return { candidates };
+    if (input.stage === 'interest_review') return interestReview(input);
+    if (input.stage === 'closing') return { closing: '背包还挺热闹，血条先急了。' };
+    return { candidates: [c] };
   } } });
-  assert.deepEqual(recap.cards.map(c => c.pattern), ['health_recovery', 'rest_choice_style']);
-  assert.equal(closingCalls, 0);
-  assert.ok(!recap.closing.includes('没动'));
+  assert.equal(recap.cards[0]?.title, c.title);
+  assert.equal(recap.closing, '背包还挺热闹，血条先急了。');
 });
+
 test('only restoration notifications without gameplay or substantive choices abstain before model calls', async () => {
   const f = clone(realObservationCases.cases.find(c => c.runId.startsWith('0da9')));
   f.facts = f.facts.filter(e => e.eventType !== 'combat.started');
@@ -518,12 +589,13 @@ test('free model pattern and provenance fields cannot manufacture a health-recov
   assert.ok(!/归零|恢复/.test(localClosing([card]))); assert.equal(storyPriority(card), 80);
   const recap = await buildRecap({ ...f, maxRounds: 0, llm: { enabled: true, completeRecapTurn: async input => {
     if (input.stage === 'validate') return { verdicts: [{ index: 0, supported: true, issues: [] }] };
+    if (input.stage === 'interest_review') return interestReview(input);
     if (input.stage === 'closing') throw Error('temporary closing failure');
     return { candidates: [c] };
   } } });
   assert.equal(recap.status, 'ready'); assert.ok(!/归零|恢复/.test(recap.closing));
 });
-test('identical rendered repair candidates are deduplicated without a later review', async () => {
+test('identical rendered repair candidates are deduplicated before interest scoring', async () => {
   const { localStories } = require('./stories');
   const f = realLong(), card = localStories(timeline(f))[0];
   const c = { ...card, bodyTemplate: '生命从{{zero}}回到{{hp}}血。', bindings: { zero: { claimIndex: 0 }, hp: { claimIndex: 1 } } };
@@ -531,6 +603,7 @@ test('identical rendered repair candidates are deduplicated without a later revi
   const recap = await buildRecap({ ...f, maxRounds: 0, llm: { enabled: true, completeRecapTurn: async input => {
     stages.push(input.stage);
     if (input.stage === 'repair') return { candidates: [c, clone(c)] };
+    if (input.stage === 'interest_review') return interestReview(input);
     if (input.stage === 'closing') return { closing: '血条重新亮了起来。' };
     return { candidates: [c, { ...c, bodyTemplate: '一次治疗后恢复。' }] };
   } } });
@@ -550,12 +623,13 @@ test('real recovery and the later third act form one card, while a reload remove
   const after = observedRelations(timeline(interrupted)).find(r => r.kind === 'health_recovery');
   assert.ok(after); assert.equal(after.fields.hpAfter, 37); assert.equal(after.fields.nextAct, undefined);
 });
-test('a true transaction and correct subtraction are background without a meaningful payoff', () => {
+test('a transaction with correct figures can survive publication checks', () => {
   const { candidateDiagnostics } = require('./stories');
   const f = clone(realObservationCases.cases.find(c => c.runId.startsWith('88ac'))), t = timeline(f);
-  assert.deepEqual(selectStories(t, realObservationCases.rejectedOrdinaryTransactionCandidates), []);
-  assert.equal(candidateDiagnostics(t, realObservationCases.rejectedOrdinaryTransactionCandidates)[0].reason, 'ordinary_transaction_background');
+  const candidates = realObservationCases.rejectedOrdinaryTransactionCandidates;
+  assert.equal(candidateDiagnostics(t, candidates)[0].accepted, true);
 });
+
 test('mechanic lookup rejects an unknown decision anchor instead of using future run state', () => {
   const f = realLong(), tools = createTools(timeline(f));
   const unknown = tools.call('get_mechanic_facts', { objectId: 'BASH', anchorEventId: 'not-recorded' });

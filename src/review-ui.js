@@ -92,15 +92,19 @@
   }
 
   function renderRecap(recap, run = {}) {
-    const labels = ['累计输出', '实际抗伤', '累计受伤', '实际恢复'];
+    const labels = ['累计输出', '实际抗伤', '累计受伤'];
     const metrics = labels.map(label => recap?.battleMetrics?.find(metric => metric.label === label) || { label, display: '未记录' });
+    metrics.push({
+      label: '本回合最高出伤',
+      display: recap?.fixedMetrics?.find(metric => metric.id === 'turn_damage')?.display ?? '未记录'
+    });
     const summary = recap?.runSummary || {}, character = summary.character || run.character;
     const [result, resultClass] = resultLabel(summary.result || run.result);
     const meta = [character ? characterName(character) : '',
       Number.isInteger(summary.ascension) ? `进阶 ${summary.ascension}` : '',
       Number.isFinite(summary.totalFloor ?? run.floor) ? `到达第 ${summary.totalFloor ?? run.floor} 层` : '',
       Number.isInteger(summary.act) && Number.isInteger(summary.floor) ? `第 ${summary.act} 幕 · 第 ${summary.floor} 层` : ''].filter(Boolean);
-    const records = (recap?.fixedMetrics || []).filter(metric => metric.label !== '实际抗伤'
+    const records = (recap?.fixedMetrics || []).filter(metric => metric.id !== 'turn_damage' && metric.label !== '实际抗伤'
       && metric.display && metric.display !== '未记录');
     const status = recap?.status === 'loading' ? '正在寻找更多值得回味的片段…'
       : recap?.status === 'unavailable' ? '本局记录暂时无法读取'
@@ -113,7 +117,7 @@
       ${recap?.portrait ? `<p class="review-recap-portrait">${escapeHtml(recap.portrait)}</p>` : ''}
       <div class="review-recap-meta">${meta.map(text => `<span>${escapeHtml(text)}</span>`).join('')}</div>
       <p class="review-recap-duration">${escapeHtml(summary.durationLabel || '记录覆盖')}<strong>${escapeHtml(summary.durationDisplay || '未记录')}</strong></p>
-      <div class="review-recap-metrics">${metrics.map((metric, index) => `<div${metric.display === '未记录' ? ' class="is-unknown"' : ''}><span class="review-recap-metric-label"><i aria-hidden="true">${['攻', '御', '伤', '愈'][index]}</i>${escapeHtml(metric.label)}</span><strong>${escapeHtml(metric.display)}</strong></div>`).join('')}</div>
+      <div class="review-recap-metrics">${metrics.map((metric, index) => `<div${metric.display === '未记录' ? ' class="is-unknown"' : ''}><span class="review-recap-metric-label"><i aria-hidden="true">${['攻', '御', '伤', '爆'][index]}</i>${escapeHtml(metric.label)}</span><strong>${escapeHtml(metric.display)}</strong></div>`).join('')}</div>
       ${recap?.choiceStats?.length ? `<div class="review-recap-choices"><span>已记录选择</span>${recap.choiceStats.map(stat => `<span>${escapeHtml(stat.label)} <b>${escapeHtml(stat.display)}</b></span>`).join('')}</div>` : ''}
       ${records.length ? `<div class="review-recap-records">${records.map(metric => `<span>${escapeHtml(metric.label)} <b>${escapeHtml(metric.display)}</b></span>`).join('')}</div>` : ''}
       <div class="review-recap-cards">${(recap?.cards || []).map((card, index) => `<article><span class="review-recap-card-index" aria-hidden="true">${String(index + 1).padStart(2, '0')}</span><h4>${escapeHtml(card.title)}</h4><p>${escapeHtml(card.body)}</p></article>`).join('')}</div>

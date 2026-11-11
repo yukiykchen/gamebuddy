@@ -191,12 +191,25 @@ const recapHtml = window.GameBuddyReviewUi.renderRecap({
   status: 'local_only', portrait: '惜命<script>不惜债',
   runSummary: { character: 'IRONCLAD', ascension: 2, totalFloor: 39, act: 3, floor: 6,
     result: 'loss', durationLabel: '记录覆盖', durationDisplay: '40分42秒' },
-  battleMetrics: [{ label: '累计输出', value: 0, display: '0' }],
+  battleMetrics: [
+    { label: '累计输出', value: 0, display: '0' },
+    { label: '实际恢复', value: 99, display: '99' }
+  ],
+  fixedMetrics: [
+    { id: 'turn_damage', label: '最高回合实际爆发', value: 50, display: '50' },
+    { id: 'lethal_hit', label: '最高斩杀', value: 55, display: '55' },
+    { id: 'reloads', label: 'SL次数', value: 1, display: '1' }
+  ],
   choiceStats: [{ label: '火堆回血', display: '6次' }],
   cards: [{ title: '瓶中精灵，留对了', body: '三层后它来捞人。' }], closing: '这局，命是真硬。'
 });
-assert.match(recapHtml, /累计输出/); assert.match(recapHtml, /实际恢复/);
-assert.equal((recapHtml.match(/class="is-unknown"/g) || []).length, 3);
+assert.deepEqual([...recapHtml.matchAll(/<span class="review-recap-metric-label"><i[^>]*>[^<]*<\/i>([^<]+)<\/span><strong>([^<]+)<\/strong>/g)]
+  .map(([, label, display]) => [label, display]),
+  [['累计输出', '0'], ['实际抗伤', '未记录'], ['累计受伤', '未记录'], ['本回合最高出伤', '50']]);
+assert.doesNotMatch(recapHtml, /实际恢复|最高回合实际爆发/);
+assert.match(recapHtml, /最高斩杀 <b>55<\/b>/);
+assert.match(recapHtml, /SL次数 <b>1<\/b>/);
+assert.equal((recapHtml.match(/class="is-unknown"/g) || []).length, 2);
 assert.match(recapHtml, /<strong>0<\/strong>/);
 assert.match(recapHtml, /40分42秒/); assert.match(recapHtml, /到达第 39 层/);
 assert.match(recapHtml, /惜命&lt;script&gt;不惜债/);
@@ -210,6 +223,7 @@ const emptyRecapHtml = window.GameBuddyReviewUi.renderRecap({
   battleMetrics: []
 });
 assert.match(emptyRecapHtml, /本局没有找到值得单独讲的片段/);
+assert.match(emptyRecapHtml, /本回合最高出伤<\/span><strong>未记录<\/strong>/);
 assert.doesNotMatch(emptyRecapHtml, /review-recap-card-index|review-recap-closing|review-recap-portrait/);
 
 console.log('Review UI tests passed.');
