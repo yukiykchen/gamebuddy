@@ -165,6 +165,8 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
 - `combat.ended`
 - `card.reward.opened`
 - `card.reward.closed`
+- `card.removal.opened`（牌组删牌选择即将出现；`data` 含 `cards`、`minSelect`、`maxSelect`、`cancelable`、`promptTable`、`promptKey`、`inShop`、`candidateCount`）
+- `card.removal.closed`（该选择界面关闭）
 
 `card.reward.opened` 在 `NCardRewardSelectionScreen` 打开或刷新时发送，`data.cards` 为当前可见候选牌；桌面端据此触发 `card_reward` Agent：
 
@@ -192,7 +194,9 @@ GameBuddy 将游戏接入层和 AI 决策层解耦。游戏 Mod Bridge 只负责
 
 `event.opened` 在事件房可见可选项变化时发送。开局远古祝福（如佩尔三选一遗物）与途中事件共用这条路径。事件、页面和选项 ID 会同时进入事件签名，因此多页面事件推进后会重新分析，而同一页面的重复快照不会重复调用。选完或离开后发送 `event.closed`；桌面端据此结束 `event_choice` 建议卡。各幕开局常先发过 `map.opened`，因此不能靠再发一次地图事件来收起开局建议。
 
-`shop.opened` / `shop.updated` 的 `data` 与状态中的 `shop` 相同。玩家购买、删牌或金币变化后，Bridge 发送 `shop.updated`，桌面端只刷新实际库存和余额，并保留进店时一次生成的完整购物清单，不再次调用商店 Agent；`shop.closed` 会停止商店思考并清除该清单。
+`shop.opened` / `shop.updated` 的 `data` 与状态中的 `shop` 相同。玩家购买、库存变化或金币变化后，Bridge 发送 `shop.updated`，桌面端只刷新实际库存和余额，并保留进店时一次生成的完整购物清单，不再次调用商店 Agent；`shop.closed` 会停止商店思考并清除该清单。购买删牌服务后弹出的选牌界面属于 `card.removal.*`，不再由 `shop.updated` 表示。
+
+`card.removal.opened` 在 Bridge 观察到游戏即将打开「从牌组里选牌」界面**并且用途是删除**时发送。判定挂在删牌入口上，而不是挂在界面本身上：同一个界面也被异变与复制一张牌复用，因此 Bridge 不会为那两种情况发送本事件，也不依赖任何本地化文案。`data.cards` 是按游戏自身可删除规则（排除永恒牌）并叠加调用方过滤后的候选牌，重复的同名牌按多张保留；`minSelect` / `maxSelect` 是界面要求的张数，`cancelable` 表示玩家可以放弃（事件与遗物通常是 `false`，商店、奖励与休息处通常是 `true`），`inShop` 表示当前是否在商店内。候选为空或角色已死亡时不发送。界面关闭后发送 `card.removal.closed`，桌面端据此清除 `card_removal` 建议。
 
 `card.played` 仍待接入对应 STS2 生命周期 Hook。
 

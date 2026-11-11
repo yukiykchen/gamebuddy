@@ -78,6 +78,26 @@ assert.equal(validateMessage({
   timestamp: Date.now(),
   data: { cards: [] }
 }).ok, false);
+const validRemoval = {
+  cards: [
+    { id: 'STRIKE', name: '打击', type: 'Attack', upgraded: false, cost: 1, description: '造成 6 点伤害。', descriptionSource: 'runtime' },
+    { id: 'STRIKE', name: '打击', type: 'Attack', upgraded: false, cost: 1 }
+  ],
+  minSelect: 2,
+  maxSelect: 2,
+  cancelable: false,
+  promptTable: 'card_selection',
+  promptKey: 'TO_REMOVE',
+  inShop: false,
+  candidateCount: 2
+};
+assert.equal(validateMessage({ type: 'event', name: 'card.removal.opened', timestamp: Date.now(), data: validRemoval }).ok, true);
+assert.equal(validateMessage({ type: 'event', name: 'card.removal.closed', timestamp: Date.now() }).ok, true);
+assert.equal(validateMessage({ type: 'event', name: 'card.removal.opened', timestamp: Date.now(), data: { ...validRemoval, cards: [] } }).ok, false);
+assert.equal(validateMessage({ type: 'event', name: 'card.removal.opened', timestamp: Date.now(), data: { ...validRemoval, maxSelect: 'two' } }).ok, false);
+assert.equal(validateMessage({ type: 'event', name: 'card.removal.opened', timestamp: Date.now(), data: { ...validRemoval, minSelect: 3, maxSelect: 2 } }).ok, false);
+assert.equal(validateMessage({ type: 'event', name: 'card.removal.opened', timestamp: Date.now(), data: { ...validRemoval, cancelable: undefined } }).ok, false);
+assert.equal(validateMessage({ type: 'event', name: 'card.removal.opened', timestamp: Date.now(), data: { ...validRemoval, cards: [{ name: 42 }] } }).ok, false);
 assert.equal(validateMessage({ type: 'event', name: 'made.up.event', timestamp: Date.now() }).ok, false);
 assert.equal(validateMessage({ type: 'state', data: { ...validState, player: { ...validState.player, energy: '3' } } }).ok, false);
 assert.equal(validateMessage({ type: 'unknown' }).ok, false);
