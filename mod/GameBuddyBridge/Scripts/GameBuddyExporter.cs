@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Godot;
+using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Context;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -19,6 +20,7 @@ using MegaCrit.Sts2.Core.Map;
 using MegaCrit.Sts2.Core.Nodes.Cards.Holders;
 using MegaCrit.Sts2.Core.Nodes.Events;
 using MegaCrit.Sts2.Core.Nodes.Rooms;
+using MegaCrit.Sts2.Core.Nodes.Screens.CardSelection;
 using MegaCrit.Sts2.Core.Nodes.Screens.Map;
 using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.Runs;
@@ -50,6 +52,8 @@ public static class GameBuddyExporter
     private static bool _eventChoiceOpen;
     private static string _lastShopSignature = string.Empty;
     private static bool _shopOpen;
+    private static bool _cardRemovalOpen;
+    private static string _lastCardRemovalSignature = string.Empty;
 
     public static void Initialize(string modDirectory)
     {
@@ -397,6 +401,131 @@ public static class GameBuddyExporter
             _activeCardRewardScreen = null;
             _lastCardRewardSignature = string.Empty;
             PublishEvent("card.reward.closed");
+        }
+    }
+
+    public static void BeginCardRemoval(Player player, CardSelectorPrefs prefs, Func<CardModel, bool>? filter)
+    {
+        try
+        {
+            lock (Gate)
+            {
+                if (_server is null || player is null)
+                {
+                    return;
+                }
+
+                // Mirror the two early exits inside the game's own removal path so we never report a
+                // screen the player cannot see: a dead creature and an empty candidate list.
+                if (player.Creature is { IsDead: true })
+                {
+                    _cardRemovalOpen = false;
+                    return;
+                }
+
+                // Duplicates stay as separate entries: removing two Strikes is a real plan, and the
+                // game lists each deck instance on the screen.
+                var candidates = (player.Deck?.Cards ?? new List<CardModel>())
+                    .Where(card => card is not null && !string.IsNullOrWhiteSpace(card.Id.Entry))
+                    .Where(card => IsRemovalCandidate(card, filter))
+                    .ToList();
+                if (candidates.Count == 0)
+                {
+                    _cardRemovalOpen = false;
+                    return;
+                }
+
+                var mapped = MapCards(candidates);
+                var signature = $"{prefs.MinSelect}:{prefs.MaxSelect}:{prefs.Cancelable}|"
+                    + string.Join("|", mapped.Select(card => $"{card.Id}:{card.Upgraded}"));
+                _cardRemovalOpen = true;
+                if (string.Equals(signature, _lastCardRemovalSignature, StringComparison.Ordinal))
+                {
+                    return;
+                }
+
+                _lastCardRemovalSignature = signature;
+                var promptKey = ReadPromptKey(prefs);
+                PublishEvent("card.removal.opened", new
+                {
+                    cards = mapped,
+                    minSelect = prefs.MinSelect,
+                    maxSelect = prefs.MaxSelect,
+                    cancelable = prefs.Cancelable,
+                    promptTable = promptKey.Table,
+                    promptKey = promptKey.Entry,
+                    inShop = _shopOpen,
+                    candidateCount = mapped.Count
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            // Early Access moves selection plumbing often; a missing event is better than a crash.
+            Log.Warn($"[GameBuddyBridge] card removal open skipped: {ex.Message}");
+        }
+    }
+
+    public static void EndCardRemoval(NCardGridSelectionScreen screen)
+    {
+        try
+        {
+            lock (Gate)
+            {
+                if (!_cardRemovalOpen || screen is not NDeckCardSelectScreen)
+                {
+                    return;
+                }
+
+                _cardRemovalOpen = false;
+                _lastCardRemovalSignature = string.Empty;
+                PublishEvent("card.removal.closed");
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Warn($"[GameBuddyBridge] card removal close skipped: {ex.Message}");
+        }
+    }
+
+    private static bool IsRemovalCandidate(CardModel card, Func<CardModel, bool>? filter)
+    {
+        if (!card.IsRemovable)
+        {
+            return false;
+        }
+
+        if (filter is null)
+        {
+            return true;
+        }
+
+        try
+        {
+            return filter(card);
+        }
+        catch
+        {
+            // A caller filter that throws only costs us one candidate, never the game.
+            return false;
+        }
+    }
+
+    private static (string? Table, string? Entry) ReadPromptKey(CardSelectorPrefs prefs)
+    {
+        try
+        {
+            var prompt = prefs.Prompt;
+            if (prompt is null)
+            {
+                return (null, null);
+            }
+
+            return (prompt.LocTable, prompt.LocEntryKey);
+        }
+        catch
+        {
+            return (null, null);
         }
     }
 

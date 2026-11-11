@@ -1,5 +1,5 @@
 const SUPPORTED_SCHEMA = 'gamebuddy.state.v1';
-const SUPPORTED_EVENTS = new Set(['combat.started', 'turn.started', 'combat.ended', 'map.opened', 'rest.opened', 'rest.closed', 'event.opened', 'event.closed', 'shop.opened', 'shop.updated', 'shop.closed', 'card.played', 'card.reward.opened', 'card.reward.closed']);
+const SUPPORTED_EVENTS = new Set(['combat.started', 'turn.started', 'combat.ended', 'map.opened', 'rest.opened', 'rest.closed', 'event.opened', 'event.closed', 'shop.opened', 'shop.updated', 'shop.closed', 'card.played', 'card.reward.opened', 'card.reward.closed', 'card.removal.opened', 'card.removal.closed']);
 const CARD_SOURCES = new Set(['runtime', 'catalog', 'unavailable']);
 const SHOP_ITEM_TYPES = new Set(['card', 'relic', 'potion', 'service']);
 
@@ -214,6 +214,27 @@ function stateSignature(state) {
   });
 }
 
+function validateRemoval(payload, label) {
+  if (!payload || typeof payload !== 'object') return { ok: false, reason: `${label} must be an object` };
+  if (!Array.isArray(payload.cards) || payload.cards.length === 0) return { ok: false, reason: `${label}.cards must be a non-empty array` };
+  for (const card of payload.cards) {
+    const validation = validateCardSnapshot(card, `${label}.cards`);
+    if (!validation.ok) return validation;
+    // Advice names cards, so a candidate without any readable identity is not usable.
+    if (typeof card === 'string') {
+      if (!card) return { ok: false, reason: `${label}.cards entries must be non-empty` };
+    } else if (typeof card.id !== 'string' && typeof card.name !== 'string') {
+      return { ok: false, reason: `${label}.cards entries need an id or name` };
+    }
+  }
+  for (const field of ['minSelect', 'maxSelect']) {
+    if (!Number.isInteger(payload[field]) || payload[field] < 0) return { ok: false, reason: `${label}.${field} must be a non-negative integer` };
+  }
+  if (payload.maxSelect < payload.minSelect) return { ok: false, reason: `${label}.maxSelect must be at least minSelect` };
+  if (typeof payload.cancelable !== 'boolean') return { ok: false, reason: `${label}.cancelable must be a boolean` };
+  return { ok: true };
+}
+
 function validateMessage(message) {
   if (!message || typeof message !== 'object') return { ok: false, reason: 'message must be an object' };
   if (message.type === 'state') return validateState(message.data);
@@ -224,6 +245,10 @@ function validateMessage(message) {
     const validation = validateReward(message.data, 'card.reward.opened data');
     if (!validation.ok) return validation;
   }
+  if (message.name === 'card.removal.opened' && message.data !== undefined && message.data !== null) {
+    const validation = validateRemoval(message.data, 'card.removal.opened data');
+    if (!validation.ok) return validation;
+  }
   if ((message.name === 'shop.opened' || message.name === 'shop.updated') && message.data !== undefined && message.data !== null) {
     const validation = validateShop(message.data, `${message.name} data`);
     if (!validation.ok) return validation;
@@ -231,4 +256,4 @@ function validateMessage(message) {
   return { ok: true };
 }
 
-module.exports = { SUPPORTED_EVENTS, SUPPORTED_SCHEMA, validateCardSnapshot, validateShop, validateMessage, validateState, stateSignature };
+module.exports = { SUPPORTED_EVENTS, SUPPORTED_SCHEMA, validateCardSnapshot, validateRemoval, validateShop, validateMessage, validateState, stateSignature };

@@ -23,7 +23,7 @@ const { createPetSprite } = window.GameBuddyPetSprite;
 const petSprite = createPetSprite(spriteRoot);
 let currentPetSkin = null;
 
-const ADVICE_TASKS = new Set(['card_reward', 'rest_site', 'map_route', 'event_choice', 'shop_choice']);
+const ADVICE_TASKS = new Set(['card_reward', 'card_removal', 'rest_site', 'map_route', 'event_choice', 'shop_choice']);
 const POSES = new Set(['waiting', 'watching', 'thinking', 'advising']);
 const POSE_TOUR = ['waiting', 'watching', 'thinking', 'advising'];
 const POSE_TOUR_LINES = {
@@ -56,6 +56,7 @@ let guideReopenPending = false;
 
 const CARD_PRESENTATION = {
   card_reward: { mark: '牌', kicker: '选牌建议' },
+  card_removal: { mark: '删', kicker: '删牌建议' },
   map_route: { mark: '路', kicker: '路线建议' },
   rest_site: { mark: '火', kicker: '火堆建议' },
   event_choice: { mark: '事', kicker: '事件建议' },
@@ -284,6 +285,21 @@ function setCardRecommendation(recommendation) {
     say(cardTitle.textContent);
     return;
   }
+  if (recommendation.task === 'card_removal') {
+    const cards = primary.cards || [];
+    const title = cards.length ? `删除 ${cards.map(card => `「${card.name}」`).join('、')}` : '这次没有可以删除的牌';
+    prepareCard(recommendation, title);
+    cardReason.textContent = recommendation.reason || '优先删除诅咒和基础牌，提高核心牌的抽取稳定性。';
+    cardPoints.innerHTML = `${cardPointList('建议删除', cards.map((card, index) => `${index + 1}. ${card.name} · ${card.reason}`), 'positive')}${cardPointList('本次要选', [`界面需要选择 ${primary.count} 张，候选 ${recommendation.context?.candidateCount ?? cards.length} 张${recommendation.context?.cancelable ? '，可以放弃' : '，必须选满'}`], 'neutral')}`;
+    const confidence = Math.round((Number(recommendation.confidence) || 0) * 100);
+    cardMeta.textContent = cardSourceLabel(recommendation, confidence);
+    cardPanel.classList.add('visible');
+    petState.cardVisible = true;
+    petState.cardRecommendation = recommendation;
+    applyPose();
+    say(title);
+    return;
+  }
   if (recommendation.task === 'shop_choice') {
     const analysis = primary.analysis || {};
     const plan = primary.plan || [];
@@ -327,6 +343,7 @@ function setAgentThinking(state) {
   const task = state.tasks?.[0];
   const labels = {
     card_reward: '正在比较三张奖励牌',
+    card_removal: '正在挑选要删除的牌',
     map_route: '正在推演后续路线',
     rest_site: '正在权衡回血和升级',
     event_choice: '正在分析事件选项',
@@ -440,6 +457,9 @@ function setRecommendation(recommendation) {
     return;
   }
   if (recommendation.task === 'card_reward' && recommendation.primary?.label) {
+    return;
+  }
+  if (recommendation.task === 'card_removal' && recommendation.primary?.label) {
     return;
   }
   if (recommendation.task === 'rest_site' && recommendation.primary?.label) {
