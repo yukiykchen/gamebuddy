@@ -323,7 +323,8 @@ function createOpenAiClient(config = readLlmConfig(), { fetchImpl = globalThis.f
     model: config.model,
     cacheKey: require('node:crypto').createHash('sha256').update(JSON.stringify({ ...config, apiKey: config.apiKey ? require('node:crypto').createHash('sha256').update(config.apiKey).digest('hex') : '' })).digest('hex'),
     completeRecapTurn: (payload, options) => completeJson(
-      payload?.stage === 'closing' ? require('../../review/recap/runner').CLOSING_PROMPT : require('../../review/recap/runner').PROMPT, payload, 'run_recap', true, options
+      payload?.stage === 'editorial_review' ? require('../../review/recap/editorial').REVIEW_PROMPT
+        : payload?.stage === 'closing' ? require('../../review/recap/runner').CLOSING_PROMPT : require('../../review/recap/runner').PROMPT, payload, 'run_recap', true, options
     ),
     completeBuildGuidance: (payload, options) => completeJson(
       require('../knowledge/card-guidance-service').GUIDANCE_PROMPT, payload, 'build_guidance', true, options

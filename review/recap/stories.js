@@ -53,24 +53,19 @@ function groundedStory(timeline, candidate, diagnostic = {}, { canonicalizeRelat
     const card = story(timeline, candidate);
     return card || reject('insufficient_story_evidence');
   }
-  const { title, bodyTemplate, assertions, evidenceIds, bindings = {} } = candidate;
-  if (typeof title !== 'string' || typeof bodyTemplate !== 'string'
-    || !Array.isArray(assertions) || !assertions.length || assertions.length > 12
-    || !Array.isArray(evidenceIds) || !evidenceIds.length || evidenceIds.length > 20) return reject('invalid_schema');
-  if (!evidenceIds.every(id => timeline.byId.has(id) || timeline.snapshotsById.has(id))) return reject('unknown_evidence');
-  if (!assertions.every(c => checkClaim(timeline, c).status === 'supported')) return reject('unsupported_assertion');
-  // Every direct assertion must cite the actual object it validates, not an unrelated ID.
-  if (assertions.some(c => [c.eventId, c.snapshotId, c.causeEventId, c.effectEventId, ...(c.eventIds || [])]
-    .filter(Boolean).some(id => !evidenceIds.includes(id)))) return reject('missing_direct_evidence');
-  const missing = [...new Set(assertions.filter(c => c.type === 'recorded_relation')
-    .flatMap(c => checkClaim(timeline, c).evidenceIds).filter(id => !evidenceIds.includes(id)))];
-  if (missing.length) return reject('missing_relation_evidence', { missingEvidenceIds: missing });
+  const { title, bodyTemplate, assertions = [], evidenceIds = [], bindings = {} } = candidate;
+  if (typeof title !== 'string' || typeof bodyTemplate !== 'string' || !Array.isArray(assertions)
+    || !Array.isArray(evidenceIds) || !bindings || typeof bindings !== 'object') return reject('invalid_schema');
+  // Only numerical claims are publication gates. Names and prose use model text.
+  const numericClaim = c => typeof c?.value === 'number' || typeof checkClaim(timeline, c).value === 'number';
+  if (assertions.some(c => numericClaim(c) && checkClaim(timeline, c).status !== 'supported'))
+    return reject('unsupported_numeric_assertion');
   const literalBody = bodyTemplate.replace(/\{\{[a-zA-Z][\w]*\}\}/g, '');
   const supportedNumbers = new Set(assertions.map(c => checkClaim(timeline, c).value)
     .filter(v => typeof v === 'number').map(String));
-  // Location labels may be copied literally from the cited observation.
-  for (const id of evidenceIds) {
-    const p = observedPayload(timeline.byId.get(id));
+  // Location labels can use the whole run overview, not just card-local IDs.
+  for (const fact of timeline.facts) {
+    const p = observedPayload(fact);
     for (const k of ['act', 'floor', 'totalFloor']) if (Number.isFinite(p?.[k])) supportedNumbers.add(String(p[k]));
   }
   const chineseValue = text => {
@@ -82,7 +77,7 @@ function groundedStory(timeline, candidate, diagnostic = {}, { canonicalizeRelat
     }
     return total + digit;
   };
-  const literalText = title + literalBody;
+  const literalText = title + ' ' + literalBody;
   const numericLiterals = literalText.match(/\d+(?:\.\d+)?/g) || [];
   const chineseLiterals = [...literalText.matchAll(/([零〇一二两三四五六七八九十百千]+)(?:回合|场|次|点|血|层|张|刀|击|幕|章)/g)].map(m => String(chineseValue(m[1])));
   const unsupportedNumbers = [...new Set([...numericLiterals, ...chineseLiterals].filter(n => !supportedNumbers.has(n)))];
@@ -96,40 +91,35 @@ function groundedStory(timeline, candidate, diagnostic = {}, { canonicalizeRelat
     return reject('unbound_number', { unsupportedNumbers, matchingObservedFields: matchingObservedFields.slice(0, 20),
       repairHint: '正确数字可补齐匹配字段的event_field断言并绑定；不要删掉有趣的表达。匹配字段仅为线索，须选择语义对应的实际字段。' });
   }
-  const namedClaims = Object.entries(bindings).filter(([name]) => bodyTemplate.includes(`{{${name}}}`))
-    .map(([, b]) => assertions[b?.claimIndex]).filter(c => c && (c.type === 'entity_name'
-      || c.type === 'event_field' && /^(cardName|cardId|potionName|potionId)$/.test(c.field)));
-  const subjects = assertions.filter(c => ['zero_plays', 'never_entered_hand', 'subject_count'].includes(c.type));
-  // Identity claims must bind an actual name; the model cannot rename POMMEL_STRIKE
-  // as a made-up card in otherwise valid prose.
-  if (subjects.some(subject => !namedClaims.some(name => name.type === 'entity_name'
-    ? name.subjectId === subject.subjectId
-    : inspectSubject(timeline, subject.subjectId, subject.combatId).eventIds.includes(name.eventId)
-      || timeline.byId.get(name.eventId)?.payload?.cardId === inspectSubject(timeline, subject.subjectId, subject.combatId).modelId))) return reject('unbound_subject_name');
-  let valid = true;
+  let valid = true, bindingError = '';
   const body = bodyTemplate.replace(/\{\{([a-zA-Z][\w]*)\}\}/g, (match, name, offset) => {
     const binding = bindings[name];
     if (!binding || !Number.isInteger(binding.claimIndex) || !assertions[binding.claimIndex]) { valid = false; return ''; }
     const claim = assertions[binding.claimIndex];
-    const checked = checkClaim(timeline, claim);
+    const checked = numericClaim(claim) ? checkClaim(timeline, claim) : { value: claim.value };
     if (!['string', 'number'].includes(typeof checked.value)) { valid = false; return ''; }
     const tail = bodyTemplate.slice(offset + match.length), head = bodyTemplate.slice(0, offset);
+    if (typeof checked.value === 'number' && /(?:增加|多了|涨了|提升了|减少|少了|降低了)$/.test(head)
+      && /^(hp|maxHp|gold|block|energy)$/.test(claim.field || '')) {
+      valid = false; bindingError = 'absolute_value_used_as_delta'; return '';
+    }
     if (/^(?:次|点|血|层|张|回合|场|刀|击)/.test(tail) || /第$/.test(head)) {
       if (typeof checked.value !== 'number') { valid = false; return ''; }
       if (/^次/.test(tail) && !/count|times|index/i.test(claim.field || '') && !(claim.type === 'metric' && claim.metricId === 'reloads')) { valid = false; return ''; }
     }
-    if (claim.type === 'event_field' && /^(cardId|potionId|relicId)$/.test(claim.field)) {
-      const catalogs = [require('../../agent/data/codex/cards.json'), require('../../agent/data/codex/potions.json'), require('../../agent/data/codex/relics.json')];
-      const named = catalogs.flat().find(row => row.id === checked.value)?.name;
-      if (!named) { valid = false; return ''; }
-      return named;
-    }
     return String(checked.value);
   });
-  if (!valid) return reject('invalid_binding', '占位符须指向有效断言的标量value；合并potionNames应绑定一个完整字符串，不能拆成两个不同名字。');
-  if (/\{\{|\}\}|\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*\b|\b(?:true|false)\b/.test(body)) return reject('machine_identifier_or_unresolved_placeholder');
-  // Wording and story value are editorial choices. Keep claim values and
-  // bindings authoritative without rejecting narrative style by keywords.
+  if (!valid) return reject(bindingError || 'invalid_binding', '占位符须指向有效断言的标量value；合并potionNames应绑定一个完整字符串，不能拆成两个不同名字。');
+  if (/满血|回满(?!半|一半)/.test(title + body)) {
+    const healthObservations = evidenceIds.map(id => observedPayload(timeline.byId.get(id)))
+      .filter(p => Number.isFinite(p.hp) && Number.isFinite(p.maxHp));
+    if (healthObservations.length && !healthObservations.some(p => p.hp === p.maxHp))
+      return reject('full_health_does_not_match_numbers', '文案写满血，但引用观测hp均小于maxHp，请改为实际血线。');
+  }
+  const renderedNumbers = (title + ' ' + body).match(/\d+(?:\.\d+)?/g) || [];
+  if (renderedNumbers.some(n => !supportedNumbers.has(n))) return reject('unsupported_rendered_number');
+  if (/\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\b|StatusIntent|SingleAttackIntent|字段|快照|诊断/.test(title + body)) return reject('unreadable_wording');
+  // Numerical checks are separate from editorial review; names need no lookup.
   const relationIds = [...new Set(assertions.filter(c => c.type === 'recorded_relation').map(c => c.relationId))];
   if (canonicalizeRelations && relationIds.length === 1
     && assertions.every(c => ['recorded_relation', 'event_field', 'sequence', 'occurred'].includes(c.type))) {
@@ -140,7 +130,6 @@ function groundedStory(timeline, candidate, diagnostic = {}, { canonicalizeRelat
       return rendered && { ...rendered, rendering: 'canonical_known_relation', verifiedKind: relation.kind };
     }
   }
-  if (/证据|未证|只证明|字段|工具|快照|诊断|来源(?:不足|未知|不明)|未核实/.test(title + body)) return reject('engineering_commentary');
   return { pattern: candidate.pattern || 'observed_moment', title, body, evidenceIds,
     assertions, relationId: relationIds.length === 1 ? relationIds[0] : null,
     ...(relationIds.length === 1 ? { verifiedKind: observedRelations(timeline).find(r => r.relationId === relationIds[0])?.kind, rendering: 'model_voice_verified_relation' } : {}),
@@ -198,8 +187,7 @@ function relationCandidate(relation) {
     d.bodyTemplate = '生命从{{hpBefore}}回到{{hpAfter}}血，接着走进了第{{nextAct}}幕。';
     d.fields = ['hpBefore', 'hpAfter', 'nextAct'];
   }
-  // Two concrete names make a short inventory contrast more personal. The final
-  // length gate remains authoritative; longer inventories use their observed count.
+  // Prefer concrete names when they fit the compact local fallback template.
   if (kind === 'low_hp_inventory' && fields.potionNames && fields.potionCount === 2
     && [...`最后记录只剩${fields.hp}血，${fields.potionNames}仍在背包。`].length <= 40) {
     d.bodyTemplate = '最后记录只剩{{hp}}血，{{potionNames}}仍在背包。'; d.fields = ['hp', 'potionNames'];
@@ -244,7 +232,7 @@ function candidateDiagnostics(timeline, candidates, { preserveModelVoice = false
   return (Array.isArray(candidates) ? candidates.slice(0, 12) : []).map((c, index) => {
     const diagnostic = {}, card = groundedStory(timeline, c, diagnostic, { canonicalizeRelations: !preserveModelVoice });
     const lengths = card && { title: [...card.title].length, body: [...card.body].length };
-    if (card && (lengths.title > 16 || lengths.body > 80 || !card.title.trim() || !card.body.trim())) diagnostic.reason = 'rendered_length_or_empty';
+    if (card && (!card.title.trim() || !card.body.trim() || lengths.title > 16 || lengths.body > 80)) diagnostic.reason = 'rendered_length_or_empty';
     return { index, title: c?.title, accepted: Boolean(card && !diagnostic.reason), ...diagnostic, ...(lengths ? { renderedLengths: lengths } : {}),
     claims: (Array.isArray(c?.assertions) ? c.assertions : []).map((claim, i) => ({ index: i,
       ...checkClaim(timeline, claim), ...(!claim.type ? { reason: '每条断言必须有type字段；使用扁平对象，不能用{event_field:{...}}' } : {}),
@@ -253,7 +241,7 @@ function candidateDiagnostics(timeline, candidates, { preserveModelVoice = false
     bindings: Object.entries(c?.bindings || {}).map(([name, binding]) => ({ name, claimIndex: binding?.claimIndex,
       valid: Number.isInteger(binding?.claimIndex) && Boolean(c?.assertions?.[binding.claimIndex]),
       field: c?.assertions?.[binding?.claimIndex]?.field })),
-    reminder: '按实际绑定后长度检查：标题16字、正文80字；完整引用关系所有evidenceIds；数值与引用无法支持时修正，表达和选材不做主观拦截。' };
+    reminder: '数值正确；标题16字正文80字；趣味至少2分且措辞自然。名称无需实体查询。不删除断言后保留旧绑定索引。' };
   });
 }
 module.exports = { story, groundedStory, selectStories, localStories, highValueLocalStory,
