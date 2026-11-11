@@ -6,7 +6,7 @@ const path = require('node:path');
 const { makeTimeline, observedRelations } = require('./facts');
 const { localRecap, buildRecap } = require('./runner');
 const { battleMetrics, recapFixedMetrics } = require('./presentation');
-const { createRecapStore } = require('./store');
+const { createRecapStore, savePublishedRecap } = require('./store');
 
 function fixture() {
   const runId = 'synthetic-scenic', facts = [];
@@ -156,7 +156,7 @@ test('recorded battle values appear when the final combat has no end marker', ()
   assert.ok(battleMetrics(f.timeline()).every(metric => metric.display === '未记录'));
 });
 
-test('a cached recap refreshes displayed metrics without replacing its cards', async t => {
+test('a published recap refreshes displayed metrics without replacing its cards', async t => {
   const f = metricFixture(), directory = fs.mkdtempSync(path.join(os.tmpdir(), 'recap-recorded-stats-'));
   t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
   f.facts.splice(f.facts.findIndex(event => event.eventType === 'combat.ended'), 1);
@@ -164,15 +164,12 @@ test('a cached recap refreshes displayed metrics without replacing its cards', a
   const store = createRecapStore({ directory, llmFactory: () => null, factStore: {
     getEffectiveFacts: () => f.facts, getCoverage: () => f.timeline().coverage, getSnapshots: () => []
   } });
-  await store.get(runId);
-  const file = path.join(directory, fs.readdirSync(directory)[0]);
-  const saved = JSON.parse(fs.readFileSync(file, 'utf8'));
-  saved.recap.battleMetrics = [];
-  saved.recap.cards = [{ title: '火堆忙活完，牌还没醒', body: '已保存的故事。' }];
-  fs.writeFileSync(file, JSON.stringify(saved));
+  const cards = [{ title: '火堆忙活完，牌还没醒', body: '已保存的故事。' }];
+  savePublishedRecap(directory, { runId, status: 'ready', cards, closing: '这句也保留。', battleMetrics: [] });
   const recap = await store.get(runId);
   assert.equal(recap.battleMetrics[0].display, '10');
-  assert.deepEqual(recap.cards, saved.recap.cards);
+  assert.deepEqual(recap.cards, cards);
+  assert.equal(recap.closing, '这句也保留。');
 });
 
 test('model failure shows local metrics and leaves the story area empty', async () => {
@@ -184,7 +181,7 @@ test('model failure shows local metrics and leaves the story area empty', async 
   assert.equal(r.closing, '');
   assert.ok(r.fixedMetrics.length);
 });
-test('recap cache includes corrected run metadata and does not reuse an old floor', async t => {
+test('unpublished recaps use corrected run metadata', async t => {
   const f = fixture(), directory = fs.mkdtempSync(path.join(os.tmpdir(), 'recap-summary-'));
   t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
   const store = createRecapStore({ directory,

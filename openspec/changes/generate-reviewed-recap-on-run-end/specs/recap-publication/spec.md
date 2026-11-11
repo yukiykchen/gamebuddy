@@ -15,3 +15,15 @@
 #### Scenario: An encyclopedia explanation gets rewritten
 - **WHEN** 候选只解释怪物技能或道具效果，或没有本局看点
 - **THEN** 系统 SHALL 允许一次重新选材，只发布最终通过的卡片，其他情况下留空
+
+### Requirement: Permanent per-run recap publication
+
+最终故事卡、画像和结语 SHALL 作为对局记录独立存档。已存档对局 MUST NOT 因重启、重新展开、提示词变化、模型变更或新增结算而重新生成。战况数值 SHALL 继续按当前事实计算。模型失败或超时 MUST NOT 占用正式存档。
+
+#### Scenario: A recap is reopened after a new release
+- **WHEN** 某局已有正式复盘，玩家在新版本展开该局
+- **THEN** 系统 SHALL 直接读取原文，并用本地记录刷新战况
+
+#### Scenario: A legacy finished recap is still available
+- **WHEN** 旧缓存中还有已完成的故事卡
+- **THEN** 系统 SHALL 将其原文迁移到正式存档

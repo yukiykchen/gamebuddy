@@ -94,7 +94,7 @@ test('the real HTTP adapter carries every prior result and full tool contracts i
   assert.equal(third.history.length, 2); assert.equal(third.history[0].results[0].name, 'find_events');
   assert.ok(third.tools.every(t => t.parameters && t.description)); assert.ok(recap.closing);
 });
-test('temporary model failures retry, concurrent reads deduplicate, successful recaps cache', async t => {
+test('temporary model failures retry, concurrent reads deduplicate, successful recaps are archived', async t => {
   const f = base(), directory = fs.mkdtempSync(path.join(os.tmpdir(), 'recap-regression-'));
   t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
   let calls = 0, fail = true;
@@ -110,6 +110,44 @@ test('temporary model failures retry, concurrent reads deduplicate, successful r
   fail = false; await store.get(f.runId); assert.equal(calls, 4);
   await store.get(f.runId); assert.equal(calls, 4);
 });
+test('published cards, portrait and closing survive app restart and changes to model and facts', async t => {
+  const f = base(), directory = fs.mkdtempSync(path.join(os.tmpdir(), 'recap-archive-'));
+  t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+  const factStore = { getEffectiveFacts: () => f.facts, getCoverage: () => f.coverage, getSnapshots: () => [] };
+  const llm = { enabled: true, cacheKey: 'old-model', completeRecapTurn: async input => {
+    if (input.stage === 'interest_review') return interestReview(input);
+    if (input.stage === 'closing') return { portrait: '火堆常客', closing: '火堆忙活完，牌还没醒。' };
+    return { candidates: [candidate(f)] };
+  } };
+  const original = await createRecapStore({ directory, factStore, llmFactory: () => llm }).get(f.runId);
+  assert.equal(original.status, 'ready');
+  assert.equal(original.cards.length, 1);
+  f.facts.push({ ...f.facts.at(-1), eventId: 'late-fact', sourceSeq: 5000, eventType: 'run.observed', payload: { hp: 0 } });
+  const reopened = createRecapStore({ directory, factStore, llmFactory: () => assert.fail('archived stories must not call the model') });
+  const result = await reopened.get(f.runId, { finalFloor: 39 });
+  assert.deepEqual(result.cards, original.cards);
+  assert.equal(result.closing, original.closing);
+  assert.equal(result.portrait, original.portrait);
+  assert.equal(result.runSummary.totalFloor, 39);
+});
+
+test('migration preserves a completed legacy recap independently of the cache version', async t => {
+  const f = base(), root = fs.mkdtempSync(path.join(os.tmpdir(), 'recap-migration-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const directory = path.join(root, 'archive'), legacyDirectory = path.join(root, 'cache');
+  fs.mkdirSync(legacyDirectory);
+  const name = require('node:crypto').createHash('sha256').update(f.runId).digest('hex') + '.json';
+  const recap = { runId: f.runId, status: 'ready', cards: [{ title: '火堆开了光，牌还在睡觉', body: '原文。' }], closing: '原结语。' };
+  fs.writeFileSync(path.join(legacyDirectory, name), JSON.stringify({ version: 'old-model-and-prompt', recap }));
+  const factStore = { getEffectiveFacts: () => [], getCoverage: () => ({}), getSnapshots: () => [] };
+  const store = createRecapStore({ directory, legacyDirectory, factStore, llmFactory: () => assert.fail('migrated stories must not call the model') });
+  assert.ok(fs.existsSync(path.join(directory, name)));
+  fs.rmSync(path.join(legacyDirectory, name));
+  assert.deepEqual(await store.get(f.runId), recap);
+  store.clear();
+  assert.deepEqual(fs.readdirSync(directory), []);
+});
+
 test('clearing a pending generation aborts it without recreating deleted run data', async t => {
   const f = base(), directory = fs.mkdtempSync(path.join(os.tmpdir(), 'recap-clear-')); let reads = 0, finish;
   t.after(() => fs.rmSync(directory, { recursive: true, force: true }));

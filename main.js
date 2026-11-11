@@ -118,7 +118,8 @@ function makeLlmClient(overrides = {}, hooks = {}) {
   });
 }
 const recapStore = createRecapStore({
-  directory: path.join(app.getPath('userData'), 'recap-cache.v1'),
+  directory: path.join(app.getPath('userData'), 'recaps.v1'),
+  legacyDirectory: path.join(app.getPath('userData'), 'recap-cache.v1'),
   factStore,
   llmFactory: () => makeLlmClient({ thinking: 'disabled', temperature: 0.1, stream: false, maxTokens: 3500 }, { timeoutMs: 90_000 })
 });
@@ -205,20 +206,13 @@ function queueFactReview(fact, stored, replay) {
       try {
         const run = refreshFactReview(runId);
         if (run && pendingAutomaticRecaps.delete(runId)) {
-          void getFinishedRecap(run).catch(error => console.warn('GameBuddy automatic recap failed:', error.message));
+          void recapStore.get(run.runId, run).catch(error => console.warn('GameBuddy automatic recap failed:', error.message));
         }
       } catch (error) { console.warn('GameBuddy review refresh failed:', error.message); }
     }
     pendingReviewRuns.clear();
     publishReviewChanged();
   }, 500);
-}
-
-async function getFinishedRecap(run) {
-  const recap = await recapStore.get(run.runId, run);
-  if (recap.status !== 'stale' || isQuitting || !finishedReviewRuns.has(run.runId)) return recap;
-  const latestRun = reviewService.getHistory().runs.find(entry => entry.runId === run.runId);
-  return latestRun ? recapStore.get(run.runId, latestRun) : recap;
 }
 
 function logLlmMode() {
@@ -1460,7 +1454,7 @@ ipcMain.handle('review:getRunRecap', async (_event, runId) => {
   if (!run) {
     return { status: 'unavailable', fixedMetrics: [], cards: [], closing: '' };
   }
-  return playerRecap(await getFinishedRecap(run));
+  return playerRecap(await recapStore.get(run.runId, run));
 });
 function playerRecap(recap) {
   const published = recap.status === 'ready';
