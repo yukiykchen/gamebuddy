@@ -7,6 +7,7 @@ release/
 *.log
 .env
 .env.*
+.secrets
 !.env.example
 .codex-cli/
 hatch-runs/
@@ -14,6 +15,8 @@ runs/
 
 mod/RunmateBridge/.godot/
 .runtime/
+shared-danmaku/worker/wrangler.toml
+shared-danmaku/worker/.wrangler/
 
 # local source checkouts
 /spire-agent/

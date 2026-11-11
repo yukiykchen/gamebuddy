@@ -3,6 +3,14 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const { decide } = require('../router');
+const {shouldAutoOpenEncounterGuide}=require('../tasks/encounter-guide');
+
+test('默认只自动打开精英与Boss攻略，普通小怪和未知类型保持关闭',()=>{
+  assert.equal(shouldAutoOpenEncounterGuide({kind:'normal'}),false);
+  assert.equal(shouldAutoOpenEncounterGuide({kind:'elite'}),true);
+  assert.equal(shouldAutoOpenEncounterGuide({kind:'boss'}),true);
+  assert.equal(shouldAutoOpenEncounterGuide(null),false);
+});
 
 function loadState(name) {
   return JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', `${name}.json`), 'utf8'))[0];

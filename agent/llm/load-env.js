@@ -35,6 +35,12 @@ function loadProjectEnv(env = process.env, root = path.join(__dirname, '..', '..
   if (loaded) return env;
   loaded = true;
   applyEnvFile(path.join(root, '.env'), env);
+  // 公司内部网关沿用根目录本地 .secrets；不复制 token 到仓库文件。
+  applyEnvFile(path.join(root, '.secrets'), env);
+  if (!env.GAMEBUDDY_LLM_API_KEY && env.TENCENT_TOKEN) env.GAMEBUDDY_LLM_API_KEY = env.TENCENT_TOKEN;
+  if (!env.GAMEBUDDY_LLM_BASE_URL && env.TENCENT_COPILOT_BASE_URL) env.GAMEBUDDY_LLM_BASE_URL = env.TENCENT_COPILOT_BASE_URL;
+  if (!env.GAMEBUDDY_LLM_MODEL && env.TENCENT_COPILOT_MODEL) env.GAMEBUDDY_LLM_MODEL = env.TENCENT_COPILOT_MODEL;
+  if (!env.GAMEBUDDY_LLM_PROVIDER && env.TENCENT_TOKEN) env.GAMEBUDDY_LLM_PROVIDER = 'Tencent Copilot';
   return env;
 }
 

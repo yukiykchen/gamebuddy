@@ -1,0 +1,13 @@
+name = "gamebuddy-shared-danmaku-pages"
+pages_build_output_dir = "./dist"
+compatibility_date = "2026-10-14"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "gamebuddy-shared-danmaku"
+database_id = "928a6974-0730-4d99-82cd-2333bd5fc89b"
+
+[[d1_databases]]
+binding = "CLEARS_DB"
+database_name = "gamebuddy-clears"
+database_id = "f3b779e9-079a-4310-8011-8fdf2cab3ecd"

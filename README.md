@@ -191,6 +191,7 @@ npm run harness:inspect -- --once
 | `npm run harness:smoke` | 校验 Replay WebSocket 首包 |
 | `npm run knowledge:cards` | 按指定 stable / beta 版本刷新全卡评价 |
 | `npm run mod:build -- -Sts2Dir ...` | 在 Windows 构建并安装游戏 Mod |
+| `npm run live:win -- -Sts2Dir ...` | Windows 一键构建复制 Mod、启动 GameBuddy 与游戏 |
 | `npm run dist:win` | 构建 Windows NSIS 安装包 |
 
 ## 文档导航

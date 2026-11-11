@@ -150,6 +150,24 @@ GameBuddy LLM: rules only
 
 ### 5.1 构建并安装 Mod
 
+如果你在 Windows 上已经完成 Node.js、.NET 9、Godot .NET SDK 与游戏安装，推荐直接从仓库根目录一键启动真实联调：
+
+```powershell
+npm run live:win
+```
+
+它会检查 `27182` 端口未被 Replay Bridge 占用，检查游戏没有运行，构建并复制只读 Mod，启动 GameBuddy 桌面端，然后启动游戏。游戏只会在启动时加载 Mod，因此检测到游戏已运行时脚本会停止，不会强制关闭任何进程。首次运行仍需在游戏的 `Mods` / `Modding` 页面确认启用 `GameBuddy Bridge`。
+
+若游戏不在默认 Steam 目录，传入安装路径：
+
+```powershell
+npm run live:win -- -Sts2Dir "D:\SteamLibrary\steamapps\common\Slay the Spire 2"
+```
+
+如果你已完成构建、只想启动已安装版本，可追加 `-SkipBuild`；未安装完整 DLL 和 manifest 时脚本会拒绝启动。`-NoDesktop` 可仅启动游戏和 Mod，方便单独用 Harness 探针检查 Bridge。
+
+以下是对应的手动构建方式：
+
 先在 Steam 库中右键游戏，选择“管理 → 浏览本地文件”，确认实际游戏目录。然后在仓库根目录的 Windows PowerShell 中执行：
 
 ```powershell

@@ -6,7 +6,6 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Godot;
-using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Context;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -20,7 +19,6 @@ using MegaCrit.Sts2.Core.Map;
 using MegaCrit.Sts2.Core.Nodes.Cards.Holders;
 using MegaCrit.Sts2.Core.Nodes.Events;
 using MegaCrit.Sts2.Core.Nodes.Rooms;
-using MegaCrit.Sts2.Core.Nodes.Screens.CardSelection;
 using MegaCrit.Sts2.Core.Nodes.Screens.Map;
 using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.Runs;
@@ -41,19 +39,38 @@ public static class GameBuddyExporter
     private static string _lastSignature = string.Empty;
     private static bool _wasInCombat;
     private static int _lastTurn = -1;
+    private static string? _lastRecapCombatKey;
     private static bool _wasMapVisible;
+    private static string? _activeRouteDecisionId;
     private static bool _wasAtRest;
     private static GameBuddyState? _restOpenSnapshot;
     private static Node? _activeCardRewardScreen;
     private static string _lastCardRewardSignature = string.Empty;
+    private static string? _activeRewardDecisionId;
+    private static bool _rewardFactOffered;
+    private static readonly GameBuddyRewardSelectionTracker RewardSelectionTracker = new();
     private static List<string> _lastCombatEnemies = new();
     private static string? _lastCombatNodeType;
     private static string _lastEventSignature = string.Empty;
     private static bool _eventChoiceOpen;
+    private static string? _activeEventDecisionId;
+    private static string? _activeEventId;
+    private static string? _activeEventPageId;
     private static string _lastShopSignature = string.Empty;
     private static bool _shopOpen;
     private static bool _cardRemovalOpen;
     private static string _lastCardRemovalSignature = string.Empty;
+    private static string? _activeShopDecisionId;
+    private static object? _activeRunObject;
+    private static string? _activeRunId;
+    private static string? _lastRunFactSignature;
+    private static long _activeRunStartedAt;
+    private static string? _pendingRunResult;
+    private static GameBuddyState? _lastRunSnapshot;
+    private static int _damageTurn = -1;
+    private static int _turnDamage;
+    private static int _maxTurnDamage;
+    private static readonly Dictionary<string, int> LastEnemyHp = new(StringComparer.Ordinal);
 
     public static void Initialize(string modDirectory)
     {
@@ -69,6 +86,8 @@ public static class GameBuddyExporter
             {
                 _server = new GameBuddyWebSocketServer(Port);
                 _server.Start();
+                GameBuddyFactEmitter.Initialize(modDirectory, _server.BroadcastFact);
+                GameBuddyRecapCapture.SnapshotProvider = CaptureRecapState;
                 GameBuddyDiagnostics.Write(modDirectory, $"WebSocket listening on 127.0.0.1:{Port}");
                 Log.Info($"[GameBuddyBridge] WebSocket server listening on 127.0.0.1:{Port}");
             }
@@ -102,7 +121,12 @@ public static class GameBuddyExporter
                 return;
             }
 
+            EnsureRunLifecycle(runState, player);
             var snapshot = BuildSnapshot(runState, player);
+            PublishRunObservation(snapshot, false);
+            TrackTurnDamage(snapshot);
+            snapshot = snapshot with { Run = snapshot.Run with { MaxTurnDamage = _maxTurnDamage } };
+            _lastRunSnapshot = snapshot;
             var json = JsonSerializer.Serialize(new BridgeMessage<GameBuddyState>("state", snapshot), JsonOptions);
             var signature = JsonSerializer.Serialize(snapshot with { Timestamp = 0 }, JsonOptions);
             if (!string.Equals(signature, _lastSignature, StringComparison.Ordinal))
@@ -117,6 +141,7 @@ public static class GameBuddyExporter
                 _lastCombatNodeType = snapshot.Run.CurrentNode ?? snapshot.Run.Room;
             }
             PublishCardRewardIfReady(snapshot);
+            PublishSelectedCardIfReady(snapshot);
             PublishTransitions(snapshot);
             PublishEventLifecycle(snapshot);
             PublishShopLifecycle(snapshot);
@@ -127,19 +152,213 @@ public static class GameBuddyExporter
         }
     }
 
+    private static void EnsureRunLifecycle(RunState runState, Player player)
+    {
+        var authoritativeRunId = GameBuddyFactEmitter.ActiveRunId;
+        if (ReferenceEquals(_activeRunObject, runState)
+            && !string.IsNullOrEmpty(_activeRunId)
+            && (authoritativeRunId is null || authoritativeRunId == _activeRunId))
+        {
+            return;
+        }
+
+        if (_activeRunObject is not null && authoritativeRunId == _activeRunId)
+        {
+            _activeRunObject = runState;
+            return;
+        }
+
+        _activeRunObject = runState;
+        _activeRunStartedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        _activeRunId = authoritativeRunId ?? BuildRunId(runState, player);
+        _pendingRunResult = null;
+        _lastRunSnapshot = null;
+        _damageTurn = -1;
+        _turnDamage = 0;
+        _maxTurnDamage = 0;
+        LastEnemyHp.Clear();
+        PublishEvent("run.started", new
+        {
+            runId = _activeRunId,
+            character = player.Character.Id.Entry,
+            ascension = ReadIntValue(ReadMember(runState, "AscensionLevel", "Ascension")),
+            startedAt = _activeRunStartedAt
+        });
+    }
+
+    private static void PublishRunObservation(GameBuddyState snapshot, bool force)
+    {
+        var runId = GameBuddyFactEmitter.ActiveRunId;
+        if (runId is null) return;
+        var signature = $"{runId}|{snapshot.Run.Act}|{snapshot.Run.Floor}|{snapshot.Run.CurrentCoord}|"
+            + $"{snapshot.Player.Hp}|{snapshot.Player.MaxHp}|{snapshot.Player.Gold}|"
+            + $"{string.Join(",", snapshot.Player.Cards.Select(card => $"{card.Id}:{card.Upgraded}"))}|"
+            + $"{string.Join(",", snapshot.Player.Relics.Select(relic => relic.Id))}|"
+            + $"{string.Join(",", snapshot.Player.Potions.Select(potion => potion.Id))}";
+        if (!force && signature == _lastRunFactSignature) return;
+        _lastRunFactSignature = signature;
+        GameBuddyFactEmitter.Publish("run.observed", new
+        {
+            character = snapshot.Run.Character,
+            ascension = snapshot.Run.Ascension,
+            act = snapshot.Run.Act,
+            floor = snapshot.Run.Floor,
+            totalFloor = snapshot.Run.TotalFloor,
+            hp = snapshot.Player.Hp,
+            maxHp = snapshot.Player.MaxHp,
+            gold = snapshot.Player.Gold,
+            deck = snapshot.Player.Cards,
+            relics = snapshot.Player.Relics,
+            potions = snapshot.Player.Potions
+        }, observationMethod: "snapshot");
+    }
+
+    public static void PublishFinalFactObservation()
+    {
+        if (_lastRunSnapshot is not null) PublishRunObservation(_lastRunSnapshot, true);
+    }
+
+    private static string BuildRunId(RunState runState, Player player)
+    {
+        var seed = ReadMember(runState, "Seed", "RunSeed", "SeedString")?.ToString();
+        var identity = string.IsNullOrWhiteSpace(seed)
+            ? $"{player.Character.Id.Entry}|{_activeRunStartedAt}|{Guid.NewGuid():N}"
+            : $"{player.Character.Id.Entry}|{seed}";
+        return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(identity)))[..20].ToLowerInvariant();
+    }
+
+    public static void AuthoritativeRunEnded(bool cleared, bool abandoned = false)
+    {
+        _pendingRunResult = GameBuddyRunEnding.Resolve(cleared, abandoned).Result;
+        EndActiveRun();
+    }
+
+    private static void EndActiveRun()
+    {
+        if (string.IsNullOrEmpty(_activeRunId))
+        {
+            return;
+        }
+
+        var snapshot = _lastRunSnapshot;
+        var result = _pendingRunResult ?? "loss";
+        PublishEvent("run.ended", new
+        {
+            runId = _activeRunId,
+            result,
+            act = snapshot?.Run.Act,
+            floor = snapshot?.Run.TotalFloor ?? snapshot?.Run.Floor,
+            playtimeSeconds = Math.Max(0, (DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - _activeRunStartedAt) / 1000),
+            bossId = snapshot?.Run.FinalBossId ?? snapshot?.Run.NextBossId,
+            bossName = snapshot?.Run.FinalBossName ?? snapshot?.Run.NextBoss,
+            maxTurnDamage = _maxTurnDamage
+        });
+        _activeRunObject = null;
+        _activeRunId = null;
+        _lastRunSnapshot = null;
+        _pendingRunResult = null;
+        LastEnemyHp.Clear();
+    }
+
+    private static void TrackTurnDamage(GameBuddyState snapshot)
+    {
+        if (snapshot.Combat is null)
+        {
+            _damageTurn = -1;
+            _turnDamage = 0;
+            LastEnemyHp.Clear();
+            return;
+        }
+
+        if (_damageTurn != snapshot.Combat.Turn)
+        {
+            _damageTurn = snapshot.Combat.Turn;
+            _turnDamage = 0;
+            LastEnemyHp.Clear();
+        }
+
+        var current = new Dictionary<string, int>(StringComparer.Ordinal);
+        for (var index = 0; index < snapshot.Combat.Enemies.Count; index += 1)
+        {
+            var enemy = snapshot.Combat.Enemies[index];
+            var key = enemy.Id ?? $"{enemy.Name}#{index}";
+            current[key] = Math.Max(0, enemy.Hp);
+            if (LastEnemyHp.TryGetValue(key, out var before) && enemy.Hp < before)
+            {
+                _turnDamage += before - Math.Max(0, enemy.Hp);
+            }
+        }
+        LastEnemyHp.Clear();
+        foreach (var pair in current) LastEnemyHp[pair.Key] = pair.Value;
+        _maxTurnDamage = Math.Max(_maxTurnDamage, _turnDamage);
+    }
+
     private static void PublishTransitions(GameBuddyState snapshot)
     {
         var inCombat = snapshot.Combat is not null;
         var mapVisible = NMapScreen.Instance?.IsVisibleInTree() == true;
 
-        if (inCombat && !_wasInCombat) PublishEvent("combat.started");
-        if (!inCombat && _wasInCombat) PublishEvent("combat.ended");
+        if (inCombat && !_wasInCombat)
+        {
+            var boss = string.Equals(snapshot.Run.CurrentNode, "Boss", StringComparison.OrdinalIgnoreCase);
+            var actualBoss = boss ? snapshot.Combat?.Enemies.FirstOrDefault() : null;
+            PublishEvent("combat.started", new
+            {
+                roomType = snapshot.Run.CurrentNode ?? snapshot.Run.Room,
+                enemies = snapshot.Combat?.Enemies.Select(enemy => new { enemy.Id, enemy.Name }).ToList(),
+                bossId = actualBoss?.Id ?? (boss ? snapshot.Run.NextBossId : null),
+                bossName = actualBoss?.Name ?? (boss ? snapshot.Run.NextBoss : null)
+            });
+        }
+        var recapCombatKey = $"{GameBuddyFactEmitter.ActiveCombatId}:{GameBuddyFactEmitter.AttemptGeneration}";
+        if (inCombat && recapCombatKey != _lastRecapCombatKey && GameBuddyFactEmitter.ActiveCombatId is string combatId)
+        {
+            _lastRecapCombatKey = recapCombatKey;
+            var boss = string.Equals(snapshot.Run.CurrentNode, "Boss", StringComparison.OrdinalIgnoreCase);
+            var actualBoss = boss ? snapshot.Combat?.Enemies.FirstOrDefault() : null;
+            GameBuddyFactEmitter.Publish("combat.started", new
+            {
+                roomType = snapshot.Run.CurrentNode ?? snapshot.Run.Room,
+                enemies = snapshot.Combat?.Enemies.Select(enemy => new { enemy.Id, enemy.Name }).ToList(),
+                boss,
+                bossId = actualBoss?.Id,
+                bossName = actualBoss?.Name,
+                deckInstanceIds = snapshot.Player.Cards.Select(card => card.DeckCardInstanceId).Where(id => id is not null).ToArray(),
+                afterSnapshotId = GameBuddyRecapCapture.Capture("combat_start_observed")
+            }, combatId: combatId, attemptGeneration: GameBuddyFactEmitter.AttemptGeneration,
+                observationMethod: "snapshot");
+        }
+        if (!inCombat && _wasInCombat) PublishEvent("combat.ended", new { roomType = _lastCombatNodeType, victory = snapshot.Player.Hp > 0 });
         if (inCombat && snapshot.Combat?.Turn is int turn && turn != _lastTurn)
         {
             PublishEvent("turn.started", new { turn });
             _lastTurn = turn;
         }
-        if (mapVisible && !_wasMapVisible) PublishEvent("map.opened");
+        if (mapVisible && !_wasMapVisible)
+        {
+            PublishEvent("map.opened");
+            _activeRouteDecisionId = $"route:{Guid.NewGuid():N}";
+            GameBuddyFactEmitter.Publish("map.observed", new
+            {
+                snapshot.Map.Current,
+                snapshot.Map.Start,
+                snapshot.Map.Boss,
+                snapshot.Map.SecondBoss,
+                snapshot.Map.Nodes,
+                snapshot.Map.Routes,
+                snapshot.Map.RoutesTruncated
+            }, observationMethod: "snapshot");
+            GameBuddyFactEmitter.Publish("route.offered", new
+            {
+                beforeSnapshotId = GameBuddyRecapCapture.OfferDecision(_activeRouteDecisionId, "route"),
+                current = snapshot.Map.Current,
+                legalEntries = snapshot.Map.Routes
+                    .Where(route => route.Count > 0)
+                    .Select(route => route[0])
+                    .Distinct(StringComparer.Ordinal)
+                    .ToArray()
+            }, decisionId: _activeRouteDecisionId, observationMethod: "snapshot");
+        }
 
         var atRest = !inCombat
             && string.Equals(snapshot.Run.CurrentNode, "RestSite", StringComparison.OrdinalIgnoreCase)
@@ -148,6 +367,20 @@ public static class GameBuddyExporter
         {
             _restOpenSnapshot = snapshot;
             PublishEvent("rest.opened");
+            var restDecisionId = $"rest:{Guid.NewGuid():N}";
+            var beforeSnapshotId = GameBuddyRecapCapture.OfferDecision(restDecisionId, "rest");
+            GameBuddyFactEmitter.Publish("rest.options_offered", new
+            {
+                beforeSnapshotId,
+                hp = snapshot.Player.Hp,
+                maxHp = snapshot.Player.MaxHp,
+                canHeal = (bool?)null,
+                missingHp = Math.Max(0, snapshot.Player.MaxHp - snapshot.Player.Hp),
+                healAvailabilitySource = "unsupported",
+                smithCandidates = snapshot.Player.Cards
+                    .Select((card, index) => new { slot = index, card.Id, card.Name, card.Upgraded, card.DeckCardInstanceId, availability = "unknown" })
+                    .ToArray()
+            }, decisionId: restDecisionId, observationMethod: "snapshot");
         }
         if (!atRest && _wasAtRest)
         {
@@ -158,6 +391,18 @@ public static class GameBuddyExporter
         _wasInCombat = inCombat;
         _wasMapVisible = mapVisible;
         _wasAtRest = atRest;
+    }
+
+    public static void PublishRouteSelected(object? coordinate)
+    {
+        GameBuddyFactEmitter.Publish("route.selected", new
+        {
+            coordinate = coordinate?.ToString(),
+            beforeSnapshotId = GameBuddyRecapCapture.BeforeDecision(_activeRouteDecisionId),
+            afterSnapshotId = GameBuddyRecapCapture.Capture("route_selected_observed", decisionId: _activeRouteDecisionId)
+        }, decisionId: _activeRouteDecisionId, observationMethod: "direct_hook");
+        GameBuddyRecapCapture.FinishDecision(_activeRouteDecisionId);
+        _activeRouteDecisionId = null;
     }
 
     private static object InferRestClosed(GameBuddyState? before, GameBuddyState after)
@@ -195,8 +440,19 @@ public static class GameBuddyExporter
             : $"{snapshot.Event.EventId}|{snapshot.Event.PageId}|{snapshot.Event.Kind}|{snapshot.Event.Title}|{string.Join("|", choosable.Select(option => $"{option.Index}:{option.OptionId}:{option.Label}:{option.Description}"))}";
         if (choosable.Count > 0 && !string.Equals(signature, _lastEventSignature, StringComparison.Ordinal))
         {
+            if (!_eventChoiceOpen) _activeEventDecisionId = $"event:{Guid.NewGuid():N}";
             _lastEventSignature = signature;
             _eventChoiceOpen = true;
+            _activeEventId = snapshot.Event!.EventId;
+            _activeEventPageId = snapshot.Event.PageId;
+            GameBuddyFactEmitter.Publish("event.options_offered", new
+            {
+                beforeSnapshotId = GameBuddyRecapCapture.OfferDecision(_activeEventDecisionId!, "event"),
+                eventId = snapshot.Event!.EventId,
+                pageId = snapshot.Event.PageId,
+                candidateVersion = signature,
+                options = choosable
+            }, decisionId: _activeEventDecisionId, observationMethod: "snapshot");
             PublishEvent("event.opened", new
             {
                 title = snapshot.Event!.Title,
@@ -213,7 +469,10 @@ public static class GameBuddyExporter
         {
             _eventChoiceOpen = false;
             _lastEventSignature = string.Empty;
+            _activeEventDecisionId = null;
             PublishEvent("event.closed");
+            _activeEventId = null;
+            _activeEventPageId = null;
         }
     }
 
@@ -226,9 +485,22 @@ public static class GameBuddyExporter
         if (shop is not null && !string.Equals(signature, _lastShopSignature, StringComparison.Ordinal))
         {
             var eventName = _shopOpen ? "shop.updated" : "shop.opened";
+            if (!_shopOpen) _activeShopDecisionId = $"shop:{Guid.NewGuid():N}";
             _shopOpen = true;
             _lastShopSignature = signature;
-            PublishEvent(eventName, shop);
+            GameBuddyFactEmitter.Publish(eventName == "shop.opened" ? "shop.opened" : "shop.inventory_updated", new
+            {
+                beforeSnapshotId = GameBuddyRecapCapture.OfferDecision(_activeShopDecisionId!, "shop"),
+                inventoryVersion = signature,
+                shop.Gold,
+                shop.Items
+            }, decisionId: _activeShopDecisionId, observationMethod: "snapshot");
+            PublishEvent(eventName, new
+            {
+                gold = shop.Gold,
+                items = shop.Items,
+                visitId = _activeShopDecisionId
+            });
             return;
         }
 
@@ -236,7 +508,39 @@ public static class GameBuddyExporter
         {
             _shopOpen = false;
             _lastShopSignature = string.Empty;
+            GameBuddyFactEmitter.Publish("shop.closed", new { }, decisionId: _activeShopDecisionId,
+                observationMethod: "direct_hook");
+            GameBuddyRecapCapture.FinishDecision(_activeShopDecisionId);
+            _activeShopDecisionId = null;
             PublishEvent("shop.closed");
+        }
+    }
+
+    internal static string? CurrentShopDecisionId => _activeShopDecisionId;
+
+    public static void PublishEventOptionSelected(object option)
+    {
+        var actionId = $"event:{Guid.NewGuid():N}";
+        GameBuddyFactEmitter.Publish("event.option_selected", new
+        {
+            beforeSnapshotId = GameBuddyRecapCapture.BeforeDecision(_activeEventDecisionId),
+            optionId = ReadTextMember(option, "Id", "OptionId"),
+            label = FormatLoc(ReadMember(option, "Title", "Label", "Text"))
+        }, decisionId: _activeEventDecisionId, actionId: actionId, observationMethod: "direct_hook");
+        GameBuddyFactEmitter.Publish("event.option_resolved", new
+        {
+            status = "observed",
+            afterSnapshotId = GameBuddyRecapCapture.Capture("event_choice_observed", actionId, _activeEventDecisionId),
+            settlementStatus = "unknown",
+            outcome = (string?)null
+        }, decisionId: _activeEventDecisionId, actionId: actionId, observationMethod: "direct_hook",
+            unknownReasons: new Dictionary<string, string> { ["payload.outcome"] = "not_observed" });
+        var selectedEvent = GameBuddyClearFacts.EventSelected(
+            _activeEventId, _activeEventPageId, ReadTextMember(option, "Id", "OptionId"));
+        if (selectedEvent is not null)
+        {
+            GameBuddyFactEmitter.Publish("event.selected", selectedEvent,
+                decisionId: _activeEventDecisionId, actionId: actionId, observationMethod: "direct_hook");
         }
     }
 
@@ -360,36 +664,14 @@ public static class GameBuddyExporter
         return value.ToString()?.Trim() ?? string.Empty;
     }
 
-    /// <summary>
-    /// Card effect text, resolved the way the game's own card UI resolves it. A card's loc
-    /// template carries selectors such as {Damage:diff()} and {IfUpgraded:show:...} that only
-    /// resolve once the card's dynamic variables and preview args are bound to it; formatting
-    /// the bare template makes the game log a "Localization formatting error!" entry with a
-    /// full managed stack for every card in every snapshot, and hands the desktop an unresolved
-    /// template instead of the numbers the player sees. When the game's builder is unavailable,
-    /// the description is reported as unavailable rather than formatted bare.
-    /// </summary>
-    private static string? ReadCardDescription(CardModel? card)
-    {
-        if (card is null) return null;
-
-        try
-        {
-            var resolved = card.GetDescriptionForPile(card.Pile?.Type ?? PileType.None);
-            if (!string.IsNullOrWhiteSpace(resolved) && !HasUnresolvedSelector(resolved)) return resolved.Trim();
-        }
-        catch
-        {
-            // Description plumbing can move between early-access patches.
-        }
-
-        return ReadTextMember(card, "DynamicDescription", "CanonicalDescription", "CardDescription");
-    }
-
-    private static bool HasUnresolvedSelector(string text) => text.Contains('{') || text.Contains('}');
-
     public static void TrackCardRewardScreen(Node screen)
     {
+        if (!ReferenceEquals(_activeCardRewardScreen, screen))
+        {
+            RewardSelectionTracker.Reset();
+            _activeRewardDecisionId = $"reward:{Guid.NewGuid():N}";
+            _rewardFactOffered = false;
+        }
         _activeCardRewardScreen = screen;
         _lastCardRewardSignature = string.Empty;
     }
@@ -398,8 +680,8 @@ public static class GameBuddyExporter
     {
         if (ReferenceEquals(_activeCardRewardScreen, screen))
         {
+            RewardSelectionTracker.Close(_lastCardRewardSignature);
             _activeCardRewardScreen = null;
-            _lastCardRewardSignature = string.Empty;
             PublishEvent("card.reward.closed");
         }
     }
@@ -410,21 +692,11 @@ public static class GameBuddyExporter
         {
             lock (Gate)
             {
-                if (_server is null || player is null)
-                {
-                    return;
-                }
-
-                // Mirror the two early exits inside the game's own removal path so we never report a
-                // screen the player cannot see: a dead creature and an empty candidate list.
-                if (player.Creature is { IsDead: true })
+                if (_server is null || player is null || player.Creature is { IsDead: true })
                 {
                     _cardRemovalOpen = false;
                     return;
                 }
-
-                // Duplicates stay as separate entries: removing two Strikes is a real plan, and the
-                // game lists each deck instance on the screen.
                 var candidates = (player.Deck?.Cards ?? new List<CardModel>())
                     .Where(card => card is not null && !string.IsNullOrWhiteSpace(card.Id.Entry))
                     .Where(card => IsRemovalCandidate(card, filter))
@@ -434,16 +706,11 @@ public static class GameBuddyExporter
                     _cardRemovalOpen = false;
                     return;
                 }
-
                 var mapped = MapCards(candidates);
                 var signature = $"{prefs.MinSelect}:{prefs.MaxSelect}:{prefs.Cancelable}|"
                     + string.Join("|", mapped.Select(card => $"{card.Id}:{card.Upgraded}"));
                 _cardRemovalOpen = true;
-                if (string.Equals(signature, _lastCardRemovalSignature, StringComparison.Ordinal))
-                {
-                    return;
-                }
-
+                if (string.Equals(signature, _lastCardRemovalSignature, StringComparison.Ordinal)) return;
                 _lastCardRemovalSignature = signature;
                 var promptKey = ReadPromptKey(prefs);
                 PublishEvent("card.removal.opened", new
@@ -461,7 +728,6 @@ public static class GameBuddyExporter
         }
         catch (Exception ex)
         {
-            // Early Access moves selection plumbing often; a missing event is better than a crash.
             Log.Warn($"[GameBuddyBridge] card removal open skipped: {ex.Message}");
         }
     }
@@ -472,11 +738,7 @@ public static class GameBuddyExporter
         {
             lock (Gate)
             {
-                if (!_cardRemovalOpen || screen is not NDeckCardSelectScreen)
-                {
-                    return;
-                }
-
+                if (!_cardRemovalOpen || screen is not NDeckCardSelectScreen) return;
                 _cardRemovalOpen = false;
                 _lastCardRemovalSignature = string.Empty;
                 PublishEvent("card.removal.closed");
@@ -490,25 +752,10 @@ public static class GameBuddyExporter
 
     private static bool IsRemovalCandidate(CardModel card, Func<CardModel, bool>? filter)
     {
-        if (!card.IsRemovable)
-        {
-            return false;
-        }
-
-        if (filter is null)
-        {
-            return true;
-        }
-
-        try
-        {
-            return filter(card);
-        }
-        catch
-        {
-            // A caller filter that throws only costs us one candidate, never the game.
-            return false;
-        }
+        if (!card.IsRemovable) return false;
+        if (filter is null) return true;
+        try { return filter(card); }
+        catch { return false; }
     }
 
     private static (string? Table, string? Entry) ReadPromptKey(CardSelectorPrefs prefs)
@@ -516,17 +763,41 @@ public static class GameBuddyExporter
         try
         {
             var prompt = prefs.Prompt;
-            if (prompt is null)
-            {
-                return (null, null);
-            }
+            return prompt is null ? (null, null) : (prompt.LocTable, prompt.LocEntryKey);
+        }
+        catch { return (null, null); }
+    }
 
-            return (prompt.LocTable, prompt.LocEntryKey);
-        }
-        catch
+    public static void ResolveCardRewardSkipped()
+    {
+        if (_activeRewardDecisionId is null) return;
+        GameBuddyFactEmitter.Publish("reward.resolved", new
         {
-            return (null, null);
-        }
+            result = "skipped",
+            beforeSnapshotId = GameBuddyRecapCapture.BeforeDecision(_activeRewardDecisionId),
+            afterSnapshotId = GameBuddyRecapCapture.Capture("reward_skip_observed", decisionId: _activeRewardDecisionId),
+            candidateVersion = _lastCardRewardSignature
+        }, decisionId: _activeRewardDecisionId, observationMethod: "direct_hook");
+        GameBuddyRecapCapture.FinishDecision(_activeRewardDecisionId);
+        _activeRewardDecisionId = null;
+    }
+
+    public static void ResolveCardRewardTaken(object? reward)
+    {
+        if (_activeRewardDecisionId is null) return;
+        var card = ReadMember(reward, "Card", "CardModel", "Reward");
+        GameBuddyFactEmitter.Publish("reward.resolved", new
+        {
+            result = "selected",
+            beforeSnapshotId = GameBuddyRecapCapture.BeforeDecision(_activeRewardDecisionId),
+            afterSnapshotId = GameBuddyRecapCapture.Capture("reward_taken_observed", decisionId: _activeRewardDecisionId),
+            cardInstanceId = GameBuddyRecapCapture.InstanceId(card),
+            cardId = GameBuddyFactProjection.ModelId(card),
+            upgraded = ReadBoolMember(card, "IsUpgraded", "Upgraded"),
+            candidateVersion = _lastCardRewardSignature
+        }, decisionId: _activeRewardDecisionId, observationMethod: "direct_hook");
+        GameBuddyRecapCapture.FinishDecision(_activeRewardDecisionId);
+        _activeRewardDecisionId = null;
     }
 
     private static void PublishCardRewardIfReady(GameBuddyState snapshot)
@@ -538,32 +809,44 @@ public static class GameBuddyExporter
             return;
         }
 
-        var cards = new List<CardModel>();
-        CollectRewardCards(screen, cards, 0);
-        var unique = cards
-            .Where(card => card is not null && !string.IsNullOrWhiteSpace(card.Id.Entry))
-            .GroupBy(card => card.Id.Entry, StringComparer.OrdinalIgnoreCase)
-            .Select(group => group.OrderByDescending(card => card.IsUpgraded).First())
-            .Take(6)
-            .ToList();
-        if (unique.Count == 0)
-        {
-            return;
-        }
-
-        var mapped = MapCards(unique);
-        var signature = string.Join("|", mapped.Select(card => $"{card.Id}:{card.Upgraded}"));
+        var reward = snapshot.Reward;
+        if (reward is null) return;
+        var mapped = reward.Cards;
+        var signature = reward.Signature;
         if (string.Equals(signature, _lastCardRewardSignature, StringComparison.Ordinal))
         {
             return;
         }
 
         _lastCardRewardSignature = signature;
+        RewardSelectionTracker.Begin(
+            signature,
+            snapshot.Player.Cards.Select(card => new RewardSelectionCard(card.Id, card.Upgraded)),
+            mapped.Select(card => new RewardSelectionCard(card.Id, card.Upgraded)));
+        GameBuddyRewardOverlay.SetOffer((MegaCrit.Sts2.Core.Nodes.Screens.CardSelection.NCardRewardSelectionScreen)screen, signature, mapped.Select(card => $"{card.Id}:{(card.Upgraded ? "1" : "0")}"));
+        var factType = _rewardFactOffered ? "reward.updated" : "reward.offered";
+        _rewardFactOffered = true;
+        GameBuddyFactEmitter.Publish(factType, new
+        {
+            beforeSnapshotId = _activeRewardDecisionId is not null ? GameBuddyRecapCapture.OfferDecision(_activeRewardDecisionId, "reward") : null,
+            candidateVersion = signature,
+            candidates = mapped.Select((card, index) => new
+            {
+                slot = index,
+                cardId = card.Id,
+                card.Name,
+                card.Upgraded
+            }).ToArray(),
+            canSkip = true,
+            source = GameBuddyRewardSource.FromRoom(snapshot.Run.Room)
+        }, decisionId: _activeRewardDecisionId, observationMethod: "direct_hook");
         PublishEvent("card.reward.opened", new
         {
             cards = mapped,
+            signature,
             canSkip = true,
-            source = "combat",
+            source = GameBuddyRewardSource.FromRoom(snapshot.Run.Room),
+            opportunityId = _activeRewardDecisionId,
             context = new
             {
                 act = snapshot.Run.Act,
@@ -576,6 +859,34 @@ public static class GameBuddyExporter
                 nextBoss = snapshot.Run.NextBoss
             }
         });
+    }
+
+    private static void PublishSelectedCardIfReady(GameBuddyState snapshot)
+    {
+        var selected = RewardSelectionTracker.Observe(
+            snapshot.Player.Cards.Select(card => new RewardSelectionCard(card.Id, card.Upgraded)));
+        if (selected is null)
+        {
+            return;
+        }
+
+        PublishEvent("card.reward.selected", new
+        {
+            signature = selected.Signature,
+            cardId = selected.CardId,
+            upgraded = selected.Upgraded
+        });
+        GameBuddyFactEmitter.Publish("reward.resolved", new
+        {
+            result = "selected",
+            beforeSnapshotId = GameBuddyRecapCapture.BeforeDecision(_activeRewardDecisionId),
+            afterSnapshotId = GameBuddyRecapCapture.Capture("reward_deck_change_observed", decisionId: _activeRewardDecisionId),
+            cardId = selected.CardId,
+            upgraded = selected.Upgraded,
+            candidateVersion = selected.Signature
+        }, decisionId: _activeRewardDecisionId, observationMethod: "state_diff");
+        GameBuddyRecapCapture.FinishDecision(_activeRewardDecisionId);
+        _activeRewardDecisionId = null;
     }
 
     private static void CollectRewardCards(Node node, List<CardModel> cards, int depth)
@@ -599,8 +910,71 @@ public static class GameBuddyExporter
         }
     }
 
+    private static RewardSnapshot? BuildRewardSnapshot()
+    {
+        if (_activeCardRewardScreen is not { } screen || !GodotObject.IsInstanceValid(screen) || !screen.IsInsideTree()) return null;
+        var cards = new List<CardModel>();
+        CollectRewardCards(screen, cards, 0);
+        var mapped = MapCards(cards.Where(card => !string.IsNullOrWhiteSpace(card.Id.Entry)).Take(6));
+        if (mapped.Count == 0) return null;
+        var signature = string.Join("|", mapped.Select((card, index) => $"{index}:{card.Id}:{card.Upgraded}"));
+        return new(mapped, signature, true);
+    }
+
+    internal static int? CurrentEnergy()
+    {
+        var run = RunManager.Instance.DebugOnlyGetState();
+        var player = run is null ? null : LocalContext.GetMe(run) ?? run.Players.FirstOrDefault();
+        return player?.PlayerCombatState?.Energy;
+    }
+    internal static int? CurrentTurn()
+    {
+        var run = RunManager.Instance.DebugOnlyGetState();
+        var player = run is null ? null : LocalContext.GetMe(run) ?? run.Players.FirstOrDefault();
+        return player?.Creature.CombatState?.RoundNumber;
+    }
+
+    private static object? CaptureRecapState()
+    {
+        var run = RunManager.Instance.DebugOnlyGetState();
+        if (run is null) return null;
+        var player = LocalContext.GetMe(run) ?? run.Players.FirstOrDefault();
+        if (player is null) return null;
+        var state = BuildSnapshot(run, player);
+        object Card(CardSnapshot c) => new {
+            cardModelId = c.Id, c.Name, c.Upgraded, c.Cost,
+            combatCardInstanceId = c.CombatCardInstanceId,
+            originDeckCardInstanceId = c.DeckCardInstanceId,
+            playable = (bool?)null, availabilitySource = "unsupported"
+        };
+        return new {
+            inCombat = state.Combat is not null,
+            location = new { state.Run.Act, state.Run.TotalFloor, state.Run.CurrentCoord, state.Run.CurrentNode },
+            player = state.Player,
+            hand = state.Combat?.Hand.Select(Card).ToArray() ?? Array.Empty<object>(),
+            cardZones = new {
+                draw = new { count = state.Combat?.DrawPile.Count, members = (object?)null },
+                discard = state.Combat?.DiscardPile.Select(Card).ToArray() ?? Array.Empty<object>(),
+                exhaust = state.Combat?.ExhaustPile.Select(Card).ToArray() ?? Array.Empty<object>()
+            },
+            enemies = player.Creature.CombatState?.HittableEnemies.Select(e => new {
+                entityInstanceId = GameBuddyRecapCapture.InstanceId(e), modelId = e.Monster?.Id.Entry,
+                e.Name, hp = e.CurrentHp, e.MaxHp, e.Block, alive = e.IsAlive,
+                visibleIntent = MapEnemy(e).Intent
+            }).ToArray(),
+            choices = new { state.Event, state.Shop, state.Reward, state.Map },
+            visibility = new { hand = true, drawPileOrder = false, enemyIntent = true },
+            quality = new { observationMethod = "snapshot", unknownFields = new[] {
+                "cardAvailability", "settlementCompletion", "triggerAttribution", "drawPileOrder" } }
+        };
+    }
+
     private static GameBuddyState BuildSnapshot(RunState runState, Player player)
     {
+        GameBuddyRecapCapture.RegisterDeck(player.Deck.Cards.Cast<object>());
+        foreach (var participant in runState.Players) GameBuddyRecapCapture.RegisterEntity(participant.Creature, "Player");
+        if (player.Creature.CombatState is { } battle)
+            foreach (var enemy in battle.HittableEnemies) GameBuddyRecapCapture.RegisterEntity(enemy, "Enemy");
         var combat = player.PlayerCombatState;
         var combatState = CombatManager.Instance.IsInProgress && combat is not null
             ? new CombatSnapshot(
@@ -609,7 +983,8 @@ public static class GameBuddyExporter
                 MapCards(combat.DrawPile.Cards),
                 MapCards(combat.DiscardPile.Cards),
                 MapCards(combat.ExhaustPile.Cards),
-                player.Creature.CombatState?.HittableEnemies.Where(enemy => enemy.IsAlive).Select(MapEnemy).ToList() ?? new List<EnemySnapshot>())
+                player.Creature.CombatState?.HittableEnemies.Where(enemy => enemy.IsAlive).Select(MapEnemy).ToList() ?? new List<EnemySnapshot>(),
+                GameBuddyFactEmitter.ActiveCombatId, GameBuddyFactEmitter.AttemptGeneration, GameBuddyRecapCapture.Side)
             : null;
 
         var currentPoint = runState.CurrentMapPoint;
@@ -637,7 +1012,13 @@ public static class GameBuddyExporter
                 nextBossId,
                 nextBoss,
                 secondBossId,
-                secondBoss),
+                secondBoss,
+                _activeRunId,
+                _activeRunStartedAt,
+                ReadIntValue(ReadMember(runState, "AscensionLevel", "Ascension")),
+                _maxTurnDamage,
+                string.Equals(currentPoint?.PointType.ToString(), "Boss", StringComparison.OrdinalIgnoreCase) ? nextBossId : null,
+                string.Equals(currentPoint?.PointType.ToString(), "Boss", StringComparison.OrdinalIgnoreCase) ? nextBoss : null),
             new PlayerSnapshot(
                 player.Creature.CurrentHp,
                 player.Creature.MaxHp,
@@ -652,7 +1033,8 @@ public static class GameBuddyExporter
             combatState,
             mapSnapshot,
             BuildEventSnapshot(runState),
-            BuildShopSnapshot(runState, player));
+            BuildShopSnapshot(runState, player),
+            BuildRewardSnapshot());
     }
 
     private static ShopSnapshot? BuildShopSnapshot(RunState runState, Player player)
@@ -661,6 +1043,7 @@ public static class GameBuddyExporter
         {
             if (runState.CurrentRoom is not MerchantRoom room)
             {
+                GameBuddyRewardOverlay.ClearShop();
                 return null;
             }
 
@@ -672,26 +1055,35 @@ public static class GameBuddyExporter
 
             var items = new List<ShopItemSnapshot>();
             var index = 0;
+            var cardSlot = 0;
             foreach (var entry in inventory.CardEntries)
             {
+                var stockKey = GameBuddyShopStock.Key("card", cardSlot);
+                cardSlot++;
                 var card = entry.CreationResult?.Card;
                 if (card is null || !entry.IsStocked) continue;
                 items.Add(MapShopItem(index++, "card", card.Id.Entry, FormatLoc(card.Title), entry, ReadTextMember(card, "Rarity", "CardRarity"),
-                    ReadCardDescription(card), MapCard(card)));
+                    ReadTextMember(card, "DynamicDescription", "Description", "CanonicalDescription", "CardDescription"), MapCard(card), stockKey));
             }
+            var relicSlot = 0;
             foreach (var entry in inventory.RelicEntries)
             {
+                var stockKey = GameBuddyShopStock.Key("relic", relicSlot);
+                relicSlot++;
                 var relic = entry.Model;
                 if (relic is null || !entry.IsStocked) continue;
                 items.Add(MapShopItem(index++, "relic", relic.Id.Entry, FormatLoc(relic.Title), entry, ReadTextMember(relic, "Rarity", "RelicRarity"),
-                    ReadTextMember(relic, "DynamicDescription", "Description"), null));
+                    ReadTextMember(relic, "DynamicDescription", "Description"), null, stockKey));
             }
+            var potionSlot = 0;
             foreach (var entry in inventory.PotionEntries)
             {
+                var stockKey = GameBuddyShopStock.Key("potion", potionSlot);
+                potionSlot++;
                 var potion = entry.Model;
                 if (potion is null || !entry.IsStocked) continue;
                 items.Add(MapShopItem(index++, "potion", potion.Id.Entry, FormatLoc(potion.Title), entry, ReadTextMember(potion, "Rarity", "PotionRarity"),
-                    ReadTextMember(potion, "DynamicDescription", "Description"), null));
+                    ReadTextMember(potion, "DynamicDescription", "Description"), null, stockKey));
             }
 
             var removalEntry = ReadMember(inventory, "CardRemovalEntry", "RemovalEntry", "PurgeEntry")
@@ -712,7 +1104,10 @@ public static class GameBuddyExporter
                 }
             }
 
-            return new ShopSnapshot(player.Gold, items);
+            var fingerprint = $"{_activeRunId}|{player.Gold}|{string.Join("|", items.Select(item => $"{item.StockKey}:{item.Id}:{item.Price}:{item.Card?.Upgraded}"))}|{string.Join("|", player.Deck.Cards.Select(card => $"{card.Id.Entry}:{card.IsUpgraded}"))}|{string.Join("|", player.Relics.Select(relic => relic.Id.Entry))}";
+            var guidanceSignature = GameBuddyRewardOverlay.SetShop(fingerprint,
+                items.Where(item => item.ItemType == "card" && item.Stocked).Select(item => $"{item.Id}:{(item.Card?.Upgraded == true ? "1" : "0")}"));
+            return new ShopSnapshot(player.Gold, items, guidanceSignature);
         }
         catch (Exception ex)
         {
@@ -729,13 +1124,14 @@ public static class GameBuddyExporter
         object entry,
         string? rarity,
         string? description,
-        CardSnapshot? card)
+        CardSnapshot? card,
+        string? stockKey = null)
     {
         var price = ReadIntValue(ReadMember(entry, "Price", "Cost", "CurrentPrice", "CurrentCost", "FinalPrice", "FinalCost", "_price", "_cost"));
         var affordable = ReadBoolMember(entry, "EnoughGold", "IsAffordable") ?? false;
         var stocked = ReadBoolMember(entry, "IsStocked", "Stocked", "Available") ?? true;
         var onSale = ReadBoolMember(entry, "OnSale", "IsOnSale", "Discounted") ?? false;
-        return new ShopItemSnapshot(index, itemType, id, name, price, affordable, stocked, onSale, rarity, description, card);
+        return new ShopItemSnapshot(index, itemType, id, name, price, affordable, stocked, onSale, rarity, description, card, stockKey);
     }
 
     private static MapSnapshot BuildMapSnapshot(RunState runState)
@@ -1057,7 +1453,7 @@ public static class GameBuddyExporter
     {
         var energyCostX = card.EnergyCost.CostsX;
         int? energyCost = energyCostX ? null : card.EnergyCost.GetAmountToSpend();
-        var description = ReadCardDescription(card);
+        var description = ReadTextMember(card, "DynamicDescription", "Description", "CanonicalDescription", "CardDescription");
 
         var starCostObject = ReadMember(card, "StarCost", "StarsCost", "StarEnergyCost", "StarCostAmount", "RequiredStars", "StarsRequired");
         var starCostX = ReadBoolMember(card, "IsXStarCost", "CostsXStars", "CostsXStar", "StarsCostX")
@@ -1081,7 +1477,9 @@ public static class GameBuddyExporter
             "runtime",
             starCost,
             starCostX,
-            starMetadataAvailable ? "runtime" : "unavailable");
+            starMetadataAvailable ? "runtime" : "unavailable",
+            GameBuddyRecapCapture.InstanceId(card),
+            GameBuddyRecapCapture.OriginId(card));
     }
 
     private static List<CardSnapshot> MapCards(IEnumerable<CardModel> cards)
@@ -1092,25 +1490,71 @@ public static class GameBuddyExporter
     private static EnemySnapshot MapEnemy(Creature enemy)
     {
         var intent = "none";
-        if (enemy.IsMonster && enemy.Monster?.NextMove is not null)
+        var intentKinds = new List<string>();
+        string? nextMoveId = null;
+        string? nextMoveName = null;
+        if (enemy.IsMonster && enemy.Monster?.NextMove is { } nextMove)
         {
-            intent = string.Join(" | ", enemy.Monster.NextMove.Intents.Select(item => item.GetType().Name));
+            intent = string.Join(" | ", nextMove.Intents.Select(item => item.GetType().Name));
+            intentKinds = nextMove.Intents
+                .Select(item => NormalizeIntentKind(item.GetType().Name))
+                .Where(kind => kind is not null)
+                .Cast<string>()
+                .Distinct()
+                .ToList();
+            // NextMove metadata varies between early-access builds. Read it best-effort,
+            // and leave fields null rather than guessing a move from the intent.
+            nextMoveId = ReadTextMember(nextMove, "MoveId", "MoveID", "Id", "ActionId");
+            nextMoveName = ReadTextMember(nextMove, "MoveName", "DisplayName", "Title", "Name");
         }
 
-        return new EnemySnapshot(enemy.Monster?.Id.Entry, enemy.Name, enemy.CurrentHp, enemy.MaxHp, enemy.Block, intent, enemy.IsAlive);
+        return new EnemySnapshot(enemy.Monster?.Id.Entry, enemy.Name, enemy.CurrentHp, enemy.MaxHp, enemy.Block, intent, intentKinds, enemy.IsAlive, nextMoveId, nextMoveName, GameBuddyRecapCapture.InstanceId(enemy));
+    }
+
+    private static string? NormalizeIntentKind(string typeName)
+    {
+        var value = typeName.ToLowerInvariant();
+        if (value.Contains("heal")) return "heal";
+        if (value.Contains("attack") || value.Contains("deathblow")) return "attack";
+        if (value.Contains("carddebuff") || value.Contains("debuff")) return "debuff";
+        if (value.Contains("status")) return "status";
+        if (value.Contains("buff")) return "buff";
+        if (value.Contains("defend") || value.Contains("block")) return "defend";
+        if (value.Contains("summon")) return "summon";
+        return null;
     }
 }
 
 public sealed record BridgeMessage<T>(string Type, T Data);
 public sealed record BridgeEvent(string Type, string Name, long Timestamp, object? Data);
 
-public sealed record GameBuddyState(string Schema, long Timestamp, string Source, RunSnapshot Run, PlayerSnapshot Player, CombatSnapshot? Combat, MapSnapshot Map, EventSnapshot? Event, ShopSnapshot? Shop);
+public sealed record GameBuddyState(string Schema, long Timestamp, string Source, RunSnapshot Run, PlayerSnapshot Player, CombatSnapshot? Combat, MapSnapshot Map, EventSnapshot? Event, ShopSnapshot? Shop, RewardSnapshot? Reward = null);
+public sealed record RewardSnapshot(List<CardSnapshot> Cards, string Signature, bool CanSkip);
 public sealed record EventSnapshot(string Title, string Description, string Kind, List<EventOptionSnapshot> Options, string? EventId, string? PageId);
 public sealed record EventOptionSnapshot(int Index, string Label, string Description, bool Locked, string? OptionId);
-public sealed record RunSnapshot(int Act, int Floor, string? Room, string Character, int TotalFloor, string? CurrentNode, string? CurrentCoord, string ActId, string ActName, string? NextBossId, string? NextBoss, string? SecondBossId, string? SecondBoss);
+public sealed record RunSnapshot(
+    int Act,
+    int Floor,
+    string? Room,
+    string Character,
+    int TotalFloor,
+    string? CurrentNode,
+    string? CurrentCoord,
+    string ActId,
+    string ActName,
+    string? NextBossId,
+    string? NextBoss,
+    string? SecondBossId,
+    string? SecondBoss,
+    string? RunId,
+    long StartedAt,
+    int? Ascension,
+    int MaxTurnDamage,
+    string? FinalBossId,
+    string? FinalBossName);
 public sealed record PlayerSnapshot(int Hp, int MaxHp, int Block, int Gold, int Energy, int MaxEnergy, List<CardSnapshot> Cards, List<OwnedItemSnapshot> Relics, List<OwnedItemSnapshot> Potions, int? MaxPotionSlots);
-public sealed record CombatSnapshot(int Turn, List<CardSnapshot> Hand, List<CardSnapshot> DrawPile, List<CardSnapshot> DiscardPile, List<CardSnapshot> ExhaustPile, List<EnemySnapshot> Enemies);
-public sealed record EnemySnapshot(string? Id, string Name, int Hp, int MaxHp, int Block, string? Intent, bool Alive);
+public sealed record CombatSnapshot(int Turn, List<CardSnapshot> Hand, List<CardSnapshot> DrawPile, List<CardSnapshot> DiscardPile, List<CardSnapshot> ExhaustPile, List<EnemySnapshot> Enemies, string? CombatId = null, int? AttemptGeneration = null, string? Side = null);
+public sealed record EnemySnapshot(string? Id, string Name, int Hp, int MaxHp, int Block, string? Intent, List<string> IntentKinds, bool Alive, string? NextMoveId, string? NextMoveName, string? EntityInstanceId = null);
 public sealed record CardSnapshot(
     string Id,
     string Name,
@@ -1124,10 +1568,12 @@ public sealed record CardSnapshot(
     string EnergyCostSource,
     int? StarCost,
     bool StarCostX,
-    string StarCostSource);
+    string StarCostSource,
+    string? CombatCardInstanceId = null,
+    string? DeckCardInstanceId = null);
 public sealed record OwnedItemSnapshot(string Id, string Name);
-public sealed record ShopSnapshot(int Gold, List<ShopItemSnapshot> Items);
-public sealed record ShopItemSnapshot(int Index, string ItemType, string Id, string Name, int? Price, bool Affordable, bool Stocked, bool OnSale, string? Rarity, string? Description, CardSnapshot? Card);
+public sealed record ShopSnapshot(int Gold, List<ShopItemSnapshot> Items, string? GuidanceSignature = null);
+public sealed record ShopItemSnapshot(int Index, string ItemType, string Id, string Name, int? Price, bool Affordable, bool Stocked, bool OnSale, string? Rarity, string? Description, CardSnapshot? Card, string? StockKey = null);
 public sealed record MapSnapshot(
     List<string> Visited,
     string? Current,
@@ -1173,6 +1619,11 @@ internal sealed class GameBuddyWebSocketServer
         BroadcastFrame(WebSocketFrames.Text(json));
     }
 
+    public void BroadcastFact(string json)
+    {
+        BroadcastFrame(WebSocketFrames.Text(json));
+    }
+
     private void BroadcastFrame(byte[] frame)
     {
         TcpClient[] clients;
@@ -1212,14 +1663,24 @@ internal sealed class GameBuddyWebSocketServer
                 _sendLocks[client] = new SemaphoreSlim(1, 1);
             }
             if (_lastStateFrame is not null) await SendAsync(client, _lastStateFrame, cancellationToken);
+            foreach (var pending in GameBuddyFactEmitter.PendingJson())
+                await SendAsync(client, WebSocketFrames.Text(pending), cancellationToken);
 
             while (!cancellationToken.IsCancellationRequested && client.Connected)
             {
                 var message = await WebSocketFrames.ReadTextAsync(stream, cancellationToken);
                 if (message is null) break;
-                if (message.Contains("request_snapshot", StringComparison.Ordinal))
+                if (TryReadFactAck(message, out var sourceSessionId, out var ackSourceSeq))
+                {
+                    GameBuddyFactEmitter.Acknowledge(sourceSessionId, ackSourceSeq);
+                }
+                else if (message.Contains("request_snapshot", StringComparison.Ordinal))
                 {
                     if (_lastStateFrame is not null) await SendAsync(client, _lastStateFrame, cancellationToken);
+                }
+                else
+                {
+                    GameBuddyRewardOverlay.QueueImpactMessage(message);
                 }
             }
         }
@@ -1237,6 +1698,30 @@ internal sealed class GameBuddyWebSocketServer
             }
             sendLock?.Dispose();
             client.Dispose();
+        }
+    }
+
+    private static bool TryReadFactAck(string json, out string sourceSessionId, out long ackSourceSeq)
+    {
+        sourceSessionId = string.Empty;
+        ackSourceSeq = 0;
+        try
+        {
+            using var document = JsonDocument.Parse(json);
+            var root = document.RootElement;
+            if (!root.TryGetProperty("type", out var type) || type.GetString() != "fact_ack"
+                || !root.TryGetProperty("sourceSessionId", out var session)
+                || !root.TryGetProperty("ackSourceSeq", out var sequence)
+                || string.IsNullOrWhiteSpace(session.GetString())
+                || !sequence.TryGetInt64(out ackSourceSeq)
+                || ackSourceSeq < 0)
+                return false;
+            sourceSessionId = session.GetString()!;
+            return true;
+        }
+        catch
+        {
+            return false;
         }
     }
 

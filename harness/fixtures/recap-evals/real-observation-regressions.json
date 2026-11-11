@@ -1,0 +1,4580 @@
+{
+  "schema": "gamebuddy.real-observation-regression.v1",
+  "synthetic": false,
+  "source": "Four real completed-loss development runs, projected windows from 2026-10-18; not generated matches",
+  "cases": [
+    {
+      "runId": "0da9bfa177a841a7bbf1091c61af0334",
+      "facts": [
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "df89d6aa28704e0c9a4d7bf4e03629be:319",
+          "eventType": "run.observed",
+          "runId": "0da9bfa177a841a7bbf1091c61af0334",
+          "sourceSessionId": "df89d6aa28704e0c9a4d7bf4e03629be",
+          "sourceSeq": 319,
+          "occurredAt": 1792338065476,
+          "sourceElapsedMs": 307121,
+          "payload": {
+            "character": "REGENT",
+            "act": 1,
+            "floor": 7,
+            "totalFloor": 7,
+            "hp": 63,
+            "maxHp": 75,
+            "gold": 107,
+            "potions": [
+              {
+                "id": "SPEED_POTION",
+                "name": "速度药水"
+              },
+              {
+                "id": "FIRE_POTION",
+                "name": "火焰药水"
+              }
+            ]
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792338065477,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "df89d6aa28704e0c9a4d7bf4e03629be:466",
+          "eventType": "run.observed",
+          "runId": "0da9bfa177a841a7bbf1091c61af0334",
+          "sourceSessionId": "df89d6aa28704e0c9a4d7bf4e03629be",
+          "sourceSeq": 466,
+          "occurredAt": 1792338100948,
+          "sourceElapsedMs": 342593,
+          "payload": {
+            "character": "REGENT",
+            "act": 1,
+            "floor": 7,
+            "totalFloor": 7,
+            "hp": 8,
+            "maxHp": 75,
+            "gold": 107,
+            "potions": [
+              {
+                "id": "SPEED_POTION",
+                "name": "速度药水"
+              },
+              {
+                "id": "FIRE_POTION",
+                "name": "火焰药水"
+              }
+            ]
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792338100949,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "df89d6aa28704e0c9a4d7bf4e03629be:467",
+          "eventType": "run.ended",
+          "runId": "0da9bfa177a841a7bbf1091c61af0334",
+          "sourceSessionId": "df89d6aa28704e0c9a4d7bf4e03629be",
+          "sourceSeq": 467,
+          "occurredAt": 1792338100949,
+          "sourceElapsedMs": 342594,
+          "payload": {
+            "cleared": false,
+            "reason": "game_ended_not_cleared"
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792338100982,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "df89d6aa28704e0c9a4d7bf4e03629be:322",
+          "eventType": "combat.started",
+          "runId": "0da9bfa177a841a7bbf1091c61af0334",
+          "sourceSessionId": "df89d6aa28704e0c9a4d7bf4e03629be",
+          "sourceSeq": 322,
+          "occurredAt": 1792338065548,
+          "sourceElapsedMs": 307193,
+          "combatId": "e93e213780f7a9e886a8b30a",
+          "attemptGeneration": 0,
+          "payload": {
+            "roomKey": "MegaCrit.Sts2.Core.Rooms.CombatRoom:0",
+            "hook": "BeforeCombatStart"
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792338065582,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "df89d6aa28704e0c9a4d7bf4e03629be:323",
+          "eventType": "combat.started",
+          "runId": "0da9bfa177a841a7bbf1091c61af0334",
+          "sourceSessionId": "df89d6aa28704e0c9a4d7bf4e03629be",
+          "sourceSeq": 323,
+          "occurredAt": 1792338065696,
+          "sourceElapsedMs": 307341,
+          "combatId": "e93e213780f7a9e886a8b30a",
+          "attemptGeneration": 0,
+          "payload": {
+            "roomType": "Monster",
+            "enemies": [
+              {
+                "id": "CUBEX_CONSTRUCT",
+                "name": "立柱构造体"
+              }
+            ],
+            "boss": false
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792338065706,
+          "replay": false
+        }
+      ],
+      "coverage": {
+        "schema": "gamebuddy.fact-coverage.v1",
+        "families": {
+          "lifecycle": {
+            "state": "available",
+            "firstSourceSeq": 1,
+            "lastSourceSeq": 467,
+            "observationMethods": [
+              "direct_hook",
+              "snapshot"
+            ],
+            "eventCount": 28,
+            "reason": null,
+            "reportedAt": 1792337812553
+          },
+          "capture": {
+            "state": "available",
+            "firstSourceSeq": 2,
+            "lastSourceSeq": 2,
+            "observationMethods": [
+              "direct_hook"
+            ],
+            "eventCount": 1
+          },
+          "combat_boundary": {
+            "state": "available",
+            "reason": null,
+            "reportedAt": 1792337812553,
+            "firstSourceSeq": 18,
+            "lastSourceSeq": 465,
+            "eventCount": 49,
+            "observationMethods": [
+              "direct_hook",
+              "snapshot"
+            ]
+          },
+          "decisions": {
+            "state": "partial",
+            "reason": "choice offers are captured; some result details may be unknown",
+            "reportedAt": 1792337812553,
+            "firstSourceSeq": 4,
+            "lastSourceSeq": 320,
+            "eventCount": 68,
+            "observationMethods": [
+              "direct_hook",
+              "snapshot",
+              "state_diff"
+            ]
+          },
+          "build": {
+            "state": "partial",
+            "reason": "deck, relic, and potion hooks installed; source attribution may be partial",
+            "reportedAt": 1792337812553,
+            "firstSourceSeq": 7,
+            "lastSourceSeq": 315,
+            "eventCount": 37,
+            "observationMethods": [
+              "direct_hook"
+            ]
+          },
+          "card_play": {
+            "state": "available",
+            "reason": null,
+            "reportedAt": 1792337812553,
+            "firstSourceSeq": 33,
+            "lastSourceSeq": 273,
+            "eventCount": 19,
+            "observationMethods": [
+              "direct_hook"
+            ]
+          },
+          "card_movement": {
+            "state": "available",
+            "reason": null,
+            "reportedAt": 1792337812553,
+            "firstSourceSeq": 20,
+            "lastSourceSeq": 463,
+            "eventCount": 224,
+            "observationMethods": [
+              "direct_hook"
+            ]
+          },
+          "combat_resolution": {
+            "state": "available",
+            "reason": null,
+            "reportedAt": 1792337812553,
+            "firstSourceSeq": 32,
+            "lastSourceSeq": 444,
+            "eventCount": 23,
+            "observationMethods": [
+              "direct_hook"
+            ]
+          },
+          "resources": {
+            "state": "partial",
+            "reason": "health, gold, and generic resource hooks are unavailable",
+            "reportedAt": 1792337812553,
+            "firstSourceSeq": 64,
+            "lastSourceSeq": 446,
+            "eventCount": 18,
+            "observationMethods": [
+              "direct_hook"
+            ]
+          }
+        },
+        "gaps": [],
+        "rejected": [],
+        "health": [
+          {
+            "at": 1792339714414,
+            "type": "kept_unfinished_combat",
+            "combatId": "e93e213780f7a9e886a8b30a"
+          }
+        ]
+      },
+      "synthetic": false,
+      "projection": "Selected real event windows; run.observed deck/relics omitted, not a full run",
+      "sourceInputHash": "9dbbc87e24e1017ff1aeded675d1414cad30b80c8d205510f5268f1a5b30ddab"
+    },
+    {
+      "runId": "309ec1038c6a49749de3274851d738a1",
+      "facts": [
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:359",
+          "eventType": "run.observed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 359,
+          "occurredAt": 1792309590357,
+          "sourceElapsedMs": 352358,
+          "payload": {
+            "character": "IRONCLAD",
+            "act": 1,
+            "floor": 7,
+            "hp": 61,
+            "maxHp": 80,
+            "gold": 96,
+            "potions": []
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792309590358,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:360",
+          "eventType": "rest.options_offered",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 360,
+          "occurredAt": 1792309590359,
+          "sourceElapsedMs": 352359,
+          "decisionId": "rest:adb15305054d46b68f8853cff756e2bd",
+          "payload": {
+            "canHeal": true,
+            "smithCandidates": [
+              {
+                "slot": 0,
+                "id": "STRIKE_IRONCLAD",
+                "name": "打击",
+                "upgraded": false
+              },
+              {
+                "slot": 1,
+                "id": "STRIKE_IRONCLAD",
+                "name": "打击+",
+                "upgraded": true
+              },
+              {
+                "slot": 2,
+                "id": "STRIKE_IRONCLAD",
+                "name": "打击",
+                "upgraded": false
+              },
+              {
+                "slot": 3,
+                "id": "STRIKE_IRONCLAD",
+                "name": "打击+",
+                "upgraded": true
+              },
+              {
+                "slot": 4,
+                "id": "STRIKE_IRONCLAD",
+                "name": "打击",
+                "upgraded": false
+              },
+              {
+                "slot": 5,
+                "id": "DEFEND_IRONCLAD",
+                "name": "防御",
+                "upgraded": false
+              },
+              {
+                "slot": 6,
+                "id": "DEFEND_IRONCLAD",
+                "name": "防御",
+                "upgraded": false
+              },
+              {
+                "slot": 7,
+                "id": "DEFEND_IRONCLAD",
+                "name": "防御",
+                "upgraded": false
+              },
+              {
+                "slot": 8,
+                "id": "DEFEND_IRONCLAD",
+                "name": "防御",
+                "upgraded": false
+              },
+              {
+                "slot": 9,
+                "id": "BASH",
+                "name": "痛击",
+                "upgraded": false
+              },
+              {
+                "slot": 10,
+                "id": "HEADBUTT",
+                "name": "头槌",
+                "upgraded": false
+              },
+              {
+                "slot": 11,
+                "id": "PERFECTED_STRIKE",
+                "name": "完美打击",
+                "upgraded": false
+              },
+              {
+                "slot": 12,
+                "id": "ASHEN_STRIKE",
+                "name": "灰烬打击",
+                "upgraded": false
+              },
+              {
+                "slot": 13,
+                "id": "SETUP_STRIKE",
+                "name": "预备打击",
+                "upgraded": false
+              }
+            ]
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792309590387,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:363",
+          "eventType": "rest.action_completed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 363,
+          "occurredAt": 1792309593282,
+          "sourceElapsedMs": 355283,
+          "actionId": "rest:fe6b1474ddac4017a19982523d062f05",
+          "payload": {
+            "action": "heal",
+            "amount": 0
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792309593330,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:364",
+          "eventType": "run.observed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 364,
+          "occurredAt": 1792309593456,
+          "sourceElapsedMs": 355456,
+          "payload": {
+            "character": "IRONCLAD",
+            "act": 1,
+            "floor": 7,
+            "hp": 85,
+            "maxHp": 85,
+            "gold": 96,
+            "potions": []
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792309593457,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:770",
+          "eventType": "run.observed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 770,
+          "occurredAt": 1792309844040,
+          "sourceElapsedMs": 606039,
+          "payload": {
+            "character": "IRONCLAD",
+            "act": 1,
+            "floor": 12,
+            "hp": 41,
+            "maxHp": 99,
+            "gold": 167,
+            "potions": [
+              {
+                "id": "EXPLOSIVE_AMPOULE",
+                "name": "爆炸安瓿"
+              },
+              {
+                "id": "ENERGY_POTION",
+                "name": "能量药水"
+              }
+            ]
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792309844041,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:771",
+          "eventType": "rest.options_offered",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 771,
+          "occurredAt": 1792309844041,
+          "sourceElapsedMs": 606040,
+          "decisionId": "rest:4a8d5dbb6a8b4a13b74babba62503c4b",
+          "payload": {
+            "canHeal": true,
+            "smithCandidates": [
+              {
+                "slot": 0,
+                "id": "STRIKE_IRONCLAD",
+                "name": "打击",
+                "upgraded": false
+              },
+              {
+                "slot": 1,
+                "id": "STRIKE_IRONCLAD",
+                "name": "打击+",
+                "upgraded": true
+              },
+              {
+                "slot": 2,
+                "id": "STRIKE_IRONCLAD",
+                "name": "打击",
+                "upgraded": false
+              },
+              {
+                "slot": 3,
+                "id": "STRIKE_IRONCLAD",
+                "name": "打击+",
+                "upgraded": true
+              },
+              {
+                "slot": 4,
+                "id": "STRIKE_IRONCLAD",
+                "name": "打击",
+                "upgraded": false
+              },
+              {
+                "slot": 5,
+                "id": "DEFEND_IRONCLAD",
+                "name": "防御",
+                "upgraded": false
+              },
+              {
+                "slot": 6,
+                "id": "DEFEND_IRONCLAD",
+                "name": "防御",
+                "upgraded": false
+              },
+              {
+                "slot": 7,
+                "id": "DEFEND_IRONCLAD",
+                "name": "防御",
+                "upgraded": false
+              },
+              {
+                "slot": 8,
+                "id": "DEFEND_IRONCLAD",
+                "name": "防御",
+                "upgraded": false
+              },
+              {
+                "slot": 9,
+                "id": "BASH",
+                "name": "痛击",
+                "upgraded": false
+              },
+              {
+                "slot": 10,
+                "id": "HEADBUTT",
+                "name": "头槌",
+                "upgraded": false
+              },
+              {
+                "slot": 11,
+                "id": "PERFECTED_STRIKE",
+                "name": "完美打击",
+                "upgraded": false
+              },
+              {
+                "slot": 12,
+                "id": "ASHEN_STRIKE",
+                "name": "灰烬打击",
+                "upgraded": false
+              },
+              {
+                "slot": 13,
+                "id": "SETUP_STRIKE",
+                "name": "预备打击",
+                "upgraded": false
+              },
+              {
+                "slot": 14,
+                "id": "TWIN_STRIKE",
+                "name": "双重打击",
+                "upgraded": false
+              },
+              {
+                "slot": 15,
+                "id": "ASHEN_STRIKE",
+                "name": "灰烬打击",
+                "upgraded": false
+              }
+            ]
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792309844070,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:774",
+          "eventType": "rest.action_completed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 774,
+          "occurredAt": 1792309845219,
+          "sourceElapsedMs": 607218,
+          "actionId": "rest:72d46005f55c4baba87044b86ae5e1ee",
+          "payload": {
+            "action": "heal",
+            "amount": 0
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792309845276,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:775",
+          "eventType": "run.observed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 775,
+          "occurredAt": 1792309845291,
+          "sourceElapsedMs": 607290,
+          "payload": {
+            "character": "IRONCLAD",
+            "act": 1,
+            "floor": 12,
+            "hp": 75,
+            "maxHp": 104,
+            "gold": 167,
+            "potions": [
+              {
+                "id": "EXPLOSIVE_AMPOULE",
+                "name": "爆炸安瓿"
+              },
+              {
+                "id": "ENERGY_POTION",
+                "name": "能量药水"
+              }
+            ]
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792309845302,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:1167",
+          "eventType": "run.observed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 1167,
+          "occurredAt": 1792310112927,
+          "sourceElapsedMs": 874916,
+          "payload": {
+            "character": "IRONCLAD",
+            "act": 1,
+            "floor": 16,
+            "hp": 53,
+            "maxHp": 104,
+            "gold": 235,
+            "potions": [
+              {
+                "id": "ENERGY_POTION",
+                "name": "能量药水"
+              },
+              {
+                "id": "STABLE_SERUM",
+                "name": "稳定血清"
+              }
+            ]
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792310112928,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:1168",
+          "eventType": "rest.options_offered",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 1168,
+          "occurredAt": 1792310112928,
+          "sourceElapsedMs": 874917,
+          "decisionId": "rest:c61179404c144e21aaf2f970ca0bc214",
+          "payload": {
+            "canHeal": true,
+            "smithCandidates": [
+              {
+                "slot": 0,
+                "id": "STRIKE_IRONCLAD",
+                "name": "打击",
+                "upgraded": false
+              },
+              {
+                "slot": 1,
+                "id": "STRIKE_IRONCLAD",
+                "name": "打击+",
+                "upgraded": true
+              },
+              {
+                "slot": 2,
+                "id": "STRIKE_IRONCLAD",
+                "name": "打击",
+                "upgraded": false
+              },
+              {
+                "slot": 3,
+                "id": "STRIKE_IRONCLAD",
+                "name": "打击+",
+                "upgraded": true
+              },
+              {
+                "slot": 4,
+                "id": "STRIKE_IRONCLAD",
+                "name": "打击",
+                "upgraded": false
+              },
+              {
+                "slot": 5,
+                "id": "DEFEND_IRONCLAD",
+                "name": "防御",
+                "upgraded": false
+              },
+              {
+                "slot": 6,
+                "id": "DEFEND_IRONCLAD",
+                "name": "防御",
+                "upgraded": false
+              },
+              {
+                "slot": 7,
+                "id": "DEFEND_IRONCLAD",
+                "name": "防御",
+                "upgraded": false
+              },
+              {
+                "slot": 8,
+                "id": "DEFEND_IRONCLAD",
+                "name": "防御",
+                "upgraded": false
+              },
+              {
+                "slot": 9,
+                "id": "BASH",
+                "name": "痛击",
+                "upgraded": false
+              },
+              {
+                "slot": 10,
+                "id": "HEADBUTT",
+                "name": "头槌",
+                "upgraded": false
+              },
+              {
+                "slot": 11,
+                "id": "PERFECTED_STRIKE",
+                "name": "完美打击",
+                "upgraded": false
+              },
+              {
+                "slot": 12,
+                "id": "ASHEN_STRIKE",
+                "name": "灰烬打击",
+                "upgraded": false
+              },
+              {
+                "slot": 13,
+                "id": "SETUP_STRIKE",
+                "name": "预备打击",
+                "upgraded": false
+              },
+              {
+                "slot": 14,
+                "id": "TWIN_STRIKE",
+                "name": "双重打击",
+                "upgraded": false
+              },
+              {
+                "slot": 15,
+                "id": "ASHEN_STRIKE",
+                "name": "灰烬打击",
+                "upgraded": false
+              },
+              {
+                "slot": 16,
+                "id": "TWIN_STRIKE",
+                "name": "双重打击",
+                "upgraded": false
+              },
+              {
+                "slot": 17,
+                "id": "POMMEL_STRIKE",
+                "name": "剑柄打击",
+                "upgraded": false
+              }
+            ]
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792310112959,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:1169",
+          "eventType": "deck.card_upgraded",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 1169,
+          "occurredAt": 1792310114357,
+          "sourceElapsedMs": 876347,
+          "actionId": "deck:f6d2a7c1e3194548940f373d47e5ee55",
+          "payload": {
+            "cardInstanceId": "CARD.STRIKE_IRONCLAD",
+            "cardId": "STRIKE_IRONCLAD",
+            "upgraded": true
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792310114358,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:1170",
+          "eventType": "deck.card_upgraded",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 1170,
+          "occurredAt": 1792310114359,
+          "sourceElapsedMs": 876348,
+          "actionId": "deck:6497a2a578254414a1262a754ea6562c",
+          "payload": {
+            "cardInstanceId": "CARD.STRIKE_IRONCLAD",
+            "cardId": "STRIKE_IRONCLAD",
+            "upgraded": true
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792310114395,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:1171",
+          "eventType": "deck.card_upgraded",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 1171,
+          "occurredAt": 1792310114359,
+          "sourceElapsedMs": 876349,
+          "actionId": "deck:399d67b0e2ee4b0989e63e3d2d997d5b",
+          "payload": {
+            "cardInstanceId": "CARD.STRIKE_IRONCLAD",
+            "cardId": "STRIKE_IRONCLAD",
+            "upgraded": true
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792310114425,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:1172",
+          "eventType": "deck.card_upgraded",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 1172,
+          "occurredAt": 1792310114361,
+          "sourceElapsedMs": 876350,
+          "actionId": "deck:6f62cd129a264360b9ab2851f73beb01",
+          "payload": {
+            "cardInstanceId": "CARD.DEFEND_IRONCLAD",
+            "cardId": "DEFEND_IRONCLAD",
+            "upgraded": true
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792310114456,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:1173",
+          "eventType": "deck.card_upgraded",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 1173,
+          "occurredAt": 1792310114363,
+          "sourceElapsedMs": 876352,
+          "actionId": "deck:46987f4f8ea4414aaa7a9b173a095e21",
+          "payload": {
+            "cardInstanceId": "CARD.DEFEND_IRONCLAD",
+            "cardId": "DEFEND_IRONCLAD",
+            "upgraded": true
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792310114484,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:1174",
+          "eventType": "deck.card_upgraded",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 1174,
+          "occurredAt": 1792310114365,
+          "sourceElapsedMs": 876354,
+          "actionId": "deck:5d58129e8b2c4105bfc7c6d30117a8b0",
+          "payload": {
+            "cardInstanceId": "CARD.DEFEND_IRONCLAD",
+            "cardId": "DEFEND_IRONCLAD",
+            "upgraded": true
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792310114512,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:1175",
+          "eventType": "deck.card_upgraded",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 1175,
+          "occurredAt": 1792310114366,
+          "sourceElapsedMs": 876356,
+          "actionId": "deck:6b34b0230a644e18a2486c6c9cc58d72",
+          "payload": {
+            "cardInstanceId": "CARD.DEFEND_IRONCLAD",
+            "cardId": "DEFEND_IRONCLAD",
+            "upgraded": true
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792310114539,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:1176",
+          "eventType": "deck.card_upgraded",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 1176,
+          "occurredAt": 1792310114368,
+          "sourceElapsedMs": 876358,
+          "actionId": "deck:49dabed9c7814702babf4972fa6bfc4e",
+          "payload": {
+            "cardInstanceId": "CARD.BASH",
+            "cardId": "BASH",
+            "upgraded": true
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792310114568,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:1177",
+          "eventType": "deck.card_upgraded",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 1177,
+          "occurredAt": 1792310114370,
+          "sourceElapsedMs": 876360,
+          "actionId": "deck:1032c028c81445158fb37cef099b74a0",
+          "payload": {
+            "cardInstanceId": "CARD.HEADBUTT",
+            "cardId": "HEADBUTT",
+            "upgraded": true
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792310114595,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:1178",
+          "eventType": "deck.card_upgraded",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 1178,
+          "occurredAt": 1792310114375,
+          "sourceElapsedMs": 876364,
+          "actionId": "deck:4e4a45759918491f92d1ec61308f9f2f",
+          "payload": {
+            "cardInstanceId": "CARD.PERFECTED_STRIKE",
+            "cardId": "PERFECTED_STRIKE",
+            "upgraded": true
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792310114624,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:1179",
+          "eventType": "deck.card_upgraded",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 1179,
+          "occurredAt": 1792310114377,
+          "sourceElapsedMs": 876366,
+          "actionId": "deck:26740dd1b27a4b838447320912faf055",
+          "payload": {
+            "cardInstanceId": "CARD.ASHEN_STRIKE",
+            "cardId": "ASHEN_STRIKE",
+            "upgraded": true
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792310114651,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:1180",
+          "eventType": "deck.card_upgraded",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 1180,
+          "occurredAt": 1792310114379,
+          "sourceElapsedMs": 876368,
+          "actionId": "deck:8c81a68c609841208292c25ce8ae21cd",
+          "payload": {
+            "cardInstanceId": "CARD.SETUP_STRIKE",
+            "cardId": "SETUP_STRIKE",
+            "upgraded": true
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792310114679,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:1181",
+          "eventType": "deck.card_upgraded",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 1181,
+          "occurredAt": 1792310114380,
+          "sourceElapsedMs": 876369,
+          "actionId": "deck:ebc28b69bddb4bada4cec72b02415b6c",
+          "payload": {
+            "cardInstanceId": "CARD.TWIN_STRIKE",
+            "cardId": "TWIN_STRIKE",
+            "upgraded": true
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792310114706,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:1182",
+          "eventType": "deck.card_upgraded",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 1182,
+          "occurredAt": 1792310114382,
+          "sourceElapsedMs": 876371,
+          "actionId": "deck:50242b7ceb7944ce8a28ea40351564e6",
+          "payload": {
+            "cardInstanceId": "CARD.ASHEN_STRIKE",
+            "cardId": "ASHEN_STRIKE",
+            "upgraded": true
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792310114733,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:1183",
+          "eventType": "deck.card_upgraded",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 1183,
+          "occurredAt": 1792310114383,
+          "sourceElapsedMs": 876372,
+          "actionId": "deck:a58005a53bd34b30b7a91243e409181e",
+          "payload": {
+            "cardInstanceId": "CARD.TWIN_STRIKE",
+            "cardId": "TWIN_STRIKE",
+            "upgraded": true
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792310114761,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:1184",
+          "eventType": "deck.card_upgraded",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 1184,
+          "occurredAt": 1792310114385,
+          "sourceElapsedMs": 876374,
+          "actionId": "deck:e8d7f4372f5645f7b4587848140a2f91",
+          "payload": {
+            "cardInstanceId": "CARD.POMMEL_STRIKE",
+            "cardId": "POMMEL_STRIKE",
+            "upgraded": true
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792310114788,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:1187",
+          "eventType": "rest.action_completed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 1187,
+          "occurredAt": 1792310116891,
+          "sourceElapsedMs": 878880,
+          "actionId": "rest:5623a5b689bf4df48a51228028fdb757",
+          "payload": {
+            "action": "heal",
+            "amount": 0
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792310116951,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:1188",
+          "eventType": "run.observed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 1188,
+          "occurredAt": 1792310116917,
+          "sourceElapsedMs": 878906,
+          "payload": {
+            "character": "IRONCLAD",
+            "act": 1,
+            "floor": 16,
+            "hp": 89,
+            "maxHp": 109,
+            "gold": 235,
+            "potions": [
+              {
+                "id": "ENERGY_POTION",
+                "name": "能量药水"
+              },
+              {
+                "id": "STABLE_SERUM",
+                "name": "稳定血清"
+              }
+            ]
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792310116978,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:2095",
+          "eventType": "run.observed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 2095,
+          "occurredAt": 1792310876063,
+          "sourceElapsedMs": 1638047,
+          "payload": {
+            "character": "IRONCLAD",
+            "act": 2,
+            "floor": 8,
+            "hp": 41,
+            "maxHp": 109,
+            "gold": 292,
+            "potions": [
+              {
+                "id": "SPEED_POTION",
+                "name": "速度药水"
+              },
+              {
+                "id": "DROPLET_OF_PRECOGNITION",
+                "name": "预知之滴"
+              }
+            ]
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792310876064,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:2096",
+          "eventType": "rest.options_offered",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 2096,
+          "occurredAt": 1792310876064,
+          "sourceElapsedMs": 1638048,
+          "decisionId": "rest:cc932e3ce5884c4cb033516a25ccbbfd",
+          "payload": {
+            "canHeal": true,
+            "smithCandidates": [
+              {
+                "slot": 0,
+                "id": "STRIKE_IRONCLAD",
+                "name": "打击",
+                "upgraded": false
+              },
+              {
+                "slot": 1,
+                "id": "STRIKE_IRONCLAD",
+                "name": "打击+",
+                "upgraded": true
+              },
+              {
+                "slot": 2,
+                "id": "STRIKE_IRONCLAD",
+                "name": "打击",
+                "upgraded": false
+              },
+              {
+                "slot": 3,
+                "id": "STRIKE_IRONCLAD",
+                "name": "打击+",
+                "upgraded": true
+              },
+              {
+                "slot": 4,
+                "id": "STRIKE_IRONCLAD",
+                "name": "打击",
+                "upgraded": false
+              },
+              {
+                "slot": 5,
+                "id": "DEFEND_IRONCLAD",
+                "name": "防御",
+                "upgraded": false
+              },
+              {
+                "slot": 6,
+                "id": "DEFEND_IRONCLAD",
+                "name": "防御",
+                "upgraded": false
+              },
+              {
+                "slot": 7,
+                "id": "DEFEND_IRONCLAD",
+                "name": "防御",
+                "upgraded": false
+              },
+              {
+                "slot": 8,
+                "id": "DEFEND_IRONCLAD",
+                "name": "防御",
+                "upgraded": false
+              },
+              {
+                "slot": 9,
+                "id": "BASH",
+                "name": "痛击",
+                "upgraded": false
+              },
+              {
+                "slot": 10,
+                "id": "HEADBUTT",
+                "name": "头槌",
+                "upgraded": false
+              },
+              {
+                "slot": 11,
+                "id": "PERFECTED_STRIKE",
+                "name": "完美打击",
+                "upgraded": false
+              },
+              {
+                "slot": 12,
+                "id": "SETUP_STRIKE",
+                "name": "预备打击",
+                "upgraded": false
+              },
+              {
+                "slot": 13,
+                "id": "TWIN_STRIKE",
+                "name": "双重打击",
+                "upgraded": false
+              },
+              {
+                "slot": 14,
+                "id": "TWIN_STRIKE",
+                "name": "双重打击",
+                "upgraded": false
+              },
+              {
+                "slot": 15,
+                "id": "POMMEL_STRIKE",
+                "name": "剑柄打击",
+                "upgraded": false
+              },
+              {
+                "slot": 16,
+                "id": "PILLAGE",
+                "name": "劫掠",
+                "upgraded": false
+              },
+              {
+                "slot": 17,
+                "id": "BLOODLETTING",
+                "name": "放血",
+                "upgraded": false
+              },
+              {
+                "slot": 18,
+                "id": "ASHEN_STRIKE",
+                "name": "灰烬打击",
+                "upgraded": false
+              },
+              {
+                "slot": 19,
+                "id": "ASHEN_STRIKE",
+                "name": "灰烬打击+",
+                "upgraded": true
+              },
+              {
+                "slot": 20,
+                "id": "POMMEL_STRIKE",
+                "name": "剑柄打击",
+                "upgraded": false
+              },
+              {
+                "slot": 21,
+                "id": "PERFECTED_STRIKE",
+                "name": "完美打击",
+                "upgraded": false
+              },
+              {
+                "slot": 22,
+                "id": "SETUP_STRIKE",
+                "name": "预备打击",
+                "upgraded": false
+              }
+            ]
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792310876102,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:2099",
+          "eventType": "rest.action_completed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 2099,
+          "occurredAt": 1792310877812,
+          "sourceElapsedMs": 1639796,
+          "actionId": "rest:8082df8e99b145bc8bfb08258bfbd9f9",
+          "payload": {
+            "action": "heal",
+            "amount": 0
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792310877881,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:2100",
+          "eventType": "run.observed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 2100,
+          "occurredAt": 1792310877824,
+          "sourceElapsedMs": 1639808,
+          "payload": {
+            "character": "IRONCLAD",
+            "act": 2,
+            "floor": 8,
+            "hp": 78,
+            "maxHp": 114,
+            "gold": 292,
+            "potions": [
+              {
+                "id": "SPEED_POTION",
+                "name": "速度药水"
+              },
+              {
+                "id": "DROPLET_OF_PRECOGNITION",
+                "name": "预知之滴"
+              }
+            ]
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792310877913,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:2360",
+          "eventType": "run.observed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 2360,
+          "occurredAt": 1792311048409,
+          "sourceElapsedMs": 1810388,
+          "payload": {
+            "character": "IRONCLAD",
+            "act": 2,
+            "floor": 11,
+            "hp": 16,
+            "maxHp": 114,
+            "gold": 380,
+            "potions": [
+              {
+                "id": "SPEED_POTION",
+                "name": "速度药水"
+              }
+            ]
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311048411,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:2361",
+          "eventType": "rest.options_offered",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 2361,
+          "occurredAt": 1792311048410,
+          "sourceElapsedMs": 1810389,
+          "decisionId": "rest:e5e57dcb03194bc7b381f53e59c196dc",
+          "payload": {
+            "canHeal": true,
+            "smithCandidates": [
+              {
+                "slot": 0,
+                "id": "STRIKE_IRONCLAD",
+                "name": "打击",
+                "upgraded": false
+              },
+              {
+                "slot": 1,
+                "id": "STRIKE_IRONCLAD",
+                "name": "打击+",
+                "upgraded": true
+              },
+              {
+                "slot": 2,
+                "id": "STRIKE_IRONCLAD",
+                "name": "打击",
+                "upgraded": false
+              },
+              {
+                "slot": 3,
+                "id": "STRIKE_IRONCLAD",
+                "name": "打击+",
+                "upgraded": true
+              },
+              {
+                "slot": 4,
+                "id": "STRIKE_IRONCLAD",
+                "name": "打击",
+                "upgraded": false
+              },
+              {
+                "slot": 5,
+                "id": "DEFEND_IRONCLAD",
+                "name": "防御",
+                "upgraded": false
+              },
+              {
+                "slot": 6,
+                "id": "DEFEND_IRONCLAD",
+                "name": "防御",
+                "upgraded": false
+              },
+              {
+                "slot": 7,
+                "id": "DEFEND_IRONCLAD",
+                "name": "防御",
+                "upgraded": false
+              },
+              {
+                "slot": 8,
+                "id": "DEFEND_IRONCLAD",
+                "name": "防御",
+                "upgraded": false
+              },
+              {
+                "slot": 9,
+                "id": "BASH",
+                "name": "痛击",
+                "upgraded": false
+              },
+              {
+                "slot": 10,
+                "id": "HEADBUTT",
+                "name": "头槌",
+                "upgraded": false
+              },
+              {
+                "slot": 11,
+                "id": "PERFECTED_STRIKE",
+                "name": "完美打击",
+                "upgraded": false
+              },
+              {
+                "slot": 12,
+                "id": "SETUP_STRIKE",
+                "name": "预备打击",
+                "upgraded": false
+              },
+              {
+                "slot": 13,
+                "id": "TWIN_STRIKE",
+                "name": "双重打击",
+                "upgraded": false
+              },
+              {
+                "slot": 14,
+                "id": "TWIN_STRIKE",
+                "name": "双重打击",
+                "upgraded": false
+              },
+              {
+                "slot": 15,
+                "id": "POMMEL_STRIKE",
+                "name": "剑柄打击",
+                "upgraded": false
+              },
+              {
+                "slot": 16,
+                "id": "PILLAGE",
+                "name": "劫掠",
+                "upgraded": false
+              },
+              {
+                "slot": 17,
+                "id": "BLOODLETTING",
+                "name": "放血",
+                "upgraded": false
+              },
+              {
+                "slot": 18,
+                "id": "ASHEN_STRIKE",
+                "name": "灰烬打击",
+                "upgraded": false
+              },
+              {
+                "slot": 19,
+                "id": "ASHEN_STRIKE",
+                "name": "灰烬打击+",
+                "upgraded": true
+              },
+              {
+                "slot": 20,
+                "id": "POMMEL_STRIKE",
+                "name": "剑柄打击",
+                "upgraded": false
+              },
+              {
+                "slot": 21,
+                "id": "PERFECTED_STRIKE",
+                "name": "完美打击",
+                "upgraded": false
+              },
+              {
+                "slot": 22,
+                "id": "SETUP_STRIKE",
+                "name": "预备打击",
+                "upgraded": false
+              },
+              {
+                "slot": 23,
+                "id": "TWIN_STRIKE",
+                "name": "双重打击+",
+                "upgraded": true
+              }
+            ]
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311048451,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:2364",
+          "eventType": "rest.action_completed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 2364,
+          "occurredAt": 1792311049179,
+          "sourceElapsedMs": 1811158,
+          "actionId": "rest:2812372798984c44bd4bf9500ace8e17",
+          "payload": {
+            "action": "heal",
+            "amount": 0
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311049257,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:2365",
+          "eventType": "run.observed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 2365,
+          "occurredAt": 1792311049291,
+          "sourceElapsedMs": 1811270,
+          "payload": {
+            "character": "IRONCLAD",
+            "act": 2,
+            "floor": 11,
+            "hp": 55,
+            "maxHp": 119,
+            "gold": 380,
+            "potions": [
+              {
+                "id": "SPEED_POTION",
+                "name": "速度药水"
+              }
+            ]
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311049292,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:2730",
+          "eventType": "run.observed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 2730,
+          "occurredAt": 1792311304842,
+          "sourceElapsedMs": 2066818,
+          "payload": {
+            "character": "IRONCLAD",
+            "act": 2,
+            "floor": 15,
+            "hp": 44,
+            "maxHp": 119,
+            "gold": 398,
+            "potions": [
+              {
+                "id": "ASHWATER",
+                "name": "灰水"
+              },
+              {
+                "id": "VULNERABLE_POTION",
+                "name": "易伤药水"
+              },
+              {
+                "id": "FAIRY_IN_A_BOTTLE",
+                "name": "瓶中精灵"
+              }
+            ]
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311304844,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:2731",
+          "eventType": "rest.options_offered",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 2731,
+          "occurredAt": 1792311304843,
+          "sourceElapsedMs": 2066818,
+          "decisionId": "rest:1f96095167304ccdbad0ec946a6061a2",
+          "payload": {
+            "canHeal": true,
+            "smithCandidates": [
+              {
+                "slot": 0,
+                "id": "STRIKE_IRONCLAD",
+                "name": "打击",
+                "upgraded": false
+              },
+              {
+                "slot": 1,
+                "id": "STRIKE_IRONCLAD",
+                "name": "打击+",
+                "upgraded": true
+              },
+              {
+                "slot": 2,
+                "id": "STRIKE_IRONCLAD",
+                "name": "打击",
+                "upgraded": false
+              },
+              {
+                "slot": 3,
+                "id": "STRIKE_IRONCLAD",
+                "name": "打击+",
+                "upgraded": true
+              },
+              {
+                "slot": 4,
+                "id": "STRIKE_IRONCLAD",
+                "name": "打击",
+                "upgraded": false
+              },
+              {
+                "slot": 5,
+                "id": "DEFEND_IRONCLAD",
+                "name": "防御",
+                "upgraded": false
+              },
+              {
+                "slot": 6,
+                "id": "DEFEND_IRONCLAD",
+                "name": "防御",
+                "upgraded": false
+              },
+              {
+                "slot": 7,
+                "id": "DEFEND_IRONCLAD",
+                "name": "防御",
+                "upgraded": false
+              },
+              {
+                "slot": 8,
+                "id": "DEFEND_IRONCLAD",
+                "name": "防御",
+                "upgraded": false
+              },
+              {
+                "slot": 9,
+                "id": "BASH",
+                "name": "痛击",
+                "upgraded": false
+              },
+              {
+                "slot": 10,
+                "id": "HEADBUTT",
+                "name": "头槌",
+                "upgraded": false
+              },
+              {
+                "slot": 11,
+                "id": "PERFECTED_STRIKE",
+                "name": "完美打击",
+                "upgraded": false
+              },
+              {
+                "slot": 12,
+                "id": "SETUP_STRIKE",
+                "name": "预备打击",
+                "upgraded": false
+              },
+              {
+                "slot": 13,
+                "id": "TWIN_STRIKE",
+                "name": "双重打击",
+                "upgraded": false
+              },
+              {
+                "slot": 14,
+                "id": "TWIN_STRIKE",
+                "name": "双重打击",
+                "upgraded": false
+              },
+              {
+                "slot": 15,
+                "id": "POMMEL_STRIKE",
+                "name": "剑柄打击",
+                "upgraded": false
+              },
+              {
+                "slot": 16,
+                "id": "PILLAGE",
+                "name": "劫掠",
+                "upgraded": false
+              },
+              {
+                "slot": 17,
+                "id": "BLOODLETTING",
+                "name": "放血",
+                "upgraded": false
+              },
+              {
+                "slot": 18,
+                "id": "ASHEN_STRIKE",
+                "name": "灰烬打击",
+                "upgraded": false
+              },
+              {
+                "slot": 19,
+                "id": "ASHEN_STRIKE",
+                "name": "灰烬打击+",
+                "upgraded": true
+              },
+              {
+                "slot": 20,
+                "id": "POMMEL_STRIKE",
+                "name": "剑柄打击",
+                "upgraded": false
+              },
+              {
+                "slot": 21,
+                "id": "PERFECTED_STRIKE",
+                "name": "完美打击",
+                "upgraded": false
+              },
+              {
+                "slot": 22,
+                "id": "SETUP_STRIKE",
+                "name": "预备打击",
+                "upgraded": false
+              },
+              {
+                "slot": 23,
+                "id": "TWIN_STRIKE",
+                "name": "双重打击+",
+                "upgraded": true
+              },
+              {
+                "slot": 24,
+                "id": "DEBT",
+                "name": "债务",
+                "upgraded": false
+              },
+              {
+                "slot": 25,
+                "id": "DOUBT",
+                "name": "疑虑",
+                "upgraded": false
+              },
+              {
+                "slot": 26,
+                "id": "TWIN_STRIKE",
+                "name": "双重打击+",
+                "upgraded": true
+              },
+              {
+                "slot": 27,
+                "id": "ASHEN_STRIKE",
+                "name": "灰烬打击",
+                "upgraded": false
+              }
+            ]
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311304894,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:2734",
+          "eventType": "rest.action_completed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 2734,
+          "occurredAt": 1792311312090,
+          "sourceElapsedMs": 2074065,
+          "actionId": "rest:8ac5b9da297241c1b6d2dd481a53cdde",
+          "payload": {
+            "action": "heal",
+            "amount": 0
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311312160,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:2735",
+          "eventType": "run.observed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 2735,
+          "occurredAt": 1792311312233,
+          "sourceElapsedMs": 2074208,
+          "payload": {
+            "character": "IRONCLAD",
+            "act": 2,
+            "floor": 15,
+            "hp": 99,
+            "maxHp": 124,
+            "gold": 398,
+            "potions": [
+              {
+                "id": "ASHWATER",
+                "name": "灰水"
+              },
+              {
+                "id": "VULNERABLE_POTION",
+                "name": "易伤药水"
+              },
+              {
+                "id": "FAIRY_IN_A_BOTTLE",
+                "name": "瓶中精灵"
+              }
+            ]
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311312234,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3006",
+          "eventType": "run.observed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3006,
+          "occurredAt": 1792311467690,
+          "sourceElapsedMs": 2229663,
+          "payload": {
+            "character": "IRONCLAD",
+            "act": 2,
+            "floor": 16,
+            "hp": 0,
+            "maxHp": 124,
+            "gold": 378,
+            "potions": [
+              {
+                "id": "ASHWATER",
+                "name": "灰水"
+              }
+            ]
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311467692,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3008",
+          "eventType": "run.observed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3008,
+          "occurredAt": 1792311468097,
+          "sourceElapsedMs": 2230071,
+          "payload": {
+            "character": "IRONCLAD",
+            "act": 2,
+            "floor": 16,
+            "hp": 37,
+            "maxHp": 124,
+            "gold": 378,
+            "potions": [
+              {
+                "id": "ASHWATER",
+                "name": "灰水"
+              }
+            ]
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311468098,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3348",
+          "eventType": "run.observed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3348,
+          "occurredAt": 1792311667077,
+          "sourceElapsedMs": 2429049,
+          "payload": {
+            "character": "IRONCLAD",
+            "act": 3,
+            "floor": 5,
+            "hp": 66,
+            "maxHp": 124,
+            "gold": 484,
+            "potions": [
+              {
+                "id": "ASHWATER",
+                "name": "灰水"
+              },
+              {
+                "id": "BLESSING_OF_THE_FORGE",
+                "name": "熔炉的祝福"
+              }
+            ]
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311667078,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3497",
+          "eventType": "run.observed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3497,
+          "occurredAt": 1792311790908,
+          "sourceElapsedMs": 2552879,
+          "payload": {
+            "character": "IRONCLAD",
+            "act": 3,
+            "floor": 6,
+            "hp": 65,
+            "maxHp": 122,
+            "gold": 488,
+            "potions": [
+              {
+                "id": "ASHWATER",
+                "name": "灰水"
+              },
+              {
+                "id": "EXPLOSIVE_AMPOULE",
+                "name": "爆炸安瓿"
+              },
+              {
+                "id": "BLESSING_OF_THE_FORGE",
+                "name": "熔炉的祝福"
+              }
+            ]
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311790911,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3702",
+          "eventType": "run.observed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3702,
+          "occurredAt": 1792311908542,
+          "sourceElapsedMs": 2670513,
+          "payload": {
+            "character": "IRONCLAD",
+            "act": 3,
+            "floor": 6,
+            "hp": 21,
+            "maxHp": 122,
+            "gold": 478,
+            "potions": [
+              {
+                "id": "ASHWATER",
+                "name": "灰水"
+              },
+              {
+                "id": "EXPLOSIVE_AMPOULE",
+                "name": "爆炸安瓿"
+              },
+              {
+                "id": "BLESSING_OF_THE_FORGE",
+                "name": "熔炉的祝福"
+              }
+            ]
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311908546,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3703",
+          "eventType": "run.ended",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3703,
+          "occurredAt": 1792311908543,
+          "sourceElapsedMs": 2670514,
+          "payload": {
+            "cleared": false,
+            "reason": "game_ended_not_cleared"
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311908597,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:361",
+          "eventType": "heal.resolved",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 361,
+          "occurredAt": 1792309593277,
+          "sourceElapsedMs": 355277,
+          "combatId": "e80cd0ed844ada6fbc572654",
+          "attemptGeneration": 0,
+          "payload": {
+            "targetEntityId": "0",
+            "amount": 24,
+            "currentHp": 80
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792309593278,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:362",
+          "eventType": "heal.resolved",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 362,
+          "occurredAt": 1792309593281,
+          "sourceElapsedMs": 355282,
+          "combatId": "e80cd0ed844ada6fbc572654",
+          "attemptGeneration": 0,
+          "payload": {
+            "targetEntityId": "0",
+            "amount": 5,
+            "currentHp": 85
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792309593305,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:772",
+          "eventType": "heal.resolved",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 772,
+          "occurredAt": 1792309845218,
+          "sourceElapsedMs": 607217,
+          "combatId": "75b03eb9c9002865feb289f6",
+          "attemptGeneration": 0,
+          "payload": {
+            "targetEntityId": "0",
+            "amount": 30,
+            "currentHp": 70
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792309845219,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:773",
+          "eventType": "heal.resolved",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 773,
+          "occurredAt": 1792309845219,
+          "sourceElapsedMs": 607218,
+          "combatId": "75b03eb9c9002865feb289f6",
+          "attemptGeneration": 0,
+          "payload": {
+            "targetEntityId": "0",
+            "amount": 5,
+            "currentHp": 75
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792309845251,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:1185",
+          "eventType": "heal.resolved",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 1185,
+          "occurredAt": 1792310116890,
+          "sourceElapsedMs": 878879,
+          "combatId": "8706720c45063b899de12a7d",
+          "attemptGeneration": 0,
+          "payload": {
+            "targetEntityId": "0",
+            "amount": 31,
+            "currentHp": 84
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792310116891,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:1186",
+          "eventType": "heal.resolved",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 1186,
+          "occurredAt": 1792310116890,
+          "sourceElapsedMs": 878880,
+          "combatId": "8706720c45063b899de12a7d",
+          "attemptGeneration": 0,
+          "payload": {
+            "targetEntityId": "0",
+            "amount": 5,
+            "currentHp": 89
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792310116924,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:2097",
+          "eventType": "heal.resolved",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 2097,
+          "occurredAt": 1792310877811,
+          "sourceElapsedMs": 1639795,
+          "combatId": "a389c4a514264df729545cca",
+          "attemptGeneration": 0,
+          "payload": {
+            "targetEntityId": "0",
+            "amount": 33,
+            "currentHp": 73
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792310877812,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:2098",
+          "eventType": "heal.resolved",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 2098,
+          "occurredAt": 1792310877812,
+          "sourceElapsedMs": 1639796,
+          "combatId": "a389c4a514264df729545cca",
+          "attemptGeneration": 0,
+          "payload": {
+            "targetEntityId": "0",
+            "amount": 5,
+            "currentHp": 78
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792310877850,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:2362",
+          "eventType": "heal.resolved",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 2362,
+          "occurredAt": 1792311049178,
+          "sourceElapsedMs": 1811157,
+          "combatId": "81eb86dad3ffa08d17ed7a6a",
+          "attemptGeneration": 0,
+          "payload": {
+            "targetEntityId": "0",
+            "amount": 34,
+            "currentHp": 50
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311049180,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:2363",
+          "eventType": "heal.resolved",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 2363,
+          "occurredAt": 1792311049179,
+          "sourceElapsedMs": 1811158,
+          "combatId": "81eb86dad3ffa08d17ed7a6a",
+          "attemptGeneration": 0,
+          "payload": {
+            "targetEntityId": "0",
+            "amount": 5,
+            "currentHp": 55
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311049226,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:2732",
+          "eventType": "heal.resolved",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 2732,
+          "occurredAt": 1792311312089,
+          "sourceElapsedMs": 2074064,
+          "combatId": "4db9006e049a0b72a06bf3a6",
+          "attemptGeneration": 0,
+          "payload": {
+            "targetEntityId": "0",
+            "amount": 51,
+            "currentHp": 94
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311312091,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:2733",
+          "eventType": "heal.resolved",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 2733,
+          "occurredAt": 1792311312090,
+          "sourceElapsedMs": 2074065,
+          "combatId": "4db9006e049a0b72a06bf3a6",
+          "attemptGeneration": 0,
+          "payload": {
+            "targetEntityId": "0",
+            "amount": 5,
+            "currentHp": 99
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311312128,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:2745",
+          "eventType": "combat.started",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 2745,
+          "occurredAt": 1792311317937,
+          "sourceElapsedMs": 2079912,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {
+            "roomKey": "MegaCrit.Sts2.Core.Rooms.CombatRoom:0",
+            "hook": "BeforeCombatStart"
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311318112,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:2746",
+          "eventType": "combat.started",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 2746,
+          "occurredAt": 1792311318105,
+          "sourceElapsedMs": 2080080,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {
+            "roomType": "Boss",
+            "enemies": [
+              {
+                "id": "CRUSHER",
+                "name": "碾碎爪"
+              },
+              {
+                "id": "ROCKET",
+                "name": "火箭"
+              }
+            ],
+            "boss": true,
+            "bossId": "CRUSHER",
+            "bossName": "碾碎爪"
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311318150,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:2747",
+          "eventType": "card.moved",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 2747,
+          "occurredAt": 1792311319942,
+          "sourceElapsedMs": 2081917,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {},
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311319944,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3007",
+          "eventType": "heal.resolved",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3007,
+          "occurredAt": 1792311468036,
+          "sourceElapsedMs": 2230010,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {
+            "targetEntityId": "0",
+            "amount": 37,
+            "currentHp": 37
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311468039,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3358",
+          "eventType": "block.changed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3358,
+          "occurredAt": 1792311678229,
+          "sourceElapsedMs": 2440201,
+          "combatId": "db30d272b05b8489025a7694",
+          "attemptGeneration": 0,
+          "payload": {
+            "entityId": "0",
+            "current": 30
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311678230,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3359",
+          "eventType": "card.played",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3359,
+          "occurredAt": 1792311678231,
+          "sourceElapsedMs": 2440203,
+          "combatId": "db30d272b05b8489025a7694",
+          "attemptGeneration": 0,
+          "actionId": "card-play:da1636a8a32244678d2ce4f6fc02b8e2",
+          "payload": {
+            "cardInstanceId": "CARD.IMPERVIOUS",
+            "cardId": "IMPERVIOUS",
+            "cardType": "Skill",
+            "resultPile": "Exhaust",
+            "autoPlay": false,
+            "playIndex": 0,
+            "playCount": 1,
+            "payment": {
+              "energySpent": 0,
+              "energyValue": 0,
+              "starsSpent": 0,
+              "starValue": 0
+            }
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311678269,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3361",
+          "eventType": "card.exhausted",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3361,
+          "occurredAt": 1792311678614,
+          "sourceElapsedMs": 2440586,
+          "combatId": "db30d272b05b8489025a7694",
+          "attemptGeneration": 0,
+          "payload": {},
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311678655,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3499",
+          "eventType": "combat.started",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3499,
+          "occurredAt": 1792311791121,
+          "sourceElapsedMs": 2553093,
+          "combatId": "23b75088fa0ec41dc813f2e8",
+          "attemptGeneration": 0,
+          "payload": {
+            "roomType": "Monster",
+            "enemies": [
+              {
+                "id": "OWL_MAGISTRATE",
+                "name": "猫头鹰法官"
+              }
+            ],
+            "boss": false
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311791137,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3041",
+          "eventType": "run.observed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3041,
+          "occurredAt": 1792311478102,
+          "sourceElapsedMs": 2240076,
+          "payload": {
+            "character": "IRONCLAD",
+            "act": 2,
+            "floor": 16,
+            "hp": 43,
+            "maxHp": 124,
+            "gold": 378,
+            "potions": [
+              {
+                "id": "ASHWATER",
+                "name": "灰水"
+              }
+            ]
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311478149,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3042",
+          "eventType": "run.observed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3042,
+          "occurredAt": 1792311483783,
+          "sourceElapsedMs": 2245757,
+          "payload": {
+            "character": "IRONCLAD",
+            "act": 2,
+            "floor": 16,
+            "hp": 43,
+            "maxHp": 124,
+            "gold": 478,
+            "potions": [
+              {
+                "id": "ASHWATER",
+                "name": "灰水"
+              }
+            ]
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311483785,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3043",
+          "eventType": "potion.gained",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3043,
+          "occurredAt": 1792311483813,
+          "sourceElapsedMs": 2245787,
+          "actionId": "potion:3fede224b69b4bfd8e0369695ea9b269",
+          "payload": {
+            "potionInstanceId": "POTION.SKILL_POTION",
+            "potionId": "SKILL_POTION"
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311483836,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3044",
+          "eventType": "run.observed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3044,
+          "occurredAt": 1792311483981,
+          "sourceElapsedMs": 2245955,
+          "payload": {
+            "character": "IRONCLAD",
+            "act": 2,
+            "floor": 16,
+            "hp": 43,
+            "maxHp": 124,
+            "gold": 478,
+            "potions": [
+              {
+                "id": "ASHWATER",
+                "name": "灰水"
+              },
+              {
+                "id": "SKILL_POTION",
+                "name": "技能药水"
+              }
+            ]
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311483983,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3045",
+          "eventType": "deck.card_upgraded",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3045,
+          "occurredAt": 1792311484164,
+          "sourceElapsedMs": 2246138,
+          "actionId": "deck:c749b6a2b9e640af84db00f0bdfb86e5",
+          "payload": {
+            "cardInstanceId": "CARD.IMPERVIOUS",
+            "cardId": "IMPERVIOUS",
+            "upgraded": true
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311484166,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3046",
+          "eventType": "deck.card_upgraded",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3046,
+          "occurredAt": 1792311484170,
+          "sourceElapsedMs": 2246144,
+          "actionId": "deck:ab281195a7514ca79cb1faf2c525b40f",
+          "payload": {
+            "cardInstanceId": "CARD.CRIMSON_MANTLE",
+            "cardId": "CRIMSON_MANTLE",
+            "upgraded": true
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311484212,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3047",
+          "eventType": "deck.card_upgraded",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3047,
+          "occurredAt": 1792311484189,
+          "sourceElapsedMs": 2246163,
+          "actionId": "deck:70e49a4dbb7447bfb5d5a4c36b5fdb80",
+          "payload": {
+            "cardInstanceId": "CARD.STOKE",
+            "cardId": "STOKE",
+            "upgraded": true
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311484246,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3048",
+          "eventType": "reward.offered",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3048,
+          "occurredAt": 1792311484204,
+          "sourceElapsedMs": 2246178,
+          "decisionId": "reward:84701bdfe6974647a41136e087d54802",
+          "payload": {
+            "candidateVersion": "0:IMPERVIOUS:False|1:CRIMSON_MANTLE:False|2:STOKE:False",
+            "candidates": [
+              {
+                "slot": 0,
+                "cardId": "IMPERVIOUS",
+                "name": "岿然不动",
+                "upgraded": false
+              },
+              {
+                "slot": 1,
+                "cardId": "CRIMSON_MANTLE",
+                "name": "绯红披风",
+                "upgraded": false
+              },
+              {
+                "slot": 2,
+                "cardId": "STOKE",
+                "name": "添柴",
+                "upgraded": false
+              }
+            ],
+            "canSkip": true,
+            "source": "combat"
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311484282,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3049",
+          "eventType": "reward.updated",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3049,
+          "occurredAt": 1792311485239,
+          "sourceElapsedMs": 2247213,
+          "decisionId": "reward:84701bdfe6974647a41136e087d54802",
+          "payload": {
+            "candidateVersion": "0:IMPERVIOUS:False|1:STOKE:False|2:CRIMSON_MANTLE:False",
+            "candidates": [
+              {
+                "slot": 0,
+                "cardId": "IMPERVIOUS",
+                "name": "岿然不动",
+                "upgraded": false
+              },
+              {
+                "slot": 1,
+                "cardId": "STOKE",
+                "name": "添柴",
+                "upgraded": false
+              },
+              {
+                "slot": 2,
+                "cardId": "CRIMSON_MANTLE",
+                "name": "绯红披风",
+                "upgraded": false
+              }
+            ],
+            "canSkip": true,
+            "source": "combat"
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311485240,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3050",
+          "eventType": "reward.updated",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3050,
+          "occurredAt": 1792311485885,
+          "sourceElapsedMs": 2247859,
+          "decisionId": "reward:84701bdfe6974647a41136e087d54802",
+          "payload": {
+            "candidateVersion": "0:IMPERVIOUS:False|1:CRIMSON_MANTLE:False|2:STOKE:False",
+            "candidates": [
+              {
+                "slot": 0,
+                "cardId": "IMPERVIOUS",
+                "name": "岿然不动",
+                "upgraded": false
+              },
+              {
+                "slot": 1,
+                "cardId": "CRIMSON_MANTLE",
+                "name": "绯红披风",
+                "upgraded": false
+              },
+              {
+                "slot": 2,
+                "cardId": "STOKE",
+                "name": "添柴",
+                "upgraded": false
+              }
+            ],
+            "canSkip": true,
+            "source": "combat"
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311485889,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3051",
+          "eventType": "reward.updated",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3051,
+          "occurredAt": 1792311486301,
+          "sourceElapsedMs": 2248275,
+          "decisionId": "reward:84701bdfe6974647a41136e087d54802",
+          "payload": {
+            "candidateVersion": "0:IMPERVIOUS:False|1:STOKE:False|2:CRIMSON_MANTLE:False",
+            "candidates": [
+              {
+                "slot": 0,
+                "cardId": "IMPERVIOUS",
+                "name": "岿然不动",
+                "upgraded": false
+              },
+              {
+                "slot": 1,
+                "cardId": "STOKE",
+                "name": "添柴",
+                "upgraded": false
+              },
+              {
+                "slot": 2,
+                "cardId": "CRIMSON_MANTLE",
+                "name": "绯红披风",
+                "upgraded": false
+              }
+            ],
+            "canSkip": true,
+            "source": "combat"
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311486302,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3052",
+          "eventType": "reward.updated",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3052,
+          "occurredAt": 1792311486512,
+          "sourceElapsedMs": 2248486,
+          "decisionId": "reward:84701bdfe6974647a41136e087d54802",
+          "payload": {
+            "candidateVersion": "0:STOKE:False|1:CRIMSON_MANTLE:False|2:IMPERVIOUS:False",
+            "candidates": [
+              {
+                "slot": 0,
+                "cardId": "STOKE",
+                "name": "添柴",
+                "upgraded": false
+              },
+              {
+                "slot": 1,
+                "cardId": "CRIMSON_MANTLE",
+                "name": "绯红披风",
+                "upgraded": false
+              },
+              {
+                "slot": 2,
+                "cardId": "IMPERVIOUS",
+                "name": "岿然不动",
+                "upgraded": false
+              }
+            ],
+            "canSkip": true,
+            "source": "combat"
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311486513,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3053",
+          "eventType": "reward.updated",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3053,
+          "occurredAt": 1792311487356,
+          "sourceElapsedMs": 2249330,
+          "decisionId": "reward:84701bdfe6974647a41136e087d54802",
+          "payload": {
+            "candidateVersion": "0:STOKE:False|1:IMPERVIOUS:False|2:CRIMSON_MANTLE:False",
+            "candidates": [
+              {
+                "slot": 0,
+                "cardId": "STOKE",
+                "name": "添柴",
+                "upgraded": false
+              },
+              {
+                "slot": 1,
+                "cardId": "IMPERVIOUS",
+                "name": "岿然不动",
+                "upgraded": false
+              },
+              {
+                "slot": 2,
+                "cardId": "CRIMSON_MANTLE",
+                "name": "绯红披风",
+                "upgraded": false
+              }
+            ],
+            "canSkip": true,
+            "source": "combat"
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311487357,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3054",
+          "eventType": "run.observed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3054,
+          "occurredAt": 1792311488801,
+          "sourceElapsedMs": 2250775,
+          "payload": {
+            "character": "IRONCLAD",
+            "act": 2,
+            "floor": 17,
+            "hp": 43,
+            "maxHp": 124,
+            "gold": 478,
+            "potions": [
+              {
+                "id": "ASHWATER",
+                "name": "灰水"
+              },
+              {
+                "id": "SKILL_POTION",
+                "name": "技能药水"
+              }
+            ]
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311488804,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3055",
+          "eventType": "reward.resolved",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3055,
+          "occurredAt": 1792311489903,
+          "sourceElapsedMs": 2251876,
+          "decisionId": "reward:84701bdfe6974647a41136e087d54802",
+          "payload": {
+            "result": "skipped",
+            "candidateVersion": "0:STOKE:False|1:IMPERVIOUS:False|2:CRIMSON_MANTLE:False"
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311489905,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3056",
+          "eventType": "run.observed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3056,
+          "occurredAt": 1792311490140,
+          "sourceElapsedMs": 2252114,
+          "payload": {
+            "character": "IRONCLAD",
+            "act": 3,
+            "floor": 0,
+            "hp": 43,
+            "maxHp": 124,
+            "gold": 478,
+            "potions": [
+              {
+                "id": "ASHWATER",
+                "name": "灰水"
+              },
+              {
+                "id": "SKILL_POTION",
+                "name": "技能药水"
+              }
+            ]
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311490141,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3009",
+          "eventType": "power.changed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3009,
+          "occurredAt": 1792311468309,
+          "sourceElapsedMs": 2230283,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {
+            "entityId": "0",
+            "powerId": "STRENGTH_POWER",
+            "amount": 7,
+            "delta": 7
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311468310,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3010",
+          "eventType": "potion.used",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3010,
+          "occurredAt": 1792311468309,
+          "sourceElapsedMs": 2230283,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {
+            "targetEntityId": "0"
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311468359,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3011",
+          "eventType": "power.changed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3011,
+          "occurredAt": 1792311468835,
+          "sourceElapsedMs": 2230809,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {
+            "entityId": "0",
+            "powerId": "REPTILE_TRINKET_POWER",
+            "amount": 3,
+            "delta": 3
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311468837,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3012",
+          "eventType": "power.changed",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3012,
+          "occurredAt": 1792311469469,
+          "sourceElapsedMs": 2231443,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {
+            "entityId": "0",
+            "powerId": "WEAK_POWER",
+            "amount": 0,
+            "delta": 0
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311469471,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3013",
+          "eventType": "turn.ended",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3013,
+          "occurredAt": 1792311469469,
+          "sourceElapsedMs": 2231443,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {},
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311469516,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3014",
+          "eventType": "card.moved",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3014,
+          "occurredAt": 1792311471229,
+          "sourceElapsedMs": 2233203,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {},
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311471231,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3015",
+          "eventType": "card.drawn",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3015,
+          "occurredAt": 1792311471229,
+          "sourceElapsedMs": 2233203,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {},
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311471280,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3016",
+          "eventType": "card.moved",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3016,
+          "occurredAt": 1792311471496,
+          "sourceElapsedMs": 2233470,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {},
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311471498,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3017",
+          "eventType": "card.drawn",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3017,
+          "occurredAt": 1792311471496,
+          "sourceElapsedMs": 2233470,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {},
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311471541,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3018",
+          "eventType": "card.moved",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3018,
+          "occurredAt": 1792311471763,
+          "sourceElapsedMs": 2233737,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {},
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311471766,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3019",
+          "eventType": "card.drawn",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3019,
+          "occurredAt": 1792311471764,
+          "sourceElapsedMs": 2233738,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {},
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311471814,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3020",
+          "eventType": "card.moved",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3020,
+          "occurredAt": 1792311472031,
+          "sourceElapsedMs": 2234005,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {},
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311472033,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3021",
+          "eventType": "card.drawn",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3021,
+          "occurredAt": 1792311472031,
+          "sourceElapsedMs": 2234005,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {},
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311472083,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3022",
+          "eventType": "card.moved",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3022,
+          "occurredAt": 1792311472296,
+          "sourceElapsedMs": 2234270,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {},
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311472298,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3023",
+          "eventType": "card.drawn",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3023,
+          "occurredAt": 1792311472296,
+          "sourceElapsedMs": 2234270,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {},
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311472349,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3024",
+          "eventType": "turn.started",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3024,
+          "occurredAt": 1792311472297,
+          "sourceElapsedMs": 2234271,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {},
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311472383,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3025",
+          "eventType": "card.moved",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3025,
+          "occurredAt": 1792311474557,
+          "sourceElapsedMs": 2236531,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {},
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311474558,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3026",
+          "eventType": "damage.resolved",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3026,
+          "occurredAt": 1792311474699,
+          "sourceElapsedMs": 2236673,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {
+            "targetEntityId": "1",
+            "hpLoss": 13,
+            "blocked": 0
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311474701,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3027",
+          "eventType": "card.moved",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3027,
+          "occurredAt": 1792311475172,
+          "sourceElapsedMs": 2237146,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {},
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311475174,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3028",
+          "eventType": "card.drawn",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3028,
+          "occurredAt": 1792311475172,
+          "sourceElapsedMs": 2237146,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {},
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311475222,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3029",
+          "eventType": "card.moved",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3029,
+          "occurredAt": 1792311475437,
+          "sourceElapsedMs": 2237410,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {},
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311475437,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3030",
+          "eventType": "card.drawn",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3030,
+          "occurredAt": 1792311475437,
+          "sourceElapsedMs": 2237411,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {},
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311475473,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3031",
+          "eventType": "card.moved",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3031,
+          "occurredAt": 1792311475698,
+          "sourceElapsedMs": 2237672,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {},
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311475699,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3032",
+          "eventType": "card.drawn",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3032,
+          "occurredAt": 1792311475698,
+          "sourceElapsedMs": 2237672,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {},
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311475734,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3033",
+          "eventType": "card.moved",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3033,
+          "occurredAt": 1792311475946,
+          "sourceElapsedMs": 2237919,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {},
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311475946,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3034",
+          "eventType": "card.drawn",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3034,
+          "occurredAt": 1792311475946,
+          "sourceElapsedMs": 2237920,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {},
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311475982,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3035",
+          "eventType": "card.played",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3035,
+          "occurredAt": 1792311475947,
+          "sourceElapsedMs": 2237921,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "actionId": "card-play:ef816afa09b1499bb4ddcbba9d49b4b8",
+          "payload": {
+            "cardInstanceId": "CARD.PILLAGE",
+            "cardId": "PILLAGE",
+            "cardType": "Attack",
+            "targetEntityId": "1",
+            "resultPile": "Discard",
+            "autoPlay": false,
+            "playIndex": 0,
+            "playCount": 1,
+            "payment": {
+              "energySpent": 1,
+              "energyValue": 1,
+              "starsSpent": 0,
+              "starValue": 0
+            }
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311476017,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3036",
+          "eventType": "card.moved",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3036,
+          "occurredAt": 1792311475968,
+          "sourceElapsedMs": 2237942,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {},
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311476053,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3037",
+          "eventType": "card.moved",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3037,
+          "occurredAt": 1792311477868,
+          "sourceElapsedMs": 2239842,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {},
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311477871,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3038",
+          "eventType": "card.played",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3038,
+          "occurredAt": 1792311478031,
+          "sourceElapsedMs": 2240005,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "actionId": "card-play:6d611c7a2521471998a9556c2a8a58ad",
+          "payload": {
+            "cardInstanceId": "CARD.PERFECTED_STRIKE",
+            "cardId": "PERFECTED_STRIKE",
+            "cardType": "Attack",
+            "targetEntityId": "1",
+            "resultPile": "Discard",
+            "autoPlay": false,
+            "playIndex": 0,
+            "playCount": 1,
+            "payment": {
+              "energySpent": 2,
+              "energyValue": 2,
+              "starsSpent": 0,
+              "starValue": 0
+            }
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311478034,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3039",
+          "eventType": "combat.ended",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3039,
+          "occurredAt": 1792311478048,
+          "sourceElapsedMs": 2240022,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {
+            "victory": false,
+            "details": {
+              "hook": "AfterCombatEnd"
+            }
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311478079,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3040",
+          "eventType": "heal.resolved",
+          "runId": "309ec1038c6a49749de3274851d738a1",
+          "sourceSessionId": "a4f659024e12401cb2c85096f95762f3",
+          "sourceSeq": 3040,
+          "occurredAt": 1792311478053,
+          "sourceElapsedMs": 2240027,
+          "combatId": "b0dc7dcda0ebf99077b25363",
+          "attemptGeneration": 0,
+          "payload": {
+            "targetEntityId": "0",
+            "amount": 6,
+            "currentHp": 43
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792311478113,
+          "replay": false
+        }
+      ],
+      "coverage": {
+        "schema": "gamebuddy.fact-coverage.v1",
+        "families": {
+          "lifecycle": {
+            "state": "available",
+            "firstSourceSeq": 165,
+            "lastSourceSeq": 3703,
+            "observationMethods": [
+              "direct_hook",
+              "snapshot"
+            ],
+            "eventCount": 226,
+            "reason": null,
+            "reportedAt": 1792311165045
+          },
+          "capture": {
+            "state": "available",
+            "firstSourceSeq": 166,
+            "lastSourceSeq": 2593,
+            "observationMethods": [
+              "direct_hook"
+            ],
+            "eventCount": 2
+          },
+          "combat_boundary": {
+            "state": "available",
+            "reason": null,
+            "reportedAt": 1792311165045,
+            "firstSourceSeq": 180,
+            "lastSourceSeq": 3701,
+            "eventCount": 317,
+            "observationMethods": [
+              "direct_hook",
+              "snapshot"
+            ]
+          },
+          "decisions": {
+            "state": "partial",
+            "reason": "choice offers are captured; some result details may be unknown",
+            "reportedAt": 1792311165045,
+            "firstSourceSeq": 168,
+            "lastSourceSeq": 3496,
+            "eventCount": 309,
+            "observationMethods": [
+              "direct_hook",
+              "snapshot",
+              "state_diff"
+            ]
+          },
+          "build": {
+            "state": "partial",
+            "reason": "deck, relic, and potion hooks installed; source attribution may be partial",
+            "reportedAt": 1792311165045,
+            "firstSourceSeq": 171,
+            "lastSourceSeq": 3489,
+            "eventCount": 245,
+            "observationMethods": [
+              "direct_hook"
+            ]
+          },
+          "card_play": {
+            "state": "available",
+            "reason": null,
+            "reportedAt": 1792311165045,
+            "firstSourceSeq": 195,
+            "lastSourceSeq": 3689,
+            "eventCount": 201,
+            "observationMethods": [
+              "direct_hook"
+            ]
+          },
+          "card_movement": {
+            "state": "available",
+            "reason": null,
+            "reportedAt": 1792311165045,
+            "firstSourceSeq": 182,
+            "lastSourceSeq": 3697,
+            "eventCount": 1661,
+            "observationMethods": [
+              "direct_hook"
+            ]
+          },
+          "combat_resolution": {
+            "state": "available",
+            "reason": null,
+            "reportedAt": 1792311165045,
+            "firstSourceSeq": 194,
+            "lastSourceSeq": 3685,
+            "eventCount": 328,
+            "observationMethods": [
+              "direct_hook"
+            ]
+          },
+          "resources": {
+            "state": "partial",
+            "reason": "health, gold, and generic resource hooks are unavailable",
+            "reportedAt": 1792311165045,
+            "firstSourceSeq": 199,
+            "lastSourceSeq": 3700,
+            "eventCount": 250,
+            "observationMethods": [
+              "direct_hook"
+            ]
+          }
+        },
+        "gaps": [],
+        "rejected": [],
+        "health": [
+          {
+            "at": 1792312757011,
+            "type": "discarded_incomplete_attempt",
+            "combatId": "25952b9f654056a06c2ca4f4"
+          },
+          {
+            "at": 1792312757011,
+            "type": "discarded_incomplete_attempt",
+            "combatId": "23b75088fa0ec41dc813f2e8"
+          }
+        ]
+      },
+      "synthetic": false,
+      "projection": "Selected real event windows; run.observed deck/relics omitted, not a full run",
+      "sourceInputHash": "2cb1b0498bf2ea866818709b2d6dbf1c9b19bd0193c2fb9e55d28b0e1063c128"
+    },
+    {
+      "runId": "88ac80b42b3349e995acd36ddde04b67",
+      "facts": [
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "d7617f5938604a5f806972d676faeb7b:245",
+          "eventType": "run.ended",
+          "runId": "88ac80b42b3349e995acd36ddde04b67",
+          "sourceSessionId": "d7617f5938604a5f806972d676faeb7b",
+          "sourceSeq": 245,
+          "occurredAt": 1792325120498,
+          "sourceElapsedMs": 185311,
+          "payload": {
+            "cleared": false,
+            "reason": "game_ended_not_cleared"
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792325120530,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "d7617f5938604a5f806972d676faeb7b:156",
+          "eventType": "card.played",
+          "runId": "88ac80b42b3349e995acd36ddde04b67",
+          "sourceSessionId": "d7617f5938604a5f806972d676faeb7b",
+          "sourceSeq": 156,
+          "occurredAt": 1792325075633,
+          "sourceElapsedMs": 140446,
+          "combatId": "7903b2724af0db6c38a30f2d",
+          "attemptGeneration": 0,
+          "actionId": "card-play:d3ff430997554fd09a9ddd6b3e717733",
+          "payload": {
+            "cardInstanceId": "CARD.EXPOSE",
+            "cardId": "EXPOSE",
+            "cardType": "Skill",
+            "targetEntityId": "1",
+            "resultPile": "Exhaust",
+            "autoPlay": false,
+            "playIndex": 0,
+            "playCount": 1,
+            "payment": {
+              "energySpent": 0,
+              "energyValue": 0,
+              "starsSpent": 0,
+              "starValue": 0
+            }
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792325075660,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "d7617f5938604a5f806972d676faeb7b:19",
+          "eventType": "run.observed",
+          "runId": "88ac80b42b3349e995acd36ddde04b67",
+          "sourceSessionId": "d7617f5938604a5f806972d676faeb7b",
+          "sourceSeq": 19,
+          "occurredAt": 1792324986771,
+          "sourceElapsedMs": 51584,
+          "payload": {
+            "character": "SILENT",
+            "act": 1,
+            "floor": 0,
+            "totalFloor": 3,
+            "hp": 43,
+            "maxHp": 70,
+            "gold": 123,
+            "potions": [
+              {
+                "id": "SNECKO_OIL",
+                "name": "异蛇之油"
+              }
+            ]
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792324987114,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "d7617f5938604a5f806972d676faeb7b:37",
+          "eventType": "shop.transaction_completed",
+          "runId": "88ac80b42b3349e995acd36ddde04b67",
+          "sourceSessionId": "d7617f5938604a5f806972d676faeb7b",
+          "sourceSeq": 37,
+          "occurredAt": 1792325021311,
+          "sourceElapsedMs": 86124,
+          "actionId": "shop:d3745ee0b2f44467a8cb8e374caf9437",
+          "payload": {
+            "itemType": "RunState",
+            "price": 72,
+            "status": "completed"
+          },
+          "quality": {
+            "observationMethod": "direct_hook",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792325021335,
+          "replay": false
+        },
+        {
+          "schema": "gamebuddy.fact-event.v1",
+          "eventVersion": 1,
+          "eventId": "d7617f5938604a5f806972d676faeb7b:38",
+          "eventType": "run.observed",
+          "runId": "88ac80b42b3349e995acd36ddde04b67",
+          "sourceSessionId": "d7617f5938604a5f806972d676faeb7b",
+          "sourceSeq": 38,
+          "occurredAt": 1792325021375,
+          "sourceElapsedMs": 86188,
+          "payload": {
+            "character": "SILENT",
+            "act": 1,
+            "floor": 4,
+            "totalFloor": 4,
+            "hp": 43,
+            "maxHp": 70,
+            "gold": 51,
+            "potions": [
+              {
+                "id": "SNECKO_OIL",
+                "name": "异蛇之油"
+              }
+            ]
+          },
+          "quality": {
+            "observationMethod": "snapshot",
+            "unknownFields": [],
+            "unknownReasons": {}
+          },
+          "receivedAt": 1792325021376,
+          "replay": false
+        }
+      ],
+      "coverage": {
+        "schema": "gamebuddy.fact-coverage.v1",
+        "families": {
+          "lifecycle": {
+            "state": "available",
+            "firstSourceSeq": 17,
+            "lastSourceSeq": 245,
+            "observationMethods": [
+              "direct_hook",
+              "snapshot"
+            ],
+            "eventCount": 11,
+            "reason": null,
+            "reportedAt": 1792324986716
+          },
+          "capture": {
+            "state": "available",
+            "firstSourceSeq": 18,
+            "lastSourceSeq": 18,
+            "observationMethods": [
+              "direct_hook"
+            ],
+            "eventCount": 1
+          },
+          "combat_boundary": {
+            "state": "available",
+            "reason": null,
+            "reportedAt": 1792324986716,
+            "firstSourceSeq": 45,
+            "lastSourceSeq": 224,
+            "eventCount": 20,
+            "observationMethods": [
+              "direct_hook",
+              "snapshot"
+            ]
+          },
+          "decisions": {
+            "state": "partial",
+            "reason": "choice offers are captured; some result details may be unknown",
+            "reportedAt": 1792324986716,
+            "firstSourceSeq": 21,
+            "lastSourceSeq": 243,
+            "eventCount": 17,
+            "observationMethods": [
+              "snapshot",
+              "direct_hook",
+              "state_diff"
+            ]
+          },
+          "build": {
+            "state": "partial",
+            "reason": "deck, relic, and potion hooks installed; source attribution may be partial",
+            "reportedAt": 1792324986716,
+            "firstSourceSeq": 22,
+            "lastSourceSeq": 237,
+            "eventCount": 20,
+            "observationMethods": [
+              "direct_hook"
+            ]
+          },
+          "card_play": {
+            "state": "available",
+            "reason": null,
+            "reportedAt": 1792324986716,
+            "firstSourceSeq": 64,
+            "lastSourceSeq": 223,
+            "eventCount": 17,
+            "observationMethods": [
+              "direct_hook"
+            ]
+          },
+          "card_movement": {
+            "state": "available",
+            "reason": null,
+            "reportedAt": 1792324986716,
+            "firstSourceSeq": 47,
+            "lastSourceSeq": 238,
+            "eventCount": 112,
+            "observationMethods": [
+              "direct_hook"
+            ]
+          },
+          "combat_resolution": {
+            "state": "available",
+            "reason": null,
+            "reportedAt": 1792324986716,
+            "firstSourceSeq": 63,
+            "lastSourceSeq": 205,
+            "eventCount": 19,
+            "observationMethods": [
+              "direct_hook"
+            ]
+          },
+          "resources": {
+            "state": "partial",
+            "reason": "health, gold, and generic resource hooks are unavailable",
+            "reportedAt": 1792324986716,
+            "firstSourceSeq": 82,
+            "lastSourceSeq": 210,
+            "eventCount": 12,
+            "observationMethods": [
+              "direct_hook"
+            ]
+          }
+        },
+        "gaps": [],
+        "rejected": [],
+        "health": []
+      },
+      "synthetic": false,
+      "projection": "Two actual events for free-pattern summary provenance regression, not a complete run"
+    }
+  ],
+  "rejectedModelCandidates": [
+    {
+      "pattern": "impervious_exhaust",
+      "title": "强化壁垒消耗",
+      "bodyTemplate": "三幕战斗打出{{card}}获{{block}}格挡，随后进入消耗堆。",
+      "bindings": {
+        "card": {
+          "claimIndex": 0
+        },
+        "block": {
+          "claimIndex": 1
+        }
+      },
+      "evidenceIds": [
+        "a4f659024e12401cb2c85096f95762f3:3359",
+        "a4f659024e12401cb2c85096f95762f3:3358",
+        "a4f659024e12401cb2c85096f95762f3:3361"
+      ],
+      "assertions": [
+        {
+          "type": "event_field",
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3359",
+          "field": "cardId",
+          "value": "IMPERVIOUS"
+        },
+        {
+          "type": "event_field",
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3358",
+          "field": "current",
+          "value": 30
+        },
+        {
+          "type": "occurred",
+          "eventId": "a4f659024e12401cb2c85096f95762f3:3361",
+          "eventType": "card.exhausted"
+        }
+      ]
+    }
+  ],
+  "rejectedOrdinaryTransactionCandidates": [
+    {
+      "pattern": "shop_buy",
+      "title": "商店一笔交易",
+      "bodyTemplate": "商店花{{p}}金完成一笔交易，金币从{{g1}}降到{{g2}}。",
+      "bindings": {
+        "p": {
+          "claimIndex": 0
+        },
+        "g1": {
+          "claimIndex": 1
+        },
+        "g2": {
+          "claimIndex": 2
+        }
+      },
+      "evidenceIds": [
+        "d7617f5938604a5f806972d676faeb7b:37",
+        "d7617f5938604a5f806972d676faeb7b:19",
+        "d7617f5938604a5f806972d676faeb7b:38"
+      ],
+      "assertions": [
+        {
+          "type": "event_field",
+          "eventId": "d7617f5938604a5f806972d676faeb7b:37",
+          "field": "price",
+          "value": 72
+        },
+        {
+          "type": "event_field",
+          "eventId": "d7617f5938604a5f806972d676faeb7b:19",
+          "field": "gold",
+          "value": 123
+        },
+        {
+          "type": "event_field",
+          "eventId": "d7617f5938604a5f806972d676faeb7b:38",
+          "field": "gold",
+          "value": 51
+        }
+      ]
+    }
+  ]
+}

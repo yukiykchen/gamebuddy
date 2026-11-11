@@ -16,15 +16,31 @@ public class Entry
         {
             GameBuddyExporter.Initialize(modDirectory);
 
+            var harmony = new Harmony("com.gamebuddy.bridge");
             try
             {
-                new Harmony("com.gamebuddy.bridge").PatchAll(typeof(Entry).Assembly);
+                harmony.PatchAll(typeof(Entry).Assembly);
                 GameBuddyDiagnostics.Write(modDirectory, "Harmony reward-screen patches applied");
             }
             catch (Exception ex)
             {
                 GameBuddyDiagnostics.Write(modDirectory, $"Harmony reward-screen patches failed: {ex}");
                 Log.Warn($"[GameBuddyBridge] reward-screen patches failed: {ex.Message}");
+            }
+
+            try
+            {
+                SaveLoadCountPatch.Apply(harmony, modDirectory);
+                GameBuddyLifecyclePatches.Apply(harmony, modDirectory);
+                GameBuddyCombatBoundaryPatches.Apply(harmony, modDirectory);
+                GameBuddyCombatFactPatches.Apply(harmony, modDirectory);
+                GameBuddySelectionFactPatches.Apply(harmony, modDirectory);
+                GameBuddyBuildFactPatches.Apply(harmony, modDirectory);
+            }
+            catch (Exception ex)
+            {
+                GameBuddyDiagnostics.Write(modDirectory, $"save-load patch failed: {ex}");
+                Log.Warn($"[GameBuddyBridge] save-load patch failed: {ex.Message}");
             }
 
             if (Engine.GetMainLoop() is not SceneTree tree)

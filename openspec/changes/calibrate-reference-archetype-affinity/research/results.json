@@ -1,0 +1,1060 @@
+{
+  "kind": "研究复算，非游戏实战；五套样本已用于检查，不再称作未来盲测集",
+  "version": "reference-affinity-prototype-v1",
+  "caveat": "初标与算法草案由同一 AI 辅助研究完成，不能解释为独立专家准确率。三套参考为设计草案，格挡参考为社区胜利牌组。",
+  "formula": "score = round(100 * (0.8 * weightedFunctionalCoverage + 0.2 * connectionCoverage) * min(1, effectiveDensity / referenceDensity))",
+  "prototypeHash": "59a8249b1a1dfbb123631ecfe2dad2bad92df4892372487518dc20ec829edf7b",
+  "samplesHash": "83fed3721e24b5c5746ffeb201fe1c510a5b408838ed6c23390c77ea0b2b3283",
+  "sourceHashes": {
+    "cards": "4d9adbb81bb24141899bb4fd36463dca0123fe6a11247c2837a8916ac129a5f7",
+    "relics": "5fb4faa7dfacce3701b52dfd0d02cb3a186a7f7ec739d46819b8aaea83aa39df"
+  },
+  "references": {
+    "auto_strike": {
+      "name": "自动打击·抽牌打击路线",
+      "origin": "authored-draft",
+      "count": 20
+    },
+    "exhaust": {
+      "name": "消耗·抽牌与消耗堆兑现路线",
+      "origin": "authored-draft",
+      "count": 20
+    },
+    "strength": {
+      "name": "力量·成长与多段输出路线",
+      "origin": "authored-draft",
+      "count": 20
+    },
+    "block": {
+      "name": "格挡·壁垒与全身撞击路线",
+      "origin": "https://spire-codex.com/zhs/runs/771edca84735c8d3",
+      "count": 21
+    }
+  },
+  "checks": [
+    {
+      "name": "五套验证样本与真实参照分离，数量、版本、模式一致",
+      "passed": true
+    },
+    {
+      "name": "四个参照满足声明的需求，且本流派恰为 100 分",
+      "passed": true
+    },
+    {
+      "name": "独立初标 27411835bfd3f399：block",
+      "passed": true
+    },
+    {
+      "name": "独立初标 b88bf732fa576d92：auto_strike",
+      "passed": true
+    },
+    {
+      "name": "独立初标 2dd1c482c04fadec：exhaust",
+      "passed": true
+    },
+    {
+      "name": "独立初标 e04c9b9a5f9b98fc：strength",
+      "passed": true
+    },
+    {
+      "name": "独立初标 35a9b4838a58956d：auto_strike / strength",
+      "passed": true
+    },
+    {
+      "name": "移除关键功能会降分并明确指出缺口",
+      "passed": true
+    },
+    {
+      "name": "十张无关打击会稀释格挡路线，不再保持满分",
+      "passed": true
+    },
+    {
+      "name": "已有充足兑现时，继续重复全身撞击不会刷分",
+      "passed": true
+    },
+    {
+      "name": "不同卡名承担相同防御功能时，替换不造成大幅降分",
+      "passed": true
+    },
+    {
+      "name": "坚定不移只放大格挡，不能替代壁垒的跨回合留存",
+      "passed": true
+    },
+    {
+      "name": "完整牌组的血量、通关结果不进入评分输入",
+      "passed": true
+    },
+    {
+      "name": "空牌组得零分、任意卡序不改变结果，未知牌占位置且提示不确定",
+      "passed": true
+    },
+    {
+      "name": "参考版不匹配时标记不确定，不能伪装跨版本已验证",
+      "passed": true
+    },
+    {
+      "name": "缺核心后新增有效配套仍能增加连续分数，没有 59 分截断",
+      "passed": true
+    },
+    {
+      "name": "遗物是功能来源，重复 ID 不重复计分，不要求搜齐全部关键遗物",
+      "passed": true
+    },
+    {
+      "name": "起始牌组不会因为基础攻击和防御被误判成明显流派",
+      "passed": true
+    },
+    {
+      "name": "全部铁甲卡牌各一张不能刷出四个高契合度",
+      "passed": true
+    },
+    {
+      "name": "劫掠提供条件抽牌但名字不含打击，不误算自动打击弹药",
+      "passed": true
+    },
+    {
+      "name": "起手方向不明确，混合样本保留力量主方向与自动打击副方向",
+      "passed": true
+    }
+  ],
+  "rows": [
+    {
+      "id": "27411835bfd3f399",
+      "url": "https://spire-codex.com/zhs/runs/27411835bfd3f399",
+      "expected": [
+        "block"
+      ],
+      "outcome": "victory",
+      "count": 26,
+      "direction": {
+        "kind": "primary",
+        "primary": "block",
+        "secondary": []
+      },
+      "scores": [
+        {
+          "id": "block",
+          "score": 54,
+          "coverage": 85,
+          "connections": 100,
+          "focus": 61,
+          "confidence": "partial",
+          "gaps": [
+            {
+              "role": "resource",
+              "label": "通用资源支持",
+              "coverage": 0,
+              "priority": 15
+            }
+          ],
+          "unknownCards": [],
+          "unknownRelics": [],
+          "dynamicUnknown": [],
+          "unverifiedFacts": [
+            "逐卡附魔未完整提取"
+          ]
+        },
+        {
+          "id": "auto_strike",
+          "score": 15,
+          "coverage": 47,
+          "connections": 25,
+          "focus": 36,
+          "confidence": "partial",
+          "gaps": [
+            {
+              "role": "loop",
+              "label": "抽牌打击循环",
+              "coverage": 0,
+              "priority": 30
+            },
+            {
+              "role": "strikes",
+              "label": "打击牌供给",
+              "coverage": 50,
+              "priority": 12.5
+            },
+            {
+              "role": "resource",
+              "label": "通用资源支持",
+              "coverage": 33,
+              "priority": 10.078125
+            }
+          ],
+          "unknownCards": [],
+          "unknownRelics": [],
+          "dynamicUnknown": [],
+          "unverifiedFacts": [
+            "逐卡附魔未完整提取"
+          ]
+        },
+        {
+          "id": "strength",
+          "score": 4,
+          "coverage": 24,
+          "connections": 0,
+          "focus": 23,
+          "confidence": "partial",
+          "gaps": [
+            {
+              "role": "source",
+              "label": "力量来源",
+              "coverage": 0,
+              "priority": 35
+            },
+            {
+              "role": "output",
+              "label": "多段与重复输出",
+              "coverage": 25,
+              "priority": 26.25
+            },
+            {
+              "role": "resource",
+              "label": "通用资源支持",
+              "coverage": 0,
+              "priority": 15
+            }
+          ],
+          "unknownCards": [],
+          "unknownRelics": [],
+          "dynamicUnknown": [],
+          "unverifiedFacts": [
+            "逐卡附魔未完整提取"
+          ]
+        },
+        {
+          "id": "exhaust",
+          "score": 0,
+          "coverage": 5,
+          "connections": 0,
+          "focus": 10,
+          "confidence": "partial",
+          "gaps": [
+            {
+              "role": "outlet",
+              "label": "主动消耗手段",
+              "coverage": 0,
+              "priority": 30
+            },
+            {
+              "role": "draw",
+              "label": "消耗转抽牌",
+              "coverage": 0,
+              "priority": 20
+            },
+            {
+              "role": "payoff",
+              "label": "消耗转输出",
+              "coverage": 0,
+              "priority": 20
+            },
+            {
+              "role": "block",
+              "label": "消耗转格挡",
+              "coverage": 0,
+              "priority": 15
+            },
+            {
+              "role": "resource",
+              "label": "通用资源支持",
+              "coverage": 33,
+              "priority": 10.078125
+            }
+          ],
+          "unknownCards": [],
+          "unknownRelics": [],
+          "dynamicUnknown": [],
+          "unverifiedFacts": [
+            "逐卡附魔未完整提取"
+          ]
+        }
+      ],
+      "current": [
+        {
+          "id": "auto_strike",
+          "score": 47
+        },
+        {
+          "id": "exhaust",
+          "score": 0
+        },
+        {
+          "id": "strength",
+          "score": 11
+        },
+        {
+          "id": "block",
+          "score": 82
+        }
+      ]
+    },
+    {
+      "id": "b88bf732fa576d92",
+      "url": "https://spire-codex.com/zhs/runs/b88bf732fa576d92",
+      "expected": [
+        "auto_strike"
+      ],
+      "outcome": "victory",
+      "count": 18,
+      "direction": {
+        "kind": "primary",
+        "primary": "auto_strike",
+        "secondary": []
+      },
+      "scores": [
+        {
+          "id": "auto_strike",
+          "score": 65,
+          "coverage": 91,
+          "connections": 100,
+          "focus": 70,
+          "confidence": "partial",
+          "gaps": [
+            {
+              "role": "resource",
+              "label": "通用资源支持",
+              "coverage": 41,
+              "priority": 8.90625
+            }
+          ],
+          "unknownCards": [],
+          "unknownRelics": [],
+          "dynamicUnknown": [],
+          "unverifiedFacts": [
+            "逐卡附魔未完整提取"
+          ]
+        },
+        {
+          "id": "strength",
+          "score": 8,
+          "coverage": 22,
+          "connections": 0,
+          "focus": 46,
+          "confidence": "partial",
+          "gaps": [
+            {
+              "role": "source",
+              "label": "力量来源",
+              "coverage": 0,
+              "priority": 35
+            },
+            {
+              "role": "output",
+              "label": "多段与重复输出",
+              "coverage": 0,
+              "priority": 35
+            },
+            {
+              "role": "defense",
+              "label": "基本防御",
+              "coverage": 44,
+              "priority": 8.4375
+            }
+          ],
+          "unknownCards": [],
+          "unknownRelics": [],
+          "dynamicUnknown": [],
+          "unverifiedFacts": [
+            "逐卡附魔未完整提取"
+          ]
+        },
+        {
+          "id": "block",
+          "score": 8,
+          "coverage": 25,
+          "connections": 0,
+          "focus": 38,
+          "confidence": "partial",
+          "gaps": [
+            {
+              "role": "retention",
+              "label": "跨回合保留格挡",
+              "coverage": 0,
+              "priority": 25
+            },
+            {
+              "role": "conversion",
+              "label": "格挡转输出",
+              "coverage": 0,
+              "priority": 25
+            },
+            {
+              "role": "growth",
+              "label": "格挡增长与放大",
+              "coverage": 0,
+              "priority": 15
+            },
+            {
+              "role": "generation",
+              "label": "格挡来源",
+              "coverage": 50,
+              "priority": 10
+            }
+          ],
+          "unknownCards": [],
+          "unknownRelics": [],
+          "dynamicUnknown": [],
+          "unverifiedFacts": [
+            "逐卡附魔未完整提取"
+          ]
+        },
+        {
+          "id": "exhaust",
+          "score": 5,
+          "coverage": 15,
+          "connections": 0,
+          "focus": 44,
+          "confidence": "partial",
+          "gaps": [
+            {
+              "role": "outlet",
+              "label": "主动消耗手段",
+              "coverage": 0,
+              "priority": 30
+            },
+            {
+              "role": "draw",
+              "label": "消耗转抽牌",
+              "coverage": 0,
+              "priority": 20
+            },
+            {
+              "role": "payoff",
+              "label": "消耗转输出",
+              "coverage": 0,
+              "priority": 20
+            },
+            {
+              "role": "block",
+              "label": "消耗转格挡",
+              "coverage": 0,
+              "priority": 15
+            }
+          ],
+          "unknownCards": [],
+          "unknownRelics": [],
+          "dynamicUnknown": [],
+          "unverifiedFacts": [
+            "逐卡附魔未完整提取"
+          ]
+        }
+      ],
+      "current": [
+        {
+          "id": "auto_strike",
+          "score": 62
+        },
+        {
+          "id": "exhaust",
+          "score": 0
+        },
+        {
+          "id": "strength",
+          "score": 13
+        },
+        {
+          "id": "block",
+          "score": 9
+        }
+      ]
+    },
+    {
+      "id": "2dd1c482c04fadec",
+      "url": "https://spire-codex.com/zhs/runs/2dd1c482c04fadec",
+      "expected": [
+        "exhaust"
+      ],
+      "outcome": "victory",
+      "count": 32,
+      "direction": {
+        "kind": "primary",
+        "primary": "exhaust",
+        "secondary": []
+      },
+      "scores": [
+        {
+          "id": "exhaust",
+          "score": 43,
+          "coverage": 85,
+          "connections": 67,
+          "focus": 53,
+          "confidence": "partial",
+          "gaps": [
+            {
+              "role": "block",
+              "label": "消耗转格挡",
+              "coverage": 0,
+              "priority": 15
+            }
+          ],
+          "unknownCards": [],
+          "unknownRelics": [],
+          "dynamicUnknown": [
+            "MAD_SCIENCE"
+          ],
+          "unverifiedFacts": [
+            "逐卡附魔未完整提取"
+          ]
+        },
+        {
+          "id": "strength",
+          "score": 29,
+          "coverage": 71,
+          "connections": 33,
+          "focus": 45,
+          "confidence": "partial",
+          "gaps": [
+            {
+              "role": "output",
+              "label": "多段与重复输出",
+              "coverage": 33,
+              "priority": 23.333333333333336
+            },
+            {
+              "role": "source",
+              "label": "力量来源",
+              "coverage": 85,
+              "priority": 5.250000000000001
+            }
+          ],
+          "unknownCards": [],
+          "unknownRelics": [],
+          "dynamicUnknown": [
+            "MAD_SCIENCE"
+          ],
+          "unverifiedFacts": [
+            "逐卡附魔未完整提取"
+          ]
+        },
+        {
+          "id": "block",
+          "score": 10,
+          "coverage": 35,
+          "connections": 0,
+          "focus": 35,
+          "confidence": "partial",
+          "gaps": [
+            {
+              "role": "retention",
+              "label": "跨回合保留格挡",
+              "coverage": 0,
+              "priority": 25
+            },
+            {
+              "role": "conversion",
+              "label": "格挡转输出",
+              "coverage": 0,
+              "priority": 25
+            },
+            {
+              "role": "growth",
+              "label": "格挡增长与放大",
+              "coverage": 0,
+              "priority": 15
+            }
+          ],
+          "unknownCards": [],
+          "unknownRelics": [],
+          "dynamicUnknown": [
+            "MAD_SCIENCE"
+          ],
+          "unverifiedFacts": [
+            "逐卡附魔未完整提取"
+          ]
+        },
+        {
+          "id": "auto_strike",
+          "score": 7,
+          "coverage": 28,
+          "connections": 0,
+          "focus": 33,
+          "confidence": "partial",
+          "gaps": [
+            {
+              "role": "starter",
+              "label": "自动打击启动",
+              "coverage": 0,
+              "priority": 30
+            },
+            {
+              "role": "loop",
+              "label": "抽牌打击循环",
+              "coverage": 0,
+              "priority": 30
+            },
+            {
+              "role": "strikes",
+              "label": "打击牌供给",
+              "coverage": 50,
+              "priority": 12.5
+            }
+          ],
+          "unknownCards": [],
+          "unknownRelics": [],
+          "dynamicUnknown": [
+            "MAD_SCIENCE"
+          ],
+          "unverifiedFacts": [
+            "逐卡附魔未完整提取"
+          ]
+        }
+      ],
+      "current": [
+        {
+          "id": "auto_strike",
+          "score": 22
+        },
+        {
+          "id": "exhaust",
+          "score": 52
+        },
+        {
+          "id": "strength",
+          "score": 57
+        },
+        {
+          "id": "block",
+          "score": 16
+        }
+      ]
+    },
+    {
+      "id": "e04c9b9a5f9b98fc",
+      "url": "https://spire-codex.com/zhs/runs/e04c9b9a5f9b98fc",
+      "expected": [
+        "strength"
+      ],
+      "outcome": "abandoned",
+      "count": 22,
+      "direction": {
+        "kind": "primary",
+        "primary": "strength",
+        "secondary": []
+      },
+      "scores": [
+        {
+          "id": "strength",
+          "score": 55,
+          "coverage": 85,
+          "connections": 100,
+          "focus": 63,
+          "confidence": "partial",
+          "gaps": [
+            {
+              "role": "resource",
+              "label": "通用资源支持",
+              "coverage": 0,
+              "priority": 15
+            }
+          ],
+          "unknownCards": [],
+          "unknownRelics": [],
+          "dynamicUnknown": [],
+          "unverifiedFacts": [
+            "逐卡附魔未完整提取"
+          ]
+        },
+        {
+          "id": "auto_strike",
+          "score": 6,
+          "coverage": 20,
+          "connections": 0,
+          "focus": 39,
+          "confidence": "partial",
+          "gaps": [
+            {
+              "role": "starter",
+              "label": "自动打击启动",
+              "coverage": 0,
+              "priority": 30
+            },
+            {
+              "role": "loop",
+              "label": "抽牌打击循环",
+              "coverage": 0,
+              "priority": 30
+            },
+            {
+              "role": "resource",
+              "label": "通用资源支持",
+              "coverage": 19,
+              "priority": 12.109375
+            },
+            {
+              "role": "strikes",
+              "label": "打击牌供给",
+              "coverage": 67,
+              "priority": 8.333333333333334
+            }
+          ],
+          "unknownCards": [],
+          "unknownRelics": [],
+          "dynamicUnknown": [],
+          "unverifiedFacts": [
+            "逐卡附魔未完整提取"
+          ]
+        },
+        {
+          "id": "block",
+          "score": 3,
+          "coverage": 15,
+          "connections": 0,
+          "focus": 25,
+          "confidence": "partial",
+          "gaps": [
+            {
+              "role": "retention",
+              "label": "跨回合保留格挡",
+              "coverage": 0,
+              "priority": 25
+            },
+            {
+              "role": "conversion",
+              "label": "格挡转输出",
+              "coverage": 0,
+              "priority": 25
+            },
+            {
+              "role": "growth",
+              "label": "格挡增长与放大",
+              "coverage": 0,
+              "priority": 15
+            },
+            {
+              "role": "resource",
+              "label": "通用资源支持",
+              "coverage": 0,
+              "priority": 15
+            },
+            {
+              "role": "generation",
+              "label": "格挡来源",
+              "coverage": 77,
+              "priority": 4.583333333333332
+            }
+          ],
+          "unknownCards": [],
+          "unknownRelics": [],
+          "dynamicUnknown": [],
+          "unverifiedFacts": [
+            "逐卡附魔未完整提取"
+          ]
+        },
+        {
+          "id": "exhaust",
+          "score": 0,
+          "coverage": 3,
+          "connections": 0,
+          "focus": 7,
+          "confidence": "partial",
+          "gaps": [
+            {
+              "role": "outlet",
+              "label": "主动消耗手段",
+              "coverage": 0,
+              "priority": 30
+            },
+            {
+              "role": "draw",
+              "label": "消耗转抽牌",
+              "coverage": 0,
+              "priority": 20
+            },
+            {
+              "role": "payoff",
+              "label": "消耗转输出",
+              "coverage": 0,
+              "priority": 20
+            },
+            {
+              "role": "block",
+              "label": "消耗转格挡",
+              "coverage": 0,
+              "priority": 15
+            },
+            {
+              "role": "resource",
+              "label": "通用资源支持",
+              "coverage": 19,
+              "priority": 12.109375
+            }
+          ],
+          "unknownCards": [],
+          "unknownRelics": [],
+          "dynamicUnknown": [],
+          "unverifiedFacts": [
+            "逐卡附魔未完整提取"
+          ]
+        }
+      ],
+      "current": [
+        {
+          "id": "auto_strike",
+          "score": 15
+        },
+        {
+          "id": "exhaust",
+          "score": 0
+        },
+        {
+          "id": "strength",
+          "score": 73
+        },
+        {
+          "id": "block",
+          "score": 5
+        }
+      ]
+    },
+    {
+      "id": "35a9b4838a58956d",
+      "url": "https://spire-codex.com/zhs/runs/35a9b4838a58956d",
+      "expected": [
+        "auto_strike",
+        "strength"
+      ],
+      "outcome": "defeat",
+      "count": 39,
+      "direction": {
+        "kind": "primary_with_secondary",
+        "primary": "strength",
+        "secondary": [
+          "auto_strike"
+        ]
+      },
+      "scores": [
+        {
+          "id": "strength",
+          "score": 53,
+          "coverage": 100,
+          "connections": 100,
+          "focus": 53,
+          "confidence": "partial",
+          "gaps": [],
+          "unknownCards": [],
+          "unknownRelics": [],
+          "dynamicUnknown": [],
+          "unverifiedFacts": [
+            "逐卡附魔未完整提取"
+          ]
+        },
+        {
+          "id": "auto_strike",
+          "score": 31,
+          "coverage": 70,
+          "connections": 50,
+          "focus": 47,
+          "confidence": "partial",
+          "gaps": [
+            {
+              "role": "loop",
+              "label": "抽牌打击循环",
+              "coverage": 0,
+              "priority": 30
+            }
+          ],
+          "unknownCards": [],
+          "unknownRelics": [],
+          "dynamicUnknown": [],
+          "unverifiedFacts": [
+            "逐卡附魔未完整提取"
+          ]
+        },
+        {
+          "id": "block",
+          "score": 22,
+          "coverage": 66,
+          "connections": 40,
+          "focus": 36,
+          "confidence": "partial",
+          "gaps": [
+            {
+              "role": "growth",
+              "label": "格挡增长与放大",
+              "coverage": 0,
+              "priority": 15
+            },
+            {
+              "role": "conversion",
+              "label": "格挡转输出",
+              "coverage": 50,
+              "priority": 12.5
+            },
+            {
+              "role": "generation",
+              "label": "格挡来源",
+              "coverage": 69,
+              "priority": 6.25
+            }
+          ],
+          "unknownCards": [],
+          "unknownRelics": [],
+          "dynamicUnknown": [],
+          "unverifiedFacts": [
+            "逐卡附魔未完整提取"
+          ]
+        },
+        {
+          "id": "exhaust",
+          "score": 4,
+          "coverage": 20,
+          "connections": 0,
+          "focus": 22,
+          "confidence": "partial",
+          "gaps": [
+            {
+              "role": "outlet",
+              "label": "主动消耗手段",
+              "coverage": 17,
+              "priority": 25
+            },
+            {
+              "role": "draw",
+              "label": "消耗转抽牌",
+              "coverage": 0,
+              "priority": 20
+            },
+            {
+              "role": "payoff",
+              "label": "消耗转输出",
+              "coverage": 0,
+              "priority": 20
+            },
+            {
+              "role": "block",
+              "label": "消耗转格挡",
+              "coverage": 0,
+              "priority": 15
+            }
+          ],
+          "unknownCards": [],
+          "unknownRelics": [],
+          "dynamicUnknown": [],
+          "unverifiedFacts": [
+            "逐卡附魔未完整提取"
+          ]
+        }
+      ],
+      "current": [
+        {
+          "id": "auto_strike",
+          "score": 62
+        },
+        {
+          "id": "exhaust",
+          "score": 4
+        },
+        {
+          "id": "strength",
+          "score": 82
+        },
+        {
+          "id": "block",
+          "score": 56
+        }
+      ]
+    }
+  ],
+  "counterfactual": [
+    {
+      "name": "original",
+      "count": 21,
+      "score": 100,
+      "coverage": 100,
+      "connections": 100,
+      "focus": 100,
+      "gaps": []
+    },
+    {
+      "name": "no_barricade",
+      "count": 20,
+      "score": 68,
+      "coverage": 75,
+      "connections": 67,
+      "focus": 93,
+      "gaps": [
+        {
+          "role": "retention",
+          "label": "跨回合保留格挡",
+          "coverage": 0,
+          "priority": 25
+        }
+      ]
+    },
+    {
+      "name": "no_body_slam",
+      "count": 18,
+      "score": 66,
+      "coverage": 75,
+      "connections": 67,
+      "focus": 90,
+      "gaps": [
+        {
+          "role": "conversion",
+          "label": "格挡转输出",
+          "coverage": 0,
+          "priority": 25
+        }
+      ]
+    },
+    {
+      "name": "add_three_body_slams",
+      "count": 24,
+      "score": 88,
+      "coverage": 100,
+      "connections": 100,
+      "focus": 88,
+      "gaps": []
+    },
+    {
+      "name": "replace_two_blood_walls",
+      "count": 21,
+      "score": 98,
+      "coverage": 100,
+      "connections": 100,
+      "focus": 98,
+      "gaps": []
+    },
+    {
+      "name": "add_ten_strikes",
+      "count": 31,
+      "score": 68,
+      "coverage": 100,
+      "connections": 100,
+      "focus": 68,
+      "gaps": []
+    },
+    {
+      "name": "no_resources",
+      "count": 18,
+      "score": 82,
+      "coverage": 89,
+      "connections": 100,
+      "focus": 90,
+      "gaps": [
+        {
+          "role": "resource",
+          "label": "通用资源支持",
+          "coverage": 25,
+          "priority": 11.25
+        }
+      ]
+    },
+    {
+      "name": "replace_barricade_with_unmovable",
+      "count": 21,
+      "score": 65,
+      "coverage": 75,
+      "connections": 67,
+      "focus": 89,
+      "gaps": [
+        {
+          "role": "retention",
+          "label": "跨回合保留格挡",
+          "coverage": 0,
+          "priority": 25
+        }
+      ]
+    }
+  ]
+}

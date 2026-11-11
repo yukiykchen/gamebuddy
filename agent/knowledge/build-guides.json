@@ -1,0 +1,2292 @@
+{
+  "version": "build-guides-1",
+  "retrievedAt": "2026-10-18T10:26:27.127720+00:00",
+  "sources": [
+    {
+      "character": "ironclad",
+      "url": "https://slaythespire2.net/zh-CN/build/ironclad",
+      "sha256": "e75264f28af66e476cd8f86a794889f041978267568d74255a4010a7825646d6"
+    },
+    {
+      "character": "silent",
+      "url": "https://slaythespire2.net/zh-CN/build/silent",
+      "sha256": "615ecc249b860663ec5f7873fbfa46fad6c820f7f60b806d00434ef95aabed16"
+    },
+    {
+      "character": "defect",
+      "url": "https://slaythespire2.net/zh-CN/build/defect",
+      "sha256": "71a09ef063541a2560207fbd5346dded0912e48d4a39010df131d1a6edadc8ae"
+    },
+    {
+      "character": "regent",
+      "url": "https://slaythespire2.net/zh-CN/build/regent",
+      "sha256": "50c429ad747ba635a18b4ad91c02427a7107ea13dd0b18321c4d60591b0747e6"
+    },
+    {
+      "character": "necrobinder",
+      "url": "https://slaythespire2.net/zh-CN/build/necrobinder",
+      "sha256": "a1bf7924bc293dc9818893a054bbf7c7e3642c129e97d62dedb7f6f4271c8c19"
+    }
+  ],
+  "builds": [
+    {
+      "id": "ironclad:exhaust-engine",
+      "character": "ironclad",
+      "name": "消耗流",
+      "source": "https://slaythespire2.net/zh-CN/build/ironclad#build-exhaust-engine",
+      "sourceKind": "guide",
+      "core": [
+        {
+          "id": "FEEL_NO_PAIN",
+          "name": "无惧疼痛",
+          "resolved": true
+        },
+        {
+          "id": "DARK_EMBRACE",
+          "name": "黑暗之拥",
+          "resolved": true
+        },
+        {
+          "id": "BURNING_PACT",
+          "name": "燃烧契约",
+          "resolved": true
+        },
+        {
+          "id": "TRUE_GRIT",
+          "name": "坚毅",
+          "resolved": true
+        },
+        {
+          "id": "FIEND_FIRE",
+          "name": "恶魔之焰",
+          "resolved": true
+        }
+      ],
+      "support": [
+        {
+          "id": "CORRUPTION",
+          "name": "腐化",
+          "resolved": true
+        },
+        {
+          "id": "SECOND_WIND",
+          "name": "重振精神",
+          "resolved": true
+        },
+        {
+          "id": "PACTS_END",
+          "name": "契约终结",
+          "resolved": true
+        },
+        {
+          "id": "OFFERING",
+          "name": "祭品",
+          "resolved": true
+        },
+        {
+          "id": "STOKE",
+          "name": "添柴",
+          "resolved": true
+        },
+        {
+          "id": "EVIL_EYE",
+          "name": "邪眼",
+          "resolved": true
+        },
+        {
+          "id": "FORGOTTEN_RITUAL",
+          "name": "被遗忘的仪式",
+          "resolved": true
+        },
+        {
+          "id": "ASHEN_STRIKE",
+          "name": "灰烬打击",
+          "resolved": true
+        },
+        {
+          "id": "DRUM_OF_BATTLE",
+          "name": "战鼓",
+          "resolved": true
+        },
+        {
+          "id": "HOWL_FROM_BEYOND",
+          "name": "彼岸咆哮",
+          "resolved": true
+        }
+      ],
+      "relics": [
+        {
+          "id": "CHARONS_ASHES",
+          "name": "卡戎之灰",
+          "resolved": true
+        },
+        {
+          "id": "JOSS_PAPER",
+          "name": "金纸",
+          "resolved": true
+        },
+        {
+          "id": "BURNING_STICKS",
+          "name": "燃烧木棍",
+          "resolved": true
+        },
+        {
+          "id": "FORGOTTEN_SOUL",
+          "name": "遗忘之魂",
+          "resolved": true
+        }
+      ]
+    },
+    {
+      "id": "ironclad:strength-scaling",
+      "character": "ironclad",
+      "name": "力量流",
+      "source": "https://slaythespire2.net/zh-CN/build/ironclad#build-strength-scaling",
+      "sourceKind": "guide",
+      "core": [
+        {
+          "id": "INFLAME",
+          "name": "燃烧",
+          "resolved": true
+        },
+        {
+          "id": "DEMON_FORM",
+          "name": "恶魔形态",
+          "resolved": true
+        },
+        {
+          "id": "TWIN_STRIKE",
+          "name": "双重打击",
+          "resolved": true
+        },
+        {
+          "id": "WHIRLWIND",
+          "name": "旋风斩",
+          "resolved": true
+        },
+        {
+          "id": "SWORD_BOOMERANG",
+          "name": "飞剑回旋镖",
+          "resolved": true
+        }
+      ],
+      "support": [
+        {
+          "id": "SETUP_STRIKE",
+          "name": "预备打击",
+          "resolved": true
+        },
+        {
+          "id": "FIGHT_ME",
+          "name": "与我一战！",
+          "resolved": true
+        },
+        {
+          "id": "DOMINATE",
+          "name": "主宰",
+          "resolved": true
+        },
+        {
+          "id": "BRAND",
+          "name": "烙印",
+          "resolved": true
+        },
+        {
+          "id": "THRASH",
+          "name": "痛殴",
+          "resolved": true
+        },
+        {
+          "id": "BATTLE_TRANCE",
+          "name": "战斗专注",
+          "resolved": true
+        },
+        {
+          "id": "OFFERING",
+          "name": "祭品",
+          "resolved": true
+        },
+        {
+          "id": "BLOODLETTING",
+          "name": "放血",
+          "resolved": true
+        },
+        {
+          "id": "SHRUG_IT_OFF",
+          "name": "耸肩无视",
+          "resolved": true
+        },
+        {
+          "id": "ONE_TWO_PUNCH",
+          "name": "连环拳",
+          "resolved": true
+        }
+      ],
+      "relics": [
+        {
+          "id": "VAJRA",
+          "name": "金刚杵",
+          "resolved": true
+        },
+        {
+          "id": "RUINED_HELMET",
+          "name": "损毁头盔",
+          "resolved": true
+        },
+        {
+          "id": "BRIMSTONE",
+          "name": "硫磺",
+          "resolved": true
+        },
+        {
+          "id": "SWORD_OF_JADE",
+          "name": "玉之剑",
+          "resolved": true
+        },
+        {
+          "id": "GIRYA",
+          "name": "壶铃",
+          "resolved": true
+        },
+        {
+          "id": "SLING_OF_COURAGE",
+          "name": "勇气投石索",
+          "resolved": true
+        }
+      ]
+    },
+    {
+      "id": "ironclad:block-barricade",
+      "character": "ironclad",
+      "name": "格挡／全身撞击流",
+      "source": "https://slaythespire2.net/zh-CN/build/ironclad#build-block-barricade",
+      "sourceKind": "guide",
+      "core": [
+        {
+          "id": "BARRICADE",
+          "name": "壁垒",
+          "resolved": true
+        },
+        {
+          "id": "BODY_SLAM",
+          "name": "全身撞击",
+          "resolved": true
+        },
+        {
+          "id": "UNMOVABLE",
+          "name": "坚定不移",
+          "resolved": true
+        },
+        {
+          "id": "SHRUG_IT_OFF",
+          "name": "耸肩无视",
+          "resolved": true
+        },
+        {
+          "id": "IMPERVIOUS",
+          "name": "岿然不动",
+          "resolved": true
+        }
+      ],
+      "support": [
+        {
+          "id": "JUGGERNAUT",
+          "name": "势不可当",
+          "resolved": true
+        },
+        {
+          "id": "CRIMSON_MANTLE",
+          "name": "绯红披风",
+          "resolved": true
+        },
+        {
+          "id": "FLAME_BARRIER",
+          "name": "火焰屏障",
+          "resolved": true
+        },
+        {
+          "id": "BLOOD_WALL",
+          "name": "血墙",
+          "resolved": true
+        },
+        {
+          "id": "COLOSSUS",
+          "name": "巨像",
+          "resolved": true
+        },
+        {
+          "id": "FEEL_NO_PAIN",
+          "name": "无惧疼痛",
+          "resolved": true
+        },
+        {
+          "id": "STONE_ARMOR",
+          "name": "岩石铠甲",
+          "resolved": true
+        },
+        {
+          "id": "ARMAMENTS",
+          "name": "武装",
+          "resolved": true
+        }
+      ],
+      "relics": [
+        {
+          "id": "ANCHOR",
+          "name": "锚",
+          "resolved": true
+        },
+        {
+          "id": "HORN_CLEAT",
+          "name": "船夹板",
+          "resolved": true
+        },
+        {
+          "id": "CAPTAINS_WHEEL",
+          "name": "舵盘",
+          "resolved": true
+        },
+        {
+          "id": "ORICHALCUM",
+          "name": "奥利哈钢",
+          "resolved": true
+        },
+        {
+          "id": "VAMBRACE",
+          "name": "臂甲",
+          "resolved": true
+        },
+        {
+          "id": "CLOAK_CLASP",
+          "name": "斗篷扣",
+          "resolved": true
+        }
+      ]
+    },
+    {
+      "id": "ironclad:vulnerable",
+      "character": "ironclad",
+      "name": "易伤流",
+      "source": "https://slaythespire2.net/zh-CN/build/ironclad#build-vulnerable",
+      "sourceKind": "guide",
+      "core": [
+        {
+          "id": "CRUELTY",
+          "name": "残酷",
+          "resolved": true
+        },
+        {
+          "id": "TREMBLE",
+          "name": "战栗",
+          "resolved": true
+        },
+        {
+          "id": "MOLTEN_FIST",
+          "name": "熔融之拳",
+          "resolved": true
+        },
+        {
+          "id": "BULLY",
+          "name": "欺凌",
+          "resolved": true
+        },
+        {
+          "id": "DISMANTLE",
+          "name": "拆卸",
+          "resolved": true
+        }
+      ],
+      "support": [
+        {
+          "id": "BASH",
+          "name": "痛击",
+          "resolved": true
+        },
+        {
+          "id": "THUNDERCLAP",
+          "name": "闪电霹雳",
+          "resolved": true
+        },
+        {
+          "id": "TAUNT",
+          "name": "挑衅",
+          "resolved": true
+        },
+        {
+          "id": "UPPERCUT",
+          "name": "上勾拳",
+          "resolved": true
+        },
+        {
+          "id": "DOMINATE",
+          "name": "主宰",
+          "resolved": true
+        },
+        {
+          "id": "VICIOUS",
+          "name": "凶恶",
+          "resolved": true
+        },
+        {
+          "id": "COLOSSUS",
+          "name": "巨像",
+          "resolved": true
+        }
+      ],
+      "relics": [
+        {
+          "id": "PAPER_PHROG",
+          "name": "纸蛙",
+          "resolved": true
+        },
+        {
+          "id": "BAG_OF_MARBLES",
+          "name": "弹珠袋",
+          "resolved": true
+        }
+      ]
+    },
+    {
+      "id": "ironclad:self-damage",
+      "character": "ironclad",
+      "name": "自伤流",
+      "source": "https://slaythespire2.net/zh-CN/build/ironclad#build-self-damage",
+      "sourceKind": "guide",
+      "core": [
+        {
+          "id": "RUPTURE",
+          "name": "撕裂",
+          "resolved": true
+        },
+        {
+          "id": "INFERNO",
+          "name": "狱火",
+          "resolved": true
+        },
+        {
+          "id": "BLOODLETTING",
+          "name": "放血",
+          "resolved": true
+        },
+        {
+          "id": "OFFERING",
+          "name": "祭品",
+          "resolved": true
+        },
+        {
+          "id": "HEMOKINESIS",
+          "name": "御血术",
+          "resolved": true
+        }
+      ],
+      "support": [
+        {
+          "id": "BREAKTHROUGH",
+          "name": "突破",
+          "resolved": true
+        },
+        {
+          "id": "TEAR_ASUNDER",
+          "name": "扯碎",
+          "resolved": true
+        },
+        {
+          "id": "SPITE",
+          "name": "怨恨",
+          "resolved": true
+        },
+        {
+          "id": "BRAND",
+          "name": "烙印",
+          "resolved": true
+        },
+        {
+          "id": "BLOOD_WALL",
+          "name": "血墙",
+          "resolved": true
+        },
+        {
+          "id": "CRIMSON_MANTLE",
+          "name": "绯红披风",
+          "resolved": true
+        },
+        {
+          "id": "FEED",
+          "name": "狂宴",
+          "resolved": true
+        }
+      ],
+      "relics": [
+        {
+          "id": "SELF_FORMING_CLAY",
+          "name": "自成型黏土",
+          "resolved": true
+        },
+        {
+          "id": "DEMON_TONGUE",
+          "name": "恶魔之舌",
+          "resolved": true
+        },
+        {
+          "id": "CENTENNIAL_PUZZLE",
+          "name": "百年积木",
+          "resolved": true
+        },
+        {
+          "id": "RED_SKULL",
+          "name": "红头骨",
+          "resolved": true
+        },
+        {
+          "id": "BEATING_REMNANT",
+          "name": "律动残余",
+          "resolved": true
+        }
+      ]
+    },
+    {
+      "id": "silent:poison",
+      "character": "silent",
+      "name": "中毒流",
+      "source": "https://slaythespire2.net/zh-CN/build/silent#build-poison",
+      "sourceKind": "guide",
+      "core": [
+        {
+          "id": "NOXIOUS_FUMES",
+          "name": "毒雾",
+          "resolved": true
+        },
+        {
+          "id": "DEADLY_POISON",
+          "name": "致命毒药",
+          "resolved": true
+        },
+        {
+          "id": "POISONED_STAB",
+          "name": "带毒刺击",
+          "resolved": true
+        },
+        {
+          "id": "BOUNCING_FLASK",
+          "name": "弹跳药瓶",
+          "resolved": true
+        },
+        {
+          "id": "ACCELERANT",
+          "name": "触媒",
+          "resolved": true
+        }
+      ],
+      "support": [
+        {
+          "id": "HAZE",
+          "name": "迷雾",
+          "resolved": true
+        },
+        {
+          "id": "BUBBLE_BUBBLE",
+          "name": "咕嘟冒泡",
+          "resolved": true
+        },
+        {
+          "id": "CORROSIVE_WAVE",
+          "name": "腐蚀波",
+          "resolved": true
+        },
+        {
+          "id": "ENVENOM",
+          "name": "涂毒",
+          "resolved": true
+        },
+        {
+          "id": "OUTBREAK",
+          "name": "毒性爆发",
+          "resolved": true
+        },
+        {
+          "id": "MIRAGE",
+          "name": "蜃景",
+          "resolved": true
+        },
+        {
+          "id": "FOOTWORK",
+          "name": "灵动步法",
+          "resolved": true
+        },
+        {
+          "id": "BACKFLIP",
+          "name": "后空翻",
+          "resolved": true
+        },
+        {
+          "id": "WELL_LAID_PLANS",
+          "name": "计划妥当",
+          "resolved": true
+        },
+        {
+          "id": "EXPERTISE",
+          "name": "独门技术",
+          "resolved": true
+        }
+      ],
+      "relics": [
+        {
+          "id": "SNECKO_SKULL",
+          "name": "异蛇头骨",
+          "resolved": true
+        },
+        {
+          "id": "TWISTED_FUNNEL",
+          "name": "扭曲漏斗",
+          "resolved": true
+        },
+        {
+          "id": "UNSETTLING_LAMP",
+          "name": "不安油灯",
+          "resolved": true
+        },
+        {
+          "id": "TOUGH_BANDAGES",
+          "name": "结实绷带",
+          "resolved": true
+        }
+      ]
+    },
+    {
+      "id": "silent:sly-discard",
+      "character": "silent",
+      "name": "奇巧弃牌流",
+      "source": "https://slaythespire2.net/zh-CN/build/silent#build-sly-discard",
+      "sourceKind": "guide",
+      "core": [
+        {
+          "id": "TACTICIAN",
+          "name": "战术大师",
+          "resolved": true
+        },
+        {
+          "id": "REFLEX",
+          "name": "本能反应",
+          "resolved": true
+        },
+        {
+          "id": "ACROBATICS",
+          "name": "杂技",
+          "resolved": true
+        },
+        {
+          "id": "PREPARED",
+          "name": "早有准备",
+          "resolved": true
+        },
+        {
+          "id": "CALCULATED_GAMBLE",
+          "name": "计算下注",
+          "resolved": true
+        }
+      ],
+      "support": [
+        {
+          "id": "DAGGER_THROW",
+          "name": "投掷匕首",
+          "resolved": true
+        },
+        {
+          "id": "FLICK_FLACK",
+          "name": "翻越撑击",
+          "resolved": true
+        },
+        {
+          "id": "RICOCHET",
+          "name": "连续反弹",
+          "resolved": true
+        },
+        {
+          "id": "UNTOUCHABLE",
+          "name": "触不可及",
+          "resolved": true
+        },
+        {
+          "id": "ABRASIVE",
+          "name": "磨蚀",
+          "resolved": true
+        },
+        {
+          "id": "HAND_TRICK",
+          "name": "手上技法",
+          "resolved": true
+        },
+        {
+          "id": "MASTER_PLANNER",
+          "name": "谋划专家",
+          "resolved": true
+        },
+        {
+          "id": "TOOLS_OF_THE_TRADE",
+          "name": "必备工具",
+          "resolved": true
+        },
+        {
+          "id": "MEMENTO_MORI",
+          "name": "铭记死亡",
+          "resolved": true
+        },
+        {
+          "id": "HIDDEN_DAGGERS",
+          "name": "隐秘匕首",
+          "resolved": true
+        }
+      ],
+      "relics": [
+        {
+          "id": "TINGSHA",
+          "name": "铜钹",
+          "resolved": true
+        },
+        {
+          "id": "TOUGH_BANDAGES",
+          "name": "结实绷带",
+          "resolved": true
+        },
+        {
+          "id": "LETTER_OPENER",
+          "name": "开信刀",
+          "resolved": true
+        },
+        {
+          "id": "BAG_OF_PREPARATION",
+          "name": "准备背包",
+          "resolved": true
+        },
+        {
+          "id": "CENTENNIAL_PUZZLE",
+          "name": "百年积木",
+          "resolved": true
+        }
+      ]
+    },
+    {
+      "id": "silent:shiv",
+      "character": "silent",
+      "name": "小刀流",
+      "source": "https://slaythespire2.net/zh-CN/build/silent#build-shiv",
+      "sourceKind": "guide",
+      "core": [
+        {
+          "id": "BLADE_DANCE",
+          "name": "刀刃之舞",
+          "resolved": true
+        },
+        {
+          "id": "ACCURACY",
+          "name": "精准",
+          "resolved": true
+        },
+        {
+          "id": "INFINITE_BLADES",
+          "name": "无尽刀刃",
+          "resolved": true
+        },
+        {
+          "id": "CLOAK_AND_DAGGER",
+          "name": "斗篷与匕首",
+          "resolved": true
+        },
+        {
+          "id": "LEADING_STRIKE",
+          "name": "先制打击",
+          "resolved": true
+        }
+      ],
+      "support": [
+        {
+          "id": "FAN_OF_KNIVES",
+          "name": "刀扇",
+          "resolved": true
+        },
+        {
+          "id": "PHANTOM_BLADES",
+          "name": "幻影之刃",
+          "resolved": true
+        },
+        {
+          "id": "BLADE_OF_INK",
+          "name": "墨之刃",
+          "resolved": true
+        },
+        {
+          "id": "KNIFE_TRAP",
+          "name": "刀刃陷阱",
+          "resolved": true
+        },
+        {
+          "id": "STORM_OF_STEEL",
+          "name": "钢铁风暴",
+          "resolved": true
+        },
+        {
+          "id": "HIDDEN_DAGGERS",
+          "name": "隐秘匕首",
+          "resolved": true
+        },
+        {
+          "id": "AFTERIMAGE",
+          "name": "余像",
+          "resolved": true
+        },
+        {
+          "id": "FINISHER",
+          "name": "终结技",
+          "resolved": true
+        },
+        {
+          "id": "EXPOSE",
+          "name": "暴露",
+          "resolved": true
+        }
+      ],
+      "relics": [
+        {
+          "id": "NINJA_SCROLL",
+          "name": "忍术卷轴",
+          "resolved": true
+        },
+        {
+          "id": "HELICAL_DART",
+          "name": "螺线飞镖",
+          "resolved": true
+        },
+        {
+          "id": "KUNAI",
+          "name": "苦无",
+          "resolved": true
+        },
+        {
+          "id": "SHURIKEN",
+          "name": "手里剑",
+          "resolved": true
+        },
+        {
+          "id": "ORNAMENTAL_FAN",
+          "name": "精致折扇",
+          "resolved": true
+        },
+        {
+          "id": "NUNCHAKU",
+          "name": "双截棍",
+          "resolved": true
+        }
+      ]
+    },
+    {
+      "id": "silent:dexterity-block",
+      "character": "silent",
+      "name": "敏捷格挡流",
+      "source": "https://slaythespire2.net/zh-CN/build/silent#build-dexterity-block",
+      "sourceKind": "guide",
+      "core": [
+        {
+          "id": "FOOTWORK",
+          "name": "灵动步法",
+          "resolved": true
+        },
+        {
+          "id": "AFTERIMAGE",
+          "name": "余像",
+          "resolved": true
+        },
+        {
+          "id": "BACKFLIP",
+          "name": "后空翻",
+          "resolved": true
+        },
+        {
+          "id": "WRAITH_FORM",
+          "name": "幽魂形态",
+          "resolved": true
+        }
+      ],
+      "support": [
+        {
+          "id": "BURST",
+          "name": "爆发",
+          "resolved": true
+        },
+        {
+          "id": "DASH",
+          "name": "冲刺",
+          "resolved": true
+        },
+        {
+          "id": "BLUR",
+          "name": "残影",
+          "resolved": true
+        },
+        {
+          "id": "DODGE_AND_ROLL",
+          "name": "闪躲翻滚",
+          "resolved": true
+        },
+        {
+          "id": "LEG_SWEEP",
+          "name": "扫腿",
+          "resolved": true
+        },
+        {
+          "id": "ABRASIVE",
+          "name": "磨蚀",
+          "resolved": true
+        },
+        {
+          "id": "PIERCING_WAIL",
+          "name": "尖啸",
+          "resolved": true
+        }
+      ],
+      "relics": [
+        {
+          "id": "TOUGH_BANDAGES",
+          "name": "结实绷带",
+          "resolved": true
+        },
+        {
+          "id": "KUNAI",
+          "name": "苦无",
+          "resolved": true
+        }
+      ]
+    },
+    {
+      "id": "silent:draw-tempo",
+      "character": "silent",
+      "name": "过牌节奏流",
+      "source": "https://slaythespire2.net/zh-CN/build/silent#build-draw-tempo",
+      "sourceKind": "guide",
+      "core": [
+        {
+          "id": "SPEEDSTER",
+          "name": "速行者",
+          "resolved": true
+        },
+        {
+          "id": "SERPENT_FORM",
+          "name": "群蛇形态",
+          "resolved": true
+        },
+        {
+          "id": "ACROBATICS",
+          "name": "杂技",
+          "resolved": true
+        },
+        {
+          "id": "ADRENALINE",
+          "name": "肾上腺素",
+          "resolved": true
+        }
+      ],
+      "support": [
+        {
+          "id": "BACKFLIP",
+          "name": "后空翻",
+          "resolved": true
+        },
+        {
+          "id": "PREDATOR",
+          "name": "猎杀者",
+          "resolved": true
+        },
+        {
+          "id": "ESCAPE_PLAN",
+          "name": "逃脱计划",
+          "resolved": true
+        },
+        {
+          "id": "PREPARED",
+          "name": "早有准备",
+          "resolved": true
+        },
+        {
+          "id": "TOOLS_OF_THE_TRADE",
+          "name": "必备工具",
+          "resolved": true
+        },
+        {
+          "id": "MURDER",
+          "name": "谋杀",
+          "resolved": true
+        },
+        {
+          "id": "CORROSIVE_WAVE",
+          "name": "腐蚀波",
+          "resolved": true
+        }
+      ],
+      "relics": []
+    },
+    {
+      "id": "defect:frost-focus-orbs",
+      "character": "defect",
+      "name": "冰霜集中球",
+      "source": "https://slaythespire2.net/zh-CN/build/defect#build-frost-focus-orbs",
+      "sourceKind": "guide",
+      "core": [
+        {
+          "id": "GLACIER",
+          "name": "冰川",
+          "resolved": true
+        },
+        {
+          "id": "DEFRAGMENT",
+          "name": "碎片整理",
+          "resolved": true
+        },
+        {
+          "id": "CAPACITOR",
+          "name": "扩容",
+          "resolved": true
+        },
+        {
+          "id": "COOLHEADED",
+          "name": "冷静头脑",
+          "resolved": true
+        },
+        {
+          "id": "MODDED",
+          "name": "模组改造",
+          "resolved": true
+        },
+        {
+          "id": "HOTFIX",
+          "name": "热修复",
+          "resolved": true
+        }
+      ],
+      "support": [
+        {
+          "id": "CHILL",
+          "name": "冰寒",
+          "resolved": true
+        },
+        {
+          "id": "COLD_SNAP",
+          "name": "寒流",
+          "resolved": true
+        },
+        {
+          "id": "LOOP",
+          "name": "循环",
+          "resolved": true
+        },
+        {
+          "id": "HAILSTORM",
+          "name": "冰雹风暴",
+          "resolved": true
+        },
+        {
+          "id": "COOLANT",
+          "name": "冷却剂",
+          "resolved": true
+        },
+        {
+          "id": "SYNCHRONIZE",
+          "name": "同步",
+          "resolved": true
+        },
+        {
+          "id": "BALL_LIGHTNING",
+          "name": "球状闪电",
+          "resolved": true
+        },
+        {
+          "id": "QUADCAST",
+          "name": "四重释放",
+          "resolved": true
+        },
+        {
+          "id": "VOLTAIC",
+          "name": "电流相生",
+          "resolved": true
+        },
+        {
+          "id": "CHAOS",
+          "name": "混沌",
+          "resolved": true
+        }
+      ],
+      "relics": [
+        {
+          "id": "DATA_DISK",
+          "name": "数据磁盘",
+          "resolved": true
+        },
+        {
+          "id": "GOLD_PLATED_CABLES",
+          "name": "镀金缆线",
+          "resolved": true
+        },
+        {
+          "id": "RUNIC_CAPACITOR",
+          "name": "符文电容器",
+          "resolved": true
+        },
+        {
+          "id": "EMOTION_CHIP",
+          "name": "情感芯片",
+          "resolved": true
+        },
+        {
+          "id": "CRACKED_CORE",
+          "name": "破损核心",
+          "resolved": true
+        }
+      ]
+    },
+    {
+      "id": "defect:claw-zero-cost",
+      "character": "defect",
+      "name": "0 费 Claw 流",
+      "source": "https://slaythespire2.net/zh-CN/build/defect#build-claw-zero-cost",
+      "sourceKind": "guide",
+      "core": [
+        {
+          "id": "CLAW",
+          "name": "爪击",
+          "resolved": true
+        },
+        {
+          "id": "ALL_FOR_ONE",
+          "name": "万物一心",
+          "resolved": true
+        },
+        {
+          "id": "FERAL",
+          "name": "野性",
+          "resolved": true
+        },
+        {
+          "id": "SCRAPE",
+          "name": "刮削",
+          "resolved": true
+        },
+        {
+          "id": "FTL",
+          "name": "超越光速",
+          "resolved": true
+        }
+      ],
+      "support": [
+        {
+          "id": "BEAM_CELL",
+          "name": "光束射线",
+          "resolved": true
+        },
+        {
+          "id": "GO_FOR_THE_EYES",
+          "name": "眼部攻击",
+          "resolved": true
+        },
+        {
+          "id": "SKIM",
+          "name": "快速检索",
+          "resolved": true
+        },
+        {
+          "id": "HOLOGRAM",
+          "name": "全息影像",
+          "resolved": true
+        },
+        {
+          "id": "MOMENTUM_STRIKE",
+          "name": "趁势打击",
+          "resolved": true
+        },
+        {
+          "id": "ADAPTIVE_STRIKE",
+          "name": "适应打击",
+          "resolved": true
+        },
+        {
+          "id": "BULK_UP",
+          "name": "暴涨",
+          "resolved": true
+        },
+        {
+          "id": "HOTFIX",
+          "name": "热修复",
+          "resolved": true
+        },
+        {
+          "id": "FLASH_OF_STEEL",
+          "name": "亮剑",
+          "resolved": true
+        }
+      ],
+      "relics": [
+        {
+          "id": "UNCEASING_TOP",
+          "name": "不休陀螺",
+          "resolved": true
+        },
+        {
+          "id": "SHURIKEN",
+          "name": "手里剑",
+          "resolved": true
+        },
+        {
+          "id": "KUNAI",
+          "name": "苦无",
+          "resolved": true
+        }
+      ]
+    },
+    {
+      "id": "defect:lightning-power-engine",
+      "character": "defect",
+      "name": "闪电能力引擎",
+      "source": "https://slaythespire2.net/zh-CN/build/defect#build-lightning-power-engine",
+      "sourceKind": "guide",
+      "core": [
+        {
+          "id": "BALL_LIGHTNING",
+          "name": "球状闪电",
+          "resolved": true
+        },
+        {
+          "id": "STORM",
+          "name": "雷暴",
+          "resolved": true
+        },
+        {
+          "id": "TEMPEST",
+          "name": "暴风雨",
+          "resolved": true
+        },
+        {
+          "id": "THUNDER",
+          "name": "雷霆",
+          "resolved": true
+        },
+        {
+          "id": "SUBROUTINE",
+          "name": "子程序",
+          "resolved": true
+        },
+        {
+          "id": "CREATIVE_AI",
+          "name": "创造性AI",
+          "resolved": true
+        }
+      ],
+      "support": [
+        {
+          "id": "ZAP",
+          "name": "电击",
+          "resolved": true
+        },
+        {
+          "id": "ECHO_FORM",
+          "name": "回响形态",
+          "resolved": true
+        },
+        {
+          "id": "SIGNAL_BOOST",
+          "name": "信号增强",
+          "resolved": true
+        },
+        {
+          "id": "MACHINE_LEARNING",
+          "name": "机器学习",
+          "resolved": true
+        },
+        {
+          "id": "LIGHTNING_ROD",
+          "name": "引雷针",
+          "resolved": true
+        },
+        {
+          "id": "TESLA_COIL",
+          "name": "特斯拉线圈",
+          "resolved": true
+        },
+        {
+          "id": "DEFRAGMENT",
+          "name": "碎片整理",
+          "resolved": true
+        },
+        {
+          "id": "CAPACITOR",
+          "name": "扩容",
+          "resolved": true
+        },
+        {
+          "id": "WHITE_NOISE",
+          "name": "白噪声",
+          "resolved": true
+        },
+        {
+          "id": "VOLTAIC",
+          "name": "电流相生",
+          "resolved": true
+        }
+      ],
+      "relics": [
+        {
+          "id": "CRACKED_CORE",
+          "name": "破损核心",
+          "resolved": true
+        },
+        {
+          "id": "DATA_DISK",
+          "name": "数据磁盘",
+          "resolved": true
+        },
+        {
+          "id": "GOLD_PLATED_CABLES",
+          "name": "镀金缆线",
+          "resolved": true
+        }
+      ]
+    },
+    {
+      "id": "defect:dark-orb-evoke-burst",
+      "character": "defect",
+      "name": "黑暗球激发爆发",
+      "source": "https://slaythespire2.net/zh-CN/build/defect#build-dark-orb-evoke-burst",
+      "sourceKind": "guide",
+      "core": [
+        {
+          "id": "DARKNESS",
+          "name": "漆黑",
+          "resolved": true
+        },
+        {
+          "id": "MULTI_CAST",
+          "name": "多重释放",
+          "resolved": true
+        },
+        {
+          "id": "LOOP",
+          "name": "循环",
+          "resolved": true
+        },
+        {
+          "id": "SHATTER",
+          "name": "打碎",
+          "resolved": true
+        },
+        {
+          "id": "SHADOW_SHIELD",
+          "name": "暗影之盾",
+          "resolved": true
+        }
+      ],
+      "support": [
+        {
+          "id": "NULL",
+          "name": "空值",
+          "resolved": true
+        },
+        {
+          "id": "DUALCAST",
+          "name": "双重释放",
+          "resolved": true
+        },
+        {
+          "id": "QUADCAST",
+          "name": "四重释放",
+          "resolved": true
+        },
+        {
+          "id": "CONSUMING_SHADOW",
+          "name": "吞噬暗影",
+          "resolved": true
+        },
+        {
+          "id": "SYNCHRONIZE",
+          "name": "同步",
+          "resolved": true
+        },
+        {
+          "id": "CAPACITOR",
+          "name": "扩容",
+          "resolved": true
+        },
+        {
+          "id": "RAINBOW",
+          "name": "彩虹",
+          "resolved": true
+        },
+        {
+          "id": "DEFRAGMENT",
+          "name": "碎片整理",
+          "resolved": true
+        }
+      ],
+      "relics": [
+        {
+          "id": "SYMBIOTIC_VIRUS",
+          "name": "共生病毒",
+          "resolved": true
+        },
+        {
+          "id": "GOLD_PLATED_CABLES",
+          "name": "镀金缆线",
+          "resolved": true
+        }
+      ]
+    },
+    {
+      "id": "defect:status-engine",
+      "character": "defect",
+      "name": "状态牌引擎",
+      "source": "https://slaythespire2.net/zh-CN/build/defect#build-status-engine",
+      "sourceKind": "guide",
+      "core": [
+        {
+          "id": "TRASH_TO_TREASURE",
+          "name": "化废为宝",
+          "resolved": true
+        },
+        {
+          "id": "SMOKESTACK",
+          "name": "烟囱",
+          "resolved": true
+        },
+        {
+          "id": "ITERATION",
+          "name": "迭代",
+          "resolved": true
+        },
+        {
+          "id": "ROCKET_PUNCH",
+          "name": "火箭飞拳",
+          "resolved": true
+        },
+        {
+          "id": "FLAK_CANNON",
+          "name": "散射炮",
+          "resolved": true
+        }
+      ],
+      "support": [
+        {
+          "id": "GUNK_UP",
+          "name": "污秽攻击",
+          "resolved": true
+        },
+        {
+          "id": "OVERCLOCK",
+          "name": "超频",
+          "resolved": true
+        },
+        {
+          "id": "TURBO",
+          "name": "内核加速",
+          "resolved": true
+        },
+        {
+          "id": "COMPACT",
+          "name": "压缩",
+          "resolved": true
+        },
+        {
+          "id": "FIGHT_THROUGH",
+          "name": "强撑",
+          "resolved": true
+        },
+        {
+          "id": "BOOST_AWAY",
+          "name": "高速脱离",
+          "resolved": true
+        },
+        {
+          "id": "HELIX_DRILL",
+          "name": "螺旋钻击",
+          "resolved": true
+        },
+        {
+          "id": "SCAVENGE",
+          "name": "内存清理",
+          "resolved": true
+        }
+      ],
+      "relics": []
+    },
+    {
+      "id": "regent:star-engine",
+      "character": "regent",
+      "name": "辉星引擎",
+      "source": "https://slaythespire2.net/zh-CN/build/regent#build-star-engine",
+      "sourceKind": "guide",
+      "core": [
+        {
+          "id": "GLOW",
+          "name": "辉光",
+          "resolved": true
+        },
+        {
+          "id": "GENESIS",
+          "name": "创世纪",
+          "resolved": true
+        },
+        {
+          "id": "HIDDEN_CACHE",
+          "name": "隐秘藏品",
+          "resolved": true
+        },
+        {
+          "id": "GATHER_LIGHT",
+          "name": "收集光辉",
+          "resolved": true
+        },
+        {
+          "id": "COMET",
+          "name": "彗星",
+          "resolved": true
+        },
+        {
+          "id": "REFLECT",
+          "name": "倒映",
+          "resolved": true
+        }
+      ],
+      "support": [
+        {
+          "id": "BIG_BANG",
+          "name": "大爆炸",
+          "resolved": true
+        },
+        {
+          "id": "SOLAR_STRIKE",
+          "name": "太阳打击",
+          "resolved": true
+        },
+        {
+          "id": "SHINING_STRIKE",
+          "name": "明耀打击",
+          "resolved": true
+        },
+        {
+          "id": "ROYAL_GAMBLE",
+          "name": "胜券在王",
+          "resolved": true
+        },
+        {
+          "id": "CHILD_OF_THE_STARS",
+          "name": "群星之子",
+          "resolved": true
+        },
+        {
+          "id": "BLACK_HOLE",
+          "name": "黑洞",
+          "resolved": true
+        },
+        {
+          "id": "SEVEN_STARS",
+          "name": "七星",
+          "resolved": true
+        },
+        {
+          "id": "RADIATE",
+          "name": "辐射",
+          "resolved": true
+        },
+        {
+          "id": "PARTICLE_WALL",
+          "name": "粒子墙",
+          "resolved": true
+        },
+        {
+          "id": "CLOAK_OF_STARS",
+          "name": "群星斗篷",
+          "resolved": true
+        }
+      ],
+      "relics": [
+        {
+          "id": "DIVINE_RIGHT",
+          "name": "天赋君权",
+          "resolved": true
+        },
+        {
+          "id": "LUNAR_PASTRY",
+          "name": "月亮糕点",
+          "resolved": true
+        },
+        {
+          "id": "GALACTIC_DUST",
+          "name": "星系尘埃",
+          "resolved": true
+        },
+        {
+          "id": "MINI_REGENT",
+          "name": "迷你储君",
+          "resolved": true
+        }
+      ]
+    },
+    {
+      "id": "regent:alignment-loop",
+      "character": "regent",
+      "name": "星位序列循环",
+      "source": "https://slaythespire2.net/zh-CN/build/regent#build-alignment-loop",
+      "sourceKind": "guide",
+      "core": [
+        {
+          "id": "ALIGNMENT",
+          "name": "星位序列",
+          "resolved": true
+        },
+        {
+          "id": "GLOW",
+          "name": "辉光",
+          "resolved": true
+        },
+        {
+          "id": "GUARDS",
+          "name": "护驾！！！",
+          "resolved": true
+        },
+        {
+          "id": "BEGONE",
+          "name": "下去！",
+          "resolved": true
+        },
+        {
+          "id": "CHARGE",
+          "name": "冲锋！！",
+          "resolved": true
+        }
+      ],
+      "support": [
+        {
+          "id": "TYRANNY",
+          "name": "暴政",
+          "resolved": true
+        },
+        {
+          "id": "BIG_BANG",
+          "name": "大爆炸",
+          "resolved": true
+        },
+        {
+          "id": "RADIATE",
+          "name": "辐射",
+          "resolved": true
+        },
+        {
+          "id": "STARDUST",
+          "name": "星尘",
+          "resolved": true
+        },
+        {
+          "id": "CHILD_OF_THE_STARS",
+          "name": "群星之子",
+          "resolved": true
+        },
+        {
+          "id": "DECISIONS_DECISIONS",
+          "name": "抉择，抉择",
+          "resolved": true
+        },
+        {
+          "id": "PARTICLE_WALL",
+          "name": "粒子墙",
+          "resolved": true
+        }
+      ],
+      "relics": []
+    },
+    {
+      "id": "regent:sovereign-blade-forge",
+      "character": "regent",
+      "name": "君王之剑铸造流",
+      "source": "https://slaythespire2.net/zh-CN/build/regent#build-sovereign-blade-forge",
+      "sourceKind": "guide",
+      "core": [
+        {
+          "id": "SUMMON_FORTH",
+          "name": "征召上前",
+          "resolved": true
+        },
+        {
+          "id": "SEEKING_EDGE",
+          "name": "追踪之刃",
+          "resolved": true
+        },
+        {
+          "id": "FURNACE",
+          "name": "熔炉",
+          "resolved": true
+        },
+        {
+          "id": "BULWARK",
+          "name": "铸墙",
+          "resolved": true
+        },
+        {
+          "id": "CONQUEROR",
+          "name": "征服者",
+          "resolved": true
+        }
+      ],
+      "support": [
+        {
+          "id": "WROUGHT_IN_WAR",
+          "name": "战火铸就",
+          "resolved": true
+        },
+        {
+          "id": "SPOILS_OF_BATTLE",
+          "name": "战利品",
+          "resolved": true
+        },
+        {
+          "id": "THE_SMITH",
+          "name": "铸剑者",
+          "resolved": true
+        },
+        {
+          "id": "REFINE_BLADE",
+          "name": "淬炼刀刃",
+          "resolved": true
+        },
+        {
+          "id": "SWORD_SAGE",
+          "name": "剑圣",
+          "resolved": true
+        },
+        {
+          "id": "BEAT_INTO_SHAPE",
+          "name": "锻打成型",
+          "resolved": true
+        },
+        {
+          "id": "BIG_BANG",
+          "name": "大爆炸",
+          "resolved": true
+        }
+      ],
+      "relics": [
+        {
+          "id": "FENCING_MANUAL",
+          "name": "击剑指南",
+          "resolved": true
+        },
+        {
+          "id": "DIVINE_RIGHT",
+          "name": "天赋君权",
+          "resolved": true
+        }
+      ]
+    },
+    {
+      "id": "regent:void-form",
+      "character": "regent",
+      "name": "虚空形态流",
+      "source": "https://slaythespire2.net/zh-CN/build/regent#build-void-form",
+      "sourceKind": "guide",
+      "core": [
+        {
+          "id": "VOID_FORM",
+          "name": "虚空形态",
+          "resolved": true
+        },
+        {
+          "id": "SEVEN_STARS",
+          "name": "七星",
+          "resolved": true
+        },
+        {
+          "id": "CONVERGENCE",
+          "name": "汇流",
+          "resolved": true
+        }
+      ],
+      "support": [
+        {
+          "id": "GENESIS",
+          "name": "创世纪",
+          "resolved": true
+        },
+        {
+          "id": "BULWARK",
+          "name": "铸墙",
+          "resolved": true
+        },
+        {
+          "id": "COMET",
+          "name": "彗星",
+          "resolved": true
+        },
+        {
+          "id": "REFLECT",
+          "name": "倒映",
+          "resolved": true
+        },
+        {
+          "id": "GLOW",
+          "name": "辉光",
+          "resolved": true
+        }
+      ],
+      "relics": []
+    },
+    {
+      "id": "regent:card-creation",
+      "character": "regent",
+      "name": "造牌流",
+      "source": "https://slaythespire2.net/zh-CN/build/regent#build-card-creation",
+      "sourceKind": "guide",
+      "core": [
+        {
+          "id": "SPECTRUM_SHIFT",
+          "name": "光谱偏移",
+          "resolved": true
+        },
+        {
+          "id": "ARSENAL",
+          "name": "武器库",
+          "resolved": true
+        },
+        {
+          "id": "PILLAR_OF_CREATION",
+          "name": "创世之柱",
+          "resolved": true
+        },
+        {
+          "id": "QUASAR",
+          "name": "类星体",
+          "resolved": true
+        }
+      ],
+      "support": [
+        {
+          "id": "MANIFEST_AUTHORITY",
+          "name": "君权自授",
+          "resolved": true
+        },
+        {
+          "id": "BUNDLE_OF_JOY",
+          "name": "新生之喜",
+          "resolved": true
+        },
+        {
+          "id": "SUPERMASSIVE",
+          "name": "超质量体",
+          "resolved": true
+        },
+        {
+          "id": "HEIRLOOM_HAMMER",
+          "name": "传承之锤",
+          "resolved": true
+        },
+        {
+          "id": "CRASH_LANDING",
+          "name": "迫降",
+          "resolved": true
+        }
+      ],
+      "relics": []
+    },
+    {
+      "id": "necrobinder:soul-cycle",
+      "character": "necrobinder",
+      "name": "灵魂循环",
+      "source": "https://slaythespire2.net/zh-CN/build/necrobinder#build-soul-cycle",
+      "sourceKind": "guide",
+      "core": [
+        {
+          "id": "GRAVE_WARDEN",
+          "name": "守墓人",
+          "resolved": true
+        },
+        {
+          "id": "CAPTURE_SPIRIT",
+          "name": "捕捉灵魂",
+          "resolved": true
+        },
+        {
+          "id": "DIRGE",
+          "name": "挽歌",
+          "resolved": true
+        },
+        {
+          "id": "HAUNT",
+          "name": "纠缠",
+          "resolved": true
+        },
+        {
+          "id": "SOUL_STORM",
+          "name": "灵魂风暴",
+          "resolved": true
+        }
+      ],
+      "support": [
+        {
+          "id": "REAVE",
+          "name": "剥夺",
+          "resolved": true
+        },
+        {
+          "id": "SEVERANCE",
+          "name": "切断",
+          "resolved": true
+        },
+        {
+          "id": "DEATH_MARCH",
+          "name": "死亡行军",
+          "resolved": true
+        },
+        {
+          "id": "DEVOUR_LIFE",
+          "name": "吞噬生命",
+          "resolved": true
+        },
+        {
+          "id": "BORROWED_TIME",
+          "name": "预借时间",
+          "resolved": true
+        },
+        {
+          "id": "UNDEATH",
+          "name": "不死",
+          "resolved": true
+        },
+        {
+          "id": "SEANCE",
+          "name": "降灵",
+          "resolved": true
+        }
+      ],
+      "relics": [
+        {
+          "id": "FUNERARY_MASK",
+          "name": "葬礼面具",
+          "resolved": true
+        }
+      ]
+    },
+    {
+      "id": "necrobinder:doom-execute",
+      "character": "necrobinder",
+      "name": "灾厄斩杀",
+      "source": "https://slaythespire2.net/zh-CN/build/necrobinder#build-doom-execute",
+      "sourceKind": "guide",
+      "core": [
+        {
+          "id": "NO_ESCAPE",
+          "name": "无处可逃",
+          "resolved": true
+        },
+        {
+          "id": "NEGATIVE_PULSE",
+          "name": "负能量脉冲",
+          "resolved": true
+        },
+        {
+          "id": "DEATHBRINGER",
+          "name": "死亡使者",
+          "resolved": true
+        },
+        {
+          "id": "COUNTDOWN",
+          "name": "倒数计时",
+          "resolved": true
+        },
+        {
+          "id": "SLEIGHT_OF_FLESH",
+          "name": "血肉戏法",
+          "resolved": true
+        }
+      ],
+      "support": [
+        {
+          "id": "DEATHS_DOOR",
+          "name": "死亡之门",
+          "resolved": true
+        },
+        {
+          "id": "BLIGHT_STRIKE",
+          "name": "荒疫打击",
+          "resolved": true
+        },
+        {
+          "id": "SCOURGE",
+          "name": "鞭打",
+          "resolved": true
+        },
+        {
+          "id": "SHROUD",
+          "name": "厄运之衣",
+          "resolved": true
+        },
+        {
+          "id": "END_OF_DAYS",
+          "name": "末日降临",
+          "resolved": true
+        },
+        {
+          "id": "TIMES_UP",
+          "name": "大限已至",
+          "resolved": true
+        },
+        {
+          "id": "OBLIVION",
+          "name": "湮灭",
+          "resolved": true
+        },
+        {
+          "id": "DEFY",
+          "name": "违逆",
+          "resolved": true
+        },
+        {
+          "id": "ENFEEBLING_TOUCH",
+          "name": "弱化之触",
+          "resolved": true
+        }
+      ],
+      "relics": [
+        {
+          "id": "UNDYING_SIGIL",
+          "name": "不死符文",
+          "resolved": true
+        },
+        {
+          "id": "BOOK_REPAIR_KNIFE",
+          "name": "修书小刀",
+          "resolved": true
+        },
+        {
+          "id": "UNSETTLING_LAMP",
+          "name": "不安油灯",
+          "resolved": true
+        }
+      ]
+    },
+    {
+      "id": "necrobinder:osty",
+      "character": "necrobinder",
+      "name": "奥斯提召唤",
+      "source": "https://slaythespire2.net/zh-CN/build/necrobinder#build-osty",
+      "sourceKind": "guide",
+      "core": [
+        {
+          "id": "FETCH",
+          "name": "取回",
+          "resolved": true
+        },
+        {
+          "id": "FLATTEN",
+          "name": "重压",
+          "resolved": true
+        },
+        {
+          "id": "RATTLE",
+          "name": "猛晃",
+          "resolved": true
+        },
+        {
+          "id": "SQUEEZE",
+          "name": "榨取",
+          "resolved": true
+        },
+        {
+          "id": "CALCIFY",
+          "name": "钙化",
+          "resolved": true
+        }
+      ],
+      "support": [
+        {
+          "id": "PULL_AGGRO",
+          "name": "吸引仇恨",
+          "resolved": true
+        },
+        {
+          "id": "INVOKE",
+          "name": "唤起",
+          "resolved": true
+        },
+        {
+          "id": "AFTERLIFE",
+          "name": "来生",
+          "resolved": true
+        },
+        {
+          "id": "SPUR",
+          "name": "增生",
+          "resolved": true
+        },
+        {
+          "id": "REANIMATE",
+          "name": "死者苏生",
+          "resolved": true
+        },
+        {
+          "id": "NECRO_MASTERY",
+          "name": "亡灵精通",
+          "resolved": true
+        },
+        {
+          "id": "RIGHT_HAND_HAND",
+          "name": "得力助手",
+          "resolved": true
+        },
+        {
+          "id": "SNAP",
+          "name": "响指",
+          "resolved": true
+        },
+        {
+          "id": "POKE",
+          "name": "戳击",
+          "resolved": true
+        },
+        {
+          "id": "SACRIFICE",
+          "name": "牺牲",
+          "resolved": true
+        }
+      ],
+      "relics": [
+        {
+          "id": "BONE_FLUTE",
+          "name": "骨笛",
+          "resolved": true
+        },
+        {
+          "id": "BOOKMARK",
+          "name": "书签",
+          "resolved": true
+        }
+      ]
+    },
+    {
+      "id": "necrobinder:ethereal",
+      "character": "necrobinder",
+      "name": "虚无流",
+      "source": "https://slaythespire2.net/zh-CN/build/necrobinder#build-ethereal",
+      "sourceKind": "guide",
+      "core": [
+        {
+          "id": "PULL_FROM_BELOW",
+          "name": "亡魂牵引",
+          "resolved": true
+        },
+        {
+          "id": "PAGESTORM",
+          "name": "书页风暴",
+          "resolved": true
+        },
+        {
+          "id": "SPIRIT_OF_ASH",
+          "name": "灰烬之灵",
+          "resolved": true
+        },
+        {
+          "id": "BANSHEES_CRY",
+          "name": "女妖之嚎",
+          "resolved": true
+        },
+        {
+          "id": "CALL_OF_THE_VOID",
+          "name": "虚空之唤",
+          "resolved": true
+        }
+      ],
+      "support": [
+        {
+          "id": "SCULPTING_STRIKE",
+          "name": "雕琢打击",
+          "resolved": true
+        },
+        {
+          "id": "VEILPIERCER",
+          "name": "刺破帷幕",
+          "resolved": true
+        },
+        {
+          "id": "DREDGE",
+          "name": "清淤",
+          "resolved": true
+        },
+        {
+          "id": "GRAVEBLAST",
+          "name": "坟冢爆射",
+          "resolved": true
+        },
+        {
+          "id": "EIDOLON",
+          "name": "幻景",
+          "resolved": true
+        },
+        {
+          "id": "DEFY",
+          "name": "违逆",
+          "resolved": true
+        }
+      ],
+      "relics": []
+    },
+    {
+      "id": "necrobinder:reaper-big-hit",
+      "character": "necrobinder",
+      "name": "死神重击",
+      "source": "https://slaythespire2.net/zh-CN/build/necrobinder#build-reaper-big-hit",
+      "sourceKind": "guide",
+      "core": [
+        {
+          "id": "REAPER_FORM",
+          "name": "死神形态",
+          "resolved": true
+        },
+        {
+          "id": "THE_SCYTHE",
+          "name": "巨镰",
+          "resolved": true
+        },
+        {
+          "id": "ERADICATE",
+          "name": "根除",
+          "resolved": true
+        },
+        {
+          "id": "LETHALITY",
+          "name": "致死性",
+          "resolved": true
+        }
+      ],
+      "support": [
+        {
+          "id": "FEAR",
+          "name": "恐惧",
+          "resolved": true
+        },
+        {
+          "id": "PUTREFY",
+          "name": "腐败",
+          "resolved": true
+        },
+        {
+          "id": "DEBILITATE",
+          "name": "摧残",
+          "resolved": true
+        },
+        {
+          "id": "BORROWED_TIME",
+          "name": "预借时间",
+          "resolved": true
+        },
+        {
+          "id": "HANG",
+          "name": "吊杀",
+          "resolved": true
+        }
+      ],
+      "relics": []
+    }
+  ],
+  "unresolved": []
+}

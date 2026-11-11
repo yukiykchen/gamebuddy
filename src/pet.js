@@ -53,6 +53,7 @@ let thinkingStartedAtByTask = {};
 let thinkingDurationsByTask = {};
 let thinkingTimer = 0;
 let guideReopenPending = false;
+let milestoneTimer = 0;
 
 const CARD_PRESENTATION = {
   card_reward: { mark: '牌', kicker: '选牌建议' },
@@ -192,7 +193,7 @@ function applyPose() {
   speech.classList.toggle('has-details', petState.guideReopenAvailable || (petState.cardVisible && !cardExpanded));
   speech.setAttribute('aria-label', petState.guideReopenAvailable
     ? '查看本场敌人攻略'
-    : petState.cardVisible && !cardExpanded ? '展开当前建议的理由' : '打开 GameBuddy 主面板');
+    : petState.cardVisible && !cardExpanded ? '展开当前建议的理由' : 'GameBuddy 状态');
   refreshCardMeta();
 }
 
@@ -201,6 +202,17 @@ function say(message, fromTour = false) {
   speechText.textContent = message;
   speech.title = message;
   speech.classList.add('visible');
+}
+
+function showArchetypeMilestone(milestone) {
+  if (!milestone?.message) return;
+  window.clearTimeout(milestoneTimer);
+  stage.classList.toggle('archetype-formed', milestone.level === 'formed');
+  stage.classList.add('archetype-milestone');
+  say(milestone.message);
+  milestoneTimer = window.setTimeout(() => {
+    stage.classList.remove('archetype-milestone', 'archetype-formed');
+  }, milestone.level === 'formed' ? 3600 : 3000);
 }
 
 function restAdvicePoints(recommendation) {
@@ -397,8 +409,10 @@ function setEncounterGuideState(state) {
   const canReopen = Boolean(state?.available && !state?.visible);
   petState.guideReopenAvailable = canReopen;
   if (canReopen) {
-    say('查看攻略');
-    speech.title = state.title ? `查看「${state.title}」的打法` : '查看本场敌人攻略';
+    if (state.kind !== 'normal') {
+      say('查看攻略');
+      speech.title = state.title ? `查看「${state.title}」的打法` : '查看本场敌人攻略';
+    }
   } else if (wasAvailable && !petState.guideVisible) {
     say(petState.cardVisible ? cardTitle.textContent : petState.live ? '我在看着这局' : '正在连接游戏');
   }
@@ -409,6 +423,7 @@ function setStatus(status) {
   const replay = status.status === 'live' && status.mode === 'replay';
   petState.live = status.status === 'live';
   statusDot.classList.remove('live', 'alert');
+  statusLabel.title = status.detail || '';
   if (replay) {
     connectionLabel = '演示中';
     statusDot.classList.add('live');
@@ -421,11 +436,16 @@ function setStatus(status) {
     statusDot.classList.add('alert');
     connectionLabel = status.status === 'stale' ? '数据延迟' : '数据异常';
     say(status.status === 'stale' ? '游戏状态停住了' : '数据格式需要检查');
+  } else if (status.status === 'storage_error' || status.status === 'processing_error') {
+    statusDot.classList.add('alert');
+    connectionLabel = status.status === 'storage_error' ? '记录写入失败' : '数据处理异常';
+    say(connectionLabel);
   } else {
     connectionLabel = status.status === 'connected' ? '等待对局' : status.status === 'connecting' ? '连接中' : status.status === 'demo' ? '演示中' : '未连接';
     if (!hasAdvice()) {
       if (status.status === 'connecting') say('正在连接游戏');
       else if (status.status === 'connected') say('等待开始对局');
+      else if (status.status === 'disconnected') say('游戏连接已断开，正在重连');
       else if (status.status !== 'demo') say('等待游戏启动');
     }
   }
@@ -499,9 +519,7 @@ speech.addEventListener('click', async () => {
   }
   if (petState.cardVisible && !cardExpanded) {
     setCardExpanded(true);
-    return;
   }
-  window.windowControls?.openMain();
 });
 
 petButton.addEventListener('pointerdown', event => {
@@ -521,11 +539,9 @@ petButton.addEventListener('pointermove', event => {
 
 function finishPetPointer(event) {
   if (!dragState || event.pointerId !== dragState.pointerId) return;
-  const wasDragged = dragState.moved;
   window.windowControls?.endPetDrag();
   if (petButton.hasPointerCapture(event.pointerId)) petButton.releasePointerCapture(event.pointerId);
   dragState = undefined;
-  if (!wasDragged) window.windowControls?.openMain();
 }
 
 petButton.addEventListener('pointerup', finishPetPointer);
@@ -548,6 +564,7 @@ window.gamebuddyBridge?.onRecommendation(setRecommendation);
 window.gamebuddyBridge?.onEncounterGuide(setEncounterGuide);
 window.gamebuddyBridge?.onEncounterGuideState(setEncounterGuideState);
 window.gamebuddyBridge?.onCardRecommendation(setCardRecommendation);
+window.gamebuddyBridge?.onArchetypeMilestone(showArchetypeMilestone);
 window.gamebuddyBridge?.onAgentThinking(setAgentThinking);
 window.gamebuddyBridge?.onLlmMode(mode => {
   llmMode = mode || { enabled: false, thinking: false };

@@ -6,26 +6,30 @@ const { validateMessage, validateState, stateSignature } = require('./protocol')
 const sourceUrl = process.env.GAMEBUDDY_SOURCE_URL || 'ws://127.0.0.1:27182';
 const outputPath = process.env.GAMEBUDDY_RECORD_OUTPUT || path.join(__dirname, 'fixtures', 'recorded-run.json');
 const eventOutputPath = process.env.GAMEBUDDY_RECORD_EVENTS_OUTPUT || outputPath.replace(/\.json$/i, '.events.json');
+const factOutputPath = process.env.GAMEBUDDY_RECORD_FACTS_OUTPUT || outputPath.replace(/\.json$/i, '.facts.json');
 const maxMs = Number(process.env.GAMEBUDDY_RECORD_MS || 0);
 const snapshots = [];
 const events = [];
+const facts = [];
+const factIds = new Set();
 let socket;
 let finished = false;
 let retryTimer;
 let stopTimer;
 let lastSignature = '';
-let lastEventSignature = '';
 
 function writeOutput() {
-  if (snapshots.length === 0) {
-    console.error('No valid state snapshots were recorded.');
+  if (snapshots.length === 0 && facts.length === 0) {
+    console.error('No valid state snapshots or facts were recorded.');
     return false;
   }
   fs.mkdirSync(path.dirname(outputPath), { recursive: true });
   fs.writeFileSync(outputPath, `${JSON.stringify(snapshots, null, 2)}\n`);
   fs.writeFileSync(eventOutputPath, `${JSON.stringify(events, null, 2)}\n`);
+  fs.writeFileSync(factOutputPath, `${JSON.stringify(facts, null, 2)}\n`);
   console.log(`Recorded ${snapshots.length} snapshots to ${outputPath}`);
   console.log(`Recorded ${events.length} events to ${eventOutputPath}`);
+  console.log(`Recorded ${facts.length} facts to ${factOutputPath}`);
   return true;
 }
 
@@ -53,10 +57,14 @@ function connect() {
         console.error(`Skipped invalid bridge message: ${messageResult.reason}`);
         return;
       }
+      if (message.type === 'fact') {
+        if (factIds.has(message.data.eventId)) return;
+        factIds.add(message.data.eventId);
+        facts.push(message.data);
+        console.log(`fact ${facts.length}: ${message.data.eventType} ${message.data.eventId}`);
+        return;
+      }
       if (message.type === 'event') {
-        const signature = JSON.stringify({ name: message.name, data: message.data });
-        if (signature === lastEventSignature) return;
-        lastEventSignature = signature;
         events.push(message);
         console.log(`event ${events.length}: ${message.name}`);
         return;

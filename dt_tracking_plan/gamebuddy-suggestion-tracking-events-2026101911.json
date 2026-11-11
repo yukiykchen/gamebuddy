@@ -1,0 +1,18 @@
+{
+  "app_id": "dt_cszwjxlyxgxt",
+  "batch_id": "19785",
+  "platform": "Windows",
+  "events": [
+    {"event_code": "app_start", "dt_pgid": "desktop", "dt_eid": "", "params": ["surface"]},
+    {"event_code": "first_open", "dt_pgid": "desktop", "dt_eid": "", "params": ["surface"]},
+    {"event_code": "dt_appout", "dt_pgid": "desktop", "dt_eid": "", "params": ["stay_duration"]},
+    {"event_code": "dt_pgin", "dt_pgid": "main_panel", "dt_eid": "", "params": []},
+    {"event_code": "dt_pgout", "dt_pgid": "main_panel", "dt_eid": "", "params": ["stay_duration"]},
+    {"event_code": "dt_pgin", "dt_pgid": "pet", "dt_eid": "", "params": []},
+    {"event_code": "dt_pgout", "dt_pgid": "pet", "dt_eid": "", "params": ["stay_duration"]},
+    {"event_code": "bridge_connect_result", "dt_pgid": "", "dt_eid": "", "params": ["result"]},
+    {"event_code": "dt_imp", "dt_pgid": "pet", "dt_eid": "suggestion_card", "params": ["feature_name", "source"]},
+    {"event_code": "dt_imp", "dt_pgid": "pet", "dt_eid": "encounter_guide", "params": ["feature_name", "source"]},
+    {"event_code": "llm_review_result", "dt_pgid": "", "dt_eid": "", "params": ["feature_name", "result"]}
+  ]
+}
